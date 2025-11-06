@@ -176,6 +176,400 @@ app/(main)/{module}/{sub-module}/
 
 ---
 
+## Sitemap
+
+### Overview
+This section provides a complete navigation structure of all pages, tabs, and dialogues in the sub-module. The sitemap helps understand the user journey and the relationship between different UI elements.
+
+### Page Hierarchy
+
+```mermaid
+graph TD
+    A["{Sub-Module} Module"] --> B["List Page"]
+    A --> C["Detail Page"]
+    A --> D["Create Page"]
+    A --> E["Edit Page"]
+
+    B --> B1["Tab: All Items"]
+    B --> B2["Tab: Active"]
+    B --> B3["Tab: Archived"]
+
+    C --> C1["Tab: Overview"]
+    C --> C2["Tab: History"]
+    C --> C3["Tab: Related"]
+
+    B --> BD1["Dialog: Quick Create"]
+    B --> BD2["Dialog: Bulk Actions"]
+    B --> BD3["Dialog: Export"]
+
+    C --> CD1["Dialog: Edit"]
+    C --> CD2["Dialog: Delete Confirm"]
+    C --> CD3["Dialog: Status Change"]
+
+    D --> DD1["Dialog: Cancel Confirm"]
+
+    E --> ED1["Dialog: Save Draft"]
+    E --> ED2["Dialog: Discard Changes"]
+```
+
+### Pages
+
+#### 1. List Page
+**Route**: `/app/(main)/{module}/{sub-module}`
+**File**: `page.tsx`
+**Purpose**: Display paginated list of all entities with filtering and sorting capabilities
+
+**Sections**:
+- Header: Title, breadcrumbs, primary actions (Create New, Import, Export)
+- Filters: Quick filters, advanced filter panel
+- Search: Global search with autocomplete
+- Data Table: Sortable columns, row actions, bulk selection
+- Pagination: Page size selector, page navigation
+
+**Tabs** (if applicable):
+- **All Items**: Shows all entities regardless of status
+- **Active**: Filtered view showing only active entities
+- **Draft**: Entities in draft status
+- **Archived**: Soft-deleted or archived entities
+- **Custom Filters**: User-saved filter combinations
+
+**Dialogs Accessible From This Page**:
+- **Quick Create Dialog**: Rapid entity creation with minimal fields
+- **Bulk Actions Dialog**: Apply actions to multiple selected entities
+- **Export Dialog**: Configure and download data exports
+- **Filter Save Dialog**: Save current filter configuration
+- **Import Dialog**: Upload and import bulk data
+
+**Navigation Targets**:
+- Click row → Navigate to Detail Page
+- Create button → Navigate to Create Page
+- Edit action → Navigate to Edit Page
+
+---
+
+#### 2. Detail Page
+**Route**: `/app/(main)/{module}/{sub-module}/[id]`
+**File**: `[id]/page.tsx`
+**Purpose**: Display comprehensive view of a single entity with all related information
+
+**Sections**:
+- Header: Entity title, status badge, action menu
+- Summary Card: Key information at a glance
+- Tabbed Content Area: Organized information sections
+- Activity Timeline: Recent changes and actions
+- Related Entities: Links to associated records
+
+**Tabs**:
+- **Overview**: Main entity details, core fields, status information
+- **Details**: Extended fields, additional information, metadata
+- **History**: Audit trail, change log, approval history
+- **Related Items**: Associated entities, references, dependencies
+- **Documents**: Attached files, images, supporting documents
+- **Comments**: Discussion thread, notes, internal communication
+- **Activity**: Timeline of all actions and changes
+
+**Dialogs Accessible From This Page**:
+- **Edit Dialog**: Quick edit for specific fields (alternative to full edit page)
+- **Delete Confirmation**: Confirm deletion with reason and impact warning
+- **Status Change Dialog**: Change entity status with notes and validation
+- **Share Dialog**: Configure sharing and permissions
+- **Print Preview Dialog**: Configure and preview printable format
+- **Clone Dialog**: Create copy with field selection
+- **Archive Confirmation**: Soft delete with reason requirement
+- **Approval Dialog**: Submit for approval with comments
+- **Rejection Dialog**: Reject with reason and feedback
+
+**Navigation Targets**:
+- Edit button → Navigate to Edit Page
+- Related entity links → Navigate to related Detail Pages
+- Back to list → Navigate to List Page
+
+---
+
+#### 3. Create Page
+**Route**: `/app/(main)/{module}/{sub-module}/new`
+**File**: `new/page.tsx`
+**Purpose**: Form interface for creating a new entity with full validation
+
+**Sections**:
+- Header: "Create New {Entity}" title, breadcrumbs
+- Form Sections: Organized field groups with progressive disclosure
+- Required Fields Indicator: Visual distinction for mandatory fields
+- Validation Messages: Real-time field-level validation feedback
+- Actions Footer: Save, Save as Draft, Cancel buttons
+
+**Form Structure**:
+- **Basic Information**: Core required fields
+- **Details**: Extended optional fields
+- **Configuration**: Settings and preferences
+- **Attachments**: File upload area
+- **Notes**: Free-text notes field
+
+**Tabs** (for complex entities):
+- **General**: Basic entity information
+- **Advanced**: Additional configuration options
+- **Permissions**: Access control settings
+- **Metadata**: Tags, categories, custom fields
+
+**Dialogs Accessible From This Page**:
+- **Cancel Confirmation**: Confirm abandoning form with unsaved changes
+- **Draft Saved Notification**: Confirmation of draft save
+- **Lookup Dialog**: Search and select related entities
+- **Field Help Dialog**: Contextual help for complex fields
+- **Validation Error Summary**: Scrollable list of all validation errors
+- **Template Selection**: Choose from predefined templates
+
+**Navigation Targets**:
+- Cancel → Navigate back to List Page
+- Save → Navigate to Detail Page of created entity
+- Save as Draft → Stay on page with success message
+
+---
+
+#### 4. Edit Page
+**Route**: `/app/(main)/{module}/{sub-module}/[id]/edit`
+**File**: `[id]/edit/page.tsx`
+**Purpose**: Form interface for modifying an existing entity
+
+**Sections**:
+- Header: "Edit {Entity Name}" title, breadcrumbs, entity status
+- Form Sections: Pre-populated fields with current values
+- Change Tracking: Visual indicators for modified fields
+- Version Warning: Alert if entity was modified by another user
+- Actions Footer: Update, Cancel, Delete buttons
+
+**Form Structure**: (Same as Create Page)
+
+**Tabs**: (Same as Create Page)
+
+**Dialogs Accessible From This Page**:
+- **Discard Changes Confirmation**: Confirm abandoning unsaved modifications
+- **Save Draft Dialog**: Save current state without validation
+- **Delete Confirmation**: Confirm entity deletion with impact analysis
+- **Concurrent Edit Warning**: Alert when entity modified by another user
+- **Field Comparison**: Compare current values with original values
+- **Validation Override**: Request approval for validation rule exceptions
+
+**Navigation Targets**:
+- Cancel → Navigate back to Detail Page
+- Update → Navigate to Detail Page with success message
+- Delete → Navigate to List Page with success message
+
+---
+
+### Dialogs
+
+#### Modal Dialogs (Full Overlay)
+
+##### Quick Create Dialog
+**Trigger**: "Quick Create" button on List Page
+**Purpose**: Rapid entity creation with only required fields
+**Fields**: Minimal required fields only (3-5 fields)
+**Actions**: Create, Cancel
+**Behavior**: Creates entity and closes dialog, remains on List Page
+
+##### Edit Dialog
+**Trigger**: "Quick Edit" action on Detail Page or List row
+**Purpose**: Edit specific fields without full edit page navigation
+**Fields**: Editable subset of entity fields
+**Actions**: Save, Cancel
+**Behavior**: Updates entity and closes dialog, remains on current page
+
+##### Delete Confirmation Dialog
+**Trigger**: Delete action on Detail Page or List row
+**Purpose**: Confirm deletion with impact assessment
+**Content**:
+- Warning message about irreversibility
+- Impact summary (related entities, dependencies)
+- Reason text field (optional or required)
+- Checkbox: "I understand this action cannot be undone"
+**Actions**: Delete (destructive), Cancel
+**Behavior**: Deletes entity, navigates to List Page
+
+##### Status Change Dialog
+**Trigger**: Status change action on Detail Page
+**Purpose**: Change entity status with validation and notes
+**Content**:
+- Current status → New status transition display
+- Validation checks and warnings
+- Required/optional comment field
+- Additional required fields (based on status)
+**Actions**: Confirm, Cancel
+**Behavior**: Updates status, closes dialog, refreshes page
+
+##### Bulk Actions Dialog
+**Trigger**: Bulk actions menu on List Page (after selecting multiple rows)
+**Purpose**: Apply action to multiple entities simultaneously
+**Content**:
+- Selected items count and preview list
+- Action selector (Status change, Delete, Export, etc.)
+- Action-specific fields
+- Progress indicator during processing
+**Actions**: Apply, Cancel
+**Behavior**: Processes all selected items, shows results summary
+
+##### Export Dialog
+**Trigger**: Export button on List Page
+**Purpose**: Configure data export parameters
+**Content**:
+- Format selector (CSV, Excel, PDF)
+- Column selection
+- Filter application option
+- Date range selector
+**Actions**: Export, Cancel
+**Behavior**: Generates file, triggers download, closes dialog
+
+---
+
+#### Drawer Dialogs (Side Panel)
+
+##### Filter Panel
+**Trigger**: Filter button on List Page
+**Purpose**: Apply advanced filtering criteria
+**Sections**:
+- Quick filters (predefined)
+- Field-specific filters
+- Date range filters
+- Custom filter builder
+**Actions**: Apply, Reset, Save Filter
+**Behavior**: Filters list, remains open for refinement
+
+##### Activity Timeline
+**Trigger**: Activity icon on Detail Page
+**Purpose**: View chronological history of entity changes
+**Content**:
+- Timeline of all actions
+- User avatars and timestamps
+- Change details with before/after values
+- Filtering by action type or user
+**Actions**: Close
+**Behavior**: Read-only view, closes on outside click
+
+##### Comments Panel
+**Trigger**: Comments icon on Detail Page
+**Purpose**: View and add comments on entity
+**Content**:
+- Comment thread (newest first)
+- Rich text editor for new comment
+- Mention functionality (@user)
+- File attachment support
+**Actions**: Post Comment, Close
+**Behavior**: Adds comment, updates thread in real-time
+
+---
+
+#### Toast Notifications (Non-blocking)
+
+##### Success Notifications
+**Triggers**: Successful operations (Create, Update, Delete)
+**Duration**: 3-5 seconds auto-dismiss
+**Content**: Success icon, brief message, optional action link
+**Position**: Top-right corner
+**Actions**: Dismiss (X), Undo (if applicable)
+
+##### Error Notifications
+**Triggers**: Failed operations, validation errors
+**Duration**: Auto-dismiss after 8 seconds or manual dismiss
+**Content**: Error icon, error message, optional help link
+**Position**: Top-right corner
+**Actions**: Dismiss (X), Retry (if applicable)
+
+##### Warning Notifications
+**Triggers**: Important notices that don't block workflow
+**Duration**: Manual dismiss only
+**Content**: Warning icon, warning message, recommended action
+**Position**: Top-right corner
+**Actions**: Dismiss (X), View Details
+
+---
+
+### Navigation Flow Diagram
+
+```mermaid
+graph LR
+    A[List Page] -->|Click Row| B[Detail Page]
+    A -->|Create Button| C[Create Page]
+    B -->|Edit Button| D[Edit Page]
+    C -->|Save| B
+    C -->|Cancel| A
+    D -->|Update| B
+    D -->|Cancel| B
+    D -->|Delete| A
+    B -->|Back| A
+
+    A -->|Quick Create| A1[Quick Create Dialog]
+    A1 -->|Save| A
+
+    B -->|Quick Edit| B1[Edit Dialog]
+    B1 -->|Save| B
+
+    B -->|Delete| B2[Delete Confirm Dialog]
+    B2 -->|Confirm| A
+
+    B -->|Status Change| B3[Status Change Dialog]
+    B3 -->|Confirm| B
+```
+
+---
+
+### User Journey Examples
+
+#### Journey 1: Create New Entity
+1. User lands on **List Page**
+2. Clicks "Create New" button
+3. Navigates to **Create Page**
+4. Fills required fields across tabs
+5. Clicks "Save"
+6. Success toast appears
+7. Navigates to **Detail Page** of new entity
+
+#### Journey 2: Quick Edit from List
+1. User on **List Page**
+2. Clicks quick edit icon on row
+3. **Edit Dialog** opens
+4. Modifies fields
+5. Clicks "Save"
+6. Dialog closes
+7. Success toast appears
+8. List refreshes with updated data
+
+#### Journey 3: Bulk Status Change
+1. User on **List Page**
+2. Selects multiple rows (checkboxes)
+3. Clicks "Bulk Actions" button
+4. **Bulk Actions Dialog** opens
+5. Selects "Change Status" action
+6. Selects new status
+7. Clicks "Apply"
+8. Progress indicator shows
+9. Success summary appears
+10. Dialog closes
+11. List refreshes
+
+---
+
+### Accessibility Notes
+
+**Keyboard Navigation**:
+- List Page: Tab through rows, Enter to open detail
+- Forms: Tab order follows logical field sequence
+- Dialogs: Focus trap, Escape to close, Enter to confirm
+- Filters: Keyboard shortcuts for common actions
+
+**Screen Reader Support**:
+- ARIA labels on all interactive elements
+- Status announcements for async operations
+- Meaningful heading hierarchy
+- Form field associations with labels
+
+**Focus Management**:
+- Return focus to trigger element after dialog close
+- Logical focus sequence in forms
+- Skip links for main content areas
+- Focus indicators on all interactive elements
+
+---
+
 ## Data Flow
 
 ### Read Operations

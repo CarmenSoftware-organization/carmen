@@ -166,19 +166,29 @@ All inventory transactions fall into one of three categories:
 
 ### Transaction Type Matrix
 
-Complete matrix of all transaction types and their cost layer behaviors:
+Complete matrix of all 8 transaction types and their cost layer behaviors:
 
-| Transaction Type | Category | Layer Type | Creates New Lot? | Consumes Lots (FIFO)? | Module | Document Status Flow |
-|-----------------|----------|------------|------------------|----------------------|---------|---------------------|
-| **GRN (Goods Receipt)** | Receipt | LOT | ✅ Yes | ❌ No | Procurement | DRAFT → POSTED |
-| **Transfer In** | Receipt | LOT | ✅ Yes (new lot) | ❌ No | Inventory | DRAFT → POSTED |
-| **Store Requisition (Issue)** | Consumption | ADJUSTMENT | ❌ No | ✅ Yes | Store Operations | DRAFT → POSTED |
-| **Credit Note (Return)** | Consumption | ADJUSTMENT | ❌ No | ✅ Yes | Procurement | DRAFT → POSTED |
-| **Inventory Adjustment (Increase)** | Adjustment | LOT | ✅ Yes | ❌ No | Inventory | DRAFT → POSTED |
-| **Inventory Adjustment (Decrease)** | Adjustment | ADJUSTMENT | ❌ No | ✅ Yes | Inventory | DRAFT → POSTED |
-| **Write-Off/Scrap** | Consumption | ADJUSTMENT | ❌ No | ✅ Yes | Inventory | DRAFT → POSTED |
+| Transaction Type | Category | Layer Type | parent_lot_no | Creates New Lot? | Consumes From Parent? | Module | Use Case |
+|-----------------|----------|------------|---------------|------------------|----------------------|---------|----------|
+| **RECEIVE** | Receipt | LOT | NULL | ✅ Yes | ❌ No | Procurement | Goods receipt from supplier |
+| **TRANSFER_IN** | Receipt | LOT | NULL | ✅ Yes (new lot) | ❌ No | Inventory | Receive from another location |
+| **OPEN** | Balance | LOT | NULL | ✅ Yes | ❌ No | Period Mgmt | Opening balance for new period |
+| **CLOSE** | Balance | LOT | NULL | ✅ Yes | ❌ No | Period Mgmt | Closing balance revaluation |
+| **ISSUE** | Consumption | ADJUSTMENT | NOT NULL | ❌ No | ✅ Yes | Store Ops | Issue to production/sales |
+| **ADJ_IN** | Adjustment Up | ADJUSTMENT | NOT NULL | ❌ No | ✅ Yes* | Inventory | Increase (cannot exceed parent) |
+| **ADJ_OUT** | Adjustment Down | ADJUSTMENT | NOT NULL | ❌ No | ✅ Yes | Inventory | Decrease/write-off |
+| **TRANSFER_OUT** | Transfer | ADJUSTMENT | NOT NULL | ❌ No | ✅ Yes | Inventory | Send to another location |
+| **CN** | Credit Note | ADJUSTMENT | NOT NULL | ❌ No | ✅ Yes (QTY_RETURN) | Procurement | Vendor credit - return or discount |
 
-**Important Note**: Only transactions with status = POSTED create or update cost layers. DRAFT transactions do not affect inventory costs or quantities.
+**Layer Logic**:
+- **LOT Layer** (parent_lot_no IS NULL): Creates new independent lot with own balance
+- **ADJUSTMENT Layer** (parent_lot_no IS NOT NULL): References and consumes from parent lot
+
+**Important Notes**:
+- Only POSTED transactions create or update cost layers (DRAFT transactions don't affect inventory)
+- *ADJ_IN cannot increase quantity beyond parent lot's original receipt
+- CLOSE transaction revalues remaining inventory to period average (Periodic Average method only)
+- OPEN transaction creates opening balance at period average cost (next period)
 
 ## LOT Layer Specifications
 
@@ -454,28 +464,229 @@ An ADJUSTMENT layer records the consumption or adjustment of inventory from a sp
 // - MK-250116-002: remaining_quantity = 30.00000
 ```
 
-#### Rule 2: Credit Note (Return) (BR-LOT-005, BR-LOT-012)
-**When**: Inventory returned to vendor
-**Action**: Same as Issue - consume from oldest lot(s) using FIFO
-**Note**: Return credit value may differ from cost (handled separately in finance module)
+#### Rule 2: Credit Note (CN) - Comprehensive Handling (BR-LOT-005, BR-LOT-012, BR-CN-001 through BR-CN-008)
+**Transaction Type**: `CN` (Credit Note)
+
+**When**: Credit note is committed (DRAFT → COMMITTED)
+
+**Action**: Process based on CN operation type:
+1. **QUANTITY_RETURN**: Physical return of goods (creates ADJUSTMENT layer with `out_qty`)
+2. **AMOUNT_DISCOUNT**: Cost adjustment without physical return (zero-quantity cost adjustment)
+
+**Both operations**:
+- Trigger immediately on CN commit
+- Process based on configured cost method (FIFO or Periodic AVG)
+- Use transaction_type `CN` (distinct from generic ADJ_OUT)
+
+---
+
+##### CN QUANTITY_RETURN: Same-Lot Return
+
+**Scenario**: Return to the specific lot from original GRN receipt
 
 **Example**:
 ```typescript
-// Return 30 units to vendor
-// Available: MK-250115-001 (75 units @ $12.50)
+// Original GRN: MK-250115-001 (100 units @ $12.50)
+// CN: Return 30 units from same lot
 
+// ADJUSTMENT layer created:
 {
   adjustment_id: "ADJ-LAYER-2025-0004",
-  parent_lot_number: "MK-250115-0001",
-  transaction_type: "RETURN",
+  parent_lot_number: "MK-250115-001",  // Same lot as GRN
+  item_id: "ITEM-12345",
+  location_id: "LOC-KITCHEN",
+  transaction_date: "2025-01-20",
+  transaction_type: "CN",  // ⭐ Specific CN transaction type
   transaction_id: "CN-2025-0001",
   quantity: 30.00000,
-  unit_cost: 12.50000,
+  unit_cost: 12.50000,  // ⭐ Uses original lot cost
   total_cost: 375.00000,
   reason_code: "QUALITY_ISSUE",
-  notes: "Damaged during delivery"
+  notes: "Damaged goods - returning to vendor"
 }
+
+// Parent lot updated:
+// MK-250115-001: remaining_quantity = 70.00000 (100-30)
 ```
+
+**Key Points**:
+- Uses original lot's cost (maintains cost consistency)
+- Lot NOT depleted (remaining = 70 units)
+- Full audit trail preserved
+
+---
+
+##### CN QUANTITY_RETURN: Different-Lot Return (FIFO)
+
+**Scenario**: Return when original lot partially/fully consumed - uses FIFO consumption
+
+**Example**:
+```typescript
+// Lot State:
+// MK-250115-001: 20 units remaining (100-80 consumed)
+// MK-250120-001: 150 units remaining
+//
+// CN: Return 30 units (but original lot only has 20 left)
+
+// First ADJUSTMENT layer (consume all from original lot):
+{
+  adjustment_id: "ADJ-LAYER-2025-0005",
+  parent_lot_number: "MK-250115-001",  // Original lot
+  transaction_type: "CN",
+  transaction_id: "CN-2025-0002",
+  quantity: 20.00000,  // All remaining from original lot
+  unit_cost: 12.50000,
+  total_cost: 250.00000,
+  reason_code: "OVER_DELIVERED",
+  notes: "Return excess - Part 1"
+}
+
+// Second ADJUSTMENT layer (consume from next FIFO lot):
+{
+  adjustment_id: "ADJ-LAYER-2025-0006",
+  parent_lot_number: "MK-250120-001",  // Next oldest lot
+  transaction_type: "CN",
+  transaction_id: "CN-2025-0002",
+  quantity: 10.00000,  // Remaining needed (30-20)
+  unit_cost: 13.00000,  // Different cost from second lot
+  total_cost: 130.00000,
+  reason_code: "OVER_DELIVERED",
+  notes: "Return excess - Part 2"
+}
+
+// Total CN-2025-0002 cost: $250 + $130 = $380
+
+// Parent lots updated:
+// MK-250115-001: remaining_quantity = 0.00000 ⭐ LOT DEPLETED
+// MK-250120-001: remaining_quantity = 140.00000 (150-10)
+```
+
+**Lot Depletion**:
+- MK-250115-001: `SUM(in_qty) - SUM(out_qty) = 100 - (80+20) = 0` ✅ DEPLETED
+- No explicit flag needed, calculated from transaction history
+
+---
+
+##### CN AMOUNT_DISCOUNT: Cost Adjustment (Zero-Quantity)
+
+**Scenario**: Adjust inventory cost without physical return (e.g., volume discount, price negotiation)
+
+**Key Characteristics**:
+- `quantity = 0` (no physical movement)
+- `unit_cost = 0` (not applicable for zero-quantity)
+- `total_cost < 0` (negative = discount/cost reduction)
+- Links to affected lot via `parent_lot_number`
+
+**Example - Single Lot Discount**:
+```typescript
+// Original GRN: MK-250125-001 (200 units @ $15.00 = $3,000)
+// CN: $300 volume discount negotiated
+
+// ADJUSTMENT layer created:
+{
+  adjustment_id: "ADJ-LAYER-2025-0007",
+  parent_lot_number: "MK-250125-001",
+  item_id: "ITEM-12345",
+  location_id: "LOC-KITCHEN",
+  transaction_date: "2025-01-28",
+  transaction_type: "CN",
+  transaction_id: "CN-2025-0003",
+  quantity: 0.00000,  // ⭐ Zero quantity (no physical movement)
+  unit_cost: 0.00000,  // ⭐ Not applicable for zero-quantity
+  total_cost: -300.00000,  // ⭐ Negative = discount
+  reason_code: "VOLUME_DISCOUNT",
+  notes: "Volume discount negotiated post-delivery"
+}
+
+// Parent lot state (no quantity change):
+// MK-250125-001: remaining_quantity = 200.00000 (unchanged)
+
+// Effective cost calculation:
+// Original total cost: $3,000
+// Discount applied: -$300
+// New total cost: $2,700
+// New effective unit cost: $2,700 ÷ 200 = $13.50/unit (reduced from $15.00)
+```
+
+**Formula**:
+```
+Effective Unit Cost = (SUM(quantity × unit_cost) + SUM(cost_adjustments)) / SUM(quantity)
+                    = (200 × $15.00 + (-$300)) / 200
+                    = ($3,000 - $300) / 200
+                    = $13.50 per unit
+```
+
+**Example - Multi-Lot Discount Allocation**:
+```typescript
+// Scenario: 300 units received, 100 consumed, $450 discount
+// Remaining: 200 units @ $4,000
+
+// ADJUSTMENT layer created:
+{
+  adjustment_id: "ADJ-LAYER-2025-0008",
+  parent_lot_number: "MK-250130-001",
+  transaction_type: "CN",
+  transaction_id: "CN-2025-0004",
+  quantity: 0.00000,
+  unit_cost: 0.00000,
+  total_cost: -450.00000,  // Discount on remaining inventory only
+  reason_code: "AMOUNT_DISCOUNT",
+  notes: "Applies to remaining 200 units only"
+}
+
+// Effective cost calculation:
+// Remaining value: 200 × $20.00 = $4,000
+// Discount: -$450
+// New effective cost: ($4,000 - $450) / 200 = $17.75/unit
+```
+
+**Important**: Discount allocates to **remaining inventory only** (not consumed items)
+
+---
+
+##### CN Transaction Business Rules
+
+**BR-CN-001: Transaction Type**
+- All CN inventory transactions MUST use transaction_type `CN`
+- Distinct from generic ADJ_OUT for audit trail
+
+**BR-CN-002: Cost Method Processing**
+- FIFO: Uses lot-specific costs with FIFO consumption order
+- Periodic AVG: Uses period average cost for QUANTITY_RETURN
+- Periodic AVG: Adjusts period average calculation for AMOUNT_DISCOUNT
+
+**BR-CN-003: QUANTITY_RETURN Same-Lot**
+- Uses original lot's `unit_cost` from GRN
+- Creates ADJUSTMENT layer with `parent_lot_number=original_lot`
+- Maintains cost consistency
+
+**BR-CN-004: QUANTITY_RETURN Different-Lot (FIFO)**
+- When original lot insufficient, consume from next available lots
+- Query: `ORDER BY lot_number ASC` (FIFO order)
+- Create separate ADJUSTMENT layers for each lot consumed
+- Calculate lot depletion: `SUM(in_qty) - SUM(out_qty) = 0`
+
+**BR-CN-005: AMOUNT_DISCOUNT Processing**
+- Create ADJUSTMENT layer with `quantity=0`, `total_cost<0`
+- Set `unit_cost=0` (not applicable)
+- Link via `parent_lot_number`
+- Allocate to remaining inventory only
+
+**BR-CN-006: Effective Cost Calculation**
+- Formula: `(SUM(qty × cost) + SUM(cost_adjustments)) / SUM(qty)`
+- Apply per lot in FIFO
+- Apply per period in Periodic AVG
+- Recalculate on-the-fly during valuation queries
+
+**BR-CN-007: Timing**
+- Trigger immediately on CN commit (DRAFT → COMMITTED)
+- Cost adjustments apply at moment of commitment
+
+**BR-CN-008: Lot Depletion**
+- No explicit "depleted" flag in database
+- Calculate: `SUM(in_qty) - SUM(out_qty) = 0`
+- Depleted lots excluded from available inventory queries
+- Audit trail preserved (entries remain)
 
 #### Rule 3: Inventory Adjustment (Decrease) (BR-LOT-005, BR-LOT-012)
 **When**: Inventory quantity decreased due to count adjustment
@@ -488,7 +699,7 @@ An ADJUSTMENT layer records the consumption or adjustment of inventory from a sp
 {
   adjustment_id: "ADJ-LAYER-2025-0005",
   parent_lot_number: "MK-250115-0001",
-  transaction_type: "ADJUSTMENT_DECREASE",
+  transaction_type: "ADJ_OUT",
   transaction_id: "ADJ-2025-0002",
   quantity: 15.00000,
   unit_cost: 12.50000,
@@ -509,7 +720,7 @@ An ADJUSTMENT layer records the consumption or adjustment of inventory from a sp
 {
   adjustment_id: "ADJ-LAYER-2025-0006",
   parent_lot_number: "MK-250115-0001",
-  transaction_type: "WRITE_OFF",
+  transaction_type: "ADJ_OUT",
   transaction_id: "WO-2025-0001",
   quantity: 20.00000,
   unit_cost: 12.50000,
@@ -541,7 +752,7 @@ A single lot can have multiple ADJUSTMENT layers from different transactions:
   adjustment_id: "ADJ-LAYER-2025-0007",
   parent_lot_number: "MK-250115-0001",
   quantity: 10.00000,
-  transaction_type: "RETURN",
+  transaction_type: "ADJ_OUT",
   // ... remaining_quantity = 65
 }
 
@@ -550,7 +761,7 @@ A single lot can have multiple ADJUSTMENT layers from different transactions:
   adjustment_id: "ADJ-LAYER-2025-0008",
   parent_lot_number: "MK-250115-0001",
   quantity: 5.00000,
-  transaction_type: "WRITE_OFF",
+  transaction_type: "ADJ_OUT",
   // ... remaining_quantity = 60
 }
 

@@ -19,7 +19,6 @@ This document defines comprehensive validation rules for the Credit Note module 
 - **Tax Compliance**: Input VAT adjustments must be calculated correctly for tax reporting
 - **Audit Requirements**: Credit notes are legal documents requiring accurate data for financial audits
 - **Inventory Control**: Quantity returns trigger stock movements that must be validated
-- **Approval Workflow**: Credit amounts above thresholds require proper authorization
 
 ### 1.2 Scope
 This document defines validation rules across three layers:
@@ -49,7 +48,6 @@ Data Stored
 5. Enforce business rules consistently
 6. Validate data integrity across related entities
 7. Enforce FIFO costing rules for quantity returns
-8. Validate approval thresholds based on credit amounts
 
 ---
 
@@ -224,15 +222,13 @@ Data Stored
 - **Database**: Column defined as ENUM type with allowed values.
 
 **Error Code**: VAL-CN-007
-**Error Message**: "Invalid credit note status. Must be DRAFT, POSTED, or VOID"
+**Error Message**: "Invalid credit note status. Must be DRAFT, COMMITTED, or VOID"
 **User Action**: User must select a valid status from the allowed values.
 
 **Test Cases**:
 - ✅ Valid: "DRAFT"
-- ✅ Valid: "POSTED"
+- ✅ Valid: "COMMITTED"
 - ✅ Valid: "VOID"
-- ❌ Invalid: "PENDING" (not in enum)
-- ❌ Invalid: "APPROVED" (not in enum)
 - ❌ Invalid: "draft" (case-sensitive)
 - ❌ Invalid: null
 
@@ -1666,7 +1662,7 @@ Action Required: Reduce credit quantity to not exceed 100.000
 - subtotalAmount, taxAmount, totalAmount, createdBy, createdAt, updatedBy, updatedAt
 
 **Optional Fields (Can be null)**:
-- description, realizedGainLoss, voidReason, voidedBy, voidedAt, approvedBy, approvedAt, postedBy, postedAt
+- description, realizedGainLoss, voidReason, voidedBy, voidedAt, committedBy, committedAt
 
 **Calculated Fields (Auto-populated, read-only)**:
 - cnNumber, subtotalAmount, taxAmount, totalAmount, realizedGainLoss, costVariance
@@ -1675,12 +1671,9 @@ Action Required: Reduce credit quantity to not exceed 100.000
 
 | From Status | To Status | Validation Required |
 |-------------|-----------|---------------------|
-| DRAFT | PENDING | All field and business rule validations |
-| PENDING | APPROVED | User approval authority validation |
-| PENDING | DRAFT | User is creator or admin validation |
-| APPROVED | POSTED | Journal entry generation validation |
+| DRAFT | COMMITTED | All field, business rule, and journal entry generation validations |
 | Any | VOID | User void permission validation |
-| POSTED | VOID | Reversal entry generation validation |
+| COMMITTED | VOID | Reversal entry generation validation |
 
 ### Appendix D: FIFO Calculation Validation Example
 

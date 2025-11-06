@@ -148,11 +148,16 @@ Foundation enhancements to enable advanced features. Adds missing fields and tab
 
 | Field | Type | Purpose | Example |
 |-------|------|---------|---------|
-| `transaction_type` | ENUM | Distinguish LOT vs ADJUSTMENT | 'LOT', 'ADJUSTMENT' |
-| `parent_lot_no` | VARCHAR(50) | Link adjustments to source lot | 'MK-250115-0001' |
+| `transaction_type` | ENUM | 8 explicit transaction types | 'RECEIVE', 'ISSUE', 'ADJ_IN', 'ADJ_OUT', 'TRANSFER_IN', 'TRANSFER_OUT', 'OPEN', 'CLOSE' |
+| `parent_lot_no` | VARCHAR(50) | Link adjustments to source lot (NULL for LOT layer, NOT NULL for ADJUSTMENT layer) | 'MK-250115-0001' |
 | `transaction_reason` | VARCHAR(20) | Categorize adjustments | 'PRODUCTION', 'WASTAGE' |
 
-**Business Value**: Full traceability from consumption back to source lot, automated audit reports
+**Transaction Type Details**:
+- **LOT Layer** (parent_lot_no IS NULL): RECEIVE, TRANSFER_IN, OPEN, CLOSE - Creates new independent lots
+- **ADJUSTMENT Layer** (parent_lot_no IS NOT NULL): ISSUE, ADJ_IN, ADJ_OUT, TRANSFER_OUT - References and reduces parent lots
+- **Layer Logic**: Automatically determined by parent_lot_no presence/absence
+
+**Business Value**: Full traceability from consumption back to source lot, crystal-clear transaction categorization, automated audit reports with layer identification
 
 #### 1.2 New Period Management Tables
 
@@ -315,14 +320,47 @@ WHERE consumption.transaction_type = 'ADJUSTMENT'
 
 ---
 
-## 📊 Phase 4: Period Management (2-3 weeks)
+## 📊 Phase 4: Period Management & Automated Revaluation (2-3 weeks)
 
 ### Overview
-Complete period lifecycle management with locking and automated snapshots.
+Complete period lifecycle management with locking, automated snapshots, and **Enhanced Periodic Average revaluation automation**.
 
 ### What's Being Added
 
-#### 4.1 Period Status Lifecycle
+#### 4.1 Automated Period-End Revaluation (Enhanced Periodic Average)
+
+**Enhanced Periodic Average with Automated Revaluation**:
+```
+During Period:
+- Receipts recorded at actual cost (RECEIVE transactions)
+- Consumption uses cached period average for reference
+- Inventory maintained at actual cost throughout period
+
+Period-End Close (Automated Revaluation):
+1. ✅ Calculate final period average from all receipts
+2. ✅ Generate CLOSE transaction for ending inventory
+3. ✅ Revalue remaining inventory to period average cost
+4. ✅ Calculate Diff variance = (Avg × Qty) - Book Value
+5. ✅ Post Diff to revaluation variance account (P&L)
+6. ✅ Create OPEN transaction for next period opening balance
+7. ✅ Standardize opening balance at period average cost
+   Duration: <5 minutes (automated)
+```
+
+**Revaluation Transaction Types**:
+- **CLOSE**: Revalues ending inventory to period average (LOT layer, no parent)
+- **OPEN**: Creates opening balance at period average (LOT layer, no parent)
+- **Diff Column**: Tracks revaluation variance + rounding errors
+
+**Business Value**:
+- ✅ Consistent inventory costs period-to-period
+- ✅ Automatic variance tracking and P&L posting
+- ✅ Clean opening balance at period average
+- ✅ Simplified reconciliation and reporting
+- ✅ Accurate period-to-period cost comparisons
+- ✅ Automated revaluation journal entries
+
+#### 4.2 Period Status Lifecycle
 ```
 OPEN → (Month-End Close) → CLOSED → (Lock) → LOCKED
   ↓                                              ↑
@@ -334,24 +372,29 @@ OPEN → (Month-End Close) → CLOSED → (Lock) → LOCKED
 - **CLOSED**: Period closed, no new transactions (unless re-opened)
 - **LOCKED**: Permanently locked, no changes allowed
 
-#### 4.2 Automated Snapshot Creation
+#### 4.3 Automated Snapshot Creation
 System automatically creates period-end snapshots showing:
-- Opening balance (from previous period close)
-- Receipts during period
-- Issues during period
-- Transfers during period
-- Adjustments during period
-- Closing balance (to next period open)
+- Opening balance (from previous period OPEN transaction)
+- Receipts during period (RECEIVE, TRANSFER_IN)
+- Issues during period (ISSUE, ADJ_OUT, TRANSFER_OUT)
+- Transfers during period (TRANSFER_IN, TRANSFER_OUT)
+- Adjustments during period (ADJ_IN, ADJ_OUT)
+- **Revaluation variance** (CLOSE transaction Diff column)
+- Closing balance (from CLOSE transaction to next period OPEN)
 
-#### 4.3 Period Close Process
+#### 4.4 Period Close Process with Revaluation
 ```typescript
 async function closePeriod(periodId: string) {
   // 1. Validate all transactions posted
   // 2. Create snapshots for all item-location combinations
-  // 3. Calculate period average costs
-  // 4. Generate closing balance transactions
+  // 3. Calculate period average costs from RECEIVE transactions
+  // 4. Generate CLOSE transactions (revalue to period average)
+  //    - Calculate Diff variance = (Period Avg × Qty) - Book Value
+  //    - Post Diff to revaluation variance account (P&L)
   // 5. Update period status to CLOSED
-  // 6. Create opening balance transactions for next period
+  // 6. Create OPEN transactions for next period
+  //    - Opening balance at period average cost
+  //    - Clean slate for next period calculations
 }
 ```
 
@@ -359,9 +402,11 @@ async function closePeriod(periodId: string) {
 
 ✨ **For Finance**:
 - Locked month-end numbers
-- Automated closing entries
-- Historical cost preservation
-- Audit-ready reports
+- **Automated revaluation** with variance tracking
+- Automated closing entries (CLOSE/OPEN transactions)
+- Historical cost preservation with period average standardization
+- **Revaluation variance** automatically posted to P&L
+- Audit-ready reports with complete revaluation trail
 
 ✨ **For Operations**:
 - Clear period boundaries

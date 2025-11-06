@@ -130,7 +130,7 @@ OPEN → (Month-End Close) → CLOSED → (Lock) → LOCKED
 
 **Impact on Operations**:
 - Cannot post transactions to locked periods
-- Late receipts require period re-opening (with approval)
+- Late receipts require period re-opening
 - Month-end reports become permanent snapshots
 - Full audit trail of period state changes
 
@@ -286,15 +286,33 @@ WHERE consumption.transaction_type = 'ADJUSTMENT'
 
 ---
 
-### Phase 4: Period Management (Weeks 7-9)
+### Phase 4: Period Management & Automated Revaluation (Weeks 7-9)
 
-**Focus**: Period locking and automated snapshots
+**Focus**: Period locking, automated snapshots, and period-end revaluation
 
 **Period Lifecycle**:
 ```
 1. OPEN: Normal operations, transactions allowed
-2. CLOSED: Period ended, no new transactions
+2. CLOSED: Period ended, revaluation complete, no new transactions
 3. LOCKED: Permanently locked, historical data preserved
+```
+
+**Enhanced Periodic Average with Revaluation**:
+```
+During Period:
+- Receipts recorded at actual cost (RECEIVE transactions)
+- Consumption uses cached period average for reference
+- Inventory maintained at actual cost throughout period
+
+Period-End Close (Automated Revaluation):
+1. ✅ Calculate final period average from all receipts
+2. ✅ Generate CLOSE transaction for ending inventory
+3. ✅ Revalue remaining inventory to period average cost
+4. ✅ Calculate Diff variance = (Avg × Qty) - Book Value
+5. ✅ Post Diff to revaluation variance account (P&L)
+6. ✅ Create OPEN transaction for next period opening balance
+7. ✅ Standardize opening balance at period average cost
+   Duration: <5 minutes (automated)
 ```
 
 **Automated Snapshots**:
@@ -303,19 +321,35 @@ Monthly Close Process (Automated):
 1. ✅ Validate all transactions posted
 2. ✅ Create snapshots (all item-location combos)
 3. ✅ Calculate period average costs
-4. ✅ Generate closing balance transactions
-5. ✅ Update period status to CLOSED
-6. ✅ Create opening balance for next period
+4. ✅ Generate CLOSE transaction with revaluation adjustment
+5. ✅ Post revaluation variance to P&L (Diff column)
+6. ✅ Update period status to CLOSED
+7. ✅ Generate OPEN transaction for next period
+8. ✅ Create opening balance at period average cost
    Duration: <5 minutes (automated)
 ```
 
+**Revaluation Benefits**:
+- ✅ Consistent inventory costs period-to-period
+- ✅ Automatic variance tracking and posting
+- ✅ Clean opening balance at period average
+- ✅ Simplified reconciliation and reporting
+- ✅ Accurate period-to-period comparisons
+
+**Transaction Types for Revaluation**:
+- **CLOSE**: Revalues ending inventory to period average (LOT layer)
+- **OPEN**: Creates opening balance at period average (LOT layer)
+- **Diff Column**: Tracks rounding errors and revaluation variance
+
 **Benefits for You**:
 - ✅ Protected historical data
-- ✅ Automated month-end close (<5 min)
+- ✅ Automated month-end close with revaluation (<5 min)
 - ✅ Instant historical reports
 - ✅ Audit-ready documentation
+- ✅ Automated variance posting to P&L
+- ✅ Period-to-period cost consistency
 
-**Migration Impact**: Training required, process change
+**Migration Impact**: Training required, process change, automated revaluation workflow
 
 ---
 

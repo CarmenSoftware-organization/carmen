@@ -18,9 +18,9 @@
 
 ## Overview
 
-The Goods Received Note data model manages the recording and tracking of goods received from vendors. The model supports two distinct workflows: PO-based receiving (linked to purchase orders) and manual receiving (standalone entries). It captures complete receiving documentation including item details, quantities, discrepancies, quality inspection results, financial calculations, and automatic stock movements upon commitment.
+The Goods Received Note data model manages the recording and tracking of goods received from vendors. The model supports two distinct workflows: PO-based receiving (linked to purchase orders) and manual receiving (standalone entries). It captures complete receiving documentation including item details, quantities, discrepancies, financial calculations, and automatic stock movements upon commitment.
 
-The data model consists of four primary entities: GoodsReceiveNote (header), GoodsReceiveNoteItem (line items), ExtraCost (additional costs), and StockMovement (inventory transactions). Supporting enumerations define status values and discrepancy types. The model supports multi-currency transactions, quality inspection workflows, and comprehensive audit trails.
+The data model consists of four primary entities: GoodsReceiveNote (header), GoodsReceiveNoteItem (line items), ExtraCost (additional costs), and StockMovement (inventory transactions). Supporting enumerations define status values and discrepancy types. The model supports multi-currency transactions and comprehensive audit trails.
 
 **⚠️ IMPORTANT: This is a Data Definition Document - TEXT FORMAT ONLY**
 - **DO NOT include SQL code** - describe database structures in text
@@ -106,7 +106,7 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 
 **Description**: Represents a goods receipt transaction documenting the delivery and acceptance of goods from a vendor. Each GRN serves as an official record of what was received, inspected, and committed into inventory.
 
-**Business Purpose**: Provides complete documentation of goods receipt for inventory management, vendor payment processing, quality tracking, and audit compliance. Serves as the bridge between purchase orders and inventory updates.
+**Business Purpose**: Provides complete documentation of goods receipt for inventory management, vendor payment processing, and audit compliance. Serves as the bridge between purchase orders and inventory updates.
 
 **Data Ownership**: Procurement Department, with shared access for warehouse and finance teams
 
@@ -193,12 +193,8 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
   - Data type: String (max 100 characters)
   - Example: "Alice Thompson"
 
-- **checkedBy**: Name of person who verified the receipt
-  - Required: No
-  - Data type: String (max 100 characters)
-
-- **approvedBy**: Name of person who approved high-value GRN
-  - Required: No (required for GRNs above approval threshold)
+- **committedBy**: Name of person who committed the GRN
+  - Required: No (set when GRN is committed)
   - Data type: String (max 100 characters)
 
 **Location Fields**:
@@ -231,28 +227,7 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
   - Required: Yes
   - Data type: Integer
   - Calculated: Count of items where hasDiscrepancy = true
-  - Example: 2 (if 2 items have quantity or quality issues)
-
-**Quality Inspection Fields**:
-- **qualityCheckRequired**: Flag indicating if quality inspection needed
-  - Required: Yes
-  - Data type: Boolean
-  - Default: false
-  - Derived from product or PO settings
-
-- **qualityCheckPassed**: Result of quality inspection
-  - Required: No (NULL if not required or not yet performed)
-  - Data type: Boolean
-  - Example: true (items passed inspection)
-
-- **qualityCheckedBy**: Name of quality inspector
-  - Required: No (required if quality check performed)
-  - Data type: String (max 100 characters)
-
-- **qualityCheckedAt**: Timestamp of quality inspection
-  - Required: No
-  - Data type: Timestamp with timezone
-  - Example: "2024-01-15T14:30:00Z"
+  - Example: 2 (if 2 items have discrepancies)
 
 **Additional Information**:
 - **notes**: General notes or comments about the receipt
@@ -290,17 +265,12 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 | driverName | VARCHAR(100) | No | NULL | Driver name | John Smith | - |
 | status | VARCHAR(20) | Yes | DRAFT | GRN lifecycle status | RECEIVED | Must be DRAFT\|RECEIVED\|COMMITTED\|VOID |
 | receivedBy | VARCHAR(100) | Yes | - | Receiver name | Alice Thompson | Non-empty |
-| checkedBy | VARCHAR(100) | No | NULL | Checker name | Bob Wilson | - |
-| approvedBy | VARCHAR(100) | No | NULL | Approver name | Manager Name | - |
+| committedBy | VARCHAR(100) | No | NULL | Person who committed GRN | Bob Wilson | - |
 | locationId | UUID | Yes | - | Receiving location | 550e8400-... | FK to locations.id |
 | totalItems | INTEGER | Yes | 0 | Count of items | 5 | ≥ 0 |
 | totalQuantity | DECIMAL(15,3) | Yes | 0.000 | Sum of quantities | 125.500 | ≥ 0 |
 | totalValue | DECIMAL(15,2) | Yes | 0.00 | Total amount | 4859.85 | ≥ 0 |
 | discrepancies | INTEGER | Yes | 0 | Count of discrepancy items | 2 | ≥ 0 |
-| qualityCheckRequired | BOOLEAN | Yes | false | Quality check flag | true | - |
-| qualityCheckPassed | BOOLEAN | No | NULL | Quality result | true | - |
-| qualityCheckedBy | VARCHAR(100) | No | NULL | Inspector name | Quality Team | - |
-| qualityCheckedAt | TIMESTAMPTZ | No | NULL | Inspection timestamp | 2024-01-15T14:30:00Z | - |
 | notes | TEXT | No | NULL | General notes | Partial shipment... | - |
 | attachments | TEXT[] | No | NULL | File URLs array | ["https://..."] | Valid URLs |
 | createdDate | TIMESTAMPTZ | Yes | NOW() | Creation timestamp | 2024-01-15T10:00:00Z | Immutable |
@@ -346,12 +316,10 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 - **Status values**: Must be one of: DRAFT, RECEIVED, COMMITTED, VOID
 - **Receipt date**: Cannot be more than 30 days in the future
 - **Total values**: totalItems, totalQuantity, totalValue must be ≥ 0
-- **Quality check**: If qualityCheckPassed is not NULL, qualityCheckedBy and qualityCheckedAt must also be not NULL
 
 **Business Rules Enforced**:
 - GRN must have at least one item before commitment (totalItems > 0)
 - All items must have storage locations assigned before commitment
-- If qualityCheckRequired is true, quality check must be completed before commitment
 - COMMITTED status GRNs are immutable (updates prevented)
 - VOID status GRNs are read-only (preserved for audit)
 
@@ -359,15 +327,15 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 
 ### Entity: GoodsReceiveNoteItem
 
-**Description**: Represents an individual product line item within a goods receipt, capturing quantities received, pricing, quality status, discrepancies, and traceability information like batch numbers and expiry dates.
+**Description**: Represents an individual product line item within a goods receipt, capturing quantities received, pricing, discrepancies, and traceability information like batch numbers and expiry dates.
 
-**Business Purpose**: Provides detailed item-level tracking of received goods, enabling inventory updates, cost accounting, quality control, and discrepancy management at the SKU level.
+**Business Purpose**: Provides detailed item-level tracking of received goods, enabling inventory updates, cost accounting, and discrepancy management at the SKU level.
 
 **Data Ownership**: Procurement and Warehouse Departments
 
 **Access Pattern**:
 - Primarily accessed via parent GRN ID
-- Filtered by item code, quality status, discrepancy flags
+- Filtered by item code, discrepancy flags
 - Sorted by line number within GRN
 
 **Data Volume**: Approximately 2,500 records per month (average 5 items per GRN), 30,000 records per year
@@ -392,7 +360,7 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 - **orderedQuantity**: Quantity originally ordered (from PO, NULL for manual)
 - **deliveredQuantity**: Quantity actually delivered by vendor
 - **receivedQuantity**: Quantity accepted into stock
-- **rejectedQuantity**: Quantity rejected due to quality/specification issues
+- **rejectedQuantity**: Quantity rejected for any reason
 - **damagedQuantity**: Quantity damaged during delivery
 
 **Unit and Pricing**:
@@ -410,13 +378,9 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 **Storage**:
 - **storageLocationId**: Assigned storage location (warehouse, cold storage, etc.)
 
-**Quality Status**:
-- **qualityStatus**: Inspection result (pending, passed, failed, conditional)
-- **rejectionReason**: Explanation if item rejected
-
 **Discrepancy Tracking**:
 - **hasDiscrepancy**: Boolean flag if item has any discrepancy
-- **discrepancyType**: Type of discrepancy (quantity, quality, specification, damage)
+- **discrepancyType**: Type of discrepancy (quantity, damage, other)
 - **discrepancyNotes**: Detailed explanation of discrepancy
 
 **Additional Notes**:
@@ -448,10 +412,8 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 | manufacturingDate | DATE | No | NULL | Manufacturing date | 2024-01-01 | - |
 | expiryDate | DATE | No | NULL | Expiration date | 2025-01-01 | Must be after mfg date |
 | storageLocationId | UUID | Yes | - | Storage location | 550e8400-... | FK to locations.id |
-| qualityStatus | VARCHAR(20) | Yes | pending | Quality inspection result | passed | pending\|passed\|failed\|conditional |
-| rejectionReason | TEXT | No | NULL | Rejection explanation | Failed quality check | Required if rejected > 0 |
 | hasDiscrepancy | BOOLEAN | Yes | false | Discrepancy flag | true | - |
-| discrepancyType | VARCHAR(20) | No | NULL | Type of discrepancy | quantity | quantity\|quality\|specification\|damage |
+| discrepancyType | VARCHAR(20) | No | NULL | Type of discrepancy | quantity | quantity\|damage\|other |
 | discrepancyNotes | TEXT | No | NULL | Discrepancy details | Received 9 instead of 10 | Required if hasDiscrepancy |
 | notes | TEXT | No | NULL | Item notes | Store in cool area | - |
 
@@ -475,7 +437,6 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 **Check Constraints**:
 - `receivedQuantity` + `rejectedQuantity` + `damagedQuantity` ≤ `deliveredQuantity`
 - `expiryDate` must be after `manufacturingDate` (if both not NULL)
-- `qualityStatus` must be one of: pending, passed, failed, conditional
 - If `hasDiscrepancy` is true, `discrepancyType` and `discrepancyNotes` must not be NULL
 
 **Unique Constraints**:
@@ -598,25 +559,14 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 - Any status → VOID (user or manager voids GRN)
 - COMMITTED cannot transition to any other status except VOID
 
-### Quality Status Enumeration
-
-**Purpose**: Defines quality inspection results for items
-
-**Values**:
-- **pending**: Quality check not yet performed
-- **passed**: Item passed quality inspection
-- **failed**: Item failed quality inspection, should be rejected
-- **conditional**: Item accepted with conditions or restrictions
-
 ### Discrepancy Type Enumeration
 
 **Purpose**: Categorizes types of discrepancies between ordered and received goods
 
 **Values**:
 - **quantity**: Quantity variance (short or over delivery)
-- **quality**: Quality does not meet specifications
-- **specification**: Product specification mismatch
 - **damage**: Items damaged during delivery
+- **other**: Other discrepancies not covered by quantity or damage
 
 ### Cost Type Enumeration
 

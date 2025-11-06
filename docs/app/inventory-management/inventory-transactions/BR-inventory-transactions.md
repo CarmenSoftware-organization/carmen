@@ -562,13 +562,13 @@ The system must support batch creation of transactions from templates or import 
 ---
 
 #### BR-TXN-013: Period Cost Cache Invalidation
-**Rule**: When new GRN posted, invalidate cached period cost for that item + period.
+**Rule**: When new GRN committed, invalidate cached period cost for that item + period.
 
-**Trigger**: GRN posting for any item in any period
+**Trigger**: GRN commitment for any item in any period
 
 **Result**: Next transaction recalculates fresh average cost
 
-**Enforcement**: GRN posting triggers cache deletion
+**Enforcement**: GRN commitment triggers cache deletion
 
 ---
 

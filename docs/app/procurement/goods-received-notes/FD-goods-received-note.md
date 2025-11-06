@@ -294,7 +294,7 @@ stateDiagram-v2
 
 **Transition Rules**:
 - DRAFT → RECEIVED: Basic validation (vendor, items, quantities)
-- DRAFT/RECEIVED → COMMITTED: Full validation (locations assigned, quality checked)
+- DRAFT/RECEIVED → COMMITTED: Full validation (locations assigned)
 - Any → VOID: Manager permission required (except DRAFT)
 - COMMITTED → VOID: Generates reversing stock movements and journal entries
 - No transitions allowed FROM VOID or COMMITTED except VOID
@@ -319,20 +319,7 @@ flowchart TD
     CheckLoc -->|No| ErrorLoc[Error: Assign storage<br/>locations to all items]
     ErrorLoc --> End1
 
-    CheckLoc -->|Yes| CheckQC{Quality check<br/>required?}
-    CheckQC -->|Yes| CheckPassed{Quality<br/>passed?}
-    CheckPassed -->|No| ErrorQC[Error: Quality check<br/>failed or not complete]
-    ErrorQC --> End1
-
-    CheckQC -->|No| CheckValue
-    CheckPassed -->|Yes| CheckValue{GRN value ><br/>approval threshold?}
-
-    CheckValue -->|Yes| CheckApproval{Manager<br/>approval exists?}
-    CheckApproval -->|No| ErrorApproval[Error: Manager approval<br/>required for high-value GRN]
-    ErrorApproval --> End1
-
-    CheckApproval -->|Yes| Confirm
-    CheckValue -->|No| Confirm[Display commitment<br/>confirmation dialog]
+    CheckLoc -->|Yes| Confirm[Display commitment<br/>confirmation dialog]
 
     Confirm --> UserConfirm{User<br/>confirms?}
     UserConfirm -->|No| End2([End: Cancelled])
@@ -369,8 +356,6 @@ flowchart TD
     style End2 fill:#ffcccc,stroke:#cc0000,stroke-width:2px,color:#000
     style ErrorStatus fill:#ffe0b3,stroke:#cc6600,stroke-width:2px,color:#000
     style ErrorLoc fill:#ffe0b3,stroke:#cc6600,stroke-width:2px,color:#000
-    style ErrorQC fill:#ffe0b3,stroke:#cc6600,stroke-width:2px,color:#000
-    style ErrorApproval fill:#ffe0b3,stroke:#cc6600,stroke-width:2px,color:#000
     style ErrorJV fill:#ffe0b3,stroke:#cc6600,stroke-width:2px,color:#000
     style GenStock fill:#e0ccff,stroke:#6600cc,stroke-width:2px,color:#000
     style UpdateInv fill:#e0ccff,stroke:#6600cc,stroke-width:2px,color:#000
@@ -381,28 +366,25 @@ flowchart TD
 1. **Start**: User clicks "Commit GRN" button
 2. **Check Status**: Verify GRN status is RECEIVED
 3. **Check Locations**: Verify all items have storage locations assigned
-4. **Check Quality**: If quality check required, verify it passed
-5. **Check Value**: Compare GRN total to approval threshold
-6. **Check Approval**: For high-value GRNs, verify manager approval exists
-7. **Confirmation**: Display dialog with commitment impact summary
-8. **User Confirms**: User reviews and confirms commitment
-9. **Change Status**: Update GRN status to COMMITTED
-10. **Generate Stock Movements**: Create stock movement record for each item
+4. **Confirmation**: Display dialog with commitment impact summary
+5. **User Confirms**: User reviews and confirms commitment
+6. **Change Status**: Update GRN status to COMMITTED
+7. **Generate Stock Movements**: Create stock movement record for each item
     - Movement type: RECEIPT
     - From: Receiving area
     - To: Assigned storage location
     - Quantity: Received quantity
     - Cost: Unit price + allocated extra cost
-11. **Update Inventory**: Increment on-hand quantities in storage locations
-12. **Calculate Finance**: Compute all financial totals with tax and extra costs
-13. **Generate JV**: Create journal voucher with balanced entries
-14. **Validate JV**: Ensure total debits = total credits
-15. **Post JV**: Submit journal voucher to Finance Module
-16. **Update PO**: If linked to PO, update fulfillment quantities and status
-17. **Log Activity**: Record commitment event in activity log
-18. **Notify**: Send notifications to finance, warehouse, purchasing teams
-19. **Lock GRN**: Set GRN to immutable state
-20. **Success**: Commitment complete, GRN now read-only
+8. **Update Inventory**: Increment on-hand quantities in storage locations
+9. **Calculate Finance**: Compute all financial totals with tax and extra costs
+10. **Generate JV**: Create journal voucher with balanced entries
+11. **Validate JV**: Ensure total debits = total credits
+12. **Post JV**: Submit journal voucher to Finance Module
+13. **Update PO**: If linked to PO, update fulfillment quantities and status
+14. **Log Activity**: Record commitment event in activity log
+15. **Notify**: Send notifications to finance, warehouse, purchasing teams
+16. **Lock GRN**: Set GRN to immutable state
+17. **Success**: Commitment complete, GRN now read-only
 
 **Rollback Scenarios**:
 - Stock movement generation fails: Rollback status change
@@ -492,7 +474,7 @@ sequenceDiagram
     participant PO as Purchase Orders Module
 
     User->>GRN: Click "Commit GRN"
-    GRN->>GRN: Validate GRN ready<br/>(locations, quality check)
+    GRN->>GRN: Validate GRN ready<br/>(locations assigned)
 
     alt Validation Failed
         GRN->>User: Display validation errors

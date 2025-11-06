@@ -22,7 +22,7 @@ The Credit Note module is a critical financial component of the procurement syst
 
 The Credit Note system supports two distinct workflows: quantity-based returns (linked to specific GRN items and lots) and amount-only discounts (pricing adjustments without physical returns). It handles multi-currency transactions, tax adjustments, lot-based inventory tracking, and automatic financial postings upon credit note commitment.
 
-This module is essential for hospitality operations, managing vendor credits for everything from damaged kitchen equipment and spoiled food items to pricing errors and negotiated discounts, ensuring all credits are properly documented, approved, and reflected in inventory and financial records.
+This module is essential for hospitality operations, managing vendor credits for everything from damaged kitchen equipment and spoiled food items to pricing errors and negotiated discounts, ensuring all credits are properly documented and reflected in inventory and financial records.
 
 ## Business Objectives
 
@@ -34,14 +34,12 @@ This module is essential for hospitality operations, managing vendor credits for
 6. **FIFO Costing**: Apply First-In-First-Out costing methodology for accurate cost of goods calculations on returns
 7. **Tax Compliance**: Properly calculate and adjust input VAT for all credit transactions
 8. **Vendor Accountability**: Track credit reasons and patterns to identify vendor performance issues
-9. **Approval Workflow**: Ensure proper authorization before credits are committed and payments adjusted
-10. **Lot Tracking**: Maintain detailed lot-level tracking for items being returned or credited
+9. **Lot Tracking**: Maintain detailed lot-level tracking for items being returned or credited
 
 ## Key Stakeholders
 
 - **Primary Users**: Accounts payable clerks, purchasing staff, receiving clerks
 - **Secondary Users**: Finance managers, warehouse staff, department managers
-- **Approvers**: Finance managers, purchasing managers, department heads
 - **Administrators**: System administrators, finance administrators
 - **Reviewers**: Internal auditors, tax compliance team, vendor relationship managers
 - **Support**: IT support team, finance support
@@ -58,13 +56,13 @@ The system must provide a comprehensive list view of all Credit Notes with sorti
 **Acceptance Criteria**:
 - Display all Credit Note records in a sortable, filterable data table
 - Show key information: Credit Note number, date, vendor, status, total amount, reason
-- Support filtering by status (Draft, Submitted, Approved, Rejected, Voided)
+- Support filtering by status (Draft, Committed, Voided)
 - Support filtering by date range, vendor, credit type, reason
 - Provide search functionality across credit note number, vendor name, description
-- Display row actions for view, edit, delete, approve operations
-- Show visual status indicators with color coding (Draft: gray, Posted: green, Void: red)
+- Display row actions for view, edit, delete, commit operations
+- Show visual status indicators with color coding (Draft: gray, Committed: green, Void: red)
 - Support both card view and table view display modes
-- Enable bulk operations on selected credit notes (approve, reject, delete)
+- Enable bulk operations on selected credit notes (delete)
 
 **Related Requirements**: FR-CN-002, FR-CN-003, FR-CN-004
 
@@ -130,10 +128,10 @@ The system must provide a comprehensive detail view showing all credit note info
   * Tax Entries: Tax adjustments with VAT calculations
   * Inventory: Impact on inventory values and quantities
   * Attachments: Uploaded supporting documents
-- Show status badge with visual indicator (Draft, Posted, Void)
+- Show status badge with visual indicator (Draft, Committed, Void)
 - Display action buttons based on status (Edit, Delete, Commit, Print, Send)
 - Show side panel toggle for additional information display
-- Display audit information (created by, created date, updated by, updated date)
+- Display audit information (created by, created date, updated by, updated date, committed by, committed date)
 
 **Related Requirements**: FR-CN-001, FR-CN-002, FR-CN-003
 
@@ -197,35 +195,10 @@ The system must support detailed item and lot selection with First-In-First-Out 
 
 ---
 
-### FR-CN-007: Credit Note Approval Workflow
-**Priority**: High
-
-The system must support a formal approval workflow for credit notes before they can be posted to financial records.
-
-**Acceptance Criteria**:
-- Support status transitions:
-  * Draft → Pending (on submission)
-  * Pending → Approved (on approval)
-  * Pending → Rejected (on rejection)
-  * Approved → Posted (on commitment)
-  * Posted → Void (on voiding)
-- Display current status visually (badge with color coding)
-- Restrict edit operations based on status (only Draft can be edited)
-- Require approval before posting for credits above threshold amount
-- Record approver information (user ID, name, date, comments)
-- Support bulk approval operations
-- Send notifications to approvers when credit submitted
-- Allow rejection with mandatory reason/comments
-- Return rejected credits to Draft status for revision
-
-**Related Requirements**: FR-CN-011, FR-CN-012
-
----
-
-### FR-CN-008: Stock Movement Generation
+### FR-CN-007: Stock Movement Generation
 **Priority**: Critical
 
-The system must automatically generate stock movement transactions when quantity-based credit notes are posted.
+The system must automatically generate stock movement transactions when quantity-based credit notes are committed.
 
 **Acceptance Criteria**:
 - Generate stock movements only for QUANTITY_RETURN type credits
@@ -241,14 +214,14 @@ The system must automatically generate stock movement transactions when quantity
 - Update lot balance quantities
 - Reduce inventory on hand by credit quantity
 - Support multi-location returns within single credit note
-- Validate sufficient lot quantity available before posting
+- Validate sufficient lot quantity available before committing
 - Generate movement reference number
 
 **Related Requirements**: FR-CN-002, FR-CN-006
 
 ---
 
-### FR-CN-009: Journal Entry Posting
+### FR-CN-008: Journal Entry Generation
 **Priority**: Critical
 
 The system must automatically generate and post journal voucher entries when credit notes are committed.
@@ -276,7 +249,7 @@ The system must automatically generate and post journal voucher entries when cre
   * Reference (credit note number, GRN number)
   * Debit or Credit amount
   * Tax code and rate (if applicable)
-  * Order number (for posting sequence)
+  * Order number (for entry sequence)
 
 - Group entries logically:
   * Primary Entries (main credit adjustments)
@@ -288,16 +261,16 @@ The system must automatically generate and post journal voucher entries when cre
   * Total Credit amount
   * Balance check (Debit = Credit)
 
-- Set journal status to Posted when credit committed
+- Set journal status to Committed when credit committed
 - Link journal voucher to credit note reference
-- Allow recalculation before posting
+- Allow recalculation before committing
 - Support department filtering in journal entry view
 
-**Related Requirements**: FR-CN-010, FR-CN-014
+**Related Requirements**: FR-CN-009, FR-CN-012
 
 ---
 
-### FR-CN-010: Tax Calculation and Adjustment
+### FR-CN-009: Tax Calculation and Adjustment
 **Priority**: Critical
 
 The system must accurately calculate tax impacts and generate tax adjustment entries for all credit transactions.
@@ -332,17 +305,17 @@ The system must accurately calculate tax impacts and generate tax adjustment ent
 - Support tax-exclusive and tax-inclusive credit scenarios
 - Validate tax calculations before posting
 
-**Related Requirements**: FR-CN-009, FR-CN-014
+**Related Requirements**: FR-CN-008, FR-CN-012
 
 ---
 
-### FR-CN-011: Void Credit Note
+### FR-CN-010: Void Credit Note
 **Priority**: High
 
-The system must support voiding of posted credit notes with full reversal of all financial and inventory impacts.
+The system must support voiding of committed credit notes with full reversal of all financial and inventory impacts.
 
 **Acceptance Criteria**:
-- Allow voiding only for credits in Posted status
+- Allow voiding only for credits in Committed status
 - Require void reason and confirmation
 - Generate reversal entries:
   * Reverse all stock movements (opposite sign quantities)
@@ -359,20 +332,20 @@ The system must support voiding of posted credit notes with full reversal of all
 - Display "VOID" watermark or indicator in printed documents
 - Update lot balances (add back voided quantities)
 - Update vendor accounts payable balance
-- Support void authorization (require manager approval for large amounts)
+- Support void authorization (require manager permission for large amounts)
 - Cannot void a credit note that has been reconciled in bank statement
 
-**Related Requirements**: FR-CN-007, FR-CN-012
+**Related Requirements**: FR-CN-011
 
 ---
 
-### FR-CN-012: Credit Note Commitment
+### FR-CN-011: Credit Note Commitment
 **Priority**: Critical
 
-The system must support committing approved credit notes to post all financial and inventory transactions.
+The system must support committing credit notes to post all financial and inventory transactions.
 
 **Acceptance Criteria**:
-- Allow commitment only for Approved status credits
+- Allow commitment for Draft status credits (no approval required)
 - Validate before commitment:
   * All required fields populated
   * Item quantities and amounts valid
@@ -383,11 +356,11 @@ The system must support committing approved credit notes to post all financial a
 - Perform commitment in transaction:
   * Generate and post stock movements
   * Generate and post journal voucher
-    * Generate and post tax adjustments
+  * Generate and post tax adjustments
   * Update lot balances
   * Update inventory values
   * Update vendor accounts payable
-  * Update credit note status to Posted
+  * Update credit note status to Committed
   * Record committed by and committed date
 - Rollback all changes if any step fails
 - Display success message with references:
@@ -403,7 +376,7 @@ The system must support committing approved credit notes to post all financial a
 
 ---
 
-### FR-CN-013: Multi-Currency Support
+### FR-CN-012: Multi-Currency Support
 **Priority**: High
 
 The system must handle credit notes in foreign currencies with automatic conversion to base currency.
@@ -429,11 +402,11 @@ The system must handle credit notes in foreign currencies with automatic convers
 - Record exchange rate source (manual, system, bank rate)
 - Show conversion calculations in detail view
 
-**Related Requirements**: FR-CN-009, FR-CN-012
+**Related Requirements**: FR-CN-008, FR-CN-011
 
 ---
 
-### FR-CN-014: Credit Reason Management
+### FR-CN-013: Credit Reason Management
 **Priority**: High
 
 The system must support categorization of credit notes by reason for analytics and vendor performance tracking.
@@ -454,14 +427,13 @@ The system must support categorization of credit notes by reason for analytics a
 - Generate vendor performance reports using reason data
 - Display reason prominently in credit note header
 - Filter credit note list by reason
-- Support reason-based approval thresholds
 - Link reason to accounting treatment (some reasons may use different GL accounts)
 
-**Related Requirements**: FR-CN-001, FR-CN-015
+**Related Requirements**: FR-CN-001, FR-CN-014
 
 ---
 
-### FR-CN-015: Attachment Management
+### FR-CN-014: Attachment Management
 **Priority**: Medium
 
 The system must support uploading and managing supporting documents for credit notes.
@@ -496,7 +468,7 @@ The system must support uploading and managing supporting documents for credit n
 
 ---
 
-### FR-CN-016: Printing and Export
+### FR-CN-015: Printing and Export
 **Priority**: Medium
 
 The system must support printing credit notes and exporting data for external use.
@@ -509,7 +481,6 @@ The system must support printing credit notes and exporting data for external us
   * Item details with quantities and prices
   * Tax calculations
   * Total credit amount
-  * Approval signatures (if approved)
   * Terms and conditions
   * VOID watermark (if voided)
 - Support PDF export
@@ -557,13 +528,10 @@ The system must support printing credit notes and exporting data for external us
 ### Workflow Rules
 
 - **BR-CN-020**: Only Draft status credits can be edited or deleted
-- **BR-CN-021**: Credits must be approved before posting (if approval threshold exceeded)
-- **BR-CN-022**: Posted credits cannot be edited (must be voided and recreated)
-- **BR-CN-023**: Void operation requires manager authorization
-- **BR-CN-024**: Credits above approval threshold (configurable, e.g., $5,000) require manager approval
-- **BR-CN-025**: Rejected credits return to Draft status for revision
-- **BR-CN-026**: Status transitions must follow defined workflow (Draft → Pending → Approved → Posted → Void)
-- **BR-CN-027**: Cannot delete Posted or Void credits (only Draft and Rejected)
+- **BR-CN-021**: Committed credits cannot be edited (must be voided and recreated)
+- **BR-CN-022**: Void operation requires manager authorization
+- **BR-CN-023**: Status transitions must follow defined workflow (Draft → Committed → Void)
+- **BR-CN-024**: Cannot delete Committed or Void credits (only Draft)
 
 ### Calculation Rules
 
@@ -594,19 +562,18 @@ The system must support printing credit notes and exporting data for external us
 - **BR-CN-052**: Tax adjustments post to Input VAT account (reduce recoverable tax)
 - **BR-CN-053**: Cost variances post to Cost Variance GL account
 - **BR-CN-054**: All journal entries must have department and cost center
-- **BR-CN-055**: Posted credits update vendor accounts payable balance
+- **BR-CN-055**: Committed credits update vendor accounts payable balance
 - **BR-CN-056**: Void reversals use same GL accounts as original with opposite signs
 - **BR-CN-057**: Journal voucher number auto-generated and unique
-- **BR-CN-058**: Credits processed in open accounting period only
+- **BR-CN-058**: Credits committed in open accounting period only
 
 ### Security Rules
 
 - **BR-CN-060**: Only purchasing staff and accounts payable can create credits
-- **BR-CN-061**: Only finance managers can approve credits above threshold
-- **BR-CN-062**: Only system administrators can void Posted credits above $10,000
-- **BR-CN-063**: Users can only view credits for their assigned departments (unless admin)
-- **BR-CN-064**: Audit log must record all create, update, approve, post, void operations
-- **BR-CN-065**: Cannot modify credit note created by another user (unless manager/admin)
+- **BR-CN-061**: Only system administrators can void Committed credits above $10,000
+- **BR-CN-062**: Users can only view credits for their assigned departments (unless admin)
+- **BR-CN-063**: Audit log must record all create, update, commit, void operations
+- **BR-CN-064**: Cannot modify credit note created by another user (unless manager/admin)
 
 ---
 
@@ -621,7 +588,7 @@ Primary entity for vendor credit documentation.
 - `docNumber` (string, unique, internal document tracking)
 - `docDate` (date, credit note date)
 - `creditType` (enum: QUANTITY_RETURN, AMOUNT_DISCOUNT)
-- `status` (enum: DRAFT, PENDING, APPROVED, REJECTED, POSTED, VOID)
+- `status` (enum: DRAFT, COMMITTED, VOID)
 - `reason` (enum: PRICING_ERROR, DAMAGED_GOODS, RETURN, DISCOUNT_AGREEMENT, OTHER)
 - `description` (string, max 500)
 - `notes` (string, max 2000)
@@ -638,8 +605,6 @@ Primary entity for vendor credit documentation.
 - `netAmount` (decimal 15,2)
 - `taxAmount` (decimal 15,2)
 - `totalAmount` (decimal 15,2)
-- `approvedBy` (string, nullable)
-- `approvedDate` (date, nullable)
 - `committedBy` (string, nullable)
 - `committedDate` (date, nullable)
 - `voidedBy` (string, nullable)
@@ -784,8 +749,7 @@ Supporting documents for credit notes.
 ## Success Metrics
 
 ### Operational Metrics
-- **Average credit note processing time**: < 10 minutes from creation to posting
-- **Credit note approval rate**: > 95% first-time approval
+- **Average credit note processing time**: < 10 minutes from creation to commitment
 - **Error rate**: < 2% credits requiring correction or void
 - **User satisfaction score**: > 4.0 out of 5.0
 

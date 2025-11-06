@@ -216,15 +216,17 @@ GET    /api/v1/periods                               # List all periods
 
 #### Enhanced Features
 
-✅ **Explicit transaction types**
-- Query by type: `LOT`, `ADJUSTMENT`, `TRANSFER`
+✅ **Explicit transaction types (8 types)**
+- **LOT Layer** (parent_lot_no IS NULL): RECEIVE, TRANSFER_IN, OPEN, CLOSE
+- **ADJUSTMENT Layer** (parent_lot_no IS NOT NULL): ISSUE, ADJ_IN, ADJ_OUT, TRANSFER_OUT
 - Type-based filtering and analytics
-- Clear transaction categorization
+- Clear transaction categorization with layer logic
 
 ✅ **Parent lot reference**
 - Direct parent-child queries (read-only initially)
 - Foundation for traceability
 - Consumption source identification
+- Layer type determined by parent_lot_no presence
 
 ✅ **Period awareness**
 - Period status queries (OPEN, CLOSED, LOCKED)
@@ -237,12 +239,28 @@ GET    /api/v1/periods                               # List all periods
 ```json
 {
   "lot_number": "MK-250115-0001",
-  "transaction_type": "LOT",          // ⭐ NEW in v1.1
-  "parent_lot_no": null,              // ⭐ NEW in v1.1
+  "transaction_type": "RECEIVE",     // ⭐ NEW in v1.1: RECEIVE|ISSUE|ADJ_IN|ADJ_OUT|TRANSFER_IN|TRANSFER_OUT|OPEN|CLOSE
+  "parent_lot_no": null,              // ⭐ NEW in v1.1: NULL for LOT layer, NOT NULL for ADJUSTMENT layer
   "transaction_reason": null,         // ⭐ NEW in v1.1
   "in_qty": 100.00000,
-  "out_qty": 0.00000
+  "out_qty": 0.00000,
+  "layer_type": "LOT"                 // ⭐ Derived: LOT or ADJUSTMENT
 }
+```
+
+**Transaction Type Matrix**:
+```
+LOT Layer (parent_lot_no IS NULL):
+├── RECEIVE: Initial receipt from supplier (GRN)
+├── TRANSFER_IN: Receipt from another location (creates new lot)
+├── OPEN: Opening balance for new period (standardized to period average)
+└── CLOSE: Closing balance revaluation (standardized to period average)
+
+ADJUSTMENT Layer (parent_lot_no IS NOT NULL):
+├── ISSUE: Consumption to production/sales (reduces parent lot)
+├── ADJ_IN: Inventory increase (cannot exceed parent lot's original receipt)
+├── ADJ_OUT: Inventory decrease/write-off/return (reduces parent lot)
+└── TRANSFER_OUT: Transfer to another location (reduces source lot)
 ```
 
 ---
@@ -408,8 +426,14 @@ GET    /api/v1/reports/period-analysis            # Period-to-period analysis
 
 ✅ **Period lifecycle management**
 - Automated period close (<5 minutes)
-- Period re-open with approval
+- Period re-open functionality
 - Permanent period locking
+
+✅ **Automated revaluation (Periodic Average)**
+- CLOSE transaction revalues ending inventory to period average
+- OPEN transaction creates opening balance at period average
+- Diff variance calculation and posting to P&L
+- Standardized period-to-period costs
 
 ✅ **Automated snapshots**
 - Period-end balance preservation
@@ -420,6 +444,7 @@ GET    /api/v1/reports/period-analysis            # Period-to-period analysis
 - Snapshot-based historical reports (<1 second)
 - Period comparison analytics
 - Complete audit trail
+- Revaluation variance reports
 
 ✅ **Performance optimization**
 - 75-90% faster queries
@@ -989,22 +1014,30 @@ All responses follow this structure:
 
 **Endpoint**: `POST /api/v1/periods/{period_id}/close`
 
-**Purpose**: Close period and create snapshots
+**Purpose**: Close period, create snapshots, and perform revaluation (if Periodic Average costing)
 
 **Authorization**: `period.manage` permission
 
 **Request Body**:
 ```json
 {
-  "costing_method": "FIFO",
+  "costing_method": "FIFO",           // or "PERIODIC_AVERAGE"
   "generate_reports": true,
   "notify_stakeholders": true,
+  "enable_revaluation": true,         // ⭐ NEW: Enable period-end revaluation (Periodic Average only)
   "validation": {
-    "skip_warnings": false,
-    "require_approval": true
+    "skip_warnings": false
   }
 }
 ```
+
+**Revaluation Process** (when `costing_method: "PERIODIC_AVERAGE"` and `enable_revaluation: true`):
+1. Calculate final period average from all RECEIVE transactions
+2. Generate CLOSE transaction for each item-location with remaining inventory
+3. Revalue ending inventory: `Revalued Amount = Period Average × Remaining Qty`
+4. Calculate Diff variance: `Diff = Revalued Amount - Book Value at Actual Costs`
+5. Post Diff to revaluation variance account in P&L
+6. Generate OPEN transaction for next period at period average cost
 
 **Response**: `202 Accepted`
 ```json
@@ -1033,10 +1066,23 @@ Response:
     "progress": 100,
     "snapshots_created": 1523,
     "total_inventory_value": 458762.50,
+    "costing_method": "PERIODIC_AVERAGE",
+    "revaluation": {                    // ⭐ NEW: Revaluation summary
+      "enabled": true,
+      "period_average_cost": 11.11,
+      "items_revalued": 248,
+      "locations_affected": 12,
+      "close_transactions_created": 248,
+      "open_transactions_created": 248,
+      "total_diff_variance": 2785.50,
+      "diff_variance_posted_to": "Account-5100-Revaluation-Variance",
+      "revaluation_journal_entry": "JE-2025-0234"
+    },
     "reports_generated": [
       "inventory-valuation-2025-01.pdf",
       "period-movement-2025-01.pdf",
-      "cogs-summary-2025-01.pdf"
+      "cogs-summary-2025-01.pdf",
+      "revaluation-variance-2025-01.pdf"  // ⭐ NEW: Revaluation report
     ],
     "completed_at": "2025-02-01T14:45:32Z"
   }
@@ -1054,8 +1100,7 @@ Response:
 **Request Body**:
 ```json
 {
-  "reason": "Missed GRN transaction from January 28th. Need to post receipt for PO-2025-0156 (50 units of ITEM-789 @ $15.25). Transaction was approved but not entered in system before period close.",
-  "approval_required": true
+  "reason": "Missed GRN transaction from January 28th. Need to post receipt for PO-2025-0156 (50 units of ITEM-789 @ $15.25). Transaction was approved but not entered in system before period close."
 }
 ```
 
@@ -1070,8 +1115,7 @@ Response:
     "reopened_at": "2025-02-05T10:15:00Z",
     "reopened_by": "USER-002",
     "reopen_count": 1,
-    "reason": "Missed GRN transaction from January 28th...",
-    "approval_status": "PENDING"
+    "reason": "Missed GRN transaction from January 28th..."
   }
 }
 ```
@@ -1088,7 +1132,7 @@ Response:
 ```json
 {
   "confirmation": "LOCK_PERIOD_PERMANENT",
-  "reason": "External audit completed, financial statements approved"
+  "reason": "External audit completed, financial statements finalized"
 }
 ```
 
@@ -1103,6 +1147,180 @@ Response:
     "locked_at": "2025-03-01T00:00:00Z",
     "locked_by": "USER-003",
     "reason": "External audit completed..."
+  }
+}
+```
+
+### Get Revaluation Transactions
+
+**Endpoint**: `GET /api/v1/periods/{period_id}/revaluation`
+
+**Purpose**: Retrieve CLOSE and OPEN transactions created during period-end revaluation
+
+**Authorization**: `inventory.read` permission
+
+**Query Parameters**:
+- `item_id` (optional): Filter by item
+- `location_id` (optional): Filter by location
+- `transaction_type` (optional): Filter by CLOSE or OPEN
+- `page` (default: 1)
+- `per_page` (default: 50, max: 500)
+
+**Response**: `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "period_id": "25-01",
+    "costing_method": "PERIODIC_AVERAGE",
+    "revaluation_date": "2025-02-01T00:00:00Z",
+    "period_average_cost": 11.11,
+
+    "transactions": [
+      {
+        "transaction_id": "CLOSE-25-01-ITEM-001",
+        "transaction_type": "CLOSE",
+        "transaction_date": "2025-01-31",
+        "item_id": "ITEM-12345",
+        "item_name": "Chicken Breast",
+        "location_id": "LOC-KITCHEN",
+        "location_code": "MK",
+        "lot_number": "MK-250131-CLOSE",  // Special lot for CLOSE transaction
+        "parent_lot_no": null,              // LOT layer (no parent)
+        "layer_type": "LOT",
+
+        "book_value_before": 2750.00,      // Inventory at actual costs
+        "revalued_amount": 2777.50,        // Inventory at period average
+        "diff_variance": 27.50,             // Revaluation variance (posted to P&L)
+        "remaining_qty": 250.00000,
+        "unit_cost_before": 11.00,         // Weighted average of actual costs
+        "unit_cost_after": 11.11,          // Period average cost
+
+        "variance_account": "Account-5100-Revaluation-Variance",
+        "journal_entry_id": "JE-2025-0234"
+      },
+      {
+        "transaction_id": "OPEN-25-02-ITEM-001",
+        "transaction_type": "OPEN",
+        "transaction_date": "2025-02-01",
+        "item_id": "ITEM-12345",
+        "item_name": "Chicken Breast",
+        "location_id": "LOC-KITCHEN",
+        "location_code": "MK",
+        "lot_number": "MK-250201-OPEN",    // Special lot for OPEN transaction
+        "parent_lot_no": null,              // LOT layer (no parent)
+        "layer_type": "LOT",
+
+        "opening_balance_qty": 250.00000,
+        "opening_balance_cost": 2777.50,
+        "unit_cost": 11.11,                 // Standardized to period average
+
+        "note": "Opening balance standardized to period average cost"
+      }
+    ],
+
+    "summary": {
+      "total_close_transactions": 248,
+      "total_open_transactions": 248,
+      "total_diff_variance": 2785.50,
+      "variance_breakdown": {
+        "positive_variance": 1850.25,      // Inventory increased in value
+        "negative_variance": -935.25       // Inventory decreased in value (shown as negative)
+      }
+    },
+
+    "pagination": {
+      "current_page": 1,
+      "per_page": 50,
+      "total_pages": 10,
+      "total_records": 496
+    }
+  }
+}
+```
+
+### Get Revaluation Variance Report
+
+**Endpoint**: `GET /api/v1/periods/{period_id}/revaluation/variance`
+
+**Purpose**: Detailed revaluation variance analysis by item and location
+
+**Authorization**: `reports.read` permission
+
+**Query Parameters**:
+- `item_id` (optional): Filter by item
+- `location_id` (optional): Filter by location
+- `min_variance` (optional): Filter by minimum absolute variance
+- `format` (optional): json, pdf, xlsx
+
+**Response**: `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "period_id": "25-01",
+    "costing_method": "PERIODIC_AVERAGE",
+    "period_average_cost": 11.11,
+    "revaluation_date": "2025-01-31",
+
+    "variance_by_item": [
+      {
+        "item_id": "ITEM-12345",
+        "item_name": "Chicken Breast",
+        "item_category": "Proteins",
+
+        "locations": [
+          {
+            "location_id": "LOC-KITCHEN",
+            "location_name": "Kitchen",
+            "location_code": "MK",
+
+            "book_value_before": 2750.00,
+            "revalued_amount": 2777.50,
+            "diff_variance": 27.50,
+            "variance_percentage": 1.00,
+
+            "remaining_qty": 250.00000,
+            "weighted_avg_cost_before": 11.00,
+            "period_avg_cost": 11.11,
+            "cost_difference": 0.11
+          },
+          {
+            "location_id": "LOC-BAR",
+            "location_name": "Bar",
+            "location_code": "BAR",
+
+            "book_value_before": 1800.00,
+            "revalued_amount": 1777.60,
+            "diff_variance": -22.40,
+            "variance_percentage": -1.24,
+
+            "remaining_qty": 160.00000,
+            "weighted_avg_cost_before": 11.25,
+            "period_avg_cost": 11.11,
+            "cost_difference": -0.14
+          }
+        ],
+
+        "total_variance": 5.10
+      }
+    ],
+
+    "summary": {
+      "items_revalued": 248,
+      "locations_affected": 12,
+      "total_diff_variance": 2785.50,
+      "largest_positive_variance": {
+        "item_id": "ITEM-789",
+        "location_id": "LOC-KITCHEN",
+        "variance": 285.50
+      },
+      "largest_negative_variance": {
+        "item_id": "ITEM-456",
+        "location_id": "LOC-BAR",
+        "variance": -185.25
+      }
+    }
   }
 }
 ```

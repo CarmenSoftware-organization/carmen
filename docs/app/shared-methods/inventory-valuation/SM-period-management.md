@@ -19,7 +19,7 @@
 - `enum_period_status` enum (OPEN, CLOSED, LOCKED)
 - Period lifecycle management (OPEN → CLOSED → LOCKED)
 - Period close process with authorization controls
-- Period re-open functionality with approval
+- Period re-open functionality
 - Period lock functionality (permanent closure)
 - Transaction validation against period status
 - Period-based financial reporting cutoffs
@@ -69,7 +69,7 @@ Period management controls the **inventory accounting periods** (calendar months
 OPEN → CLOSED → LOCKED
   ↑        ↓
   └────────┘
-  (Re-open with approval)
+  (Re-open)
 ```
 
 **Period Cutoff**: The date/time after which no transactions can be posted to a period (enforced when status = CLOSED or LOCKED).
@@ -122,7 +122,7 @@ OPEN → CLOSED → LOCKED
 │ CLOSED  │  ← Period closed, can be re-opened
 └────┬────┘
      │ ↑
-     │ │ Re-open (with approval)
+     │ │ Re-open
      │ └──────────────────────
      │
      │ Lock Period (permanent)
@@ -214,9 +214,8 @@ Before closing a period, verify:
 
 1. **All Transactions Posted**: No DRAFT transactions remaining for the period
 2. **Reconciliation Complete**: Inventory counts reconciled with system
-3. **Approvals Obtained**: All pending approvals completed
-4. **Prior Period Closed**: Previous period already closed (sequential closing)
-5. **Data Validation**: No data integrity issues
+3. **Prior Period Closed**: Previous period already closed (sequential closing)
+4. **Data Validation**: No data integrity issues
 
 **Validation Query**:
 ```sql
@@ -340,7 +339,6 @@ After successful close:
 **Requirements**:
 - Only most recent closed period can be re-opened
 - Must provide detailed reason (minimum 50 characters)
-- Approval workflow may be configured (optional)
 - Next period must not be locked
 
 ### Re-Open Period Workflow
@@ -370,18 +368,7 @@ async function requestPeriodReopen(
     throw new ValidationError('Reason must be at least 50 characters')
   }
 
-  // Check if approval workflow required
-  const approvalRequired = await checkApprovalRequired()
-  if (approvalRequired) {
-    return await createApprovalRequest({
-      type: 'PERIOD_REOPEN',
-      period_id: periodId,
-      requested_by: userId,
-      reason: reason
-    })
-  }
-
-  // Direct re-open (no approval required)
+  // Execute re-open
   return await executePeriodReopen(periodId, userId, reason)
 }
 ```
@@ -472,7 +459,7 @@ When corrections complete:
 
 Lock a period when:
 1. Next period successfully closed
-2. Financial statements finalized and approved
+2. Financial statements finalized
 3. External audit complete (if applicable)
 4. Sufficient time passed (e.g., 3 months)
 5. Year-end close complete (for last period of fiscal year)

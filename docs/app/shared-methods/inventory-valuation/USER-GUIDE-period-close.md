@@ -152,24 +152,7 @@ Ensure you have:
 
 ---
 
-### Step 3: Verify Pending Approvals
-
-**Goal**: Clear all pending approval workflows
-
-**Navigation**: `Workflow > Pending Approvals`
-
-**Actions**:
-1. Filter by transaction date within period
-2. Review pending purchase orders, GRNs, requisitions
-3. Either:
-   - Complete approval process
-   - Reject and cancel if inappropriate
-
-**✅ Success Criteria**: No pending approvals for period transactions
-
----
-
-### Step 4: Confirm Prior Period Closed
+### Step 3: Confirm Prior Period Closed
 
 **Goal**: Ensure periods close sequentially
 
@@ -188,7 +171,7 @@ Ensure you have:
 
 ---
 
-### Step 5: Run Pre-Close Reports
+### Step 4: Run Pre-Close Reports
 
 **Goal**: Review summary data before closing
 
@@ -214,11 +197,9 @@ Print or copy this checklist:
 
 - [ ] All transactions posted (zero drafts)
 - [ ] Inventory counts reconciled
-- [ ] Pending approvals cleared
 - [ ] Prior period closed
 - [ ] Pre-close reports reviewed
 - [ ] Anomalies investigated and resolved
-- [ ] Finance manager approval obtained
 - [ ] Backup completed (optional but recommended)
 
 ## Period Close Walkthrough
@@ -291,7 +272,7 @@ Details:
 → Options:
 - Click **"View Details"** to investigate
 - Click **"Cancel"** to resolve issues first (recommended)
-- Click **"Proceed Anyway"** if warnings acceptable (with approval)
+- Click **"Proceed Anyway"** if warnings acceptable
 
 **Outcome C: Validation Failed** ❌
 ```
@@ -584,7 +565,6 @@ System Inventory: 25.00 ✅ (matches)
 Re-open a closed period only when:
 - ✅ Critical transaction was missed
 - ✅ Error discovered requiring correction
-- ✅ Approved by financial manager
 
 **Best Practice**: Minimize re-opens to <5% of all periods
 
@@ -616,24 +596,12 @@ Need to post receipt for PO-2025-0156 (50 units of
 ITEM-789 @ $15.25). Transaction was approved but not
 entered before period close."
 
-Approval Required: Yes
-Approver: [Select Financial Manager]
-
 [Cancel]  [Submit Request]
 ```
 
-**Step 2: Obtain Approval** (if required)
-
-**What Happens**:
-1. Request sent to designated approver
-2. Approver receives email notification
-3. Approver reviews reason and approves/rejects
-
-**Timeline**: Typically approved within 24 hours
-
 ---
 
-**Step 3: Period Re-Opened**
+**Step 2: Period Re-Opened**
 
 **Notification**:
 ```
@@ -645,7 +613,6 @@ New Status: OPEN
 
 Re-Opened At: 2025-02-05 10:15:00
 Re-Opened By: Jane Smith
-Approved By: John Doe
 Reason: Missed GRN transaction from January 28th...
 
 ⚠️ Important:
@@ -659,7 +626,7 @@ Reason: Missed GRN transaction from January 28th...
 
 ---
 
-**Step 4: Post Corrective Transactions**
+**Step 3: Post Corrective Transactions**
 
 **Actions**:
 1. Post missed or corrective transactions
@@ -739,7 +706,6 @@ inventory period on February 2nd at 2 PM.
 Please ensure:
 ✓ All transactions for January are posted by 5 PM Jan 31
 ✓ Inventory counts are completed and reconciled
-✓ Pending approvals are cleared
 
 Any transactions posted after the cutoff will be recorded
 in February.
@@ -808,7 +774,7 @@ Larger operations (>2,000 transactions) may take 30-45 minutes.
 
 ### Q4: How many times can I re-open a period?
 
-**A**: Maximum 5 times (configurable). Each re-open requires approval and creates new snapshot.
+**A**: Maximum 5 times (configurable). Each re-open creates new snapshot.
 
 **Best Practice**: Minimize re-opens to <5% of periods by improving pre-close processes.
 
@@ -829,7 +795,7 @@ Larger operations (>2,000 transactions) may take 30-45 minutes.
 ### Q6: What's the difference between CLOSED and LOCKED?
 
 **A**:
-- **CLOSED**: Period closed, can be re-opened with approval
+- **CLOSED**: Period closed, can be re-opened
 - **LOCKED**: Permanently closed, cannot be re-opened under any circumstances
 
 Lock periods after external audit or sufficient time passed (e.g., 3 months).
@@ -930,7 +896,7 @@ Configure in `System Administration > Notifications > Period Close`
 - Comprehensive step-by-step walkthrough with UI descriptions
 - Pre-close checklist with validation steps
 - Troubleshooting guide for common issues
-- Period re-opening process with approval workflow
+- Period re-opening process
 - Best practices for monthly close routine
 - FAQ section addressing common user questions
 - Support contacts and additional resources

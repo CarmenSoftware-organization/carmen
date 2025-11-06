@@ -90,7 +90,7 @@ Each period aligns with a calendar month:
 OPEN → CLOSED → LOCKED
   ↑        ↓
   └────────┘
-  (Re-open with approval)
+  (Re-open)
 ```
 
 | Status | Description | Transactions Allowed? | Snapshot Exists? |
@@ -861,7 +861,6 @@ WHERE location_id = :location_id  -- Source
 **Requirements**:
 - Only most recent closed period can be re-opened
 - Must provide reason (minimum 50 characters)
-- Approval workflow may be required (configurable)
 
 ### Re-Opening Process
 

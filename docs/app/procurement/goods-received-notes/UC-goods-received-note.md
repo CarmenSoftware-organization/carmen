@@ -20,7 +20,7 @@
 
 This document describes the use cases for the Goods Received Note (GRN) module, covering all user interactions, system processes, and integration points discovered in the actual codebase. The GRN module supports receiving goods from vendors through two primary workflows: PO-based GRN creation (from existing purchase orders) and manual GRN creation (for unplanned deliveries).
 
-Key workflows include GRN list management, item-level receiving with discrepancy tracking, quality inspection, multi-currency handling, extra cost distribution, and automatic stock movement generation upon commitment.
+Key workflows include GRN list management, item-level receiving with discrepancy tracking, multi-currency handling, extra cost distribution, and automatic stock movement generation upon commitment.
 
 **Related Documents**:
 - [Business Requirements](./BR-goods-received-note.md)
@@ -45,10 +45,9 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 
 | Actor | Description | Role |
 |-------|-------------|------|
-| Procurement Manager | Manager overseeing procurement operations | Approves high-value GRNs, reviews discrepancies, voids GRNs |
-| Quality Inspector | Staff responsible for quality assurance | Performs quality checks, approves or rejects items |
+| Procurement Manager | Manager overseeing procurement operations | Reviews discrepancies, voids GRNs |
 | Finance Team | Financial staff processing vendor payments | Reviews GRN financial data, processes invoices |
-| Warehouse Supervisor | Supervisor of warehouse operations | Approves GRN commitments, manages storage assignments |
+| Warehouse Supervisor | Supervisor of warehouse operations | Manages storage assignments |
 
 ### System Actors
 
@@ -80,17 +79,15 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 [UC-GRN-004]                  [UC-GRN-007]                   [UC-GRN-009]
 [UC-GRN-005]                  [UC-GRN-008]
 [UC-GRN-006]                  [UC-GRN-010]
-[UC-GRN-011]                  [UC-GRN-011]
 
 
-         ┌──────────────────┐              ┌──────────────────┐
-         │   Procurement    │              │     Quality      │
-         │     Manager      │              │    Inspector     │
-         └────────┬─────────┘              └────────┬─────────┘
-                  │                                 │
-             [UC-GRN-012]                      [UC-GRN-011]
-             [UC-GRN-013]                   (quality check)
-              (approval)
+              ┌──────────────────┐
+              │   Procurement    │
+              │     Manager      │
+              └────────┬─────────┘
+                       │
+                  [UC-GRN-012]
+                  [UC-GRN-013]
 
 
     ┌──────────────┐              ┌──────────────┐              ┌──────────────┐
@@ -105,7 +102,7 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 
 **Legend**:
 - **Primary Actors** (top row): Receiving Clerk, Purchasing Staff, Warehouse Staff
-- **Secondary Actors** (middle row): Procurement Manager, Quality Inspector
+- **Secondary Actors** (middle row): Procurement Manager
 - **System Actors** (bottom row): Inventory, Finance, and Purchase Orders modules
 
 ---
@@ -125,9 +122,8 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 | UC-GRN-008 | Manage Extra Costs | Purchasing Staff | Medium | Medium | User |
 | UC-GRN-009 | Assign Storage Locations | Warehouse Staff | Critical | Simple | User |
 | UC-GRN-010 | Add Comments and Attachments | Receiving Clerk, Purchasing Staff | Medium | Simple | User |
-| UC-GRN-011 | Perform Quality Inspection | Quality Inspector | High | Medium | User |
-| UC-GRN-012 | Commit GRN | Warehouse Staff, Procurement Manager | Critical | Complex | User |
-| UC-GRN-013 | Void GRN | Procurement Manager | Medium | Simple | User |
+| UC-GRN-011 | Commit GRN | Warehouse Staff, Receiving Clerk, Purchasing Staff | Critical | Complex | User |
+| UC-GRN-012 | Void GRN | Procurement Manager | Medium | Simple | User |
 | **System Use Cases** | | | | | |
 | UC-GRN-101 | Generate Stock Movements | Inventory Management Module | Critical | Complex | System |
 | UC-GRN-102 | Generate Journal Voucher | Finance Module | Critical | Complex | System |
@@ -302,7 +298,6 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 **Notes**:
 - System generates temporary ID (new-UUID) during creation, replaced with actual GRN number on save
 - User can select multiple PO lines from same PO or different POs for same vendor
-- Quality check flag is automatically inherited from product or PO settings
 - System stores PO reference for traceability and audit
 
 ---
@@ -397,8 +392,8 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 **Notes**:
 - Manual GRNs often used for vendor returns, emergency purchases, or direct deliveries
 - No ordered quantity reference available, so no automatic discrepancy detection
-- User must manually flag any quality issues or discrepancies
-- Manual GRNs require same level of documentation and approval as PO-based GRNs
+- User must manually flag any discrepancies
+- Manual GRNs require same level of documentation as PO-based GRNs
 
 ---
 
@@ -589,7 +584,7 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 
 ### UC-GRN-007: Record Item Discrepancies
 
-**Description**: User documents discrepancies between expected and actual received items, including quantity variances, quality issues, specification mismatches, and damaged goods.
+**Description**: User documents discrepancies between expected and actual received items, including quantity variances, damaged goods, and other issues.
 
 **Actor(s)**: Receiving Clerk
 
@@ -612,7 +607,7 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 3. System flags item row with discrepancy indicator
 4. User clicks on item to view/edit details
 5. System displays item detail form with discrepancy fields
-6. User selects discrepancy type: quantity, quality, specification, or damage
+6. User selects discrepancy type: quantity, damage, or other
 7. User enters rejected quantity (if applicable)
 8. User enters damaged quantity (if applicable)
 9. User enters discrepancy notes explaining the issue
@@ -625,29 +620,21 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 
 **Alternative Flows**:
 
-**Alt-7A: Quality Discrepancy** (At step 6)
-- User selects "quality" as discrepancy type
-- User enters quality issue description in notes
-- User may enter rejected quantity if items fail quality check
-- System marks item quality status as "failed" or "conditional"
-- Continue to step 10
-
-**Alt-7B: Damage Discrepancy** (At step 6)
+**Alt-7A: Damage Discrepancy** (At step 6)
 - User selects "damage" as discrepancy type
 - User enters damaged quantity
 - User describes nature of damage in notes
 - System calculates net received quantity (delivered - damaged)
 - Continue to step 10
 
-**Alt-7C: Specification Mismatch** (At step 6)
-- User selects "specification" as discrepancy type
-- User describes specification variance in notes
-- User may reject entire quantity if specification critical
-- System flags for procurement review
+**Alt-7B: Other Discrepancy** (At step 6)
+- User selects "other" as discrepancy type
+- User describes the issue in notes
+- User may enter rejected quantity if items not accepted
 - Continue to step 10
 
-**Alt-7D: No Discrepancy After Review** (At step 4)
-- User confirms quantities match and quality acceptable
+**Alt-7C: No Discrepancy After Review** (At step 4)
+- User confirms quantities match and no discrepancies
 - User does not flag discrepancy
 - System removes auto-detected discrepancy flag
 - Use case ends
@@ -672,11 +659,9 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 
 **Related Requirements**:
 - FR-GRN-006: Discrepancy Management
-- FR-GRN-007: Quality Inspection Integration
 
 **Notes**:
 - Discrepancy count displayed prominently in GRN header
-- High-value discrepancies may require manager approval before commitment
 - Discrepancy data used for vendor performance tracking
 - Photos can be attached as evidence via Comments & Attachments tab
 
@@ -851,100 +836,11 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 
 ---
 
-### UC-GRN-011: Perform Quality Inspection
-
-**Description**: Quality inspector reviews received items against quality standards, records inspection results, and approves or rejects items based on quality check.
-
-**Actor(s)**: Quality Inspector
-
-**Priority**: High
-
-**Frequency**: Weekly (for items flagged for quality check, ~15% of GRNs)
-
-**Preconditions**:
-- GRN exists with qualityCheckRequired flag set to true
-- GRN status is RECEIVED
-- User has quality inspector role
-
-**Postconditions**:
-- **Success**: Quality check completed, items marked as passed/failed/conditional
-- **Failure**: Quality check incomplete, GRN cannot be committed
-
-**Main Flow**:
-1. Quality inspector navigates to GRN requiring quality check
-2. System displays GRN items with quality status column
-3. Inspector reviews each item against quality specifications
-4. For each item, inspector selects quality status: pending, passed, failed, or conditional
-5. If item fails quality check, inspector enters rejection reason
-6. If conditional acceptance, inspector enters acceptance conditions in notes
-7. Inspector records rejected quantity (if partial rejection)
-8. Inspector repeats for all items requiring quality check
-9. Inspector marks overall GRN quality check as passed or failed
-10. Inspector enters own name as quality checker
-11. System records quality check timestamp
-12. Inspector saves quality inspection results
-13. System updates GRN with quality check information
-14. System displays updated quality status
-15. Use case ends
-
-**Alternative Flows**:
-
-**Alt-11A: Partial Rejection** (At step 7)
-- Inspector rejects portion of delivered quantity
-- Inspector enters rejected quantity and reason
-- System updates received quantity (delivered - rejected)
-- System flags item with quality discrepancy
-- Continue to step 8
-
-**Alt-11B: Conditional Acceptance** (At step 4)
-- Inspector marks item as "conditional"
-- Inspector enters conditions for acceptance (e.g., "use by specific date", "for internal use only")
-- System allows GRN commitment with conditions noted
-- Continue to step 8
-
-**Alt-11C: All Items Pass** (At step 9)
-- All items marked as quality status "passed"
-- Inspector marks overall GRN quality check as passed
-- System enables GRN commitment
-- Continue to step 11
-
-**Exception Flows**:
-
-**Exc-11A: Missing Rejection Reason** (At step 12)
-- Inspector marked items as failed but did not enter rejection reason
-- System displays validation error "Rejection reason required for failed items"
-- Inspector enters rejection reasons
-- Resume at step 12
-
-**Exc-11B: All Items Fail Quality Check** (At step 9)
-- All items marked as quality status "failed"
-- Inspector marks overall GRN quality check as failed
-- System prevents GRN commitment
-- System notifies purchasing staff for vendor follow-up
-- Use case ends
-
-**Business Rules**:
-- **BR-GRN-015**: Quality check required GRNs cannot be committed until quality check passed or conditionally accepted
-- **BR-GRN-005**: Rejected quantity cannot exceed delivered quantity
-
-**Related Requirements**:
-- FR-GRN-007: Quality Inspection Integration
-- FR-GRN-006: Discrepancy Management (for quality discrepancies)
-
-**Notes**:
-- Quality check requirements determined by item configuration or PO settings
-- Failed quality checks trigger vendor performance tracking
-- Quality inspector name and timestamp recorded for audit trail
-- Conditional acceptance requires manager approval in some cases
-- Photos of quality issues can be attached as documentation
-
----
-
-### UC-GRN-012: Commit GRN
+### UC-GRN-011: Commit GRN
 
 **Description**: User finalizes a GRN by committing it, which triggers stock movements, updates inventory levels, and generates financial journal entries.
 
-**Actor(s)**: Warehouse Staff, Procurement Manager
+**Actor(s)**: Warehouse Staff, Receiving Clerk, Purchasing Staff
 
 **Priority**: Critical
 
@@ -953,8 +849,7 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 **Preconditions**:
 - GRN exists in DRAFT or RECEIVED status
 - All items have storage locations assigned
-- If quality check required, quality check is passed or conditionally accepted
-- User has permission to commit GRNs (or approval for high-value GRNs)
+- User has permission to commit GRNs
 
 **Postconditions**:
 - **Success**: GRN status changed to COMMITTED, stock movements generated, inventory updated, journal voucher created
@@ -963,7 +858,7 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 **Main Flow**:
 1. User opens GRN in RECEIVED status
 2. User reviews all GRN data: items, quantities, prices, locations, discrepancies
-3. User verifies all validations passed (locations assigned, quality checked if required)
+3. User verifies all validations passed (locations assigned)
 4. User clicks "Commit GRN" button
 5. System validates GRN is ready for commitment
 6. System displays commitment confirmation dialog with impact summary
@@ -981,14 +876,7 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 
 **Alternative Flows**:
 
-**Alt-12A: High-Value GRN Approval** (At step 4)
-- GRN total value exceeds approval threshold (e.g., $10,000)
-- System requires procurement manager approval
-- Warehouse staff submits GRN for approval
-- Procurement manager reviews and approves
-- Continue to step 5
-
-**Alt-12B: Commitment with Discrepancies** (At step 5)
+**Alt-11A: Commitment with Discrepancies** (At step 5)
 - GRN contains flagged discrepancies
 - System displays warning about committing with discrepancies
 - User reviews discrepancy notes
@@ -997,21 +885,14 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 
 **Exception Flows**:
 
-**Exc-12A: Missing Storage Locations** (At step 5)
+**Exc-11A: Missing Storage Locations** (At step 5)
 - System detects items without storage location assignments
 - System displays validation error listing items needing locations
 - System prevents commitment
 - User assigns locations via UC-GRN-009
 - Resume at step 4 or end use case
 
-**Exc-12B: Failed Quality Check** (At step 5)
-- System detects overall quality check failed
-- System displays error "Cannot commit GRN with failed quality check"
-- System prevents commitment
-- User voids GRN or works with vendor on replacement
-- Use case ends
-
-**Exc-12C: Stock Movement Generation Failure** (At step 9)
+**Exc-11B: Stock Movement Generation Failure** (At step 9)
 - System encounters error generating stock movements
 - System rolls back GRN status change
 - System displays error message with details
@@ -1022,7 +903,6 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 **Business Rules**:
 - **BR-GRN-012**: COMMITTED status GRNs cannot be edited or deleted, only voided
 - **BR-GRN-014**: Stock movements only generated when GRN status changes to COMMITTED
-- **BR-GRN-024**: GRN commitment requires manager approval for values exceeding threshold
 - **BR-GRN-008**: Storage location must be assigned for all items before commitment
 
 **Includes**:
@@ -1210,7 +1090,7 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 - FR-GRN-013: Activity Log (comment addition logged)
 
 **Notes**:
-- Common attachments: delivery notes, packing slips, vendor invoices, quality inspection photos
+- Common attachments: delivery notes, packing slips, vendor invoices, photos of discrepancies
 - Comments support collaboration between receiving, purchasing, and finance teams
 - Attachments stored securely with access controlled by user permissions
 - Comment history preserved even if GRN is voided
@@ -1526,7 +1406,7 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 - Integration point with Purchase Orders Module via internal API
 - PO fulfillment status drives procurement workflow (close POs, trigger new POs)
 - Partial receipt common for large orders or phased deliveries
-- Over receipt may require manager approval based on configuration
+- Over receipt handled based on configuration
 - This integration supports procurement analytics and vendor performance tracking
 
 ---
@@ -1536,10 +1416,9 @@ Key workflows include GRN list management, item-level receiving with discrepancy
 ### Glossary
 - **Actor**: Person, role, or system that interacts with the GRN module
 - **Discrepancy**: Variance between expected (ordered) and actual (received) goods
-- **Commitment**: Final approval of GRN triggering inventory and financial updates
+- **Commitment**: Finalization of GRN triggering inventory and financial updates
 - **Stock Movement**: Inventory transaction recording goods transfer between locations
 - **Journal Voucher**: Accounting entry recording financial impact of GRN
-- **Quality Status**: Inspection result (pending, passed, failed, conditional)
 - **Extra Cost**: Additional cost beyond item prices (freight, handling, insurance)
 - **Base Currency**: Primary currency for financial reporting (USD)
 - **Transaction Currency**: Currency used in specific GRN transaction

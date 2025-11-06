@@ -188,12 +188,12 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 - **status**: Tracks credit note lifecycle state
   - Required: Yes
   - Data type: Enum (CreditNoteStatus)
-  - Allowed values: DRAFT, POSTED, VOID
+  - Allowed values: DRAFT, COMMITTED, VOID
   - Default: DRAFT
   - Status transitions:
-    - DRAFT → POSTED (post to GL)
-    - POSTED → VOID (void posted credit)
-  - Business rule: POSTED status can only transition to VOID
+    - DRAFT → COMMITTED (commit to GL)
+    - COMMITTED → VOID (void committed credit)
+  - Business rule: COMMITTED status can only transition to VOID
 
 **Credit Reason and Description**:
 - **creditReason**: Standardized reason code for credit
@@ -258,13 +258,13 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
   - Data type: Text
   - Example: "Vendor acknowledged quality issues, agreed to full credit"
 
-**Posting Information**:
-- **postingDate**: Date when credit note was posted to GL
-  - Required: No (NULL until posted, set when status changes to POSTED)
+**Commitment Information**:
+- **committedDate**: Date when credit note was committed to GL
+  - Required: No (NULL until committed, set when status changes to COMMITTED)
   - Data type: Date
 
-- **postingReference**: Journal voucher or posting reference number
-  - Required: No (NULL until posted)
+- **commitmentReference**: Journal voucher or commitment reference number
+  - Required: No (NULL until committed)
   - Data type: String (max 50 characters)
   - Example: "JV-2024-1523"
 
@@ -303,7 +303,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 | invoiceDate | DATE | No | NULL | Original invoice date | 2024-10-10 | - |
 | taxInvoiceReference | VARCHAR(100) | No | NULL | Tax invoice number | TAX-2024-001 | - |
 | taxDate | DATE | No | NULL | Tax invoice date | 2024-10-10 | - |
-| status | VARCHAR(20) | Yes | DRAFT | Credit note lifecycle status | POSTED | DRAFT\|POSTED\|VOID |
+| status | VARCHAR(20) | Yes | DRAFT | Credit note lifecycle status | COMMITTED | DRAFT\|COMMITTED\|VOID |
 | creditReason | VARCHAR(50) | Yes | - | Standardized reason code | DAMAGED_GOODS | PRICING_ERROR\|DAMAGED_GOODS\|RETURN\|DISCOUNT_AGREEMENT\|OTHER |
 | description | TEXT | Yes | - | Detailed explanation | Partial shipment damaged... | Min 10 chars (50 for OTHER) |
 | currency | CHAR(3) | Yes | Base | Currency code (ISO 4217) | USD | Valid ISO code |
@@ -313,8 +313,8 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 | taxRate | DECIMAL(5,2) | Yes | 0.00 | Tax rate percentage | 18.00 | 0-100 |
 | totalAmount | DECIMAL(15,2) | Yes | 0.00 | Total credit with tax | 4720.00 | ≥ 0 |
 | notes | TEXT | No | NULL | Internal notes | Vendor acknowledged issues | - |
-| postingDate | DATE | No | NULL | GL posting date | 2024-10-25 | Cannot be NULL if POSTED |
-| postingReference | VARCHAR(50) | No | NULL | Journal voucher reference | JV-2024-1523 | - |
+| committedDate | DATE | No | NULL | GL commitment date | 2024-10-25 | Cannot be NULL if COMMITTED |
+| commitmentReference | VARCHAR(50) | No | NULL | Commitment reference | JV-2024-1523 | - |
 | voidDate | DATE | No | NULL | Void date | 2024-10-30 | Cannot be NULL if VOID |
 | voidReason | TEXT | No | NULL | Void reason | Error in quantities... | Required if VOID |
 | createdDate | TIMESTAMPTZ | Yes | NOW() | Creation timestamp | 2024-10-23T10:00:00Z | Immutable |
@@ -352,7 +352,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
   - Business rule: Track user accountability for credit note operations
 
 **Check Constraints**:
-- **Status values**: Must be one of: DRAFT, POSTED, VOID
+- **Status values**: Must be one of: DRAFT, COMMITTED, VOID
 - **Credit type values**: Must be one of: QUANTITY_RETURN, AMOUNT_DISCOUNT
 - **Credit reason values**: Must be one of: PRICING_ERROR, DAMAGED_GOODS, RETURN, DISCOUNT_AGREEMENT, OTHER
 - **Document date**: Cannot be more than 7 days in the future
@@ -361,16 +361,16 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 - **Exchange rate**: Must be > 0
 - **Total calculation**: totalAmount must equal netAmount + taxAmount
 - **Description length**: Minimum 10 characters (50 if creditReason = OTHER)
-- **Posted status**: If status = POSTED, postingDate and postingReference must not be NULL
+- **Committed status**: If status = COMMITTED, committedDate and commitmentReference must not be NULL
 - **Void status**: If status = VOID, voidDate and voidReason must not be NULL
 
 **Business Rules Enforced**:
-- Credit note must have at least one item before submission (validated at application level)
-- All items must have lot selections for quantity returns before submission
+- Credit note must have at least one item before commitment (validated at application level)
+- All items must have lot selections for quantity returns before commitment
 - Tax invoice reference required for input VAT credit claims
 - DRAFT status credit notes are editable
-- POSTED status credit notes are locked from editing (can only be voided)
-- POSTED status credit notes are immutable (updates prevented), can only be voided
+- COMMITTED status credit notes are locked from editing (can only be voided)
+- COMMITTED status credit notes are immutable (updates prevented), can only be voided
 - VOID status credit notes are read-only (preserved for audit)
 - Credit type cannot be changed after save (immutable field)
 
@@ -642,7 +642,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 - Each lot must exist in inventory system with sufficient available quantity
 - FIFO weighted average cost calculated as: Σ(quantity × unitCost) / Σ(quantity)
 - Cost variance = current unit price - FIFO weighted average cost
-- Applied lots are immutable once credit note is posted
+- Applied lots are immutable once credit note is committed
 
 ---
 
@@ -776,7 +776,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 
 ### Enumeration: CreditNoteStatus
 
-**Description**: Tracks the lifecycle state of a credit note from draft creation through posting and potential voiding.
+**Description**: Tracks the lifecycle state of a credit note from draft creation through commitment and potential voiding.
 
 **Values**:
 - **DRAFT**: Initial state, credit note being created or edited
@@ -784,28 +784,28 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
   - No financial impact
   - Can be deleted
 
-- **POSTED**: Posted to general ledger
+- **COMMITTED**: Committed to general ledger
   - Immutable (cannot be edited)
   - Journal entries created
   - Stock movements generated (for quantity returns)
   - Vendor payable reduced
   - Can only be voided (not deleted)
 
-- **VOID**: Voided after posting, reversing entries created
+- **VOID**: Voided after commitment, reversing entries created
   - Read-only
-  - Reversing journal entries posted
+  - Reversing journal entries created
   - Reversing stock movements generated
   - Vendor payable restored
   - Preserved for audit trail
 
 **State Transitions**:
-- DRAFT → POSTED (post to GL)
-- POSTED → VOID (void posted credit)
+- DRAFT → COMMITTED (commit to GL)
+- COMMITTED → VOID (void committed credit)
 
 **Business Rules**:
 - Only DRAFT status allows editing
 - Status transitions validated and logged in audit trail
-- POSTED status is final (except for void operation)
+- COMMITTED status is final (except for void operation)
 - VOID status is terminal (no further transitions allowed)
 
 ---
@@ -860,7 +860,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 
 - **Status Index**: status (B-tree)
   - Purpose: Filter credit notes by status
-  - Usage: List view filtering, posting queue
+  - Usage: List view filtering, commitment queue
 
 - **Vendor Index**: vendorId (B-tree)
   - Purpose: Find all credit notes for a vendor
@@ -870,7 +870,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
   - Purpose: Sort credit notes by date, date range queries
   - Usage: Recent credits, period-end reporting, aging analysis
 
-- **Posting Date Index**: postingDate (B-tree)
+- **Commitment Date Index**: committedDate (B-tree)
   - Purpose: GL period queries
   - Usage: Financial period reporting, audit queries
 
@@ -923,7 +923,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
   - All CreditNoteItem records
   - All AppliedLot records (via CreditNoteItem cascade)
   - All CreditNoteAttachment records
-- Business rule: Cannot cascade delete if credit note is POSTED (must void instead)
+- Business rule: Cannot cascade delete if credit note is COMMITTED (must void instead)
 
 **Restrict Deletes**:
 - Cannot delete Vendor if credit notes exist (must deactivate vendor instead)
@@ -939,17 +939,17 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 **Cross-Field Validation**:
 - Total amount must equal net amount + tax amount
 - For quantity returns: sum of applied lot quantities must equal credit note item cnQty
-- If status = POSTED, postingDate and postingReference must not be NULL
+- If status = COMMITTED, committedDate and commitmentReference must not be NULL
 - If status = VOID, voidDate and voidReason must not be NULL
 - If creditReason = OTHER, description must be ≥ 50 characters
 
 **Business Logic Validation**:
 - Cannot edit credit note unless status = DRAFT
-- Cannot delete credit note if status = POSTED (must void instead)
+- Cannot delete credit note if status = COMMITTED (must void instead)
 - Cannot change credit type after save
-- Cannot submit credit note without at least one item
-- Cannot post credit note unless status = DRAFT
-- Cannot void credit note unless status = POSTED
+- Cannot commit credit note without at least one item
+- Cannot commit credit note unless status = DRAFT
+- Cannot void credit note unless status = COMMITTED
 
 ---
 
@@ -1003,7 +1003,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 
 **Status-Based Access**:
 - DRAFT: Can be edited by creator or procurement team
-- POSTED: Read-only for all users except authorized void permission
+- COMMITTED: Read-only for all users except authorized void permission
 - VOID: Read-only for all users
 
 ### Field-Level Security
@@ -1036,19 +1036,19 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 
 **Input VAT**: Value-added tax paid on purchases that can be credited against output VAT. Credit notes reduce input VAT previously claimed.
 
-**Journal Voucher**: Accounting document containing GL entries generated from credit note posting.
+**Journal Voucher**: Accounting document containing GL entries generated from credit note commitment.
 
 **Stock Movement**: Inventory transaction record showing quantity changes by location and lot number. Credit notes generate negative stock movements (reduce inventory).
 
-**GL Account**: General Ledger account number used in financial system for posting transactions.
+**GL Account**: General Ledger account number used in financial system for commitment transactions.
 
 **Primary Entries**: Main journal entries for accounts payable credit and inventory/tax adjustments.
 
 **Inventory Entries**: Additional journal entries for cost variances between current cost and FIFO cost.
 
-**Posting Date**: Date when credit note was posted to general ledger, used for GL period determination.
+**Commitment Date**: Date when credit note was committed to general ledger, used for GL period determination.
 
-**Void**: Reverse a posted credit note by creating reversing journal entries and stock movements, restoring original balances.
+**Void**: Reverse a committed credit note by creating reversing journal entries and stock movements, restoring original balances.
 
 ---
 

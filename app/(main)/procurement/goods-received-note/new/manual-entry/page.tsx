@@ -110,7 +110,6 @@ export default function ManualEntryPage() {
                                     },
                                     lotNumber: (item as any).lotNumber || '',
                                     storageLocationId: (item as any).location || '',
-                                    qualityStatus: 'pending' as const,
                                     hasDiscrepancy: false,
                                     // Legacy fields for compatibility (remove in future refactor)
                                     name: (item as any).name || '',
@@ -173,7 +172,6 @@ export default function ManualEntryPage() {
             currency: 'USD'
         },
         discrepancies: 0,
-        qualityCheckRequired: false,
         // Legacy/extra fields for compatibility
         ref: localDetails.reference || `GRN-MANUAL-${tempId.substring(0, 8)}`,
         selectedItems: [],

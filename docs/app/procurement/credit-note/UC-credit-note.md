@@ -20,7 +20,7 @@
 
 This document describes the use cases for the Credit Note module, covering all user interactions, system processes, and integration points discovered in the actual codebase. The Credit Note module supports vendor credit management through two primary workflows: quantity-based credit notes (for physical returns with stock movements) and amount-based credit notes (for pricing adjustments without physical returns).
 
-Key workflows include credit note list management, item-level credit processing with FIFO costing, lot tracking, multi-currency handling, automatic journal entry generation, tax adjustments, stock movement integration, and approval workflows.
+Key workflows include credit note list management, item-level credit processing with FIFO costing, lot tracking, multi-currency handling, automatic journal entry generation, tax adjustments, and stock movement integration.
 
 **Related Documents**:
 - [Business Requirements](./BR-credit-note.md)
@@ -45,7 +45,7 @@ Key workflows include credit note list management, item-level credit processing 
 
 | Actor | Description | Role |
 |-------|-------------|------|
-| Procurement Manager | Manager overseeing procurement operations | Approves high-value credit notes, reviews pricing disputes |
+| Procurement Manager | Manager overseeing procurement operations | Reviews credit notes, resolves pricing disputes, voids committed credits |
 | Finance Team | Financial staff processing vendor payments | Reviews credit note financial data, processes vendor credits |
 | Accounts Payable Clerk | Staff managing vendor payments and credits | Applies credits to vendor accounts, processes adjustments |
 
@@ -53,8 +53,8 @@ Key workflows include credit note list management, item-level credit processing 
 
 | System | Description | Integration Type |
 |--------|-------------|------------------|
-| Inventory Management Module | Updates stock levels when quantity-based credit note is posted | Internal Module Integration |
-| Finance Module | Receives journal entries from posted credit notes | Internal Module Integration |
+| Inventory Management Module | Updates stock levels when quantity-based credit note is committed | Internal Module Integration |
+| Finance Module | Receives journal entries from committed credit notes | Internal Module Integration |
 | GRN Module | Provides source data for credit notes linked to receipts | Internal Module Integration |
 | Tax Module | Calculates and adjusts input VAT on credit amounts | Internal Module Integration |
 
@@ -89,9 +89,8 @@ Key workflows include credit note list management, item-level credit processing 
          │     Manager      │              │      Team        │
          └────────┬─────────┘              └────────┬─────────┘
                   │                                 │
-             [UC-CN-011]                       [UC-CN-012]
-             [UC-CN-012]                       [UC-CN-013]
-              (approval)                     (credit review)
+             [UC-CN-011]                       [UC-CN-010]
+             (void credit)                     (commit credit)
 
 
     ┌──────────────┐              ┌──────────────┐              ┌──────────────┐
@@ -135,11 +134,8 @@ Key workflows include credit note list management, item-level credit processing 
 | UC-CN-007 | Review FIFO Cost Analysis | Purchasing Staff, Finance Team | High | Medium | User |
 | UC-CN-008 | Assign Credit Reason and Description | Purchasing Staff | Medium | Simple | User |
 | UC-CN-009 | Add Comments and Attachments | Purchasing Staff | Medium | Simple | User |
-| UC-CN-010 | Submit Credit Note for Approval | Purchasing Staff | High | Simple | User |
-| UC-CN-011 | Approve Credit Note | Procurement Manager | Critical | Medium | User |
-| UC-CN-012 | Reject Credit Note | Procurement Manager | Medium | Simple | User |
-| UC-CN-013 | Post Credit Note | Finance Team, Procurement Manager | Critical | Complex | User |
-| UC-CN-014 | Void Credit Note | Procurement Manager | Medium | Medium | User |
+| UC-CN-010 | Commit Credit Note | Finance Team, Procurement Manager | Critical | Complex | User |
+| UC-CN-011 | Void Credit Note | Procurement Manager | Medium | Medium | User |
 | **System Use Cases** | | | | | |
 | UC-CN-101 | Generate Stock Movements | Inventory Management Module | Critical | Complex | System |
 | UC-CN-102 | Generate Journal Entries | Finance Module | Critical | Complex | System |
@@ -215,7 +211,7 @@ Key workflows include credit note list management, item-level credit processing 
 
 **Notes**:
 - List supports sorting by all displayed columns
-- Status colors: DRAFT (gray), PENDING (yellow), APPROVED (blue), POSTED (green), VOID (red)
+- Status colors: DRAFT (gray), COMMITTED (green), VOID (red)
 - Pagination defaults to 20 rows per page
 - Credit type icons differentiate QUANTITY_RETURN vs AMOUNT_DISCOUNT
 
@@ -935,7 +931,7 @@ Key workflows include credit note list management, item-level credit processing 
 - Reason codes standardized for reporting and analysis
 - Description supports up to 1000 characters
 - Both reason and description appear on printed credit note
-- Reason selection may trigger approval threshold checks
+- Reason recorded in audit trail and visible in credit note details
 
 ---
 
@@ -1041,300 +1037,10 @@ Key workflows include credit note list management, item-level credit processing 
 
 ---
 
-### UC-CN-010: Submit Credit Note for Approval
 
-**Description**: User submits draft credit note for approval, triggering approval workflow based on credit amount thresholds.
+### UC-CN-010: Commit Credit Note
 
-**Actor(s)**: Purchasing Staff
-
-**Priority**: High
-
-**Frequency**: Daily (10-20 times per day)
-
-**Preconditions**:
-- Credit note exists in DRAFT status
-- All required fields completed and validated
-- User has permission to submit credit notes
-- Credit note total amount calculated
-
-**Postconditions**:
-- **Success**: Credit note status changed to PENDING, approval notifications sent
-- **Failure**: Validation errors prevent submission
-
-**Main Flow**:
-1. User opens credit note in DRAFT status
-2. System displays "Submit for Approval" button
-3. User clicks "Submit for Approval" button
-4. System performs final validation:
-   - All required fields present
-   - Items and quantities valid
-   - Lot selections complete (for quantity returns)
-   - Calculations correct
-5. System determines approval required based on credit amount:
-   - If amount ≤ threshold: Auto-approve
-   - If amount > threshold: Require manager approval
-6. System changes status to PENDING
-7. System sends notification to approver(s):
-   - Email with credit note details
-   - In-app notification
-8. System displays success message "Credit note submitted for approval"
-9. System disables edit functionality
-10. System logs submission in audit trail
-11. Use case ends
-
-**Alternative Flows**:
-
-**Alt-10A: Auto-Approve Below Threshold** (At step 5)
-- 5a. Credit note amount below auto-approval threshold
-- 5b. System automatically approves credit note
-- 5c. System changes status directly to APPROVED
-- 5d. System displays "Credit note approved automatically" message
-- Continue to step 10
-
-**Alt-10B: Submit with Comments** (At step 3)
-- 3a. User enters submission comments in text area
-- 3b. Comments included in approval notification
-- Continue to step 4
-
-**Alt-10C: Escalate to Higher Approval** (At step 5)
-- 5a. Credit note amount exceeds department manager threshold
-- 5b. System routes to procurement manager for approval
-- 5c. System sends escalation notification
-- Continue to step 6
-
-**Exception Flows**:
-
-**Exc-10A: Validation Failure** (At step 4)
-- System detects validation errors
-- System displays specific error messages:
-  - Missing required fields
-  - Invalid quantities or amounts
-  - Incomplete lot selections
-- User corrects errors
-- Resume at step 3 or edit credit note
-
-**Exc-10B: No Approver Configured** (At step 7)
-- System cannot determine approver for credit amount
-- System displays configuration error
-- User contacts administrator
-- Use case ends (resume after configuration)
-
-**Exc-10C: Already Submitted** (At step 3)
-- Credit note already in PENDING status
-- System displays "Already submitted" message
-- System disables submit button
-- Use case ends
-
-**Business Rules**:
-- **BR-CN-022**: Only DRAFT credit notes can be submitted
-- **BR-CN-023**: All required fields must be complete before submission
-- **BR-CN-024**: Approval required if credit amount exceeds threshold
-- **BR-CN-025**: Threshold values configured per location/department
-
-**Related Requirements**:
-- FR-CN-013: Approval Workflow
-- FR-CN-016: Audit Trail
-- NFR-CN-007: Approval notification sent within 30 seconds
-
-**Notes**:
-- Auto-approval threshold typically $500-$1000
-- Manager approval threshold typically $5000
-- Procurement manager approval for amounts over $5000
-- Status change triggers email and in-app notifications
-- User cannot edit after submission (must request rejection first)
-
----
-
-### UC-CN-011: Approve Credit Note
-
-**Description**: Approver reviews credit note details and approves the credit, allowing it to proceed to posting.
-
-**Actor(s)**: Procurement Manager
-
-**Priority**: Critical
-
-**Frequency**: Daily (5-15 times per day)
-
-**Preconditions**:
-- Credit note exists in PENDING status
-- User has approval authority for credit amount
-- User receives approval notification
-
-**Postconditions**:
-- **Success**: Credit note status changed to APPROVED, ready for posting
-- **Failure**: Credit note remains PENDING if approval denied
-
-**Main Flow**:
-1. Approver receives notification of pending credit note
-2. Approver navigates to credit note detail page
-3. System displays credit note with PENDING status
-4. Approver reviews credit note details:
-   - Vendor and amounts
-   - Credit reason and description
-   - Items and quantities
-   - FIFO cost analysis (if applicable)
-   - Journal entries preview
-   - Stock movements preview (if applicable)
-5. Approver verifies credit is justified and amounts correct
-6. Approver clicks "Approve" button
-7. System prompts for optional approval comments
-8. Approver enters comments (if any)
-9. System validates approver authority for credit amount
-10. System changes status to APPROVED
-11. System sends notification to requester
-12. System logs approval in audit trail with approver name and timestamp
-13. System displays success message
-14. Use case ends
-
-**Alternative Flows**:
-
-**Alt-11A: Approve with Comments** (At step 7)
-- 7a. Approver enters specific comments or conditions
-- 7b. Comments saved with approval record
-- 7c. Comments visible in audit trail
-- Continue to step 9
-
-**Alt-11B: Request More Information** (At step 5)
-- 5a. Approver needs clarification before approving
-- 5b. Approver adds comment requesting more information
-- 5c. System sends notification to requester
-- 5d. Credit note remains in PENDING status
-- Use case ends (resume after clarification provided)
-
-**Alt-11C: Approve Multiple Credit Notes** (At step 1)
-- 1a. Approver views list of pending credit notes
-- 1b. Approver selects multiple credit notes
-- 1c. Approver clicks "Approve Selected"
-- 1d. System approves all selected credit notes in batch
-- Continue to step 12
-
-**Exception Flows**:
-
-**Exc-11A: Insufficient Approval Authority** (At step 9)
-- Approver authority level insufficient for credit amount
-- System displays "Insufficient authority" error
-- System escalates to higher approval level
-- Use case ends
-
-**Exc-11B: Credit Note Modified During Review** (At step 6)
-- Credit note modified by another user since approver opened it
-- System displays "Credit note has been modified" warning
-- System prompts approver to reload and review changes
-- Resume at step 3
-
-**Exc-11C: Already Approved** (At step 6)
-- Another approver has already approved credit note
-- System displays "Already approved" message
-- System disables approve button
-- Use case ends
-
-**Business Rules**:
-- **BR-CN-026**: Approver must have authority level matching or exceeding credit amount
-- **BR-CN-027**: Approval comments optional but recommended for high-value credits
-- **BR-CN-028**: Credit note cannot be edited after approval
-- **BR-CN-064**: All approvals logged with user, timestamp, and authority level
-
-**Related Requirements**:
-- FR-CN-013: Approval Workflow
-- FR-CN-016: Audit Trail
-- NFR-CN-008: Approval action completes within 2 seconds
-
-**Notes**:
-- Approvers can filter pending credit notes by amount, vendor, age
-- System highlights credit notes requiring urgent attention
-- Approval comments appear on printed credit note
-- Mass approval feature for routine low-value credits
-
----
-
-### UC-CN-012: Reject Credit Note
-
-**Description**: Approver reviews credit note and rejects it, returning it to requester for revision or cancellation.
-
-**Actor(s)**: Procurement Manager
-
-**Priority**: Medium
-
-**Frequency**: Weekly (2-5 times per week)
-
-**Preconditions**:
-- Credit note exists in PENDING status
-- User has approval authority
-- User receives approval notification
-
-**Postconditions**:
-- **Success**: Credit note status changed to REJECTED, returned to requester
-- **Failure**: Credit note remains PENDING if rejection fails
-
-**Main Flow**:
-1. Approver navigates to credit note detail page
-2. System displays credit note with PENDING status
-3. Approver reviews credit note details
-4. Approver identifies issue requiring rejection
-5. Approver clicks "Reject" button
-6. System prompts for rejection reason (required)
-7. Approver enters specific rejection reason:
-   - Insufficient documentation
-   - Incorrect amounts
-   - Vendor dispute required
-   - Policy violation
-   - Other (with explanation)
-8. Approver enters detailed rejection comments
-9. System validates rejection reason provided
-10. System changes status to REJECTED
-11. System sends notification to requester with rejection reason
-12. System logs rejection in audit trail
-13. System displays success message
-14. Use case ends
-
-**Alternative Flows**:
-
-**Alt-12A: Reject and Suggest Revision** (At step 8)
-- 8a. Approver provides specific guidance for revision
-- 8b. Approver suggests corrected amounts or approach
-- 8c. Comments include actionable next steps
-- Continue to step 9
-
-**Alt-12B: Reject and Void** (At step 5)
-- 5a. Approver determines credit note should be cancelled entirely
-- 5b. Approver selects "Reject and Void" option
-- 5c. System changes status to VOID instead of REJECTED
-- 5d. Credit note cannot be revised
-- Use case ends
-
-**Exception Flows**:
-
-**Exc-12A: No Rejection Reason** (At step 9)
-- Approver attempts to reject without providing reason
-- System displays "Rejection reason required" error
-- Approver enters rejection reason
-- Resume at step 7
-
-**Exc-12B: Already Approved** (At step 5)
-- Another approver has already approved credit note
-- System displays "Cannot reject approved credit note" error
-- Use case ends
-
-**Business Rules**:
-- **BR-CN-026**: Approver must have authority to reject credit note
-- **BR-CN-029**: Rejection reason is mandatory field
-- **BR-CN-065**: Rejected credit notes can be revised and resubmitted
-
-**Related Requirements**:
-- FR-CN-013: Approval Workflow
-- FR-CN-016: Audit Trail
-
-**Notes**:
-- Rejection returns credit note to DRAFT status for revision
-- Requester receives email notification with rejection reason
-- Rejection reason appears in audit history
-- Credit note can be revised and resubmitted after rejection
-
----
-
-### UC-CN-013: Post Credit Note
-
-**Description**: Authorized user posts approved credit note to financial system, generating journal entries, updating inventory, and adjusting vendor payables.
+**Description**: Authorized user commits draft credit note to financial system, generating journal entries, updating inventory, and adjusting vendor payables.
 
 **Actor(s)**: Finance Team, Procurement Manager
 
@@ -1343,19 +1049,19 @@ Key workflows include credit note list management, item-level credit processing 
 **Frequency**: Daily (10-20 times per day)
 
 **Preconditions**:
-- Credit note exists in APPROVED status
-- User has posting permission
+- Credit note exists in DRAFT status
+- User has commit permission
 - Accounting period is open for transaction date
 
 **Postconditions**:
-- **Success**: Credit note status changed to POSTED, journal entries created, inventory updated (if applicable), vendor payable reduced
-- **Failure**: Credit note remains APPROVED, user informed of posting errors
+- **Success**: Credit note status changed to COMMITTED, journal entries created, inventory updated (if applicable), vendor payable reduced
+- **Failure**: Credit note remains DRAFT, user informed of commitment errors
 
 **Main Flow**:
-1. User navigates to approved credit note
-2. System displays "Post" button for approved credit note
-3. User clicks "Post" button
-4. System performs pre-posting validation:
+1. User navigates to draft credit note
+2. System displays "Commit" button for draft credit note
+3. User clicks "Commit" button
+4. System performs pre-commitment validation:
    - Accounting period open
    - GL accounts configured
    - Vendor account active
@@ -1374,74 +1080,74 @@ Key workflows include credit note list management, item-level credit processing 
 7. System posts journal entries to Finance module
 8. System updates inventory balances via Inventory module
 9. System reduces vendor payable balance
-10. System changes status to POSTED
-11. System assigns posting date and posting reference number
-12. System sends posting notification to relevant users
-13. System logs posting in audit trail
-14. System displays success message with posting reference
+10. System changes status to COMMITTED
+11. System assigns commitment date and commitment reference number
+12. System sends commitment notification to relevant users
+13. System logs commitment in audit trail
+14. System displays success message with commitment reference
 15. System locks credit note from further edits
 16. Use case ends
 
 **Alternative Flows**:
 
-**Alt-13A: Post with Different Date** (At step 3)
-- 3a. User enters custom posting date
+**Alt-10A: Commit with Different Date** (At step 3)
+- 3a. User enters custom commitment date
 - 3b. System validates date within open accounting period
-- 3c. System uses custom posting date for journal entries
+- 3c. System uses custom commitment date for journal entries
 - Continue to step 4
 
-**Alt-13B: Review Before Post** (At step 3)
-- 3a. User clicks "Preview Posting" button
-- 3b. System displays posting preview:
+**Alt-10B: Review Before Commit** (At step 3)
+- 3a. User clicks "Preview Commitment" button
+- 3b. System displays commitment preview:
    - Journal entries to be created
    - Stock movements to be generated
    - Account balances to be updated
-- 3c. User reviews and confirms posting
+- 3c. User reviews and confirms commitment
 - Continue to step 4
 
-**Alt-13C: Batch Post Multiple Credit Notes** (At step 1)
-- 1a. User selects multiple approved credit notes from list
-- 1b. User clicks "Post Selected" button
-- 1c. System posts all selected credit notes
-- 1d. System displays summary of successful and failed postings
+**Alt-10C: Batch Commit Multiple Credit Notes** (At step 1)
+- 1a. User selects multiple draft credit notes from list
+- 1b. User clicks "Commit Selected" button
+- 1c. System commits all selected credit notes
+- 1d. System displays summary of successful and failed commitments
 - Use case ends
 
 **Exception Flows**:
 
-**Exc-13A: Accounting Period Closed** (At step 4)
+**Exc-10A: Accounting Period Closed** (At step 4)
 - Accounting period is closed for credit note date
 - System displays "Accounting period closed" error
-- System suggests changing posting date or reopening period
+- System suggests changing commitment date or reopening period
 - User contacts finance team
 - Use case ends
 
-**Exc-13B: GL Account Not Configured** (At step 5)
-- Required GL account not configured for posting
+**Exc-10B: GL Account Not Configured** (At step 5)
+- Required GL account not configured for commitment
 - System displays "GL account configuration missing" error
 - System identifies specific missing account
 - User contacts administrator
 - Use case ends
 
-**Exc-13C: Inventory Update Failure** (At step 8)
+**Exc-10C: Inventory Update Failure** (At step 8)
 - Inventory module fails to process stock movement
 - System rolls back journal entries
 - System displays "Inventory update failed" error
-- Credit note remains in APPROVED status
+- Credit note remains in DRAFT status
 - User investigates inventory issue
 - Use case ends (resume after resolution)
 
-**Exc-13D: Vendor Account Inactive** (At step 4)
+**Exc-10D: Vendor Account Inactive** (At step 4)
 - Vendor account is marked inactive or on hold
 - System displays "Vendor account inactive" error
 - User verifies vendor status
 - Use case ends (resume after vendor reactivated)
 
 **Business Rules**:
-- **BR-CN-050**: Journal entries posted only when credit note status is POSTED
+- **BR-CN-050**: Journal entries committed only when credit note status is COMMITTED
 - **BR-CN-051**: Posting date must be within open accounting period
-- **BR-CN-052**: All GL accounts must be configured before posting
+- **BR-CN-052**: All GL accounts must be configured before commitment
 - **BR-CN-053**: Stock movements generated only for quantity-based credits
-- **BR-CN-041**: Stock movements cannot be reversed after posting
+- **BR-CN-041**: Stock movements cannot be reversed after commitment
 - **BR-CN-054**: Vendor payable reduced by credit total amount
 
 **Includes**:
@@ -1459,15 +1165,15 @@ Key workflows include credit note list management, item-level credit processing 
 **Notes**:
 - Posting is irreversible; void credit note if correction needed
 - System performs atomic transaction (all or nothing)
-- Posting generates audit trail with detailed log
+- Commitment generates audit trail with detailed log
 - Email notifications sent to finance team and requester
-- Posted credit notes appear in vendor statement immediately
+- Committed credit notes appear in vendor statement immediately
 
 ---
 
-### UC-CN-014: Void Credit Note
+### UC-CN-011: Void Credit Note
 
-**Description**: Authorized user voids a posted credit note due to errors or disputes, generating reversing entries.
+**Description**: Authorized user voids a committed credit note due to errors or disputes, generating reversing entries.
 
 **Actor(s)**: Procurement Manager
 
@@ -1476,16 +1182,16 @@ Key workflows include credit note list management, item-level credit processing 
 **Frequency**: Monthly (1-3 times per month)
 
 **Preconditions**:
-- Credit note exists in POSTED status
+- Credit note exists in COMMITTED status
 - User has void permission (manager role)
 - Accounting period is open
 
 **Postconditions**:
 - **Success**: Credit note status changed to VOID, reversing journal entries created, inventory reversed (if applicable)
-- **Failure**: Credit note remains POSTED, user informed of void errors
+- **Failure**: Credit note remains COMMITTED, user informed of void errors
 
 **Main Flow**:
-1. User navigates to posted credit note
+1. User navigates to committed credit note
 2. System displays "Void" button (manager permission required)
 3. User clicks "Void" button
 4. System prompts for void reason (required):
@@ -1560,7 +1266,7 @@ Key workflows include credit note list management, item-level credit processing 
 - Resume at step 5
 
 **Business Rules**:
-- **BR-CN-055**: Only POSTED credit notes can be voided
+- **BR-CN-055**: Only COMMITTED credit notes can be voided
 - **BR-CN-056**: Void reason is mandatory
 - **BR-CN-057**: Void generates reversing journal entries with same amounts
 - **BR-CN-058**: Stock movements reversed exactly (same lots, opposite quantities)
@@ -1584,7 +1290,7 @@ Key workflows include credit note list management, item-level credit processing 
 
 ### UC-CN-101: Generate Stock Movements
 
-**Description**: System automatically generates negative stock movements for quantity-based credit notes when posted, reducing inventory balances for returned items.
+**Description**: System automatically generates negative stock movements for quantity-based credit notes when committed, reducing inventory balances for returned items.
 
 **Actor(s)**: Inventory Management Module (System)
 

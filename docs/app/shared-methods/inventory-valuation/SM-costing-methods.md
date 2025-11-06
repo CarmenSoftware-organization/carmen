@@ -158,7 +158,7 @@ interface CalculatedLotBalance {
 ```
 Opening Balance: 0 units
 
-Receipts (GRN - creates entries with in_qty):
+Receipts (GRN commitment creates entries with in_qty):
 - Jan 5, 2025: MK-250105-01 - Entry with in_qty=100, cost_per_unit=$10.00
 - Jan 15, 2025: MK-250115-01 - Entry with in_qty=150, cost_per_unit=$12.00
 - Jan 25, 2025: MK-250125-01 - Entry with in_qty=200, cost_per_unit=$11.50
@@ -232,6 +232,357 @@ Calculated Remaining Balances:
 Total: 270 units @ $3,140
 ```
 
+---
+
+### Credit Note (CN) Transaction Handling
+
+**Transaction Type**: `CN` (Credit Note)
+
+Credit Notes affect inventory in two distinct ways, both triggered immediately when the Credit Note is **committed** (CN uses direct DRAFT → COMMITTED → VOID flow):
+
+1. **QUANTITY_RETURN**: Physical return of goods (creates `out_qty` entry)
+2. **AMOUNT_DISCOUNT**: Cost adjustment without physical return (creates zero-quantity cost adjustment)
+
+Both operations process based on the configured **Cost Method** (FIFO or Periodic AVG).
+
+---
+
+#### CN Operation 1: QUANTITY_RETURN (Physical Return)
+
+**Behavior**: Returns physical inventory to vendor, reducing stock quantity.
+
+**Two Scenarios**:
+- **Same-Lot Return**: Return from the specific lot received in the original GRN
+- **Different-Lot Return**: Return when original lot is partially/fully consumed (uses FIFO consumption)
+
+##### Same-Lot Return Example (FIFO)
+
+**Setup**:
+```
+Product: Raw Material XYZ
+Location: Main Kitchen (MK)
+Costing Method: FIFO
+
+Initial Receipt (GRN-001 committed Jan 15):
+┌───────────────┬────────┬──────────┬────────────┬─────────────┐
+│ lot_no        │ in_qty │ out_qty  │ unit_cost  │ total_cost  │
+├───────────────┼────────┼──────────┼────────────┼─────────────┤
+│ MK-250115-01  │ 100    │ 0        │ $12.50     │ $1,250      │
+└───────────────┴────────┴──────────┴────────────┴─────────────┘
+
+Calculated Balance: 100 units @ $1,250 ($12.50/unit)
+```
+
+**Credit Note Transaction** (CN-001 committed Jan 20):
+- Reason: Quality issue - 30 units damaged
+- Operation: QUANTITY_RETURN
+- Specific Lot: MK-250115-01
+
+**Database Entry Created**:
+```
+Transaction Type: CN
+Entry Details:
+- lot_no: MK-250115-01 (matches original GRN lot)
+- in_qty: 0
+- out_qty: 30
+- cost_per_unit: $12.50 (same as original lot)
+- total_cost: -$375 (negative = inventory reduction)
+```
+
+**Updated Database State**:
+```
+┌───────────────┬────────┬──────────┬────────────┬─────────────┬────────────────┐
+│ lot_no        │ in_qty │ out_qty  │ unit_cost  │ total_cost  │ transaction    │
+├───────────────┼────────┼──────────┼────────────┼─────────────┼────────────────┤
+│ MK-250115-01  │ 100    │ 0        │ $12.50     │ $1,250      │ GRN-001        │
+│ MK-250115-01  │ 0      │ 30       │ $12.50     │ -$375       │ CN-001 (QTY_RET)│
+└───────────────┴────────┴──────────┴────────────┴─────────────┴────────────────┘
+
+Calculated Balance: 70 units (100-30) @ $875 ($12.50/unit maintained)
+```
+
+**Key Points**:
+- Uses original lot's cost ($12.50)
+- Cost per unit remains constant
+- Lot is **not depleted** (remaining = 70 units)
+- Audit trail preserved via transaction entries
+
+##### Different-Lot Return Example (FIFO)
+
+**Setup**:
+```
+Product: Raw Material XYZ
+Location: Main Kitchen (MK)
+Costing Method: FIFO
+
+Multiple Receipts:
+┌───────────────┬────────┬──────────┬────────────┬─────────────┐
+│ lot_no        │ in_qty │ out_qty  │ unit_cost  │ total_cost  │
+├───────────────┼────────┼──────────┼────────────┼─────────────┤
+│ MK-250115-01  │ 100    │ 80       │ $12.50     │ Receipt/Issue│  ← Partially consumed
+│ MK-250120-01  │ 150    │ 0        │ $13.00     │ $1,950       │  ← Newer lot
+└───────────────┴────────┴──────────┴────────────┴─────────────┘
+
+Calculated Balances:
+- MK-250115-01: 20 units remaining (100-80) @ $12.50
+- MK-250120-01: 150 units remaining @ $13.00
+```
+
+**Credit Note Transaction** (CN-002 committed Jan 25):
+- Reason: Over-delivered - return 30 units
+- Operation: QUANTITY_RETURN
+- Original lot reference: MK-250115-01 (but only 20 units remain)
+
+**FIFO Processing**:
+```
+Step 1: Check lot MK-250115-01 availability
+  - Requested: 30 units from MK-250115-01
+  - Available: 20 units (100-80)
+  - Action: Consume all 20 units from MK-250115-01
+
+Step 2: Query next available lot (FIFO order)
+  - ORDER BY lot_no ASC
+  - Next lot: MK-250120-01 (150 units @ $13.00)
+  - Needed: 10 units remaining (30-20)
+  - Action: Consume 10 units from MK-250120-01
+
+Step 3: Create CN transactions
+  - Entry 1: lot_no=MK-250115-01, out_qty=20, cost=$12.50
+  - Entry 2: lot_no=MK-250120-01, out_qty=10, cost=$13.00
+```
+
+**Database Entries Created**:
+```
+┌───────────────┬────────┬──────────┬────────────┬─────────────┬────────────────┐
+│ lot_no        │ in_qty │ out_qty  │ unit_cost  │ total_cost  │ transaction    │
+├───────────────┼────────┼──────────┼────────────┼─────────────┼────────────────┤
+│ MK-250115-01  │ 0      │ 20       │ $12.50     │ -$250       │ CN-002 (QTY_RET)│
+│ MK-250120-01  │ 0      │ 10       │ $13.00     │ -$130       │ CN-002 (QTY_RET)│
+└───────────────┴────────┴──────────┴────────────┴─────────────┴────────────────┘
+
+Total CN-002 Cost: $250 + $130 = $380
+```
+
+**Lot Depletion Detection**:
+```
+MK-250115-01 Balance Check:
+  SUM(in_qty) - SUM(out_qty) = 100 - (80+20) = 0 units
+  Status: ✅ LOT DEPLETED (calculated on-the-fly, no explicit flag)
+
+MK-250120-01 Balance Check:
+  SUM(in_qty) - SUM(out_qty) = 150 - 10 = 140 units remaining
+```
+
+---
+
+#### CN Operation 2: AMOUNT_DISCOUNT (Cost Adjustment)
+
+**Behavior**: Adjusts inventory cost without changing physical quantity (e.g., price negotiation, volume discount received post-delivery).
+
+**Key Characteristics**:
+- `in_qty = 0` (no quantity added)
+- `out_qty = 0` (no quantity removed)
+- `cost_per_unit = $0.00` (not applicable for zero-quantity adjustment)
+- `total_cost < 0` (negative value = discount/cost reduction)
+
+##### Amount Discount Example (FIFO)
+
+**Setup**:
+```
+Product: Raw Material ABC
+Location: Main Kitchen (MK)
+Costing Method: FIFO
+
+Initial State after GRN-003 committed:
+┌───────────────┬────────┬──────────┬────────────┬─────────────┐
+│ lot_no        │ in_qty │ out_qty  │ unit_cost  │ total_cost  │
+├───────────────┼────────┼──────────┼────────────┼─────────────┤
+│ MK-250125-01  │ 200    │ 0        │ $15.00     │ $3,000      │
+└───────────────┴────────┴──────────┴────────────┴─────────────┘
+
+Calculated Balance: 200 units @ $3,000 ($15.00/unit)
+```
+
+**Credit Note Transaction** (CN-003 committed Jan 28):
+- Reason: Volume discount negotiated - $300 discount
+- Operation: AMOUNT_DISCOUNT
+- Applies to: Remaining inventory only (not consumed items)
+
+**Database Entry Created**:
+```
+Transaction Type: CN
+Entry Details:
+- lot_no: MK-250125-01 (links to affected lot)
+- in_qty: 0 (no quantity change)
+- out_qty: 0 (no quantity change)
+- cost_per_unit: $0.00 (not applicable)
+- total_cost: -$300 (negative = cost reduction)
+```
+
+**Updated Database State**:
+```
+┌───────────────┬────────┬──────────┬────────────┬─────────────┬────────────────┐
+│ lot_no        │ in_qty │ out_qty  │ unit_cost  │ total_cost  │ transaction    │
+├───────────────┼────────┼──────────┼────────────┼─────────────┼────────────────┤
+│ MK-250125-01  │ 200    │ 0        │ $15.00     │ $3,000      │ GRN-003        │
+│ MK-250125-01  │ 0      │ 0        │ $0.00      │ -$300       │ CN-003 (AMT_DISC)│
+└───────────────┴────────┴──────────┴────────────┴─────────────┴────────────────┘
+
+Calculated Values:
+  Physical Quantity: 200 units (unchanged)
+  Total Cost: $3,000 - $300 = $2,700
+  Effective Unit Cost: $2,700 ÷ 200 = $13.50/unit (reduced from $15.00)
+```
+
+**Effective Cost Calculation**:
+```
+Formula:
+  Effective Unit Cost = (SUM(in_qty × cost) + SUM(cost adjustments)) / SUM(in_qty)
+
+For lot MK-250125-01:
+  = (200 × $15.00 + (-$300)) / 200
+  = ($3,000 - $300) / 200
+  = $2,700 / 200
+  = $13.50 per unit
+```
+
+**Multi-Lot Discount Allocation**:
+
+When amount discount applies to partially consumed inventory across multiple lots:
+
+```
+Scenario: GRN received 300 units, 100 consumed, CN discount $450
+
+Lot State:
+┌───────────────┬────────┬──────────┬────────────┬─────────────┐
+│ lot_no        │ in_qty │ out_qty  │ unit_cost  │ total_cost  │
+├───────────────┼────────┼──────────┼────────────┼─────────────┤
+│ MK-250130-01  │ 300    │ 100      │ $20.00     │ GRN/ISSUE   │
+└───────────────┴────────┴──────────┴────────────┴─────────────┘
+
+Remaining Inventory: 200 units (300-100)
+Remaining Value: 200 × $20.00 = $4,000
+
+CN AMOUNT_DISCOUNT Processing:
+- Discount: $450
+- Applies to: Remaining 200 units only
+- Creates: lot_no=MK-250130-01, in_qty=0, out_qty=0, total_cost=-$450
+- New Effective Cost: ($4,000 - $450) / 200 = $17.75/unit
+```
+
+---
+
+#### CN Transaction Handling: Periodic Average
+
+**Key Difference**: Periodic Average uses **period-based average cost** instead of lot-specific costs.
+
+##### QUANTITY_RETURN (Periodic AVG)
+
+**Behavior**: Returns reduce quantity but cost is based on period average, not specific lot.
+
+**Example**:
+```
+Product: Raw Material XYZ
+Location: Main Kitchen (MK)
+Costing Method: Periodic AVG
+
+January 2025 Period Average: $11.333/unit
+(Calculated from all January receipts: $5,100 ÷ 450 units)
+
+Credit Note CN-004 (Jan 28):
+- Return: 30 units
+- Reason: Quality issue
+
+CN Entry Created:
+- transaction_type: CN
+- qty: -30 (negative = return)
+- cost_per_unit: $11.333 (period average, not original GRN cost)
+- total_cost: 30 × $11.333 = -$339.99
+
+Note: No lot_no tracking in Periodic AVG method
+```
+
+##### AMOUNT_DISCOUNT (Periodic AVG)
+
+**Behavior**: Cost adjustments affect the **period average calculation** for future transactions.
+
+**Example**:
+```
+Product: Raw Material ABC
+Costing Method: Periodic AVG
+
+January Receipts:
+- GRN-001: 200 units @ $15.00 = $3,000
+- GRN-002: 300 units @ $16.00 = $4,800
+  Total: 500 units @ $7,800
+
+Initial Period Average: $7,800 ÷ 500 = $15.60/unit
+
+Credit Note CN-005 (Jan 25):
+- Amount Discount: $450
+- Operation: AMOUNT_DISCOUNT
+
+Updated Period Calculation:
+  Total Receipts Cost: $7,800 - $450 = $7,350
+  Total Quantity: 500 units (unchanged)
+  Adjusted Period Average: $7,350 ÷ 500 = $14.70/unit
+
+Impact:
+  - All transactions after CN-005 in January use $14.70/unit
+  - Transactions before CN-005 remain at $15.60/unit (no retroactive change)
+  - Cost adjustment applied immediately on CN commit
+```
+
+---
+
+#### CN Transaction Business Rules
+
+**BR-CN-001: Transaction Type**
+- All Credit Note inventory transactions must use transaction type `CN`
+- Distinct from generic adjustments (ADJ_OUT) for audit trail
+
+**BR-CN-002: Cost Method Processing**
+- CN transactions process based on company-wide costing method configuration
+- FIFO: Uses lot-specific costs with FIFO consumption order
+- Periodic AVG: Uses period average cost for QUANTITY_RETURN
+- Periodic AVG: Adjusts period average calculation for AMOUNT_DISCOUNT
+
+**BR-CN-003: QUANTITY_RETURN Same-Lot**
+- When returning to same lot, use original lot's `cost_per_unit`
+- Create entry with `in_qty=0`, `out_qty=returned_qty`, `lot_no=original_lot`
+- Maintains cost consistency for same-lot returns
+
+**BR-CN-004: QUANTITY_RETURN Different-Lot (FIFO)**
+- When original lot insufficient, consume from next available lots
+- Query available lots: `ORDER BY lot_no ASC` (FIFO order)
+- Create separate CN entries for each lot consumed
+- Calculate lot depletion: `SUM(in_qty) - SUM(out_qty) = 0`
+
+**BR-CN-005: AMOUNT_DISCOUNT Processing**
+- Create entry with `in_qty=0`, `out_qty=0`, `total_cost<0`
+- Set `cost_per_unit=$0.00` (not applicable for zero-quantity)
+- Link to affected lot(s) via `lot_no` field
+- Allocate discount to **remaining inventory only** (not consumed items)
+
+**BR-CN-006: Effective Cost Calculation**
+- Formula: `(SUM(in_qty × cost) + SUM(cost_adjustments)) / SUM(in_qty)`
+- Apply to each lot separately in FIFO
+- Apply to entire period in Periodic AVG
+- Recalculate on-the-fly when querying inventory valuation
+
+**BR-CN-007: Timing**
+- All CN inventory transactions trigger **immediately on CN commit**
+- CN uses DRAFT → COMMITTED → VOID flow
+- Cost adjustments apply at moment of commitment
+
+**BR-CN-008: Lot Depletion**
+- No explicit "depleted" flag in database
+- Calculate on-the-fly: `SUM(in_qty) - SUM(out_qty) = 0`
+- Depleted lots excluded from available inventory queries
+- Audit trail preserved (entries remain in database)
+
+---
+
 ### Current FIFO Business Rules
 
 **✅ What Works Now**:
@@ -257,10 +608,10 @@ Total: 270 units @ $3,140
 ✅ **Lower COGS in Rising Prices**: Uses older, cheaper costs first
 ✅ **Audit Trail**: Transaction history via in_qty/out_qty entries
 ✅ **Lot Tracking**: Basic lot identification via lot_no field
+✅ **Automatic Lot Management**: Automatic lot number generation on GRN commit
 
 ### FIFO Disadvantages
 
-❌ **Manual Lot Management**: No automatic lot number generation
 ❌ **Limited Traceability**: No parent-child lot relationships
 ⚠️ **Performance**: Aggregation queries needed for balances (trade-off for audit trail)
 
@@ -282,7 +633,7 @@ The following features are **planned but not yet implemented**:
 2. **✅ FIFO Ordering**: ORDER BY lot_no ASC (natural chronological sort) - **IMPLEMENTED**
 3. **⚠️ Transaction Types**: Distinguish LOT (new lots) from ADJUSTMENT (consumption) layers - **NOT IMPLEMENTED**
 4. **⚠️ Parent Linkage**: `parent_lot_no` field for adjustment layer traceability - **NOT IMPLEMENTED**
-5. **⚠️ Automatic Lot Creation**: GRN/Transfer automatically generate lot numbers - **PARTIAL**
+5. **✅ Automatic Lot Creation**: GRN commitment automatically generates lot numbers - **IMPLEMENTED**
 6. **⚠️ Lot Number Parsing**: Function to extract date from lot_no when needed - **NOT IMPLEMENTED**
 
 **Note**:
@@ -311,17 +662,17 @@ HAVING SUM(in_qty) - SUM(out_qty) > 0
 ORDER BY lot_no ASC  -- FIFO order: lot_no naturally sorts chronologically
 ```
 
-### Transaction Type Behavior (Future Enhancement)
+### Transaction Type Behavior (Partial Implementation)
 
-**⚠️ Not yet implemented - see SCHEMA-ALIGNMENT.md Phase 3**
+**✅ Implemented**: GRN auto-lot generation | **⚠️ Not yet implemented**: Layer types, parent linkage - see SCHEMA-ALIGNMENT.md Phase 3
 
-| Transaction Type | Layer Type | Creates New Lot? | Future Implementation |
+| Transaction Type | Layer Type | Creates New Lot? | Implementation Status |
 |-----------------|------------|------------------|----------------------|
-| **GRN (Receipt)** | LOT | ✅ Yes | Auto-generate lot number |
-| **Transfer In** | LOT | ✅ Yes | New lot at destination |
-| **Store Requisition** | ADJUSTMENT | ❌ No | Link via parent_lot_no |
-| **Credit Note** | ADJUSTMENT | ❌ No | Link via parent_lot_no |
-| **Inventory Adjustment** | ADJUSTMENT | ❌ No | Link via parent_lot_no |
+| **GRN Commitment** | LOT | ✅ Yes | ✅ Auto-generates lot number |
+| **Transfer In** | LOT | ✅ Yes | ⚠️ Future: New lot at destination |
+| **Store Requisition** | ADJUSTMENT | ❌ No | ⚠️ Future: Link via parent_lot_no |
+| **Credit Note** | ADJUSTMENT | ❌ No | ⚠️ Future: Link via parent_lot_no |
+| **Inventory Adjustment** | ADJUSTMENT | ❌ No | ⚠️ Future: Link via parent_lot_no |
 
 </div>
 
@@ -490,7 +841,7 @@ The following features are **planned but not yet implemented**:
 1. **Period Table**: `tb_period` with OPEN → CLOSED → LOCKED lifecycle
 2. **Snapshot Table**: `tb_period_snapshot` for period-end balances
 3. **Period Close Process**: Manual trigger with authorization
-4. **Period Re-Open**: With approval workflow and reason tracking
+4. **Period Re-Open**: With reason tracking and authorization
 5. **Cost Caching**: Performance optimization for average costs
 6. **Transaction Validation**: Check period status before posting
 
@@ -565,7 +916,7 @@ interface PeriodSnapshot {
 | **Storage** | Moderate | Low | High |
 | **Period Management** | ❌ None | ❌ None | ⚠️ Future (tb_period) |
 | **Snapshots** | ❌ None | ❌ None | ⚠️ Future (tb_period_snapshot) |
-| **Automatic Lot Numbers** | ❌ Manual | N/A | ⚠️ Future (auto-generate) |
+| **Automatic Lot Numbers** | ✅ Auto-generate | N/A | ✅ Auto-generate |
 
 ---
 

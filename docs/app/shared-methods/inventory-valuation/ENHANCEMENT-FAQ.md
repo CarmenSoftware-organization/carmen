@@ -428,6 +428,121 @@ GROUP BY lot_no
 
 ---
 
+### Q17: What are the 8 transaction types and why are they important?
+
+**A**: The system uses 8 explicit transaction types to clearly categorize inventory movements:
+
+**LOT Layer** (parent_lot_no IS NULL - creates new lots):
+1. **RECEIVE**: Initial receipt from supplier (GRN) - creates new inventory lot
+2. **TRANSFER_IN**: Receipt from another location - creates new lot at destination
+3. **OPEN**: Opening balance for new period - standardized to period average
+4. **CLOSE**: Closing balance revaluation - standardized to period average
+
+**ADJUSTMENT Layer** (parent_lot_no IS NOT NULL - modifies existing lots):
+5. **ISSUE**: Consumption to production/sales - reduces parent lot balance
+6. **ADJ_IN**: Inventory increase adjustment - cannot exceed parent lot's original receipt
+7. **ADJ_OUT**: Inventory decrease (write-off, return, spoilage) - reduces parent lot
+8. **TRANSFER_OUT**: Transfer to another location - reduces source lot balance
+
+**Why Important**:
+- ✅ **Crystal Clear Intent**: No more inferring transaction type from qty fields
+- ✅ **Accurate Reporting**: Type-based filtering and categorization
+- ✅ **Layer Logic**: Automatic LOT vs ADJUSTMENT layer identification
+- ✅ **Traceability**: Parent-child relationships clearly defined
+- ✅ **Audit Trail**: Complete transparency in transaction categorization
+
+**Example**:
+```
+RECEIVE (LOT layer):
+- lot_no: MK-250115-0001
+- parent_lot_no: NULL
+- transaction_type: RECEIVE
+- in_qty: 100, out_qty: 0
+
+ISSUE (ADJUSTMENT layer):
+- lot_no: MK-250120-ADJ-001
+- parent_lot_no: MK-250115-0001  (references source lot)
+- transaction_type: ISSUE
+- in_qty: 0, out_qty: 25
+```
+
+---
+
+### Q18: How does the layer logic work with parent_lot_no?
+
+**A**: Layer type is automatically determined by parent_lot_no presence:
+
+**LOT Layer** (parent_lot_no IS NULL):
+- Creates **independent** new lot with its own balance
+- Used for: RECEIVE, TRANSFER_IN, OPEN, CLOSE
+- Balance tracked separately from other lots
+- Can be consumed by ADJUSTMENT layer transactions
+
+**ADJUSTMENT Layer** (parent_lot_no IS NOT NULL):
+- **References** and **reduces** parent lot balance
+- Used for: ISSUE, ADJ_IN, ADJ_OUT, TRANSFER_OUT
+- Cannot exist without parent lot
+- Consumption follows FIFO from oldest parent lots first
+
+**Key Rules**:
+- ✅ RECEIVE creates LOT layer (no parent) at actual cost
+- ✅ ISSUE creates ADJUSTMENT layer (has parent) consuming from LOT
+- ✅ TRANSFER_OUT creates ADJUSTMENT at source (has parent)
+- ✅ TRANSFER_IN creates LOT at destination (no parent, new lot)
+- ✅ CLOSE/OPEN create LOT layers (no parent) for revaluation
+- ✅ ADJ_IN cannot exceed parent lot's original receipt quantity
+
+**Example Transaction Flow**:
+```
+1. RECEIVE: MK-250115-0001 (100 kg @ $10.00) - LOT layer, parent_lot_no = NULL
+2. ISSUE: ADJ-001 consumes 25 kg - ADJUSTMENT layer, parent_lot_no = MK-250115-0001
+3. ISSUE: ADJ-002 consumes 50 kg - ADJUSTMENT layer, parent_lot_no = MK-250115-0001
+4. Remaining: MK-250115-0001 balance = 25 kg (100 - 25 - 50)
+```
+
+---
+
+### Q19: What is ADJ_IN and why can't it exceed the parent lot?
+
+**A**: ADJ_IN is an upward inventory adjustment with business rule constraints:
+
+**Purpose**: Correct inventory shortages discovered after physical count or receiving errors
+
+**Constraint**: Cannot increase quantity beyond parent lot's **original receipt**
+
+**Why This Constraint**:
+- ✅ **Data Integrity**: Prevents creating inventory from nothing
+- ✅ **Audit Trail**: Ensures adjustments reference actual receipts
+- ✅ **Quality Control**: Adjustments must be corrections, not new inventory
+- ✅ **Compliance**: Maintains clear source-to-adjustment linkage
+
+**Example Scenarios**:
+
+**Valid ADJ_IN**:
+```
+1. Original RECEIVE: MK-250115-0001 (100 kg @ $10.00)
+2. ISSUE consumption: 30 kg (balance: 70 kg)
+3. Physical count finds: 75 kg (5 kg shortage was incorrect)
+4. ADJ_IN: +5 kg (valid, does not exceed 100 kg original)
+   Result: Balance = 75 kg (within original 100 kg receipt)
+```
+
+**Invalid ADJ_IN** (would be rejected):
+```
+1. Original RECEIVE: MK-250115-0001 (100 kg @ $10.00)
+2. ISSUE consumption: 30 kg (balance: 70 kg)
+3. Attempt ADJ_IN: +50 kg
+   ERROR: Would make balance 120 kg, exceeding original 100 kg receipt
+   Must create new RECEIVE transaction instead
+```
+
+**When to Use RECEIVE Instead of ADJ_IN**:
+- New deliveries from supplier → RECEIVE
+- Additional quantity beyond original receipt → RECEIVE
+- Discovered inventory from unknown source → Investigate, then RECEIVE with explanation
+
+---
+
 ## Operations Impact Questions
 
 ### Q17: Will I need to change how I enter GRN transactions?
@@ -474,7 +589,6 @@ Manual Period Close (4 hours):
 3. Archive reports to shared drive → 15 min
 4. Email reports to finance team → 15 min
 5. Update period tracking spreadsheet → 30 min
-6. Manual approval process → 30 min
 ```
 
 **Future Process** (v2.0):
@@ -527,7 +641,7 @@ Automated Period Close (<5 minutes):
 
 ### Q20: What if I need to post a transaction to a closed period?
 
-**A**: Re-open procedure with approval workflow (Phase 4):
+**A**: Re-open procedure (Phase 4):
 
 **Re-Open Process**:
 ```
@@ -536,25 +650,19 @@ Automated Period Close (<5 minutes):
    - Provide transaction details
    - Attach supporting documents
 
-2. Approval Required:
-   - Financial Manager approval
-   - Document business justification
-   - System logs approval trail
-
-3. System Re-Opens Period:
+2. System Re-Opens Period:
    - Status: CLOSED → OPEN
    - Post late transaction
    - System recalculates affected balances
 
-4. Re-Close Period:
+3. Re-Close Period:
    - Updated snapshots created
    - Reports regenerated
    - Period re-closed
 ```
 
-**Approval Time**: Typically <1 business day
 **Recalculation**: Automatic (instant)
-**Audit Trail**: Complete (reason, approver, timestamp)
+**Audit Trail**: Complete (reason, timestamp)
 
 **Best Practice**: Minimize re-opens through improved transaction posting discipline. Phase 4 training includes period-end checklists to reduce late postings.
 
@@ -605,7 +713,7 @@ Automated Period Close (<5 minutes):
 **Period States**:
 ```
 OPEN → Transactions allowed
-CLOSED → No new transactions, can re-open with approval
+CLOSED → No new transactions, can re-open
 LOCKED → Permanently frozen, cannot re-open
 ```
 
@@ -666,7 +774,7 @@ Month-End (Day 1-2):
 Week After Close (Day 5-7):
 - Internal financial review
 - Reconciliation with general ledger
-- Any re-opens with approval
+- Any re-opens if needed
 
 Month After Close (Day 30-40):
 - External audit (if applicable)
@@ -683,6 +791,173 @@ Month After Close (Day 30-40):
 **Best Practice**: Lock periods 2-3 months after close, once all reviews and audits are complete.
 
 **Exception**: Some companies may lock immediately after close for strict financial control (more restrictive, requires disciplined posting).
+
+---
+
+### Q25: What is period-end revaluation and why is it important?
+
+**A**: Period-end revaluation is an automated process for Periodic Average costing that standardizes inventory costs at period close:
+
+**Purpose**: Ensure period-to-period cost consistency and accurate financial reporting
+
+**How It Works**:
+1. **During Period**: Receipts recorded at **actual costs** (no revaluation yet)
+2. **Period Close**: System calculates **final period average** from all receipts
+3. **CLOSE Transaction**: Revalues ending inventory to period average cost
+4. **Diff Variance**: Calculates and posts variance to P&L revaluation account
+5. **OPEN Transaction**: Creates opening balance for next period at period average
+
+**Example**:
+```
+January 2025 Receipts:
+- 100 kg @ $10.00 = $1,000
+- 150 kg @ $12.00 = $1,800
+- 200 kg @ $11.00 = $2,200
+Period Average = $5,000 / 450 kg = $11.11/kg
+
+Ending Inventory: 250 kg
+- Book Value at Actual Costs: $2,750.00
+- Revalued Amount (250 × $11.11): $2,777.50
+- Diff Variance: $27.50 (posted to P&L)
+
+Next Period (February):
+- Opens with 250 kg @ $11.11/kg (standardized)
+- Clean slate for February calculations
+```
+
+**Business Value**:
+- ✅ **Consistent Costs**: Period-to-period inventory at consistent average
+- ✅ **Accurate Reporting**: Simplified reconciliation and comparison
+- ✅ **Automated Variance**: No manual journal entries needed
+- ✅ **Audit Trail**: Complete revaluation history preserved
+
+---
+
+### Q26: How does the Diff column work in revaluation?
+
+**A**: The Diff column tracks revaluation variance and rounding differences:
+
+**Two Components**:
+
+**1. Revaluation Variance** (period-end):
+```
+Diff = (Period Average × Remaining Qty) - Book Value at Actual Costs
+
+Example:
+- Remaining Qty: 250 kg
+- Period Average: $11.11/kg
+- Book Value at Actual: $2,750.00
+- Revalued Amount: 250 × $11.11 = $2,777.50
+- Diff: $2,777.50 - $2,750.00 = $27.50
+```
+
+**2. Rounding Differences** (precision handling):
+```
+Price Precision: 2 decimal display, 5 decimal storage (DECIMAL(20,5))
+Qty Precision: 3 decimal display, 5 decimal storage
+
+Example:
+- Actual calculation: 100 kg × $33.33333 = $3,333.333
+- Displayed: 100 kg × $33.33 = $3,333.00
+- Diff: $0.33 (rounding difference)
+```
+
+**Where Diff Is Posted**:
+- **Account**: Revaluation Variance (P&L account)
+- **Timing**: At period close, as part of CLOSE transaction
+- **Journal Entry**: Automated, no manual posting needed
+- **Reporting**: Shown in revaluation variance reports
+
+**Sign Convention**:
+- **Positive Diff**: Inventory value increased (debit inventory, credit variance account)
+- **Negative Diff**: Inventory value decreased (credit inventory, debit variance account)
+
+---
+
+### Q27: When does revaluation happen and can I disable it?
+
+**A**: Revaluation timing and configuration options:
+
+**When Revaluation Happens**:
+- **Trigger**: Period close operation (end of month)
+- **Costing Method**: Only for **Periodic Average** (not FIFO)
+- **Frequency**: Once per period (monthly)
+- **Duration**: <5 minutes (automated)
+- **Transaction Types**: Creates CLOSE and OPEN transactions
+
+**Configuration Options**:
+```json
+{
+  "costing_method": "PERIODIC_AVERAGE",
+  "enable_revaluation": true   // Can be toggled
+}
+```
+
+**Can You Disable Revaluation?**:
+- ✅ **Yes**, but not recommended for Periodic Average
+- ⚠️ Without revaluation: Period-to-period costs will vary
+- ⚠️ Manual journal entries required for cost standardization
+- ✅ FIFO method does not use revaluation (uses actual lot costs)
+
+**Recommended Configuration**:
+- **Periodic Average**: `enable_revaluation: true` (standardize costs)
+- **FIFO**: `enable_revaluation: false` (not applicable, uses actual lot costs)
+
+**Impact of Disabling**:
+- ❌ Ending inventory remains at mixed actual costs
+- ❌ Next period opens at mixed costs (inconsistent)
+- ❌ Manual reconciliation required
+- ❌ Period-to-period comparisons more complex
+- ✅ Variance still tracked in movement reports (but not posted)
+
+---
+
+### Q28: How does revaluation affect my financial statements?
+
+**A**: Revaluation impacts balance sheet and P&L:
+
+**Balance Sheet Impact**:
+```
+Before Revaluation (at actual costs):
+Inventory Asset: $2,750.00
+
+After Revaluation (at period average):
+Inventory Asset: $2,777.50
+Net Change: +$27.50
+```
+
+**P&L Impact**:
+```
+Revaluation Variance (P&L Account):
+- Account: 5100-Revaluation-Variance
+- Amount: $27.50 credit (if inventory increased)
+- Period: January 2025
+- Nature: Non-operating income/expense
+```
+
+**Financial Reporting**:
+- ✅ **COGS**: Not affected (uses period average for consumption)
+- ✅ **Gross Margin**: Consistent period-to-period
+- ✅ **Inventory Value**: Standardized at period average
+- ✅ **Variance Account**: Separate line item in P&L
+
+**Example P&L Extract**:
+```
+Cost of Goods Sold (COGS)        $87,650.00
+Gross Margin                     $112,350.00
+Operating Expenses               ($45,000.00)
+Operating Income                  $67,350.00
+
+Other Income/(Expense):
+Revaluation Variance                  $27.50  ← Appears here
+Net Income                        $67,377.50
+```
+
+**Audit Considerations**:
+- ✅ Clearly disclosed as revaluation variance
+- ✅ Complete audit trail with journal entries
+- ✅ Reconcilable to movement reports
+- ✅ Complies with accounting standards (IAS 2, GAAP)
 
 ---
 

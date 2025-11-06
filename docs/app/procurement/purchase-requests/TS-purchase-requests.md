@@ -427,21 +427,849 @@ flowchart TD
     SinglePO --> ValidateBudget[Validate budget<br/>availability]
     CreateMultiplePOs --> ValidateBudget
 
-    ValidateBudget --> CreatePOs[Create PO record(s)<br/>in database]
+    ValidateBudget --> CreatePOs[Create PO records<br/>in database]
 
-    CreatePOs --> LinkPRPO[Link PR to PO(s)]
+    CreatePOs --> LinkPRPO[Link PR to POs]
 
     LinkPRPO --> UpdatePRStatus[Update PR status<br/>to Converted]
 
     UpdatePRStatus --> NotifyCreator[Notify PR creator]
 
-    NotifyCreator --> ShowSuccess[Show success message<br/>with PO number(s)]
+    NotifyCreator --> ShowSuccess[Show success message<br/>with PO numbers]
 
     ShowSuccess --> RedirectPO[Redirect to PO<br/>detail page]
 
     ShowError --> End([End])
     RedirectPO --> End
 ```
+
+---
+
+## Sitemap
+
+### Overview
+This section provides a complete navigation structure of all pages, tabs, and dialogues in the Purchase Requests sub-module. It documents user workflows, interaction patterns, and accessibility considerations for the complete PR lifecycle from creation through conversion to Purchase Order.
+
+### Enhanced Page Hierarchy
+
+```mermaid
+graph TD
+    ListPage["List Page<br/>(/procurement/purchase-requests)"]
+    CreatePage["Create Page<br/>(/procurement/purchase-requests/new)"]
+    DetailPage["Detail Page<br/>(/procurement/purchase-requests/[id])"]
+    EditPage["Edit Page<br/>(/procurement/purchase-requests/[id]/edit)"]
+    TemplatePage["Template Management<br/>(/procurement/purchase-requests/templates)"]
+
+    %% List Page Tabs
+    ListPage --> ListTab1["Tab: All PRs"]
+    ListPage --> ListTab2["Tab: My PRs"]
+    ListPage --> ListTab3["Tab: Pending Approval"]
+    ListPage --> ListTab4["Tab: Approved"]
+    ListPage --> ListTab5["Tab: Drafts"]
+
+    %% List Page Dialogs
+    ListPage -.-> ListDialog1["Dialog: Quick Create"]
+    ListPage -.-> ListDialog2["Dialog: Bulk Actions"]
+    ListPage -.-> ListDialog3["Dialog: Export"]
+    ListPage -.-> ListDialog4["Dialog: Filter Settings"]
+    ListPage -.-> ListDialog5["Dialog: Column Preferences"]
+
+    %% Create Page Tabs
+    CreatePage --> CreateTab1["Tab: General Info"]
+    CreatePage --> CreateTab2["Tab: Line Items"]
+    CreatePage --> CreateTab3["Tab: Delivery Details"]
+    CreatePage --> CreateTab4["Tab: Financial"]
+
+    %% Create Page Dialogs
+    CreatePage -.-> CreateDialog1["Dialog: Item Selection"]
+    CreatePage -.-> CreateDialog2["Dialog: Product Search"]
+    CreatePage -.-> CreateDialog3["Dialog: Inventory Panel"]
+    CreatePage -.-> CreateDialog4["Dialog: Template Selection"]
+    CreatePage -.-> CreateDialog5["Dialog: Draft Saved"]
+    CreatePage -.-> CreateDialog6["Dialog: Cancel Confirm"]
+    CreatePage -.-> CreateDialog7["Dialog: Validation Error"]
+    CreatePage -.-> CreateDialog8["Dialog: Budget Check"]
+
+    %% Detail Page Tabs
+    DetailPage --> DetailTab1["Tab: Overview"]
+    DetailPage --> DetailTab2["Tab: Line Items"]
+    DetailPage --> DetailTab3["Tab: Approval Timeline"]
+    DetailPage --> DetailTab4["Tab: Attachments"]
+    DetailPage --> DetailTab5["Tab: Comments"]
+    DetailPage --> DetailTab6["Tab: Activity Log"]
+    DetailPage --> DetailTab7["Tab: Related Documents"]
+
+    %% Detail Page Dialogs
+    DetailPage -.-> DetailDialog1["Dialog: Approve PR"]
+    DetailPage -.-> DetailDialog2["Dialog: Reject PR"]
+    DetailPage -.-> DetailDialog3["Dialog: Convert to PO"]
+    DetailPage -.-> DetailDialog4["Dialog: Recall PR"]
+    DetailPage -.-> DetailDialog5["Dialog: Cancel PR"]
+    DetailPage -.-> DetailDialog6["Dialog: Add Comment"]
+    DetailPage -.-> DetailDialog7["Dialog: Upload Attachment"]
+    DetailPage -.-> DetailDialog8["Dialog: Print PR"]
+    DetailPage -.-> DetailDialog9["Dialog: Share PR"]
+    DetailPage -.-> DetailDialog10["Dialog: Clone PR"]
+
+    %% Edit Page Tabs (Same as Create)
+    EditPage --> EditTab1["Tab: General Info"]
+    EditPage --> EditTab2["Tab: Line Items"]
+    EditPage --> EditTab3["Tab: Delivery Details"]
+    EditPage --> EditTab4["Tab: Financial"]
+
+    %% Edit Page Dialogs
+    EditPage -.-> EditDialog1["Dialog: Item Selection"]
+    EditPage -.-> EditDialog2["Dialog: Change Tracking"]
+    EditPage -.-> EditDialog3["Dialog: Cancel Changes"]
+    EditPage -.-> EditDialog4["Dialog: Save Draft"]
+
+    %% Template Management
+    TemplatePage -.-> TempDialog1["Dialog: Create Template"]
+    TemplatePage -.-> TempDialog2["Dialog: Edit Template"]
+    TemplatePage -.-> TempDialog3["Dialog: Delete Template"]
+    TemplatePage -.-> TempDialog4["Dialog: Apply Template"]
+
+    %% Navigation arrows
+    ListPage --> DetailPage
+    ListPage --> CreatePage
+    DetailPage --> EditPage
+    CreatePage --> DetailPage
+    EditPage --> DetailPage
+    ListPage --> TemplatePage
+
+    style ListPage fill:#e1f5ff
+    style CreatePage fill:#fff4e1
+    style DetailPage fill:#e8f5e9
+    style EditPage fill:#fce4ec
+    style TemplatePage fill:#f3e5f5
+```
+
+### Pages
+
+#### 1. List Page
+**Route**: `/procurement/purchase-requests`
+**File**: `app/(main)/procurement/purchase-requests/page.tsx`
+**Purpose**: Display searchable, filterable list of all purchase requests with status indicators and quick actions
+
+**Sections**:
+- **Header**: Page title, breadcrumbs, "New PR" button, bulk action button, export button
+- **Filters**: Status filter, date range, department filter, requestor filter, amount range
+- **Search Bar**: Full-text search across PR number, description, requestor name
+- **Data Table**: Sortable columns with PR#, Date, Requestor, Department, Delivery Date, Amount, Status, Actions
+- **Pagination**: Page size selector (10/20/50/100), page navigation, total count display
+
+**Tabs**:
+- **All PRs** (Default): Shows all purchase requests user has access to
+  - Sort by: Date (newest first)
+  - Filters available: All standard filters
+  - Action buttons: View, Edit (if draft), Delete (if draft)
+
+- **My PRs**: Shows only PRs created by current user
+  - Sort by: Date (newest first)
+  - Filters available: Status, Date range
+  - Action buttons: View, Edit (if draft), Recall (if submitted), Clone
+
+- **Pending Approval**: Shows PRs awaiting current user's approval
+  - Sort by: Submission date (oldest first - urgent first)
+  - Filters available: Amount range, Department
+  - Action buttons: View, Approve, Reject
+  - Badge: Shows count of pending approvals
+
+- **Approved**: Shows all approved PRs
+  - Sort by: Approval date (newest first)
+  - Filters available: All standard filters
+  - Action buttons: View, Convert to PO (if purchasing staff)
+
+- **Drafts**: Shows all draft PRs created by user
+  - Sort by: Last modified (newest first)
+  - Filters available: Date range
+  - Action buttons: Continue Editing, Delete, Clone
+
+**Dialogs**:
+- **Quick Create Dialog** (Modal - Full Overlay)
+  - Trigger: Click "Quick Create" button or keyboard shortcut (Ctrl+N)
+  - Content: Minimal form with essential fields (Type, Department, Description, Justification)
+  - Actions: "Create Draft" (saves and opens full form), "Cancel"
+  - Validation: Client-side validation with inline errors
+  - Keyboard: Enter to submit, Esc to close
+
+- **Bulk Actions Dialog** (Modal - Full Overlay)
+  - Trigger: Select multiple PRs, click "Bulk Actions" button
+  - Content: Available actions list (Export selected, Print selected, Delete drafts)
+  - Actions: "Apply Action", "Cancel"
+  - Confirmation: Requires confirmation for destructive actions
+
+- **Export Dialog** (Modal - Medium)
+  - Trigger: Click "Export" button
+  - Content: Export format selection (Excel, PDF, CSV), date range, columns to include
+  - Actions: "Export", "Cancel"
+  - Download: Triggers file download on success
+
+- **Filter Settings Dialog** (Drawer - Right Side)
+  - Trigger: Click "Advanced Filters" button
+  - Content: All available filters with save/load filter presets
+  - Actions: "Apply Filters", "Clear All", "Save Preset", "Close"
+  - Persistence: Saves filter state in user preferences
+
+- **Column Preferences Dialog** (Modal - Medium)
+  - Trigger: Click column settings icon
+  - Content: Checklist of available columns, drag to reorder
+  - Actions: "Save Preferences", "Reset to Default", "Cancel"
+  - Persistence: Saves column visibility and order in user preferences
+
+**Navigation Targets**:
+- **To Detail Page**: Click on PR number or "View" action
+- **To Create Page**: Click "New PR" button
+- **To Edit Page**: Click "Edit" action (for drafts only)
+- **To Template Management**: Click "Templates" in toolbar
+
+---
+
+#### 2. Detail Page
+**Route**: `/procurement/purchase-requests/[id]`
+**File**: `app/(main)/procurement/purchase-requests/[id]/page.tsx`
+**Purpose**: Display complete PR details with approval workflow, comments, attachments, and action buttons
+
+**Sections**:
+- **Header**: PR number, status badge, action buttons (Edit, Approve/Reject, Convert to PO, Print, Share)
+- **Summary Panel**: Key info (Date, Requestor, Department, Location, Delivery Date, Total Amount)
+- **Tabbed Content Area**: See tabs below
+- **Footer**: Creation/modification info, workflow status indicator
+
+**Tabs**:
+- **Overview** (Default): Shows PR header information and financial summary
+  - Content: PR details, justification, description, delivery point, financial breakdown
+  - Visual: Currency formatting, status badges, delivery date countdown
+  - Actions: Quick edit button (if editable), hide/show price toggle (if requestor)
+
+- **Line Items**: Displays all PR line items with pricing and delivery details
+  - Content: Item table (Item#, Product, Description, Qty, Unit, Price, Tax, Total)
+  - Features: Sortable, expandable rows for specifications, delivery info panel
+  - Actions: Edit items (if draft), view inventory (shows panel), adjust pricing
+
+- **Approval Timeline**: Shows approval workflow progress and history
+  - Content: Visual timeline with approval levels, approver names, timestamps, comments
+  - Features: Current approver highlighted, approval path visualization
+  - Actions: Approve/Reject buttons (if current approver), view approval comments
+
+- **Attachments**: Lists all file attachments with preview capability
+  - Content: File list (Name, Type, Size, Uploaded By, Date)
+  - Features: Preview for images/PDFs, download all as ZIP
+  - Actions: Upload new (if permitted), download, delete (if owner or admin)
+
+- **Comments**: Displays threaded conversation with internal/external toggle
+  - Content: Comment thread with replies, user avatars, timestamps
+  - Features: @mentions, rich text formatting, internal/external toggle
+  - Actions: Add comment, reply to comment, edit own comment (5 min window), delete own comment
+
+- **Activity Log**: Complete audit trail of all PR actions
+  - Content: Chronological log (Action, User, Date/Time, Details, IP Address)
+  - Features: Filterable by action type, expandable details, change tracking
+  - Actions: Export log (admin only), filter activities
+
+- **Related Documents**: Shows linked documents (PO, GRN, invoices)
+  - Content: Related document list (Type, Number, Date, Status, Link)
+  - Features: Auto-linked when PR converted to PO, manual link capability
+  - Actions: View related document, navigate to related module
+
+**Dialogs**:
+- **Approve PR Dialog** (Modal - Medium)
+  - Trigger: Click "Approve" button (visible to current approver only)
+  - Content: Approval confirmation, optional comment field, approval level indicator
+  - Actions: "Confirm Approval", "Cancel"
+  - Validation: Server-side permission check, workflow validation
+  - Success: Shows success toast, sends notification, redirects to list
+
+- **Reject PR Dialog** (Modal - Medium)
+  - Trigger: Click "Reject" button (visible to current approver only)
+  - Content: Rejection reason (required), suggestions for correction
+  - Actions: "Confirm Rejection", "Cancel"
+  - Validation: Reason field required (min 10 characters)
+  - Success: Shows toast, sends notification to requestor, redirects to list
+
+- **Convert to PO Dialog** (Modal - Large)
+  - Trigger: Click "Convert to PO" button (purchasing staff only, approved PRs)
+  - Content: PO form pre-filled with PR data, vendor selection per item, delivery dates
+  - Actions: "Create PO", "Split to Multiple POs", "Cancel"
+  - Validation: All items must have vendors selected, budget re-check
+  - Success: Creates PO(s), links to PR, updates PR status to "Converted", redirects to PO detail
+
+- **Recall PR Dialog** (Modal - Small)
+  - Trigger: Click "Recall" button (visible to requestor, submitted PRs only)
+  - Content: Recall confirmation, reason field (optional)
+  - Actions: "Confirm Recall", "Cancel"
+  - Validation: Can only recall if not yet approved
+  - Success: Returns PR to draft status, notifies approvers, redirects to edit page
+
+- **Cancel PR Dialog** (Modal - Medium)
+  - Trigger: Click "Cancel" button (visible to authorized users)
+  - Content: Cancellation reason (required), impact warning (budget release, notifications)
+  - Actions: "Confirm Cancellation", "Cancel"
+  - Validation: Reason required, cannot cancel if already converted to PO
+  - Success: Updates status to "Cancelled", releases budget, sends notifications
+
+- **Add Comment Dialog** (Modal - Medium)
+  - Trigger: Click "Add Comment" button in Comments tab
+  - Content: Rich text editor, internal/external toggle, @mention autocomplete
+  - Actions: "Post Comment", "Cancel"
+  - Features: Auto-save draft, attachment support, preview mode
+
+- **Upload Attachment Dialog** (Modal - Medium)
+  - Trigger: Click "Upload" button in Attachments tab
+  - Content: Drag-drop zone, file browser, file type/size validation, description field
+  - Actions: "Upload", "Cancel"
+  - Validation: Max 10MB per file, allowed types (PDF, DOC, XLS, JPG, PNG)
+  - Progress: Shows upload progress bar, multiple file support
+
+- **Print PR Dialog** (Modal - Small)
+  - Trigger: Click "Print" button
+  - Content: Print options (show/hide pricing, include attachments, include comments)
+  - Actions: "Print", "Download PDF", "Cancel"
+  - Output: Opens print preview or downloads PDF
+
+- **Share PR Dialog** (Modal - Medium)
+  - Trigger: Click "Share" button
+  - Content: User search/select, permission level (View only, Can comment), message field
+  - Actions: "Share", "Cancel"
+  - Validation: User must have access to PR department/location
+  - Success: Sends notification with PR link
+
+- **Clone PR Dialog** (Modal - Small)
+  - Trigger: Click "Clone" action in toolbar
+  - Content: Confirmation message, option to include line items, attachments
+  - Actions: "Create Clone", "Cancel"
+  - Success: Creates new draft PR with copied data, redirects to edit page
+
+**Navigation Targets**:
+- **To List Page**: Click breadcrumb or "Back to List" button
+- **To Edit Page**: Click "Edit" button (if draft and authorized)
+- **To PO Detail Page**: Click PO link in Related Documents tab (after conversion)
+- **To Create Page**: Click "Clone" button
+
+---
+
+#### 3. Create Page
+**Route**: `/procurement/purchase-requests/new`
+**File**: `app/(main)/procurement/purchase-requests/new/page.tsx`
+**Purpose**: Multi-step form for creating new purchase requests with validation, inventory integration, and auto-save
+
+**Sections**:
+- **Header**: Page title ("New Purchase Request"), progress indicator, action buttons (Save Draft, Submit, Cancel)
+- **Form Container**: Tabbed interface with validation indicators
+- **Footer**: Auto-save indicator, validation summary, action buttons
+
+**Tabs**:
+- **General Info** (Default - Required for submit):
+  - Fields: PR Type, PR Date, Department, Location, Requestor (auto-filled), Description, Justification
+  - Validation: All fields required except description
+  - Features: Auto-populate requestor, department from user context
+
+- **Line Items** (Required - at least 1 item):
+  - Content: Line items table with add/edit/remove actions
+  - Fields per item: Product, Description, Specifications, Qty, Unit, FOC Qty/Unit, Price, Discount, Tax, Total
+  - Features: Product search dialog, inventory panel integration, pricing calculator
+  - Validation: At least one line item required, quantity > 0, price ≥ 0
+
+- **Delivery Details** (Optional):
+  - Fields: Delivery Date (required), Delivery Point (optional), Special Instructions
+  - Per-Item Fields: Item-specific required date, delivery point, delivery comment
+  - Features: Calendar picker, delivery point search, auto-populate from header
+
+- **Financial** (Read-only calculated):
+  - Fields: Subtotal, Discount, Net Amount, Tax Amount, Total Amount, Currency
+  - Features: Real-time calculation, currency selection, exchange rate display
+  - Display: Formatted monetary values with currency symbol
+
+**Dialogs**:
+- **Item Selection Dialog** (Modal - Large)
+  - Trigger: Click "Add Item" button in Line Items tab
+  - Content: Product search/browse, product details, item configuration form
+  - Fields: Product (search), Qty, Unit, FOC Qty/Unit, Price, Discount, Tax Rate, Adjust checkbox
+  - Features: Inventory integration panel (on-hand, on-order, reorder point), price history
+  - Actions: "Add to PR", "Cancel"
+  - Validation: Product required, qty > 0, price ≥ 0
+
+- **Product Search Dialog** (Modal - Large)
+  - Trigger: Click product search field in Item Selection Dialog
+  - Content: Search bar, category browse, product list with images
+  - Features: Autocomplete, category filter, recent products, favorites
+  - Actions: Select product (closes dialog and populates item form)
+
+- **Inventory Panel Dialog** (Drawer - Right Side)
+  - Trigger: Click "View Inventory" button for selected product
+  - Content: On-hand qty by location, on-order qty with dates, reorder point, consumption history chart
+  - Features: Real-time data, location selector, alternative products suggestions
+  - Actions: Close panel, switch location
+  - Performance: <2s load time, 5-minute cache
+
+- **Template Selection Dialog** (Modal - Medium)
+  - Trigger: Click "Apply Template" button
+  - Content: User's saved templates list (Name, Last Used, Description)
+  - Features: Search templates, preview template details
+  - Actions: "Apply Template" (populates form), "Cancel"
+  - Success: Populates form with template data, allows editing
+
+- **Draft Saved Dialog** (Toast - Bottom Right)
+  - Trigger: Auto-save every 2 minutes or manual "Save Draft"
+  - Content: "Draft saved at [time]" message
+  - Duration: 3 seconds auto-dismiss
+  - Actions: "Undo" (within 10 seconds), dismiss
+
+- **Cancel Confirm Dialog** (Modal - Small)
+  - Trigger: Click "Cancel" button with unsaved changes
+  - Content: "You have unsaved changes. Discard draft?" warning
+  - Actions: "Save Draft", "Discard and Leave", "Stay on Page"
+  - Validation: Only shows if form has changes since last save
+
+- **Validation Error Dialog** (Modal - Medium)
+  - Trigger: Click "Submit" with validation errors
+  - Content: List of all validation errors grouped by tab, jump-to-field links
+  - Actions: "Go to First Error", "Review Errors", "Cancel"
+  - Navigation: Clicking error jumps to that field and highlights it
+
+- **Budget Check Dialog** (Modal - Medium)
+  - Trigger: Click "Submit" - auto-triggered before submission
+  - Content: Budget availability check results, over-budget warning, budget details
+  - States: "Checking budget...", "Budget available ✓", "Over budget ✗"
+  - Actions: "Proceed to Submit" (if available), "Review PR", "Cancel"
+  - Error: Shows over-budget error with budget details, prevents submission
+
+**Navigation Targets**:
+- **To List Page**: Click "Cancel" (with confirmation if unsaved changes)
+- **To Detail Page**: After successful submission (redirects to newly created PR)
+- **To Template Management**: Click "Templates" in toolbar
+
+---
+
+#### 4. Edit Page
+**Route**: `/procurement/purchase-requests/[id]/edit`
+**File**: `app/(main)/procurement/purchase-requests/[id]/edit/page.tsx`
+**Purpose**: Edit existing draft or recalled purchase requests with change tracking and validation
+
+**Sections**:
+- **Header**: Page title with PR number, status indicator, action buttons (Save Draft, Update, Cancel)
+- **Change Indicator**: Visual diff showing modified fields since last save
+- **Form Container**: Same tabbed interface as Create Page
+- **Footer**: Last saved timestamp, change summary, action buttons
+
+**Tabs**:
+- **General Info**: Same fields as Create Page with pre-populated data
+  - Features: Change tracking highlights, restore original value button
+
+- **Line Items**: Same as Create Page with existing items
+  - Features: Modified items highlighted, deleted items shown as strikethrough, audit log per item
+
+- **Delivery Details**: Same as Create Page with existing data
+  - Features: Date change warnings (if approaching delivery date)
+
+- **Financial**: Read-only calculated totals
+  - Features: Shows previous total vs. new total if changed
+
+**Dialogs**:
+- **Item Selection Dialog**: Same as Create Page (for adding new items)
+
+- **Change Tracking Dialog** (Drawer - Right Side)
+  - Trigger: Click "View Changes" button
+  - Content: Side-by-side comparison (Original vs. Modified) for all changed fields
+  - Features: Field-level diff, revert individual changes, export change summary
+  - Actions: "Revert Change", "Revert All", "Close"
+
+- **Cancel Changes Dialog** (Modal - Small)
+  - Trigger: Click "Cancel" with unsaved changes
+  - Content: "Discard all changes and return to detail view?" warning
+  - Actions: "Discard Changes", "Keep Editing"
+
+- **Save Draft Dialog** (Toast - Bottom Right)
+  - Trigger: Click "Save Draft" or auto-save (every 2 min)
+  - Content: "Changes saved as draft" message
+  - Duration: 3 seconds
+  - Actions: Dismiss
+
+**Navigation Targets**:
+- **To Detail Page**: After successful update or click "Cancel" (with confirmation)
+- **To List Page**: Click breadcrumb
+
+---
+
+#### 5. Template Management Page
+**Route**: `/procurement/purchase-requests/templates`
+**File**: `app/(main)/procurement/purchase-requests/templates/page.tsx`
+**Purpose**: Create, edit, and manage PR templates for frequently used purchase patterns
+
+**Sections**:
+- **Header**: Page title, "New Template" button
+- **Template List**: Cards showing template name, description, last used date, usage count
+- **Actions per Template**: Edit, Delete, Apply to New PR
+
+**Dialogs**:
+- **Create Template Dialog** (Modal - Large)
+  - Trigger: Click "New Template" button
+  - Content: Template name, description, PR form (same as Create Page)
+  - Actions: "Save Template", "Cancel"
+  - Validation: Name required (unique), at least one line item
+
+- **Edit Template Dialog** (Modal - Large)
+  - Trigger: Click "Edit" on template card
+  - Content: Same as Create Template, pre-populated with template data
+  - Actions: "Update Template", "Cancel"
+
+- **Delete Template Dialog** (Modal - Small)
+  - Trigger: Click "Delete" on template card
+  - Content: Confirmation message with template name
+  - Actions: "Delete", "Cancel"
+  - Warning: "This action cannot be undone"
+
+- **Apply Template Dialog** (Modal - Small)
+  - Trigger: Click "Apply" on template card
+  - Content: Confirmation, option to customize before applying
+  - Actions: "Create New PR", "Cancel"
+  - Success: Redirects to Create Page with template data pre-filled
+
+**Navigation Targets**:
+- **To Create Page**: Click "Apply Template" (with template data)
+- **To List Page**: Click breadcrumb
+
+---
+
+### Dialog Types Summary
+
+#### Modal Dialogs (Full Overlay - Requires Action)
+- **Quick Create**: Fast PR creation with minimal fields
+- **Approve PR**: Approval confirmation with comments
+- **Reject PR**: Rejection with required reason
+- **Convert to PO**: PO creation form with vendor selection
+- **Recall PR**: Recall submitted PR to draft
+- **Cancel PR**: Cancel PR with reason
+- **Print PR**: Print options and PDF generation
+- **Share PR**: Share with users and set permissions
+- **Clone PR**: Duplicate PR as new draft
+- **Item Selection**: Add/edit line items with inventory integration
+- **Product Search**: Search and select products
+- **Template Selection**: Choose from saved templates
+- **Budget Check**: Budget availability verification
+- **Validation Error**: Display all validation errors with navigation
+- **Bulk Actions**: Apply actions to selected PRs
+- **Export**: Export data in various formats
+- **Column Preferences**: Customize table columns
+- **Create Template**: Save new PR template
+- **Edit Template**: Update existing template
+- **Delete Template**: Confirm template deletion
+- **Apply Template**: Apply template to new PR
+- **Cancel Confirm**: Confirm discard of unsaved changes
+- **Cancel Changes**: Confirm revert to original data
+- **Add Comment**: Compose and post comments
+- **Upload Attachment**: Upload files with description
+
+#### Drawer Dialogs (Side Panel - Non-blocking)
+- **Filter Settings**: Advanced filtering with presets (Right side)
+- **Inventory Panel**: Real-time inventory and pricing data (Right side)
+- **Change Tracking**: View all changes made to PR (Right side)
+
+#### Toast Notifications (Non-blocking - Auto-dismiss)
+- **Draft Saved**: Confirmation of auto-save or manual save (Bottom right, 3s)
+- **Success Messages**: Action completed successfully (Top right, 3s)
+- **Error Messages**: Action failed with reason (Top right, 5s)
+- **Warning Messages**: Important information requiring attention (Top right, 5s)
+
+---
+
+### Navigation Flow Diagram
+
+```mermaid
+flowchart TD
+    Start([User lands on<br/>PR List Page]) --> ListAction{User Action?}
+
+    ListAction -->|New PR| CreatePage[Create Page]
+    ListAction -->|View PR| DetailPage[Detail Page]
+    ListAction -->|Edit Draft| EditPage[Edit Page]
+    ListAction -->|Manage Templates| TemplatePage[Template Management]
+    ListAction -->|Quick Create| QuickCreate[Quick Create Dialog]
+    ListAction -->|Bulk Actions| BulkActions[Bulk Actions Dialog]
+
+    QuickCreate -->|Create Draft| CreatePage
+    QuickCreate -->|Cancel| ListAction
+
+    CreatePage --> CreateTabs{Which Tab?}
+    CreateTabs -->|General Info| GeneralTab[Fill Basic Info]
+    CreateTabs -->|Line Items| ItemsTab[Add Line Items]
+    CreateTabs -->|Delivery| DeliveryTab[Set Delivery Details]
+    CreateTabs -->|Financial| FinancialTab[Review Totals]
+
+    ItemsTab -->|Add Item| ItemDialog[Item Selection Dialog]
+    ItemDialog -->|Search Product| ProductSearch[Product Search Dialog]
+    ItemDialog -->|View Inventory| InventoryPanel[Inventory Panel Drawer]
+    ItemDialog -->|Add to PR| ItemsTab
+
+    CreatePage -->|Save Draft| DraftSaved[Draft Saved Toast]
+    CreatePage -->|Submit| BudgetCheck[Budget Check Dialog]
+    CreatePage -->|Cancel| CancelConfirm[Cancel Confirm Dialog]
+
+    BudgetCheck -->|Available| SubmitSuccess[PR Created]
+    BudgetCheck -->|Over Budget| CreatePage
+    BudgetCheck -->|Error| ValidationError[Validation Error Dialog]
+
+    CancelConfirm -->|Discard| ListAction
+    CancelConfirm -->|Save Draft| DraftSaved
+    CancelConfirm -->|Stay| CreatePage
+
+    SubmitSuccess --> DetailPage
+    DraftSaved --> CreatePage
+
+    DetailPage --> DetailTabs{Which Tab?}
+    DetailTabs -->|Overview| OverviewTab[View Summary]
+    DetailTabs -->|Line Items| DetailItemsTab[View Line Items]
+    DetailTabs -->|Approval| ApprovalTab[View Approval Status]
+    DetailTabs -->|Attachments| AttachmentsTab[View/Upload Files]
+    DetailTabs -->|Comments| CommentsTab[View/Add Comments]
+    DetailTabs -->|Activity| ActivityTab[View Audit Log]
+    DetailTabs -->|Related| RelatedTab[View Related Docs]
+
+    DetailPage -->|Edit| EditPage
+    DetailPage -->|Approve| ApproveDialog[Approve Dialog]
+    DetailPage -->|Reject| RejectDialog[Reject Dialog]
+    DetailPage -->|Convert to PO| ConvertDialog[Convert to PO Dialog]
+    DetailPage -->|Recall| RecallDialog[Recall Dialog]
+    DetailPage -->|Cancel| CancelDialog[Cancel Dialog]
+    DetailPage -->|Clone| CloneDialog[Clone Dialog]
+    DetailPage -->|Print| PrintDialog[Print Dialog]
+    DetailPage -->|Share| ShareDialog[Share Dialog]
+
+    ApproveDialog -->|Confirm| ApprovalSuccess[PR Approved]
+    RejectDialog -->|Confirm| RejectionSuccess[PR Rejected]
+    ConvertDialog -->|Create PO| POCreated[PO Created]
+    RecallDialog -->|Confirm| EditPage
+    CancelDialog -->|Confirm| PRCancelled[PR Cancelled]
+    CloneDialog -->|Confirm| CreatePage
+
+    ApprovalSuccess --> ListAction
+    RejectionSuccess --> ListAction
+    POCreated --> ListAction
+    PRCancelled --> ListAction
+
+    AttachmentsTab -->|Upload| UploadDialog[Upload Attachment Dialog]
+    CommentsTab -->|Add Comment| CommentDialog[Add Comment Dialog]
+
+    UploadDialog -->|Success| AttachmentsTab
+    CommentDialog -->|Post| CommentsTab
+
+    EditPage --> EditTabs{Which Tab?}
+    EditTabs -->|Any Tab| EditForm[Edit Form Fields]
+
+    EditPage -->|View Changes| ChangeTracking[Change Tracking Drawer]
+    EditPage -->|Save Draft| DraftSavedEdit[Draft Saved Toast]
+    EditPage -->|Update| UpdateSuccess[PR Updated]
+    EditPage -->|Cancel| CancelChanges[Cancel Changes Dialog]
+
+    ChangeTracking -->|Revert| EditForm
+    CancelChanges -->|Discard| DetailPage
+    CancelChanges -->|Keep Editing| EditPage
+    UpdateSuccess --> DetailPage
+    DraftSavedEdit --> EditPage
+
+    TemplatePage -->|New Template| CreateTemplate[Create Template Dialog]
+    TemplatePage -->|Edit Template| EditTemplate[Edit Template Dialog]
+    TemplatePage -->|Delete Template| DeleteTemplate[Delete Template Dialog]
+    TemplatePage -->|Apply Template| ApplyTemplate[Apply Template Dialog]
+
+    CreateTemplate -->|Save| TemplatePage
+    EditTemplate -->|Update| TemplatePage
+    DeleteTemplate -->|Confirm| TemplatePage
+    ApplyTemplate -->|Create PR| CreatePage
+
+    DetailPage -->|Back| ListAction
+    CreatePage -->|Back| ListAction
+    EditPage -->|Back| DetailPage
+    TemplatePage -->|Back| ListAction
+```
+
+---
+
+### User Journey Examples
+
+#### Journey 1: Create and Submit Standard Purchase Request
+
+**Scenario**: Kitchen staff creates a PR for weekly food supplies
+
+**Steps**:
+1. **Start**: User navigates to PR List Page
+2. **Initiate**: Clicks "New PR" button → Redirects to Create Page
+3. **General Info Tab**:
+   - Selects PR Type: "Standard Order"
+   - System auto-fills: PR Date (today), Department (Kitchen), Requestor (current user)
+   - Enters Description: "Weekly food supplies"
+   - Enters Justification: "Regular weekly order for kitchen operations"
+4. **Line Items Tab**:
+   - Clicks "Add Item" → Opens Item Selection Dialog
+   - Searches for "Fresh Tomatoes" in Product Search Dialog
+   - Selects product → Dialog closes, product populated
+   - Enters Quantity: 50, Unit: KG
+   - Clicks "View Inventory" → Inventory Panel Drawer opens
+     - Views on-hand: 20 KG, on-order: 30 KG (arriving tomorrow)
+     - Views price history: Last 3 orders averaged $2.50/KG
+     - Closes panel
+   - Enters Unit Price: $2.50, Tax Rate: 7%
+   - System calculates: Net Amount: $125.00, Tax: $8.75, Total: $133.75
+   - Clicks "Add to PR" → Item added to table
+   - Repeats for 5 more products (Lettuce, Chicken, Olive Oil, etc.)
+5. **Delivery Details Tab**:
+   - Selects Delivery Date: +3 days from today
+   - Searches Delivery Point: "Main Kitchen Loading Dock" (auto-populates label)
+   - Enters Special Instructions: "Morning delivery preferred (7-9 AM)"
+6. **Financial Tab**:
+   - Reviews calculated totals:
+     - Subtotal: $550.00
+     - Discount: $0.00
+     - Net Amount: $550.00
+     - Tax: $38.50
+     - Total: $588.50
+   - Currency: USD (auto-selected)
+7. **Submit**:
+   - Clicks "Submit" button
+   - Budget Check Dialog appears: "Checking budget availability..."
+   - Budget Check succeeds: "Budget available ✓"
+   - Clicks "Proceed to Submit"
+   - System validates form, saves PR, determines approval route
+   - Success toast appears: "PR-2025-0042 submitted successfully"
+   - Redirects to Detail Page for PR-2025-0042
+8. **Detail Page**:
+   - Status badge shows: "Submitted" (yellow)
+   - Approval Timeline tab shows: Pending approval from "John Smith (Dept Manager)"
+   - User clicks "Back to List" → Returns to PR List Page
+9. **Notification**: Email sent to approver (John Smith) with PR link
+
+**Accessibility**: Keyboard shortcuts used (Ctrl+N for new PR, Tab for field navigation, Enter to submit)
+
+---
+
+#### Journey 2: Approve Purchase Request
+
+**Scenario**: Department Manager approves a submitted PR
+
+**Steps**:
+1. **Start**: Manager receives email notification with PR link
+2. **Navigate**: Clicks email link → Opens PR Detail Page directly
+3. **Review**:
+   - Reads PR Overview tab: Date, Requestor, Justification, Delivery Date
+   - Switches to Line Items tab:
+     - Reviews all items, quantities, prices
+     - Clicks "View Inventory" for key items → Inventory Panel shows stock levels
+     - Closes panel
+   - Switches to Attachments tab:
+     - Sees attached quotation from vendor
+     - Clicks "Preview" → Views PDF in browser
+     - Closes preview
+4. **Decision**:
+   - Manager decides to approve
+   - Clicks "Approve" button → Approve PR Dialog opens
+5. **Approve Dialog**:
+   - Dialog shows:
+     - PR Number: PR-2025-0042
+     - Amount: $588.50
+     - Approval Level: 1 (Department Manager)
+   - Manager enters comment: "Approved for weekly supplies. Standard order."
+   - Clicks "Confirm Approval"
+6. **Success**:
+   - Dialog closes
+   - Success toast appears: "PR-2025-0042 approved successfully"
+   - Detail Page status updates: Badge changes to "Approved" (green)
+   - Approval Timeline tab updates: Manager's approval recorded with timestamp
+   - Manager clicks "Back to List"
+7. **Notification**: Email sent to requestor confirming approval
+
+**Accessibility**: Screen reader announces status changes, keyboard navigation (Tab, Enter)
+
+---
+
+#### Journey 3: Convert Approved PR to Purchase Order
+
+**Scenario**: Purchasing staff converts approved PR to PO
+
+**Steps**:
+1. **Start**: Purchasing staff opens PR List Page
+2. **Filter**: Clicks "Approved" tab → Shows all approved PRs
+3. **Select**: Clicks PR-2025-0042 → Opens Detail Page
+4. **Verify**:
+   - Status: "Approved" ✓
+   - Approval Timeline: All approvers have approved ✓
+   - Line Items: Reviews all items
+5. **Convert**:
+   - Clicks "Convert to PO" button → Convert to PO Dialog opens
+6. **Convert Dialog**:
+   - Dialog pre-fills PO form with PR data:
+     - PO Date: Today
+     - Line items copied from PR with same quantities, prices
+   - For each line item, staff selects vendor:
+     - Item 1 (Tomatoes): Selects "ABC Fresh Produce" from dropdown
+     - Item 2 (Lettuce): Selects "ABC Fresh Produce"
+     - Item 3 (Chicken): Selects "XYZ Meats Inc."
+     - Item 4-6: Assigns vendors accordingly
+   - System detects multiple vendors
+   - Staff clicks "Split to Multiple POs" checkbox
+   - System groups items by vendor:
+     - PO 1: ABC Fresh Produce (Items 1-2, Total: $250.00)
+     - PO 2: XYZ Meats Inc. (Items 3-4, Total: $200.00)
+     - PO 3: Others (Items 5-6, Total: $138.50)
+   - Reviews grouping
+   - Clicks "Create POs"
+7. **Budget Re-check**:
+   - System validates budget availability (already encumbered from PR approval)
+   - Budget check passes
+8. **Success**:
+   - System creates 3 POs: PO-2025-0088, PO-2025-0089, PO-2025-0090
+   - Links POs to PR-2025-0042
+   - Updates PR status to "Converted"
+   - Success toast: "Created 3 Purchase Orders from PR-2025-0042"
+   - Redirects to PO Detail Page (PO-2025-0088)
+9. **Verify**:
+   - PO Detail Page shows linked PR
+   - User navigates back to PR Detail Page
+   - Related Documents tab shows all 3 linked POs
+   - Status badge: "Converted" (blue)
+10. **Notification**: Email sent to requestor with PO numbers
+
+**Accessibility**: Dialog keyboard navigation, vendor selection via keyboard (arrows, Enter)
+
+---
+
+### Accessibility Notes
+
+#### Keyboard Navigation
+- **Tab**: Move between interactive elements (buttons, inputs, links)
+- **Shift+Tab**: Move backwards
+- **Enter**: Activate buttons, submit forms, open dialogs
+- **Escape**: Close dialogs, cancel actions
+- **Arrow Keys**: Navigate dropdowns, tabs, table rows
+- **Ctrl+N**: Quick create new PR (global shortcut on List Page)
+- **Ctrl+S**: Save draft (on Create/Edit Page)
+- **Ctrl+F**: Focus search field (on List Page)
+
+#### Screen Reader Support
+- **ARIA Labels**: All interactive elements have descriptive labels
+- **Status Announcements**: Screen reader announces status changes (e.g., "PR approved", "Draft saved")
+- **Error Messages**: Validation errors read aloud with field context
+- **Loading States**: "Loading..." announced for async operations
+- **Dialog Titles**: Dialog purpose announced when opened
+- **Table Headers**: Table columns have proper headers for row context
+- **Form Labels**: All form fields have visible labels (no placeholder-only fields)
+
+#### Visual Accessibility
+- **Color Contrast**: All text meets WCAG 2.1 AA standards (4.5:1 for normal text, 3:1 for large text)
+- **Focus Indicators**: Visible focus outline on all interactive elements (2px solid blue)
+- **Status Colors**: Color-coded statuses supplemented with icons and text
+  - Draft: Gray + Draft icon + "Draft" text
+  - Submitted: Blue + Clock icon + "Submitted" text
+  - Approved: Green + Check icon + "Approved" text
+  - Rejected: Red + X icon + "Rejected" text
+- **Error States**: Red borders + error icon + error text (not color alone)
+- **Required Fields**: Asterisk (*) + "required" text in label
+- **Font Size**: Minimum 14px for body text, 16px for inputs
+- **Zoom Support**: Interface remains functional at 200% zoom
+
+#### Mobile Accessibility
+- **Touch Targets**: Minimum 44x44 pixels for all interactive elements
+- **Gesture Alternatives**: All gestures have button alternatives (e.g., swipe to delete has delete button)
+- **Orientation**: Interface works in both portrait and landscape
+- **Screen Size**: Responsive breakpoints for phone (320px), tablet (768px), desktop (1024px)
 
 ---
 

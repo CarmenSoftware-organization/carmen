@@ -259,7 +259,6 @@ The use cases cover:
 - User is authenticated
 - User has permission to modify inventory settings
 - Current costing method is configured
-- User has obtained approval from CFO/Finance Director
 - All pending transactions have been processed
 
 **Postconditions**:
@@ -1601,7 +1600,7 @@ If valuation service unavailable:
 
 **Fallback Strategy**:
 If valuation service fails:
-- Allow manual cost entry (requires approval)
+- Allow manual cost entry
 - Flag adjustment for review
 - Alert finance team
 

@@ -398,10 +398,10 @@ The system must track detailed information about which FIFO layers were consumed
 
 ---
 
-### FR-INV-012: Calculate Period Average Using Monthly Receipts
+### FR-INV-012: Calculate Period Average Using Monthly Receipts with Revaluation
 **Priority**: High
 
-The system must calculate periodic average cost using all receipts within the calendar month of the transaction date.
+The system must calculate periodic average cost using all receipts within the calendar month of the transaction date, with automated period-end revaluation to standardize inventory costs.
 
 **Acceptance Criteria**:
 - System normalizes transaction date to period boundaries (1st to last day of month)
@@ -410,9 +410,69 @@ The system must calculate periodic average cost using all receipts within the ca
 - Average cost formula: Σ(quantity × unitCost) ÷ Σ(quantity)
 - Average cost rounded to 5 decimal places (DECIMAL(20,5) in schema)
 - Total value rounded to 2 decimal places
+- Receipts recorded at actual cost, consumption uses cached period average
+- **Period close creates CLOSE transaction** to revalue ending inventory to period average
+- **Period open creates OPEN transaction** for next period at standardized average cost
+- Diff column tracks rounding errors (2 decimal price, 3 decimal qty) and revaluation variance
 - Error thrown if no receipts found in period (triggers fallback)
 
-**Related Requirements**: BR-INV-024, BR-INV-025, BR-INV-026, BR-INV-027, BR-INV-028, UC-INV-102
+**Related Requirements**: BR-INV-024, BR-INV-025, BR-INV-026, BR-INV-027, BR-INV-028, BR-INV-048, BR-INV-049, BR-INV-050, UC-INV-102
+
+---
+
+### FR-INV-012A: Transaction Type Identification Logic
+**Priority**: High
+
+The system must automatically identify transaction types based on parent lot reference and transaction nature.
+
+**Acceptance Criteria**:
+- **LOT Layer transactions** (parent_lot_no IS NULL): RECEIVE, TRANSFER_IN, OPEN, CLOSE
+- **ADJUSTMENT Layer transactions** (parent_lot_no IS NOT NULL): ISSUE, ADJ_IN, ADJ_OUT, TRANSFER_OUT
+- Transaction type determines cost layer behavior
+- LOT transactions create new lots with independent balances
+- ADJUSTMENT transactions consume from parent lots (reduce parent balance)
+- System validates transaction type consistency with parent_lot_no presence
+- CLOSE transaction revalues remaining inventory to period average
+- OPEN transaction creates opening balance at period average cost
+
+**Related Requirements**: BR-INV-051, BR-INV-052, BR-INV-053, BR-INV-054, BR-INV-055, BR-INV-056, BR-INV-057, BR-INV-058
+
+---
+
+### FR-INV-012B: Period-End Revaluation Process
+**Priority**: High
+
+The system must automatically revalue inventory at period close to standardize costs to period average.
+
+**Acceptance Criteria**:
+- Period close calculates final period average cost
+- System creates CLOSE transaction (LOT layer, no parent)
+- CLOSE transaction includes Diff variance: (Period Average - Actual Costs) × Remaining Qty
+- Diff represents revaluation adjustment posted to P&L
+- System creates OPEN transaction for next period
+- OPEN transaction uses period average cost (standardized opening balance)
+- Revaluation ensures period-to-period cost consistency
+- All transactions maintain complete audit trail
+
+**Related Requirements**: BR-INV-048, BR-INV-049, BR-INV-050, BR-PERIOD-*
+
+---
+
+### FR-INV-012C: Diff Column Calculation and Tracking
+**Priority**: Medium
+
+The system must track rounding differences and revaluation variances in the Diff column.
+
+**Acceptance Criteria**:
+- Diff column tracks precision/rounding differences (price: 2 decimal display, 3 decimal qty)
+- During period: Diff accumulates rounding errors from transactions
+- At period close: Diff includes revaluation variance adjustment
+- Diff calculation: (Period Average × Remaining Qty) - (Book Value at Actual Costs)
+- Diff posted to revaluation variance account in P&L
+- Movement reports reflect Diff impact on inventory valuation
+- System maintains precision: DECIMAL(20,5) storage, 2 decimal display
+
+**Related Requirements**: BR-INV-059, BR-INV-060
 
 ---
 
@@ -711,6 +771,41 @@ The system must periodically remove stale cache entries that are no longer neede
 - **BR-INV-039**: Audit logging failures do not fail parent operations
 - **BR-INV-040**: Sensitive data (costs, quantities) may be audited depending on company policy
 
+### Transaction Type Rules
+
+- **BR-INV-051**: System automatically identifies 8 transaction types: RECEIVE, ISSUE, ADJ_IN, ADJ_OUT, TRANSFER_IN, TRANSFER_OUT, OPEN, CLOSE
+- **BR-INV-052**: LOT layer transactions (parent_lot_no IS NULL) include: RECEIVE, TRANSFER_IN, OPEN, CLOSE
+- **BR-INV-053**: ADJUSTMENT layer transactions (parent_lot_no IS NOT NULL) include: ISSUE, ADJ_IN, ADJ_OUT, TRANSFER_OUT
+- **BR-INV-054**: RECEIVE creates new lot at actual purchase price (no parent)
+- **BR-INV-055**: ISSUE consumes from parent lot using FIFO or period average
+- **BR-INV-056**: ADJ_IN adjusts inventory upward (cannot exceed parent lot balance)
+- **BR-INV-057**: ADJ_OUT adjusts inventory downward (references parent lot)
+- **BR-INV-058**: TRANSFER_IN creates new lot at destination location (no parent)
+- **BR-INV-059**: TRANSFER_OUT consumes from source lot (references parent)
+- **BR-INV-060**: CLOSE transaction revalues ending inventory to period average (LOT layer)
+- **BR-INV-061**: OPEN transaction creates opening balance at period average (LOT layer)
+
+### Period-End Revaluation Rules
+
+- **BR-INV-048**: Enhanced Periodic Average includes automated period-end revaluation
+- **BR-INV-049**: Receipts recorded at actual cost during period (not revalued immediately)
+- **BR-INV-050**: Consumption uses cached period average for cost calculation
+- **BR-INV-062**: Period close calculates final period average from all receipts
+- **BR-INV-063**: CLOSE transaction creates revaluation adjustment with Diff variance
+- **BR-INV-064**: Diff variance = (Period Average × Remaining Qty) - Book Value at Actual
+- **BR-INV-065**: Diff posted to revaluation variance account in P&L
+- **BR-INV-066**: OPEN transaction standardizes opening balance to period average
+- **BR-INV-067**: Next period opens at period average cost (clean slate)
+- **BR-INV-068**: Revaluation ensures period-to-period cost consistency
+
+### Precision and Rounding Rules
+
+- **BR-INV-069**: Price stored with 5 decimal precision (DECIMAL(20,5)), displayed with 2 decimals
+- **BR-INV-070**: Quantity stored with 3 decimal precision
+- **BR-INV-071**: Diff column tracks rounding errors during period
+- **BR-INV-072**: Diff column accumulates revaluation variance at period close
+- **BR-INV-073**: Movement reports reflect Diff impact on inventory valuation
+
 <div style="color: #FFD700;">
 
 ### ⚠️ FUTURE ENHANCEMENT: Lot-Based Cost Layer Rules (FIFO)
@@ -719,18 +814,19 @@ The system must periodically remove stale cache entries that are no longer neede
 
 These rules define the **desired** lot-based system. Current implementation uses `in_qty`/`out_qty` instead.
 
-- **BR-LOT-001** ⚠️: GRN creates new LOT layer with unique lot number format `{LOCATION}-{YYMMDD}-{SEQ}`
+- **BR-LOT-001** ✅: GRN creates new LOT layer with unique lot number format `{LOCATION}-{YYMMDD}-{SEQ}`
   - **Format**: `{LOCATION}-{YYMMDD}-{SEQ}` where LOCATION is 2-4 char code, YYMMDD is 6-digit date, SEQ is 2-digit sequence
   - **Examples**: `MK-251102-0001`, `KC-251105-0001`, `BAR-251110-0001`
-  - **Current**: Lot numbers are free-form text, no enforced format
+  - **Current**: Automatic lot number generation implemented on GRN commit
 - **BR-LOT-002** ⚠️: Transfer In creates new LOT layer at destination location with new lot number
   - **Current**: No automatic lot generation for transfers
 - **BR-LOT-003** ⚠️: Lot numbers must be unique across all locations within the company
   - **Current**: Uniqueness enforced by `@@unique([lot_no, lot_index])` but not location-aware
 - **BR-LOT-004** ✅: Each LOT layer tracks balance via `in_qty`/`out_qty` (calculated as SUM(in_qty) - SUM(out_qty))
   - **Current**: Correctly implemented using transaction-based approach (single source of truth)
-- **BR-LOT-005** ⚠️: Issues, Returns, Adjustments, Write-Offs create ADJUSTMENT layers (not LOT layers)
-  - **Current**: No transaction_type distinction between LOT and ADJUSTMENT
+- **BR-LOT-005** ⚠️: ISSUE, ADJ_IN, ADJ_OUT, TRANSFER_OUT create ADJUSTMENT layers (not LOT layers)
+  - **Transaction Types**: System automatically identifies layer type based on parent_lot_no presence
+  - **Current**: No transaction_type distinction between LOT and ADJUSTMENT (Phase 1 enhancement)
 - **BR-LOT-006** ⚠️: ADJUSTMENT layers MUST link to parent lot via `parent_lot_number` field
   - **Current**: No `parent_lot_no` field exists
 - **BR-LOT-007** ⚠️: Multiple ADJUSTMENT layers can reference the same parent lot
@@ -766,6 +862,116 @@ These rules define the **desired** lot-based system. Current implementation uses
 - **BR-TRANSFER-006** ✅: Source and destination lots are traceable via transaction records
   - **Current**: Traceable via `inventory_transaction_detail_id`
 
+### Credit Note (CN) Inventory Transaction Rules
+
+**Status**: Current Implementation (Integrated with FIFO and Periodic AVG methods)
+
+Credit Note transactions affect inventory immediately when CN is committed (DRAFT → COMMITTED). Two operation types: **QUANTITY_RETURN** (physical return) and **AMOUNT_DISCOUNT** (cost adjustment).
+
+- **BR-CN-001** ✅: **Transaction Type Distinction**
+  - All Credit Note inventory transactions MUST use transaction type `CN`
+  - Distinct from generic adjustments (ADJ_OUT) for audit trail and reporting
+  - **Current**: Implemented via transaction_type field in closing_balance table
+  - **Purpose**: Enable filtered queries, audit reports, and CN-specific analytics
+
+- **BR-CN-002** ✅: **Cost Method Processing**
+  - CN transactions process based on company-wide costing method configuration
+  - **FIFO Method**:
+    - QUANTITY_RETURN: Uses lot-specific costs with FIFO consumption order
+    - AMOUNT_DISCOUNT: Adjusts specific lot costs via zero-quantity adjustment
+  - **Periodic AVG Method**:
+    - QUANTITY_RETURN: Uses period average cost (not original GRN cost)
+    - AMOUNT_DISCOUNT: Adjusts period average calculation for future transactions
+  - **Current**: Implemented in costing method calculation logic
+
+- **BR-CN-003** ✅: **QUANTITY_RETURN Same-Lot Return**
+  - When returning to the same lot as original GRN receipt:
+    - Uses original lot's `cost_per_unit` value from GRN
+    - Creates entry with `in_qty=0`, `out_qty=returned_qty`, `lot_no=original_lot`
+    - Maintains cost consistency (same unit cost as original receipt)
+  - **Current**: Implemented with lot-specific cost tracking
+  - **Formula**: `remaining_qty = SUM(in_qty) - SUM(out_qty)`
+
+- **BR-CN-004** ✅: **QUANTITY_RETURN Different-Lot (FIFO)**
+  - When original lot is insufficient (partially/fully consumed):
+    - Query available lots: `ORDER BY lot_no ASC` (FIFO order)
+    - Consume from oldest available lots first
+    - Create separate CN entries for each lot consumed
+    - Calculate lot depletion on-the-fly: `SUM(in_qty) - SUM(out_qty) = 0`
+  - **Current**: Implemented with FIFO consumption algorithm
+  - **Lot Depletion**: No explicit flag, calculated from transaction history
+  - **Audit Trail**: Multiple CN entries preserve full traceability
+
+- **BR-CN-005** ✅: **AMOUNT_DISCOUNT Zero-Quantity Processing**
+  - Cost adjustment without physical quantity change:
+    - Create entry with `in_qty=0`, `out_qty=0`, `total_cost<0` (negative)
+    - Set `cost_per_unit=$0.00` (not applicable for zero-quantity)
+    - Link to affected lot(s) via `lot_no` field
+    - Allocate discount to **remaining inventory only** (not consumed items)
+  - **Current**: Implemented with zero-quantity cost adjustment pattern
+  - **Validation**: System prevents applying discount to depleted lots
+
+- **BR-CN-006** ✅: **Effective Cost Calculation**
+  - Formula: `Effective Unit Cost = (SUM(in_qty × cost) + SUM(cost_adjustments)) / SUM(in_qty)`
+  - **FIFO Method**: Apply per lot separately
+    - Each lot maintains its own effective cost after discounts
+    - Example: Lot with 200 units @ $15.00, $300 discount = $13.50/unit effective
+  - **Periodic AVG Method**: Apply to entire period
+    - Adjusts period total cost for average calculation
+    - Affects all transactions after discount in same period
+  - **Current**: Implemented in valuation query logic (calculated on-demand)
+
+- **BR-CN-007** ✅: **Immediate Commitment Trigger**
+  - All CN inventory transactions trigger **immediately on CN commit**
+  - Status flow: DRAFT → COMMITTED (no PENDING/APPROVED states)
+  - Cost adjustments apply at moment of commitment
+  - **Current**: Implemented with direct DRAFT → COMMITTED flow
+  - **Rationale**: Financial and inventory impacts must be synchronized
+
+- **BR-CN-008** ✅: **Lot Depletion Detection**
+  - No explicit "depleted" or "is_depleted" flag stored in database
+  - Calculate depletion on-the-fly: `SUM(in_qty) - SUM(out_qty) = 0`
+  - Depleted lots excluded from available inventory queries via `HAVING` clause
+  - Audit trail preserved: Depleted lot entries remain in database
+  - **Current**: Implemented with calculated balance approach
+  - **Query Pattern**: `HAVING SUM(in_qty) - SUM(out_qty) > 0` for available lots
+  - **Performance**: Indexed lot_no and product_id for efficient aggregation
+
+**CN-Specific Query Patterns**:
+
+```sql
+-- Available lots for CN QUANTITY_RETURN (FIFO)
+SELECT
+  lot_no,
+  SUM(in_qty) - SUM(out_qty) as remaining_quantity,
+  cost_per_unit
+FROM tb_inventory_transaction_closing_balance
+WHERE product_id = :product_id
+  AND location_id = :location_id
+  AND lot_no IS NOT NULL
+GROUP BY lot_no, cost_per_unit
+HAVING SUM(in_qty) - SUM(out_qty) > 0  -- Exclude depleted lots
+ORDER BY lot_no ASC  -- FIFO order
+
+-- Effective cost calculation (including AMOUNT_DISCOUNT)
+SELECT
+  lot_no,
+  SUM(in_qty) as total_received,
+  SUM(out_qty) as total_consumed,
+  SUM(in_qty) - SUM(out_qty) as remaining,
+  (SUM(CASE WHEN in_qty > 0 THEN in_qty * cost_per_unit ELSE 0 END) +
+   SUM(CASE WHEN in_qty = 0 AND out_qty = 0 THEN total_cost ELSE 0 END)) /
+  NULLIF(SUM(in_qty), 0) as effective_unit_cost
+FROM tb_inventory_transaction_closing_balance
+WHERE lot_no = :lot_no
+GROUP BY lot_no
+```
+
+**Cross-Reference**:
+- Detailed transaction handling: `SM-costing-methods.md` (CN Transaction Handling section)
+- Transaction type specifications: `SM-transaction-types-and-cost-layers.md` (Rule 2: Credit Note)
+- Credit Note module rules: `BR-credit-note.md`, `VAL-credit-note.md`
+
 ### ⚠️ FUTURE ENHANCEMENT: Period-End Snapshot Rules
 
 **Status**: Planned (See SCHEMA-ALIGNMENT.md Phase 4)
@@ -794,7 +1000,7 @@ These rules require `tb_period` and `tb_period_snapshot` tables which **do not e
   - **Current**: No period calculations
 - **BR-PERIOD-011** ⚠️: Only most recent closed period can be re-opened
   - **Current**: No period re-open capability
-- **BR-PERIOD-012** ⚠️: Period re-open requires financial-manager approval and reason (minimum 50 characters)
+- **BR-PERIOD-012** ⚠️: Period re-open requires reason (minimum 50 characters)
   - **Current**: No period management workflow
 - **BR-PERIOD-013** ⚠️: Re-opening period does NOT delete existing snapshots (preserves audit trail)
   - **Current**: No snapshot preservation mechanism
@@ -1138,7 +1344,7 @@ interface ValuationAuditLog {
 
 ### Assumptions
 
-- Costing method changes are infrequent (1-2 times per year or less), as they represent major accounting policy decisions requiring CFO approval.
+- Costing method changes are infrequent (1-2 times per year or less), as they represent major accounting policy decisions.
 
 - All GRN data is accurate and committed before being used in cost calculations (GIGO - garbage in, garbage out).
 

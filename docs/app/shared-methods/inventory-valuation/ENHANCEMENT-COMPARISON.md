@@ -28,7 +28,8 @@ This document provides comprehensive comparison tables showing the evolution of 
 | **Lot Tracking** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Lot number format | ✅ Manual | ✅ Manual | ✅ Auto | ✅ Auto | ✅ Auto | ✅ Auto |
 | Format validation | ❌ None | ❌ None | ✅ Enforced | ✅ Enforced | ✅ Enforced | ✅ Enforced |
-| **Transaction Types** | ❌ Inferred | ✅ Explicit | ✅ Explicit | ✅ Explicit | ✅ Explicit | ✅ Explicit |
+| **Transaction Types** | ❌ Inferred | ✅ 8 Types | ✅ 8 Types | ✅ 8 Types | ✅ 8 Types | ✅ 8 Types |
+| Layer logic (LOT/ADJ) | ❌ None | ✅ Enforced | ✅ Enforced | ✅ Enforced | ✅ Enforced | ✅ Enforced |
 | Transaction reason | ❌ None | ✅ Available | ✅ Available | ✅ Available | ✅ Available | ✅ Available |
 | **Parent Linkage** | ❌ Manual | ✅ Automatic | ✅ Automatic | ✅ Automatic | ✅ Automatic | ✅ Automatic |
 | Traceability depth | 2 levels | 2 levels | 2 levels | Unlimited | Unlimited | Unlimited |
@@ -76,9 +77,9 @@ This document provides comprehensive comparison tables showing the evolution of 
 | Table | Field | Type | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Purpose |
 |-------|-------|------|---------|---------|---------|---------|---------|
 | `tb_inventory_transaction_closing_balance` | | | | | | | |
-| | `transaction_type` | ENUM | ✅ | ✅ | ✅ | ✅ | Distinguish LOT vs ADJUSTMENT |
-| | `parent_lot_no` | VARCHAR(50) | ✅ | ✅ | ✅ | ✅ | Link to source lot |
-| | `transaction_reason` | VARCHAR(20) | ✅ | ✅ | ✅ | ✅ | Business reason code |
+| | `transaction_type` | ENUM(8) | ✅ | ✅ | ✅ | ✅ | 8 types: RECEIVE, ISSUE, ADJ_IN, ADJ_OUT, TRANSFER_IN, TRANSFER_OUT, OPEN, CLOSE |
+| | `parent_lot_no` | VARCHAR(50) | ✅ | ✅ | ✅ | ✅ | Link to source lot (NULL=LOT, NOT NULL=ADJUSTMENT) |
+| | `transaction_reason` | VARCHAR(20) | ✅ | ✅ | ✅ | ✅ | Business reason code (PRODUCTION, WASTAGE, etc.) |
 | | `lot_no` (constraint) | CHECK | ❌ | ✅ | ✅ | ✅ | Format validation |
 | `tb_period` | *(new table)* | | ✅ | ✅ | ✅ | ✅ | Period lifecycle |
 | | `period_id` | VARCHAR(10) | ✅ | ✅ | ✅ | ✅ | YY-MM format |
@@ -173,7 +174,8 @@ This document provides comprehensive comparison tables showing the evolution of 
 
 | Capability | Current (v1.0) | Enhanced (v2.0) | Benefit |
 |------------|----------------|-----------------|---------|
-| **Type Identification** | Inferred from qty patterns | Explicit `transaction_type` field | Clear categorization |
+| **Type Identification** | Inferred from qty patterns | 8 explicit types with layer logic | Crystal-clear categorization |
+| **Layer Enforcement** | None | Automatic (LOT/ADJUSTMENT) | Database-level consistency |
 | **Parent Linkage** | Manual via detail table | Direct `parent_lot_no` | One-click traceability |
 | **Reason Tracking** | Notes field | Structured `transaction_reason` | Automated categorization |
 | **Audit Depth** | 2 levels (manual joins) | Unlimited (recursive query) | Complete trail |

@@ -396,9 +396,6 @@ Changed By: [Full Name]
 User ID: [User ID]
 Role: [User Role]
 Department: [User Department]
-
-Approved By: [Approving Authority Name]
-Approval Role: [e.g., CFO, Finance Director]
 ```
 
 **Business Justification**:

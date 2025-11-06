@@ -118,17 +118,17 @@ CANCELLED    REJECTED                 REVERSED
 
 **Note**: For complete GRN process documentation, see [Procurement: Goods Received Note](../../procurement/BR-goods-received-note.md)
 
-This section describes **only the inventory transaction processing** triggered when a GRN is posted.
+This section describes **only the inventory transaction processing** triggered when a GRN is committed.
 
-#### 2.1 Inventory Transaction Creation (Triggered by GRN Posting)
-- ✅ GRN posting creates inventory IN transaction
+#### 2.1 Inventory Transaction Creation (Triggered by GRN Commitment)
+- ✅ GRN commitment creates inventory IN transaction
 - ✅ Each GRN line item creates separate transaction (or combined based on configuration)
 - ✅ Transaction cost comes from GRN (which comes from purchase order or invoice)
 - ✅ Lot number and batch tracking inherited from GRN
 
-#### 2.2 Inventory Processing When GRN Posts
+#### 2.2 Inventory Processing When GRN Commits
 ```
-GRN Posted (in Procurement module)
+GRN Committed (in Procurement module)
          ↓
 Inventory Transaction Module receives event
          ↓
@@ -385,24 +385,24 @@ This section documents all external system integrations for inventory transactio
 **Module**: Procurement Management
 **Transaction Type**: Goods Receipt (GRN)
 **Movement Type**: IN
-**Integration Type**: Event-Driven (GRN posts → Inventory transaction created)
+**Integration Type**: Event-Driven (GRN commits → Inventory transaction created)
 
 #### Integration Flow
 ```
-GRN Posted (Procurement) → Event Triggered → Inventory Transaction Created → Stock Updated
+GRN Committed (Procurement) → Event Triggered → Inventory Transaction Created → Stock Updated
 ```
 
 #### Key Integration Touchpoints
 
 **1.1 Event Trigger from Procurement**
-- **Event**: `grn.posted`
+- **Event**: `grn.committed`
 - **Payload Data**:
   - GRN ID and line item IDs
   - Item IDs and quantities received
   - Unit costs (from PO or invoice)
   - Receiving location
   - Lot/batch numbers (if tracked)
-  - GRN posting date
+  - GRN commitment date
 - **Inventory Module Response**: Success/Failure with transaction IDs created
 
 **1.2 Inventory Transaction Processing**

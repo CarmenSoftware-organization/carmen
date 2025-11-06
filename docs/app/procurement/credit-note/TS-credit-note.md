@@ -18,7 +18,7 @@
 
 ## Overview
 
-This technical specification describes the implementation of the Credit Note module using Next.js 14 App Router, React, TypeScript, and Supabase. The module implements two distinct credit note types (quantity-based returns with FIFO costing and amount-based discounts), vendor and GRN selection workflows, inventory lot tracking, automatic journal entry generation, tax calculations, and approval workflows.
+This technical specification describes the implementation of the Credit Note module using Next.js 14 App Router, React, TypeScript, and Supabase. The module implements two distinct credit note types (quantity-based returns with FIFO costing and amount-based discounts), vendor and GRN selection workflows, inventory lot tracking, automatic journal entry generation, and tax calculations.
 
 **⚠️ IMPORTANT: This is a Technical Specification Document - TEXT FORMAT ONLY**
 - **DO NOT include actual code** - describe implementation patterns in text
@@ -64,7 +64,7 @@ This technical specification describes the implementation of the Credit Note mod
 
 ### Component Architecture
 
-The Credit Note module follows Next.js 14 App Router conventions with server-side rendering for initial page loads and client-side interactivity for data manipulation. The module integrates with GRN module for source data, Inventory module for lot tracking, and Finance module for GL postings.
+The Credit Note module follows Next.js 14 App Router conventions with server-side rendering for initial page loads and client-side interactivity for data manipulation. The module integrates with GRN module for source data, Inventory module for lot tracking, and Finance module for GL commitments.
 
 - **Frontend Layer**
   - Page Components: List page, detail page with dynamic routing, vendor selection, GRN selection
@@ -75,7 +75,7 @@ The Credit Note module follows Next.js 14 App Router conventions with server-sid
 - **Backend Layer**
   - Server Actions: Handle credit note CRUD operations and business logic (future implementation)
   - Data Access Layer: Interface with mock data (future: database queries)
-  - Business Logic: FIFO costing calculations, tax calculations, status transitions, approval workflows
+  - Business Logic: FIFO costing calculations, tax calculations, status transitions
   - Integration Layer: Stock movements, journal entries, GRN references, vendor payables
 
 - **Data Layer**
@@ -107,8 +107,7 @@ The Credit Note module follows Next.js 14 App Router conventions with server-sid
 ### Business Logic
 - **FIFO Costing Engine**: Calculates weighted average costs from inventory lots
 - **Tax Calculation Engine**: Applies tax rates and calculates input VAT adjustments
-- **Approval Workflow Engine**: Determines approval requirements based on thresholds
-- **Journal Entry Generator**: Creates GL entries for posting to finance module
+- **Journal Entry Generator**: Creates GL entries for commitment to finance module
 
 ### Testing
 - **Unit Tests**: Vitest (planned)
@@ -174,11 +173,11 @@ lib/
 **Responsibilities**:
 - Load mock credit note data from centralized mock data file
 - Display credit notes in card view or table view
-- Provide status filtering (All, Draft, Submitted, Approved, Rejected, Voided)
+- Provide status filtering (All, Draft, Committed, Voided)
 - Support search across CN number, vendor name, description
-- Render status badges with color coding (draft=gray, pending=yellow, approved=blue, posted=green, void=red)
-- Provide row actions (view, edit, approve, reject, delete)
-- Handle bulk operations (approve, reject, delete selected)
+- Render status badges with color coding (draft=gray, committed=green, void=red)
+- Provide row actions (view, edit, commit, delete, void)
+- Handle bulk operations (commit, delete selected)
 - Maintain pagination state with configurable page sizes
 - Sort by any column in ascending or descending order
 
@@ -212,17 +211,15 @@ lib/
   - Credit reason and description
 - Render tabbed interface for different aspects:
   - Inventory tab (lot applications and FIFO analysis)
-  - Journal Entries tab (GL postings)
+  - Journal Entries tab (GL commitments)
   - Tax Entries tab (VAT calculations)
   - Stock Movement tab (inventory adjustments for quantity returns)
 - Manage tab state and switching between tabs
 - Handle field edit interactions for header information
 - Provide action buttons based on status:
   - Save (for draft edits)
-  - Submit for Approval (draft to pending)
-  - Approve/Reject (for approvers)
-  - Post (approved to posted)
-  - Void (posted to void)
+  - Commit (draft to committed)
+  - Void (committed to void)
 - Display status badge with appropriate color
 - Integrate all tabs as separate components
 
@@ -300,7 +297,7 @@ lib/
 
 #### Journal Entries Tab Component
 **File**: `components/journal-entries.tsx`
-**Purpose**: Display generated journal entries for posted credit notes
+**Purpose**: Display generated journal entries for committed credit notes
 **Responsibilities**:
 - Show journal entries grouped by entry type:
   - Primary Entries Group (AP credit, inventory adjustment, input VAT)
@@ -315,7 +312,7 @@ lib/
   - Entry order number
 - Validate total debits equal total credits
 - Display group subtotals
-- Show posting date and journal voucher reference
+- Show commitment date and journal voucher reference
 - Read-only view of system-generated entries
 
 #### Tax Entries Tab Component
@@ -350,7 +347,7 @@ lib/
 **File**: `components/stock-movement.tsx` and `StockMovementTab.tsx`
 **Purpose**: Display inventory movements for quantity-based credits
 **Responsibilities**:
-- Show stock movements generated when credit note posted
+- Show stock movements generated when credit note committed
 - Display movement details per item:
   - Location type (INV=Inventory, CON=Consignment)
   - Lot number
@@ -501,57 +498,15 @@ Navigation to credit note detail view
 Detail component displays complete credit note
 ```
 
-### Credit Note Approval Workflow Flow
+
+### Commitment and Journal Entry Generation Flow
 
 ```
 User opens draft credit note
     ↓
-User clicks "Submit for Approval"
+User clicks "Commit" button
     ↓
-System performs validation:
-  - All required fields present
-  - Items and lots selected
-  - Calculations correct
-    ↓
-System determines approval requirement:
-  IF credit amount ≤ auto-approval threshold
-    → Auto-approve, change status to APPROVED
-  IF credit amount > threshold
-    → Change status to PENDING
-    → Send notification to approver
-    ↓
-Approver receives notification
-    ↓
-Approver opens credit note
-    ↓
-Approver reviews:
-  - Header information
-  - Items and quantities
-  - FIFO analysis
-  - Financial impact
-    ↓
-Approver decides:
-  APPROVE:
-    - Clicks "Approve" button
-    - Enters optional approval comments
-    - Status changes to APPROVED
-    - Requester notified
-  REJECT:
-    - Clicks "Reject" button
-    - Enters rejection reason (required)
-    - Status changes to REJECTED
-    - Requester notified
-    - Credit note returns to DRAFT for revision
-```
-
-### Posting and Journal Entry Generation Flow
-
-```
-User opens approved credit note
-    ↓
-User clicks "Post" button
-    ↓
-System performs pre-posting validation:
+System performs pre-commitment validation:
   - Accounting period open for document date
   - GL accounts configured
   - Vendor account active
@@ -596,26 +551,26 @@ System generates stock movements [qty returns only]:
     - Quantity: Negative (e.g., -10 for return)
     - Unit cost: From FIFO calculation
     - Extra cost: Proportional allocation
-    - Movement date: Posting date
+    - Movement date: Commitment date
     - Reference: CN number
     ↓
-System posts transactions atomically:
-  1. Post journal entries to Finance module
-  2. Post stock movements to Inventory module
+System commits transactions atomically:
+  1. Commit journal entries to Finance module
+  2. Commit stock movements to Inventory module
   3. Update vendor payable balance
-  4. Change credit note status to POSTED
-  5. Assign posting date and reference number
+  4. Change credit note status to COMMITTED
+  5. Assign commitment date and reference number
     ↓
 System sends notifications:
   - Email to finance team
   - Email to requester
   - In-app notifications
     ↓
-System logs posting in audit trail
+System logs commitment in audit trail
     ↓
 User sees success message
     ↓
-Detail view refreshes with posted status
+Detail view refreshes with committed status
     ↓
 Credit note locked from edits
 ```
@@ -623,7 +578,7 @@ Credit note locked from edits
 ### Voiding Flow
 
 ```
-User opens posted credit note
+User opens committed credit note
     ↓
 User clicks "Void" button (manager only)
     ↓
@@ -652,8 +607,8 @@ System generates reversing entries:
   - Same GL accounts, amounts, references
     ↓
 System posts reversing transactions:
-  1. Post reversing journal entries
-  2. Post reversing stock movements
+  1. Commit reversing journal entries
+  2. Commit reversing stock movements
   3. Restore vendor payable balance
   4. Change status to VOID
   5. Assign void date and reference
@@ -716,23 +671,12 @@ All data operations currently use mock data from centralized files:
 - Output: Updated credit note object
 - Business logic: Status validation, recalculations, audit logging
 
-**Submit for Approval**
-- Endpoint: Server action (future)
-- Input: Credit note ID
-- Output: Updated status, approval notifications
-- Business logic: Threshold check, approver determination, email notifications
 
-**Approve/Reject Credit Note**
+**Commit Credit Note**
 - Endpoint: Server action (future)
-- Input: Credit note ID, approval decision, comments
-- Output: Updated status
-- Business logic: Authority validation, status transition, notifications
-
-**Post Credit Note**
-- Endpoint: Server action (future)
-- Input: Credit note ID, posting date
+- Input: Credit note ID, commitment date
 - Output: Posted credit note with journal entries and stock movements
-- Business logic: Journal entry generation, stock movement creation, GL posting, inventory updates
+- Business logic: Journal entry generation, stock movement creation, GL commitment, inventory updates
 
 **Void Credit Note**
 - Endpoint: Server action (future)
@@ -750,18 +694,18 @@ All data operations currently use mock data from centralized files:
 **Inventory Module Integration**
 - Read lot data: Retrieve available lots for return items
 - Read lot costs: Get unit costs for FIFO calculations
-- Post stock movements: Send negative stock movements on credit note posting
+- Commit stock movements: Send negative stock movements on credit note commitment
 - Update balances: Reduce inventory quantities per lot
 
 **Finance Module Integration**
-- Post journal entries: Send GL entries on credit note posting
+- Commit journal entries: Send GL entries on credit note commitment
 - Update vendor payable: Reduce payable balance by credit amount
-- Post tax entries: Send input VAT adjustments for tax reporting
-- Period validation: Validate accounting period is open before posting
+- Commit tax entries: Send input VAT adjustments for tax reporting
+- Period validation: Validate accounting period is open before commitment
 
 **Vendor Module Integration**
 - Read vendor data: Retrieve vendor information for selection
-- Read vendor accounts: Get GL account codes for posting
+- Read vendor accounts: Get GL account codes for commitment
 - Credit application: Apply credit to vendor account balance (future)
 
 ---
@@ -822,44 +766,9 @@ All data operations currently use mock data from centralized files:
 - VAT period classification
 - Tax entry for VAT return reporting
 
-### Approval Workflow Engine
-
-**Purpose**: Determine approval requirements and route credit notes to appropriate approvers
-
-**Algorithm Description**:
-1. User submits credit note (status changes DRAFT → PENDING)
-2. System retrieves credit note total amount
-3. System retrieves approval threshold configuration:
-   - Auto-approval threshold (e.g., $500)
-   - Manager approval threshold (e.g., $5,000)
-4. IF total ≤ auto-approval threshold:
-   - Change status directly to APPROVED
-   - Skip manual approval
-   - Log auto-approval in audit trail
-5. ELSE IF total ≤ manager approval threshold:
-   - Change status to PENDING
-   - Route to department manager
-   - Send email notification to manager
-6. ELSE IF total > manager approval threshold:
-   - Change status to PENDING
-   - Route to procurement manager
-   - Send email notification to procurement manager
-7. Store approval requirement with credit note
-8. Log status change in audit trail
-
-**Data Requirements**:
-- Approval threshold configuration per location/department
-- Approver assignments per level
-- User email addresses for notifications
-
-**Output**:
-- Status change (DRAFT → APPROVED or DRAFT → PENDING)
-- Approval routing decision
-- Notification triggers
-
 ### Journal Entry Generator
 
-**Purpose**: Generate GL journal entries when credit note is posted
+**Purpose**: Generate GL journal entries when credit note is committed
 
 **Algorithm Description**:
 
@@ -908,9 +817,9 @@ All data operations currently use mock data from centralized files:
 
 5. Validate journal balance: total debits = total credits
 6. Assign journal voucher number
-7. Assign posting date
+7. Assign commitment date
 8. Store all entries with credit note
-9. Post entries to Finance module
+9. Commit entries to Finance module
 
 **Data Requirements**:
 - GL account mapping configuration
@@ -947,7 +856,7 @@ All data operations currently use mock data from centralized files:
       - Quantity: Negative value (e.g., -10 for 10 units returned)
       - Unit cost: From FIFO calculation
       - Extra cost: Proportional allocation if applicable
-      - Movement date: Credit note posting date
+      - Movement date: Credit note commitment date
       - Reference type: "Credit Note"
       - Reference number: CN number
       - Document ID: Credit note ID
@@ -957,7 +866,7 @@ All data operations currently use mock data from centralized files:
       - Note: Value is negative for returns
 
 3. Validate all stock movements created for all items
-4. Post stock movements to Inventory module atomically
+4. Commit stock movements to Inventory module atomically
 5. Inventory module updates:
    - Reduces lot available quantity by return quantity
    - Updates inventory valuation
@@ -1018,19 +927,9 @@ All data operations currently use mock data from centralized files:
 - Inventory lot existence validation
 - Numerical field range validations
 
-**Pre-Submission Validation**:
-- All required fields complete
-- At least one item with valid lot selection (quantity) or discount (amount)
-- Calculations correct (totals, tax, FIFO)
-- Status is DRAFT
 
-**Pre-Approval Validation**:
-- User has approval authority for credit amount
-- Credit note in PENDING status
-- No concurrent edits detected
-
-**Pre-Posting Validation**:
-- Credit note in APPROVED status
+**Pre-Commitment Validation**:
+- Credit note in DRAFT status
 - Accounting period open for document date
 - All GL accounts configured and exist
 - Vendor account exists and is active
@@ -1044,10 +943,10 @@ All data operations currently use mock data from centralized files:
 ### Role-Based Access Control
 
 **Roles**:
-- **Purchasing Staff**: Create, edit draft, submit, view
+- **Purchasing Staff**: Create, edit draft, view
 - **Receiving Clerk**: Create quantity returns, edit draft, view
-- **Procurement Manager**: All purchasing staff permissions plus approve, reject, post, void
-- **Finance Team**: View, post approved credits, review journal entries
+- **Procurement Manager**: All purchasing staff permissions plus commit, void
+- **Finance Team**: View, commit credits, review journal entries
 - **Warehouse Staff**: View, confirm lot selections
 
 **Permission Matrix**:
@@ -1058,10 +957,7 @@ All data operations currently use mock data from centralized files:
 | View Detail | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Create Credit Note | ✓ | ✓ | ✓ | - | - |
 | Edit Draft | ✓ | ✓ | ✓ | - | - |
-| Submit for Approval | ✓ | ✓ | ✓ | - | - |
-| Approve | - | - | ✓ | - | - |
-| Reject | - | - | ✓ | - | - |
-| Post | - | - | ✓ | ✓ | - |
+| Commit | - | - | ✓ | ✓ | - |
 | Void | - | - | ✓ | - | - |
 | View Financial Data | ✓ | Limited | ✓ | ✓ | Limited |
 
@@ -1070,18 +966,17 @@ All data operations currently use mock data from centralized files:
 - **Location-Based Access**: Users can only view/edit credit notes for their assigned locations (unless cross-location permission granted)
 - **Vendor-Based Access**: Users can only create credit notes for vendors they have permission to access
 - **Status-Based Editing**: Only DRAFT status credit notes can be edited
-- **Amount-Based Approval**: Approval authority validated against user's approval limit
 
 ### Audit Trail
 
 All credit note operations logged with:
-- **Action Type**: Create, update, submit, approve, reject, post, void
+- **Action Type**: Create, update, commit, void
 - **User**: Username and user ID
 - **Timestamp**: Date and time of action
 - **Details**: Changed fields, old/new values
 - **IP Address**: Request source IP
 - **Status Changes**: From/to status
-- **Comments**: Approval/rejection comments, void reasons
+- **Comments**: Void reasons
 
 Audit log is immutable (no deletion or editing allowed) and retained per compliance requirements.
 
@@ -1119,7 +1014,7 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 - **FIFO calculation**: < 2 seconds for 10 lots per item
 - **Tax calculation**: < 1 second for 20 items
 - **Save operation**: < 3 seconds including validation
-- **Post operation**: < 5 seconds including journal and stock movements
+- **Commit operation**: < 5 seconds including journal and stock movements
 - **Void operation**: < 5 seconds including reversing entries
 
 ---
@@ -1161,7 +1056,7 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 - Maintenance mode for severe system issues
 
 **Data Integrity Errors**:
-- Atomic transactions for posting and voiding operations
+- Atomic transactions for commitment and voiding operations
 - Rollback on any failure in multi-step processes
 - Validate data consistency before and after operations
 - Lock records during updates to prevent concurrent modification
@@ -1186,8 +1081,7 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 ### Integration Testing (Planned)
 
 **Scenarios to Test**:
-- End-to-end credit note creation flow (vendor → GRN → lots → save)
-- Approval workflow (submit → approve → post)
+- End-to-end credit note creation flow (vendor → GRN → lots → save → commit)
 - Void workflow with journal and stock movement reversal
 - Multi-currency credit note with exchange rate conversion
 - FIFO costing with complex lot selections
@@ -1270,7 +1164,7 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 **Log Levels**:
 - **ERROR**: System errors, validation failures, API errors
 - **WARN**: Business rule violations, deprecated feature usage
-- **INFO**: User actions (create, submit, approve, post, void)
+- **INFO**: User actions (create, update, commit, void)
 - **DEBUG**: Detailed execution flow (development only)
 
 **Log Content**:
@@ -1293,9 +1187,7 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 ### Planned Features
 
 1. **Workflow Automation**:
-   - Auto-submission for low-value credits
-   - Scheduled posting batch jobs
-   - Automated approval reminders
+   - Scheduled commitment batch jobs
 
 2. **Advanced Reporting**:
    - Credit note aging report
@@ -1340,8 +1232,6 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 **Journal Voucher**: Accounting document containing GL entries.
 
 **Stock Movement**: Inventory transaction record showing quantity changes.
-
-**Approval Threshold**: Credit amount limit requiring manager approval.
 
 **GL Account**: General Ledger account number used in financial system.
 

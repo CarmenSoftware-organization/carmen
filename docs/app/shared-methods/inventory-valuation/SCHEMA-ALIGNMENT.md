@@ -48,9 +48,9 @@ Timeline:        8-11 weeks total to complete all phases
 
 | Phase | Enhancement | Business Value | Priority |
 |-------|-------------|----------------|----------|
-| **Phase 1** | `transaction_type` field | Full LOT/ADJUSTMENT distinction | P0 |
-| **Phase 1** | `parent_lot_no` field | Complete traceability | P0 |
-| **Phase 1** | Period tables | Period lifecycle management | P0 |
+| **Phase 1** | `transaction_type` field (8 types) | 8 explicit types + layer logic (LOT/ADJUSTMENT) | P0 |
+| **Phase 1** | `parent_lot_no` field | Complete traceability with layer enforcement | P0 |
+| **Phase 1** | Period tables | Period lifecycle + revaluation automation | P0 |
 | **Phase 2** | Automatic lot generation | Eliminate manual errors | P1 |
 | **Phase 2** | Format validation | Prevent invalid formats | P1 |
 | **Phase 3** | Enhanced FIFO | Edge case handling | P1 |
@@ -77,7 +77,7 @@ Timeline:        8-11 weeks total to complete all phases
 |-------------|---------|---------|----------|---------|
 | **tb_inventory_transaction_closing_balance** | | | | |
 | `lot_no` | ✅ Free-form | ✅ | ✅ Validated | Lot identifier |
-| `transaction_type` | ❌ | ✅ NEW | ✅ | LOT vs ADJUSTMENT |
+| `transaction_type` | ❌ | ✅ NEW | ✅ | 8 types + layer logic |
 | `parent_lot_no` | ❌ | ✅ NEW | ✅ | Source lot link |
 | `transaction_reason` | ❌ | ✅ NEW | ✅ | Business reason |
 | **tb_period** | ❌ | ✅ NEW TABLE | ✅ | Period lifecycle |
@@ -244,8 +244,12 @@ model tb_inventory_transaction_closing_balance {
   // For FIFO ordering: ORDER BY lot_no ASC (naturally sorts chronologically)
 
   // ✅ ADD: Transaction type classification
-  transaction_type String?    // NEW: 'LOT' or 'ADJUSTMENT'
-  parent_lot_no    String?    // NEW: For ADJUSTMENT layers, link to parent lot
+  transaction_type enum_transaction_type?  // NEW: 8 explicit types with layer logic
+  parent_lot_no    String?                  // NEW: For ADJUSTMENT layers, link to parent lot
+
+  // ✅ LAYER LOGIC:
+  // - LOT Layer (parent_lot_no IS NULL): RECEIVE, TRANSFER_IN, OPEN, CLOSE
+  // - ADJUSTMENT Layer (parent_lot_no IS NOT NULL): ISSUE, ADJ_IN, ADJ_OUT, TRANSFER_OUT
 
   // ✅ ADD: Enhanced tracking
   transaction_reason String?  // NEW: Reason code (PRODUCTION, WASTAGE, etc.)
@@ -259,11 +263,37 @@ model tb_inventory_transaction_closing_balance {
 
 **Migration Strategy**:
 ```sql
--- Add new columns (nullable initially)
+-- Step 1: Create ENUM type for transaction types
+CREATE TYPE enum_transaction_type AS ENUM (
+  'RECEIVE',      -- LOT layer: Initial receipt from supplier (GRN)
+  'TRANSFER_IN',  -- LOT layer: Receipt from another location
+  'OPEN',         -- LOT layer: Opening balance (standardized to period average)
+  'CLOSE',        -- LOT layer: Closing balance revaluation (standardized to period average)
+  'ISSUE',        -- ADJUSTMENT layer: Consumption to production/sales
+  'ADJ_IN',       -- ADJUSTMENT layer: Inventory increase adjustment
+  'ADJ_OUT',      -- ADJUSTMENT layer: Inventory decrease (write-off, return, spoilage)
+  'TRANSFER_OUT'  -- ADJUSTMENT layer: Transfer to another location
+);
+
+-- Step 2: Add new columns (nullable initially)
 ALTER TABLE tb_inventory_transaction_closing_balance
-  ADD COLUMN transaction_type VARCHAR(20),
+  ADD COLUMN transaction_type enum_transaction_type,
   ADD COLUMN parent_lot_no VARCHAR(255),
   ADD COLUMN transaction_reason VARCHAR(100);
+
+-- Step 3: Add check constraints for layer logic
+ALTER TABLE tb_inventory_transaction_closing_balance
+  ADD CONSTRAINT chk_lot_layer
+    CHECK (
+      (transaction_type IN ('RECEIVE', 'TRANSFER_IN', 'OPEN', 'CLOSE') AND parent_lot_no IS NULL)
+      OR
+      (transaction_type IN ('ISSUE', 'ADJ_IN', 'ADJ_OUT', 'TRANSFER_OUT') AND parent_lot_no IS NOT NULL)
+    );
+
+-- Step 4: Add foreign key for parent lot traceability
+ALTER TABLE tb_inventory_transaction_closing_balance
+  ADD CONSTRAINT fk_parent_lot
+    FOREIGN KEY (parent_lot_no) REFERENCES tb_inventory_transaction_closing_balance(lot_no);
 
 -- NOTE: No receipt_date column needed
 -- Date is embedded in lot_no format: {LOCATION}-{YYMMDD}-{SEQ}
@@ -273,9 +303,10 @@ ALTER TABLE tb_inventory_transaction_closing_balance
 -- Remaining quantity calculated at runtime: SUM(in_qty) - SUM(out_qty)
 -- This design provides:
 --   1. Single source of truth (no synchronization issues)
---   2. Complete audit trail
+--   2. Complete audit trail with layer logic enforcement
 --   3. Flexibility for corrections
 --   4. Simplified transaction posting logic
+--   5. Automatic layer identification via parent_lot_no
 ```
 
 #### 2. NEW: tb_period
@@ -320,6 +351,21 @@ model tb_period {
 
   @@index([status])
   @@index([start_date, end_date])
+}
+
+// ✅ ADD NEW ENUM: Transaction Type with Layer Logic
+enum enum_transaction_type {
+  // LOT Layer (parent_lot_no IS NULL) - Creates new independent lots
+  RECEIVE       // Initial receipt from supplier (GRN)
+  TRANSFER_IN   // Receipt from another location
+  OPEN          // Opening balance for new period (standardized to period average)
+  CLOSE         // Closing balance revaluation (standardized to period average)
+
+  // ADJUSTMENT Layer (parent_lot_no IS NOT NULL) - References and reduces parent lots
+  ISSUE         // Consumption to production/sales
+  ADJ_IN        // Inventory increase adjustment
+  ADJ_OUT       // Inventory decrease (write-off, return, spoilage)
+  TRANSFER_OUT  // Transfer to another location
 }
 
 // ✅ ADD NEW ENUM
@@ -453,9 +499,9 @@ function generateLotNumber(
 | `out_qty` | `out_qty` | **Keep** | Outgoing quantity (consumption) |
 | N/A | **Calculated** | **Calculate** | `SUM(in_qty) - SUM(out_qty)` at runtime |
 | N/A | ~~`receipt_date`~~ | **NOT NEEDED** | Date embedded in `lot_no`, FIFO sorts by `lot_no` ASC |
-| N/A | `transaction_type` | **Add** | 'LOT' or 'ADJUSTMENT' |
-| N/A | `parent_lot_no` | **Add** | For ADJUSTMENT linkage |
-| N/A | `transaction_reason` | **Add** | Business reason code |
+| N/A | `transaction_type` | **Add** | 8 types: RECEIVE, ISSUE, ADJ_IN, ADJ_OUT, TRANSFER_IN, TRANSFER_OUT, OPEN, CLOSE |
+| N/A | `parent_lot_no` | **Add** | For ADJUSTMENT layer linkage (NULL for LOT, NOT NULL for ADJUSTMENT) |
+| N/A | `transaction_reason` | **Add** | Business reason code (PRODUCTION, WASTAGE, etc.) |
 | N/A | `tb_period` table | **Add** | Period management (format: `YY-MM`) |
 | N/A | `tb_period_snapshot` table | **Add** | Period-end snapshots |
 
@@ -476,9 +522,10 @@ Transaction → tb_inventory_transaction (header)
            [FIFO Logic Determines Lot Consumption]
            ↓
            → tb_inventory_transaction_closing_balance (LOT or ADJUSTMENT layers)
-              - LOT layers: Create new lot with in_qty > 0
-              - ADJUSTMENT layers: Create entry with out_qty > 0
-                                   Link to parent lot via parent_lot_no
+              - LOT layer (parent_lot_no IS NULL): RECEIVE, TRANSFER_IN, OPEN, CLOSE
+                Create new lot with in_qty > 0
+              - ADJUSTMENT layer (parent_lot_no IS NOT NULL): ISSUE, ADJ_IN, ADJ_OUT, TRANSFER_OUT
+                Create entry with out_qty > 0, link to parent lot via parent_lot_no
 ```
 
 ---
@@ -489,16 +536,19 @@ Transaction → tb_inventory_transaction (header)
 **Goal**: Add required fields and tables without breaking existing system
 
 **Steps**:
-1. Add new fields to `tb_inventory_transaction_closing_balance`:
-   - `transaction_type` VARCHAR(20)
+1. Create ENUM type `enum_transaction_type` (8 values with layer logic)
+2. Add new fields to `tb_inventory_transaction_closing_balance`:
+   - `transaction_type` enum_transaction_type
    - `parent_lot_no` VARCHAR(255)
    - `transaction_reason` VARCHAR(100)
    - **Note**: No `receipt_date` field - date embedded in `lot_no`
-2. Create `tb_period` table (period format: `YY-MM`)
-3. Create `tb_period_snapshot` table
-4. Create new enums (`enum_period_status`, `enum_snapshot_status`)
-5. Add indexes for performance (especially on `lot_no` for FIFO ordering)
-6. Migrate existing data to new fields
+3. Add check constraint `chk_lot_layer` to enforce layer logic (LOT vs ADJUSTMENT)
+4. Add foreign key `fk_parent_lot` for parent lot traceability
+5. Create `tb_period` table (period format: `YY-MM`)
+6. Create `tb_period_snapshot` table
+7. Create new enums (`enum_period_status`, `enum_snapshot_status`)
+8. Add indexes for performance (especially on `lot_no` for FIFO ordering)
+9. Migrate existing data to new fields
 
 **Estimated Effort**: 1-2 weeks (including testing)
 

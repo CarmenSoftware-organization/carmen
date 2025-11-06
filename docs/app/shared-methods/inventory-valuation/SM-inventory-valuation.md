@@ -172,7 +172,7 @@ This shared method is used across multiple modules:
 | Module | Use Case | Current Integration | Future Enhancement |
 |--------|----------|-------------------|-------------------|
 | **Credit Notes** | Calculate return cost | Uses `from_lot_no` field | ⚠️ Enhanced lot consumption tracking |
-| **GRN (Goods Receipt)** | Record receipt cost | Creates `current_lot_no` entry | ⚠️ Structured lot number generation |
+| **GRN (Goods Receipt)** | Record receipt cost | Creates `current_lot_no` entry | ✅ Automatic lot number generation |
 | **Store Requisitions** | Issue cost calculation | Uses `from_lot_no` for consumption | ⚠️ FIFO algorithm with parent linkage |
 | **Stock In/Out** | Inventory movement costing | Basic lot tracking | ⚠️ Enhanced lot lineage tracking |
 | **Inventory Adjustments** | Adjustment costing | Manual lot specification | ⚠️ Automated lot selection |
@@ -646,7 +646,6 @@ Note:
 2. **No Transaction Type**: Can't distinguish LOT vs ADJUSTMENT layers (no `transaction_type` field)
 3. **No Period Management**: No `tb_period` table for month-end close
 4. **No Snapshots**: No `tb_period_snapshot` table for historical balances
-5. **Manual Lot Generation**: No automatic lot number generator yet (partial implementation)
 
 ### Current FIFO Implementation ✅
 
@@ -824,11 +823,10 @@ Stock-Out → Query available lots WHERE SUM(in_qty) - SUM(out_qty) > 0
 Additional Features NOT YET IMPLEMENTED:
 - transaction_type field (to distinguish LOT vs ADJUSTMENT layers)
 - parent_lot_no field (for adjustment layer traceability)
-- Automatic lot number generation (currently manual/partial)
 
-Enhanced Flow (Future):
-GRN Receipt → Auto-generate {LOCATION}-{YYMMDD}-{SEQ}
-           → Create LOT layer (in_qty > 0, transaction_type = 'LOT')
+Current Flow (Implemented):
+GRN Receipt → ✅ Auto-generates {LOCATION}-{YYMMDD}-{SEQ}
+           → Create lot entry (in_qty > 0)
                          ↓
 Stock-Out → Query lots WHERE SUM(in_qty) - SUM(out_qty) > 0
            → ORDER BY lot_no ASC (chronological FIFO)

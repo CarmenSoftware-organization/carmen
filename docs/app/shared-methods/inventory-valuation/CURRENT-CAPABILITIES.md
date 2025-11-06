@@ -36,6 +36,7 @@ Every inventory receipt creates a unique lot number that tracks the item from re
 - `KC-251105-0001` - Kakadiya Kitchen, November 5, 2025, sequence 01
 
 **Key Features**:
+- ✅ Automatic lot number generation on GRN commit
 - ✅ Unique tracking from receipt to consumption
 - ✅ Embedded date for natural FIFO ordering
 - ✅ Location-specific lot identification
@@ -43,13 +44,11 @@ Every inventory receipt creates a unique lot number that tracks the item from re
 
 **How to Use**:
 ```
-1. Receive goods → System creates lot number automatically (if configured)
+1. Receive goods → System creates lot number automatically
 2. Record quantity and cost per lot
 3. Track lot consumption through production/issues
 4. View lot history and current balance
 ```
-
-**Current Limitation**: Manual lot number entry required (auto-generation coming in Phase 2)
 
 ---
 
@@ -96,43 +95,75 @@ System Automatically Consumes:
 
 ---
 
-### 3. Calculate Periodic Average Costs
+### 3. Calculate Periodic Average Costs (Enhanced with Period-End Revaluation)
 
 **Status**: ✅ **Fully Functional**
 
-Periodic Average costing calculates the weighted average cost for all receipts within a calendar month.
+Enhanced Periodic Average costing calculates the weighted average cost for all receipts within a calendar month, with automated period-end revaluation to standardize inventory costs.
 
 **How It Works**:
 ```
 Period: January 2025 (25-01)
 
-Receipts:
-- MK-250105-0001: 100 kg @ $10.00 = $1,000
-- MK-250112-0001: 150 kg @ $12.00 = $1,800
-- MK-250120-0001: 200 kg @ $11.00 = $2,200
+During Period (Receipts at Actual Cost):
+- MK-250105-0001: 100 kg @ $10.00 = $1,000.00
+- MK-250112-0001: 150 kg @ $12.00 = $1,800.00
+- MK-250120-0001: 200 kg @ $11.00 = $2,200.00
 
-Periodic Average = $5,000 / 450 kg = $11.11/kg
+Period Average = $5,000 / 450 kg = $11.11/kg (rounded to 2 decimals)
 
-All January issues use: $11.11/kg
+Consumption During Period:
+- All January issues use cached average: $11.11/kg for reference
+
+Period-End Close (Revaluation):
+- Remaining inventory: 250 kg at various actual costs
+- Book value at actual costs: $2,750.00
+- Revalued amount: 250 kg × $11.11 = $2,777.50
+- Diff (revaluation variance): $27.50 posted to P&L
+
+Next Period Opens:
+- Opening balance: 250 kg @ $11.11/kg (standardized)
+- Clean slate for February calculations
 ```
 
 **Key Features**:
-- ✅ Calendar month period boundaries
-- ✅ On-demand calculation from transaction history
+- ✅ Calendar month period boundaries (YY-MM format)
+- ✅ Receipts recorded at actual cost (never adjusted during period)
+- ✅ Cached period average used for consumption reference
+- ✅ Automated period-end revaluation via CLOSE transaction
+- ✅ Opening balance standardized via OPEN transaction
+- ✅ Diff column tracks rounding errors and revaluation variance
 - ✅ Receipt-based averaging: `SUM(total_cost) / SUM(qty)`
 - ✅ Fallback strategies for missing data
+
+**Transaction Types**:
+- **RECEIVE**: Records receipt at actual cost (LOT layer, no parent)
+- **ISSUE**: Consumption using cached period average (ADJUSTMENT layer, has parent)
+- **CLOSE**: Revalues ending inventory to period average (LOT layer)
+- **OPEN**: Creates opening balance at period average (LOT layer)
 
 **When to Use Periodic Average**:
 - ✅ Stable prices with low volatility
 - ✅ High-volume commodity items
 - ✅ Items where physical flow doesn't matter
 - ✅ Simplified financial reporting
+- ✅ Need for period-to-period cost consistency
 
 **Calculation Formula**:
 ```sql
+-- Calculate period average from receipts
 Period Average Cost = SUM(receipt_qty × receipt_cost) / SUM(receipt_qty)
-                     for all receipts in period YY-MM
+                     for all RECEIVE transactions in period YY-MM
+
+-- Calculate revaluation variance at period close
+Diff = (Period Average × Remaining Qty) - Book Value at Actual Costs
 ```
+
+**Diff Column Behavior**:
+- Tracks rounding differences (prices stored as DECIMAL(20,5), displayed as 2 decimals)
+- Captures revaluation variance at period close
+- Posted to revaluation variance account in P&L
+- Ensures inventory balance sheet reflects period average cost
 
 ---
 
@@ -226,16 +257,7 @@ Standard inventory valuation reports are available for financial and operational
 
 Understanding current limitations helps you work effectively while enhancements are being developed.
 
-### Limitation 1: Manual Lot Number Entry
-
-**Current State**: Manual entry required
-**Impact**: Risk of format inconsistencies or duplicates
-**Workaround**: Use location-specific naming conventions, follow `{LOC}-{YYMMDD}-{SEQ}` format strictly
-**Coming in Phase 2** (1 week): Automatic lot generation with sequence management
-
----
-
-### Limitation 2: Inferred Transaction Types
+### Limitation 1: Inferred Transaction Types
 
 **Current State**: No explicit transaction_type field
 **Impact**: Must use `in_qty`/`out_qty` patterns to distinguish receipts from consumption
@@ -244,7 +266,7 @@ Understanding current limitations helps you work effectively while enhancements 
 
 ---
 
-### Limitation 3: Limited Parent Lot Traceability
+### Limitation 2: Limited Parent Lot Traceability
 
 **Current State**: Cannot directly link consumption back to source lot in main table
 **Impact**: Audit trail requires joining `transaction_detail` table
@@ -253,7 +275,7 @@ Understanding current limitations helps you work effectively while enhancements 
 
 ---
 
-### Limitation 4: No Period Locking
+### Limitation 3: No Period Locking
 
 **Current State**: Cannot prevent changes to closed accounting periods
 **Impact**: Late receipts can alter historical costs
@@ -262,7 +284,7 @@ Understanding current limitations helps you work effectively while enhancements 
 
 ---
 
-### Limitation 5: No Automated Snapshots
+### Limitation 4: No Automated Snapshots
 
 **Current State**: No automatic period-end balance preservation
 **Impact**: Historical reports recalculated each time (performance and accuracy concerns)
@@ -323,7 +345,7 @@ Understanding current limitations helps you work effectively while enhancements 
 - Perform full physical inventory count
 - Calculate period average costs (if using Periodic Average)
 - Export and archive all reports
-- Review and approve period close
+- Review period close
 
 ---
 
@@ -332,13 +354,12 @@ Understanding current limitations helps you work effectively while enhancements 
 **Always Document**:
 - ✅ Reason for adjustments
 - ✅ Source documents (GRN, issue slips)
-- ✅ Approvals for significant changes
 - ✅ Physical count results
 
 **Maintain Records**:
 - ✅ Supporting documents for all transactions
 - ✅ Period-end reports and reconciliations
-- ✅ Adjustment approvals and justifications
+- ✅ Adjustment justifications
 - ✅ Physical count sheets
 
 ---
@@ -497,9 +518,11 @@ A: Phase 2 (approximately 1 week after Phase 1 completion). See WHATS-COMING.md 
 
 The system is currently in an **enhancement program** to add advanced features while maintaining full backward compatibility with existing functionality.
 
+**Recently Completed**:
+- ✅ **Automatic lot number generation**: GRN commitment auto-generates lot numbers
+
 **Coming Soon**:
 - ⏳ **Phase 1** (1-2 weeks): Transaction types, parent lot linkage, schema enhancements
-- ⏳ **Phase 2** (1 week): Automatic lot number generation and validation
 - ⏳ **Phase 3** (2-3 weeks): Enhanced FIFO with complete traceability
 - ⏳ **Phase 4** (2-3 weeks): Period management, locking, and automated snapshots
 - ⏳ **Phase 5** (2 weeks): Enhanced reporting and performance optimization

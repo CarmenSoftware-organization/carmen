@@ -253,6 +253,9 @@ export interface GoodsReceiveNote {
   receiptDate: Date;
   vendorId: string;
   vendorName: string;
+  // NOTE: PO references are stored at LINE ITEM level (purchaseOrderId, purchaseOrderItemId)
+  // This allows one GRN to receive from multiple POs
+  // These header-level fields are deprecated but kept for backward compatibility
   purchaseOrderId?: string;
   purchaseOrderNumber?: string;
   invoiceNumber?: string;
@@ -262,8 +265,7 @@ export interface GoodsReceiveNote {
   driverName?: string;
   status: GRNStatus;
   receivedBy: string;
-  checkedBy?: string;
-  approvedBy?: string;
+  committedBy?: string; // Person who committed the GRN (no approval workflow)
   locationId: string;
   totalItems: number;
   totalQuantity: number;
@@ -271,10 +273,6 @@ export interface GoodsReceiveNote {
   discrepancies: number;
   notes?: string;
   attachments?: string[];
-  qualityCheckRequired: boolean;
-  qualityCheckPassed?: boolean;
-  qualityCheckedBy?: string;
-  qualityCheckedAt?: Date;
 }
 
 /**
@@ -284,6 +282,8 @@ export interface GoodsReceiveNoteItem {
   id: string;
   grnId: string;
   lineNumber: number;
+  // Multi-PO support: PO references at line item level
+  purchaseOrderId?: string; // Allows different POs per line item
   purchaseOrderItemId?: string;
   itemId: string;
   itemCode: string;
@@ -303,12 +303,11 @@ export interface GoodsReceiveNoteItem {
   manufacturingDate?: Date;
   expiryDate?: Date;
   storageLocationId: string;
-  qualityStatus: 'pending' | 'passed' | 'failed' | 'conditional';
   rejectionReason?: string;
   notes?: string;
   // Discrepancy tracking
   hasDiscrepancy: boolean;
-  discrepancyType?: 'quantity' | 'quality' | 'specification' | 'damage';
+  discrepancyType?: 'quantity' | 'quality' | 'specification' | 'damage'; // 'quality' refers to goods condition, not inspection workflow
   discrepancyNotes?: string;
 }
 

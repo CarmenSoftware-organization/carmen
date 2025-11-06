@@ -17,7 +17,6 @@ This document defines comprehensive validation rules for the Goods Received Note
 - **Financial Impact**: GRNs trigger inventory valuation and accounts payable transactions
 - **Inventory Accuracy**: Incorrect GRN data leads to stock discrepancies and operational issues
 - **Audit Compliance**: GRNs are legal documents requiring accurate data for audits
-- **Quality Control**: Quality inspection data must be validated to prevent substandard goods
 - **Multi-Currency**: Currency conversions and exchange rates require precise validation
 
 ### 1.2 Scope
@@ -443,34 +442,7 @@ Data Stored
 
 ---
 
-### VAL-GRN-016: Line Item - Quality Status Required
-
-**Field**: `qualityStatus` (in GRNItem)
-**Database Column**: `goods_receive_note_items.quality_status`
-**Data Type**: ENUM('pending', 'passed', 'failed', 'conditional') / string
-
-**Validation Rule**: Quality status must be one of: pending, passed, failed, or conditional.
-
-**Implementation Requirements**:
-- **Client-Side**: Display dropdown with only valid values. Default to 'pending'.
-- **Server-Side**: Verify status matches enum values.
-- **Database**: Column defined as ENUM with allowed values.
-
-**Error Code**: VAL-GRN-016
-**Error Message**: "Invalid quality status. Must be pending, passed, failed, or conditional"
-**User Action**: User must select a valid quality status.
-
-**Test Cases**:
-- ✅ Valid: "pending"
-- ✅ Valid: "passed"
-- ✅ Valid: "failed"
-- ✅ Valid: "conditional"
-- ❌ Invalid: "approved" (not in enum)
-- ❌ Invalid: null
-
----
-
-### VAL-GRN-017: Line Item - Storage Location Required
+### VAL-GRN-016: Line Item - Storage Location Required
 
 **Field**: `storageLocationId` (in GRNItem)
 **Database Column**: `goods_receive_note_items.storage_location_id`
@@ -699,75 +671,7 @@ Data Stored
 
 ---
 
-### VAL-GRN-105: Quality Inspection Required
-
-**Rule Description**: If qualityCheckRequired flag is true, GRN cannot be committed without quality inspection approval.
-
-**Business Justification**: Ensures quality standards are met before goods are accepted into inventory. Prevents substandard items from entering the system.
-
-**Validation Logic**:
-1. Check qualityCheckRequired flag
-2. If true, verify qualityCheckPassed is not null
-3. If true, verify all line items have quality status != 'pending'
-4. Reject commitment if quality checks incomplete
-
-**When Validated**: Before commit operation
-
-**Implementation Requirements**:
-- **Client-Side**: Disable commit button if quality check pending. Display "Quality Inspection Required" message.
-- **Server-Side**: Verify quality checks completed before allowing commit.
-- **Database**: Not enforced (business logic only).
-
-**Error Code**: VAL-GRN-105
-**Error Message**: "Cannot commit GRN. Quality inspection is required and not yet completed."
-**User Action**: User must complete quality inspection before committing.
-
-**Related Business Requirements**: BR-GRN-010
-
-**Examples**:
-
-**Scenario 1: Valid Case**
-- Quality Check Required: true
-- Quality Check Passed: true
-- All Items Quality Status: "passed"
-- Result: ✅ Validation passes
-
-**Scenario 2: Invalid Case**
-- Quality Check Required: true
-- Quality Check Passed: null (not inspected)
-- Result: ❌ Validation fails
-- User must: Complete quality inspection first
-
----
-
-### VAL-GRN-106: Quality Inspection Failure
-
-**Rule Description**: If quality inspection fails (qualityCheckPassed = false), GRN cannot be committed without management override.
-
-**Business Justification**: Failed quality inspections indicate goods do not meet standards. Requires management decision on acceptance or rejection.
-
-**Validation Logic**:
-1. Check qualityCheckPassed field
-2. If false, prevent commit without override authorization
-3. Require management approval to proceed
-4. Log override with reason and approver details
-
-**When Validated**: Before commit operation
-
-**Implementation Requirements**:
-- **Client-Side**: Show warning dialog if quality failed. Prompt for management override credentials and reason.
-- **Server-Side**: Verify override authorization if quality failed.
-- **Database**: Log override in audit trail.
-
-**Error Code**: VAL-GRN-106
-**Error Message**: "Quality inspection failed. Management override required to proceed."
-**User Action**: User must obtain management approval and provide override reason.
-
-**Related Business Requirements**: BR-GRN-010
-
----
-
-### VAL-GRN-107: PO-Based GRN Must Reference Valid PO
+### VAL-GRN-105: PO-Based GRN Must Reference Valid PO
 
 **Rule Description**: If GRN is created from a Purchase Order, the purchaseOrderId must reference a valid, existing PO.
 
@@ -902,6 +806,132 @@ Data Stored
 **User Action**: User cannot proceed if system cannot create reversals. Contact support.
 
 **Related Business Requirements**: BR-GRN-008
+
+---
+
+### VAL-GRN-110: Closed Accounting Period Validation
+
+**Rule Description**: GRN cannot be committed if the receipt date falls within a closed accounting period. System must validate that the accounting period is open before allowing commitment.
+
+**Business Justification**: Closed accounting periods are locked for financial reporting and auditing purposes. Allowing transactions in closed periods would compromise financial data integrity and violate audit requirements.
+
+**Validation Logic**:
+1. When user attempts to commit GRN, retrieve receipt date
+2. Query accounting periods table to find period containing receipt date
+3. Check if period status = CLOSED
+4. If period is closed, reject commitment operation
+5. If period is open or no period found, allow commitment
+
+**When Validated**: Before GRN commitment operation (status change from RECEIVED to COMMITTED)
+
+**Implementation Requirements**:
+- **Client-Side**: Before commit action, query accounting period status. Show warning dialog if period is closed. Disable "Commit" button.
+- **Server-Side**: Validate accounting period status before processing commit request. Query: `SELECT status FROM accounting_periods WHERE start_date <= receipt_date AND end_date >= receipt_date AND status = 'CLOSED'`
+- **Database**: Not enforced (business logic only, requires date comparison).
+
+**Error Code**: VAL-GRN-110
+**Error Message**: "Cannot commit GRN. Receipt date {receiptDate} falls within closed accounting period {periodName} ({periodStart} to {periodEnd}). Please contact finance department to reopen the period or adjust the receipt date."
+**User Action**: User must either:
+- Contact finance department to reopen the accounting period
+- Change receipt date to fall within an open period
+- Wait until the period is reopened
+
+**Related Business Requirements**: BR-GRN-016
+
+**Examples**:
+
+**Scenario 1: Valid Case**
+- Situation: User attempts to commit GRN
+- Receipt Date: 2025-01-30
+- Accounting Period: Jan 2025 (2025-01-01 to 2025-01-31)
+- Period Status: OPEN
+- Result: ✅ Validation passes
+- Reason: Period is open, commitment allowed
+
+**Scenario 2: Invalid Case**
+- Situation: User attempts to commit GRN
+- Receipt Date: 2024-12-15
+- Accounting Period: Dec 2024 (2024-12-01 to 2024-12-31)
+- Period Status: CLOSED
+- Result: ❌ Validation fails
+- Reason: Cannot commit transactions in closed periods
+- User must: Contact finance to reopen Dec 2024 period or correct receipt date
+
+**Scenario 3: Valid Case**
+- Situation: User attempts to commit GRN
+- Receipt Date: 2025-01-15
+- Accounting Period: None found (period not created yet)
+- Result: ✅ Validation passes (Warning displayed)
+- Reason: No period restrictions if period doesn't exist
+- Note: System should warn user that accounting period should be set up
+
+---
+
+### VAL-GRN-111: Stock Take In Progress Validation
+
+**Rule Description**: GRN cannot be committed for a location if a stock take (physical count) is currently in progress for that location. System must check for active stock take sessions before allowing commitment.
+
+**Business Justification**: Stock take requires freezing inventory movements to ensure accurate physical count reconciliation. Allowing GRN commitments during stock take would invalidate the count and create discrepancies between physical and system inventory.
+
+**Validation Logic**:
+1. When user attempts to commit GRN, retrieve GRN location ID
+2. Query stock take sessions table for active sessions at this location
+3. Check if any session has status = IN_PROGRESS or STARTED
+4. If active stock take found, reject commitment operation
+5. If no active stock take, allow commitment
+
+**When Validated**: Before GRN commitment operation (status change from RECEIVED to COMMITTED)
+
+**Implementation Requirements**:
+- **Client-Side**: Before commit action, query stock take sessions for location. Show warning dialog if stock take is active. Disable "Commit" button with explanation tooltip.
+- **Server-Side**: Validate no active stock take sessions before processing commit. Query: `SELECT id, session_number FROM stock_take_sessions WHERE location_id = grn.location_id AND status IN ('STARTED', 'IN_PROGRESS')`
+- **Database**: Not enforced (business logic only, requires cross-table validation).
+
+**Error Code**: VAL-GRN-111
+**Error Message**: "Cannot commit GRN. Stock take session {sessionNumber} is currently in progress for location {locationName}. Please wait until stock take is completed or contact warehouse supervisor."
+**User Action**: User must either:
+- Wait until stock take session is completed
+- Contact warehouse supervisor to complete or pause the stock take
+- Defer GRN commitment until after stock take reconciliation
+
+**Related Business Requirements**: BR-GRN-017
+
+**Examples**:
+
+**Scenario 1: Valid Case**
+- Situation: User attempts to commit GRN
+- Location: Kitchen Storage
+- Stock Take Sessions: None active
+- Result: ✅ Validation passes
+- Reason: No stock take in progress, commitment allowed
+
+**Scenario 2: Invalid Case**
+- Situation: User attempts to commit GRN
+- Location: Main Warehouse
+- Stock Take Session: ST-2025-001
+- Session Status: IN_PROGRESS
+- Session Started: 2025-01-30 08:00
+- Result: ❌ Validation fails
+- Reason: Cannot commit GRN during active stock take
+- User must: Wait until ST-2025-001 is completed or contact supervisor
+
+**Scenario 3: Valid Case**
+- Situation: User attempts to commit GRN
+- Location: Office Storage
+- Stock Take Session: ST-2025-002
+- Session Status: COMPLETED
+- Session Completed: 2025-01-28
+- Result: ✅ Validation passes
+- Reason: Stock take is completed, commitment allowed
+
+**Scenario 4: Invalid Case - Multi-Location**
+- Situation: User attempts to commit GRN with items for multiple storage locations
+- Primary Location: Kitchen Storage (no stock take)
+- Line Item 1 Location: Kitchen Storage (no stock take) ✅
+- Line Item 2 Location: Main Warehouse (stock take IN_PROGRESS) ❌
+- Result: ❌ Validation fails
+- Reason: At least one item's location has active stock take
+- User must: Wait for stock take completion at Main Warehouse
 
 ---
 
@@ -1054,36 +1084,7 @@ Data Stored
 
 ---
 
-### VAL-GRN-205: Quality Check Fields Required When Flag Set
-
-**Fields Involved**: `qualityCheckRequired`, `qualityCheckPassed`, `qualityCheckedBy`, `qualityCheckedAt`
-
-**Validation Rule**: If qualityCheckRequired is true, then qualityCheckPassed, qualityCheckedBy, and qualityCheckedAt must be provided before commitment.
-
-**Business Justification**: Ensures complete quality inspection data when quality check is mandatory.
-
-**Validation Logic**:
-1. If qualityCheckRequired = false, skip validation
-2. If qualityCheckRequired = true and status = COMMITTED:
-   - Verify qualityCheckPassed is not null
-   - Verify qualityCheckedBy is not empty
-   - Verify qualityCheckedAt is not null
-3. Reject commitment if any required field is missing
-
-**When Validated**: Before commit operation
-
-**Implementation Requirements**:
-- **Client-Side**: Show quality section only if flag is true. Mark fields as required. Disable commit until completed.
-- **Server-Side**: Verify all quality fields populated if flag is true.
-- **Database**: CHECK constraint: (quality_check_required = false) OR (quality_check_passed IS NOT NULL AND quality_checked_by IS NOT NULL AND quality_checked_at IS NOT NULL).
-
-**Error Code**: VAL-GRN-205
-**Error Message**: "Quality inspection is incomplete. All quality check fields must be filled."
-**User Action**: User must complete quality inspection fields before committing.
-
----
-
-### VAL-GRN-206: PO Reference Fields Consistency
+### VAL-GRN-205: PO Reference Fields Consistency
 
 **Fields Involved**: `purchaseOrderId`, `purchaseOrderNumber`
 
@@ -1199,7 +1200,6 @@ Data Stored
 **Validation Rule**: User can only edit or delete GRN records they created (where createdBy = userId), unless they have admin or manager permissions.
 
 **Exceptions**:
-- Quality inspectors can update quality fields regardless of ownership
 - Managers can edit GRNs from their department
 - Admins can edit all GRNs
 
@@ -1327,7 +1327,6 @@ Data Stored
 
 **Business Rule Violation**:
 - Message: "{Clear explanation of why action is not allowed}"
-- Example: "Cannot commit GRN. Quality inspection is required but not yet completed."
 - Example: "Cannot edit committed GRN. To reverse this transaction, use the Void function."
 
 **Cross-Field Validation**:
@@ -1402,7 +1401,6 @@ All validation rules must have test cases covering:
 8. For each line item:
    - Delivered quantity: 10
    - Received quantity: 10
-   - Quality status: pending
 9. Click "Save as RECEIVED"
 
 **Input Data**:
@@ -1499,26 +1497,23 @@ All validation rules must have test cases covering:
 
 **Test ID**: VAL-GRN-T301
 
-**Test Description**: Complete GRN workflow from creation to commitment with quality inspection
+**Test Description**: Complete GRN workflow from creation to commitment
 
 **Test Type**: Integration
 
 **Preconditions**:
 - User has all required permissions (create, update, commit)
 - Valid approved PO exists
-- User has quality inspector role
-- Items require quality inspection
 
 **Test Steps**:
 1. Create GRN from PO (DRAFT status)
 2. Enter all required data and save as RECEIVED
-3. Perform quality inspection on all items
-4. Mark quality check as passed
-5. Commit GRN to inventory
-6. Verify stock movements created
-7. Verify journal vouchers created
+3. Assign storage locations to all items
+4. Commit GRN to inventory
+5. Verify stock movements created
+6. Verify journal vouchers created
 
-**Input Data**: Complete GRN data with quality inspection
+**Input Data**: Complete GRN data with all required fields
 
 **Expected Result**: ✅ Full workflow completes successfully
 
@@ -1527,7 +1522,6 @@ All validation rules must have test cases covering:
 **Pass/Fail Criteria**:
 - GRN status transitions: DRAFT → RECEIVED → COMMITTED
 - All validations pass at each stage
-- Quality inspection recorded
 - Stock movements created with correct quantities
 - Journal vouchers created with correct amounts
 - Inventory updated correctly
@@ -1554,26 +1548,24 @@ All validation rules must have test cases covering:
 | VAL-GRN-013 | Delivered Qty Required | deliveredQuantity | Field | ✅ | ✅ | ✅ |
 | VAL-GRN-014 | Received Qty Required | receivedQuantity | Field | ✅ | ✅ | ✅ |
 | VAL-GRN-015 | Unit Price Required | unitPrice | Field | ✅ | ✅ | ✅ |
-| VAL-GRN-016 | Quality Status Valid | qualityStatus | Field | ✅ | ✅ | ✅ |
-| VAL-GRN-017 | Storage Location Required | storageLocationId | Field | ✅ | ✅ | ✅ |
-| VAL-GRN-018 | Decimal Precision | quantities | Field | ✅ | ✅ | ✅ |
+| VAL-GRN-016 | Storage Location Required | storageLocationId | Field | ✅ | ✅ | ✅ |
+| VAL-GRN-017 | Decimal Precision | quantities | Field | ✅ | ✅ | ✅ |
 | VAL-GRN-101 | Cannot Commit Draft | status | Business | ✅ | ✅ | ❌ |
 | VAL-GRN-102 | Cannot Edit Committed | status | Business | ✅ | ✅ | ❌ |
 | VAL-GRN-103 | Received <= Delivered | received, delivered | Business | ✅ | ✅ | ✅ |
 | VAL-GRN-104 | Quantity Reconciliation | received, rejected, damaged, delivered | Business | ✅ | ✅ | ✅ |
-| VAL-GRN-105 | Quality Inspection Required | qualityCheckRequired | Business | ✅ | ✅ | ❌ |
-| VAL-GRN-106 | Quality Inspection Failure | qualityCheckPassed | Business | ✅ | ✅ | ❌ |
-| VAL-GRN-107 | Valid PO Reference | purchaseOrderId | Business | ✅ | ✅ | ✅ |
-| VAL-GRN-108 | PO Quantity Limit | receivedQuantity | Business | ⚠️ | ✅ | ❌ |
-| VAL-GRN-109 | Exchange Rate Required | currency, exchangeRate | Business | ✅ | ✅ | ✅ |
-| VAL-GRN-110 | Extra Cost Distribution | extraCosts | Business | ✅ | ✅ | ❌ |
-| VAL-GRN-111 | Void With Reversal | status | Business | ✅ | ✅ | ❌ |
+| VAL-GRN-105 | Valid PO Reference | purchaseOrderId | Business | ✅ | ✅ | ✅ |
+| VAL-GRN-106 | PO Quantity Limit | receivedQuantity | Business | ⚠️ | ✅ | ❌ |
+| VAL-GRN-107 | Exchange Rate Required | currency, exchangeRate | Business | ✅ | ✅ | ✅ |
+| VAL-GRN-108 | Extra Cost Distribution | extraCosts | Business | ✅ | ✅ | ❌ |
+| VAL-GRN-109 | Void With Reversal | status | Business | ✅ | ✅ | ❌ |
+| VAL-GRN-110 | Closed Period Validation | receiptDate, accountingPeriod | Business | ✅ | ✅ | ❌ |
+| VAL-GRN-111 | Stock Take In Progress | locationId, stockTakeSession | Business | ✅ | ✅ | ❌ |
 | VAL-GRN-201 | Invoice Date <= Receipt Date | invoiceDate, receiptDate | Cross-field | ✅ | ✅ | ✅ |
 | VAL-GRN-202 | Manufacturing < Expiry | manufacturingDate, expiryDate | Cross-field | ✅ | ✅ | ✅ |
 | VAL-GRN-203 | Total Value Calculation | line totals, GRN total | Cross-field | ✅ | ✅ | ✅ |
 | VAL-GRN-204 | Total Quantity Consistency | line quantities, GRN totals | Cross-field | ✅ | ✅ | ✅ |
-| VAL-GRN-205 | Quality Fields Required | quality fields | Cross-field | ✅ | ✅ | ✅ |
-| VAL-GRN-206 | PO Fields Consistency | PO ID, PO number | Cross-field | ✅ | ✅ | ✅ |
+| VAL-GRN-205 | PO Fields Consistency | PO ID, PO number | Cross-field | ✅ | ✅ | ✅ |
 | VAL-GRN-301 | Create Permission | - | Security | ✅ | ✅ | ✅ |
 | VAL-GRN-302 | Edit Permission | - | Security | ✅ | ✅ | ✅ |
 | VAL-GRN-303 | Commit Permission | - | Security | ✅ | ✅ | ✅ |
