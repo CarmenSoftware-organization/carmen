@@ -331,11 +331,11 @@ model tb_credit_note {
   pricelist_detail_id String?  @db.Uuid
   pricelist_no        String?  @db.VarChar
   pricelist_unit      String?  @db.VarChar
-  pricelist_price     Decimal? @db.Decimal(15, 5)
+  pricelist_price     Decimal? @default(0) @db.Decimal(20, 5)
 
   currency_id        String?   @db.Uuid
   currency_name      String?   @db.VarChar
-  exchange_rate      Decimal?  @db.Decimal(15, 5)
+  exchange_rate      Decimal?  @default(1) @db.Decimal(15, 5)
   exchange_rate_date DateTime? @db.Timestamptz(6)
 
   grn_id   String?   @db.Uuid
@@ -368,9 +368,9 @@ model tb_credit_note {
   last_action_by_id   String?           @db.Uuid
   last_action_by_name String?           @db.VarChar
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -398,6 +398,7 @@ model tb_credit_note_detail {
   note        String? @db.VarChar
 
   location_id         String? @db.Uuid
+  location_code       String? @db.VarChar
   location_name       String? @db.VarChar
   delivery_point_id   String? @db.Uuid
   delivery_point_name String? @db.VarChar
@@ -406,41 +407,41 @@ model tb_credit_note_detail {
   product_name       String? @db.VarChar
   product_local_name String? @db.VarChar
 
-  return_qty               Decimal? @db.Decimal(20, 5)
+  return_qty               Decimal? @default(0) @db.Decimal(20, 5)
   return_unit_id           String?  @db.Uuid
   return_unit_name         String?  @db.VarChar
-  return_conversion_factor Decimal? @db.Decimal(20, 5)
-  return_base_qty          Decimal? @db.Decimal(20, 5)
+  return_conversion_factor Decimal? @default(0) @db.Decimal(20, 5)
+  return_base_qty          Decimal? @default(0) @db.Decimal(20, 5)
 
-  price Decimal? @db.Decimal(20, 5)
+  price Decimal? @default(0) @db.Decimal(20, 5)
 
   tax_profile_id    String?  @db.Uuid
   tax_profile_name  String?  @db.VarChar
-  tax_rate          Decimal? @db.Decimal(15, 5)
-  tax_amount        Decimal? @db.Decimal(20, 5)
-  base_tax_amount   Decimal? @db.Decimal(20, 5)
+  tax_rate          Decimal? @default(0) @db.Decimal(15, 5)
+  tax_amount        Decimal? @default(0) @db.Decimal(20, 5)
+  base_tax_amount   Decimal? @default(0) @db.Decimal(20, 5)
   is_tax_adjustment Boolean? @default(false)
 
   discount_rate          Decimal? @default(0) @db.Decimal(15, 5)
-  discount_amount        Decimal? @db.Decimal(20, 5)
-  base_discount_amount   Decimal? @db.Decimal(20, 5)
+  discount_amount        Decimal? @default(0) @db.Decimal(20, 5)
+  base_discount_amount   Decimal? @default(0) @db.Decimal(20, 5)
   is_discount_adjustment Boolean? @default(false)
 
-  extra_cost_amount      Decimal? @db.Decimal(20, 5)
-  base_extra_cost_amount Decimal? @db.Decimal(20, 5)
+  extra_cost_amount      Decimal? @default(0) @db.Decimal(20, 5)
+  base_extra_cost_amount Decimal? @default(0) @db.Decimal(20, 5)
 
-  sub_total_price Decimal? @db.Decimal(20, 5)
-  net_amount      Decimal? @db.Decimal(20, 5)
-  total_price     Decimal? @db.Decimal(20, 5)
+  sub_total_price Decimal? @default(0) @db.Decimal(20, 5)
+  net_amount      Decimal? @default(0) @db.Decimal(20, 5)
+  total_price     Decimal? @default(0) @db.Decimal(20, 5)
 
-  base_price           Decimal? @db.Decimal(20, 5)
-  base_sub_total_price Decimal? @db.Decimal(20, 5)
-  base_net_amount      Decimal? @db.Decimal(20, 5)
-  base_total_price     Decimal? @db.Decimal(20, 5)
+  base_price           Decimal? @default(0) @db.Decimal(20, 5)
+  base_sub_total_price Decimal? @default(0) @db.Decimal(20, 5)
+  base_net_amount      Decimal? @default(0) @db.Decimal(20, 5)
+  base_total_price     Decimal? @default(0) @db.Decimal(20, 5)
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -491,7 +492,8 @@ model tb_currency {
   tb_purchase_request_detail                                   tb_purchase_request_detail[]
   tb_purchase_request_template_detail                          tb_purchase_request_template_detail[]
   tb_credit_note                                               tb_credit_note[]
-  tb_pricelist                                        tb_pricelist[]
+  tb_pricelist                                                 tb_pricelist[]
+  tb_pricelist_template                                        tb_pricelist_template[]
 
   @@index([code], map: "currency_code_u")
 }
@@ -614,7 +616,7 @@ model tb_good_received_note {
   note        String? @db.VarChar
   info        Json?   @db.Json
   dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -638,6 +640,7 @@ model tb_good_received_note_detail {
   sequence_no              Int     @default(1)
 
   location_id   String  @db.Uuid
+  location_code String? @db.VarChar
   location_name String? @db.VarChar
 
   product_id         String  @db.Uuid
@@ -647,43 +650,43 @@ model tb_good_received_note_detail {
   inventory_unit_id   String? @db.Uuid
   inventory_unit_name String? @db.VarChar
 
-  order_qty                    Decimal? @db.Decimal(20, 5)
+  order_qty                    Decimal? @default(0) @db.Decimal(20, 5)
   order_unit_id                String   @db.Uuid
   order_unit_name              String?  @db.VarChar
-  order_unit_conversion_factor Decimal? @db.Decimal(20, 5)
-  order_base_qty               Decimal? @db.Decimal(20, 5)
+  order_unit_conversion_factor Decimal? @default(0) @db.Decimal(20, 5)
+  order_base_qty               Decimal? @default(0) @db.Decimal(20, 5)
 
-  received_qty                    Decimal? @db.Decimal(20, 5)
+  received_qty                    Decimal? @default(0) @db.Decimal(20, 5)
   received_unit_id                String   @db.Uuid
   received_unit_name              String?  @db.VarChar
-  received_unit_conversion_factor Decimal? @db.Decimal(20, 5)
-  received_base_qty               Decimal? @db.Decimal(20, 5)
+  received_unit_conversion_factor Decimal? @default(0) @db.Decimal(20, 5)
+  received_base_qty               Decimal? @default(0) @db.Decimal(20, 5)
 
-  foc_qty                    Decimal? @db.Decimal(20, 5)
+  foc_qty                    Decimal? @default(0) @db.Decimal(20, 5)
   foc_unit_id                String?  @db.Uuid
   foc_unit_name              String?  @db.VarChar
-  foc_unit_conversion_factor Decimal? @db.Decimal(20, 5)
-  foc_base_qty               Decimal? @db.Decimal(20, 5)
+  foc_unit_conversion_factor Decimal? @default(0) @db.Decimal(20, 5)
+  foc_base_qty               Decimal? @default(0) @db.Decimal(20, 5)
 
-  price Decimal? @db.Decimal(20, 5)
+  price Decimal? @default(0) @db.Decimal(20, 5)
 
   tax_profile_id    String?  @db.Uuid
   tax_profile_name  String?  @db.VarChar
-  tax_rate          Decimal? @db.Decimal(15, 5)
-  tax_amount        Decimal? @db.Decimal(20, 5)
+  tax_rate          Decimal? @default(0) @db.Decimal(15, 5)
+  tax_amount        Decimal? @default(0) @db.Decimal(20, 5)
   is_tax_adjustment Boolean? @default(false)
 
-  total_amount        Decimal? @db.Decimal(20, 5)
+  total_amount        Decimal? @default(0) @db.Decimal(20, 5)
   delivery_point_id   String?  @db.Uuid
   delivery_point_name String?  @db.VarChar
 
-  base_price Decimal? @db.Decimal(20, 5)
-  base_qty   Decimal? @db.Decimal(20, 5)
-  extra_cost Decimal? @db.Decimal(20, 5)
-  total_cost Decimal? @db.Decimal(20, 5)
+  base_price Decimal? @default(0) @db.Decimal(20, 5)
+  base_qty   Decimal? @default(0) @db.Decimal(20, 5)
+  extra_cost Decimal? @default(0) @db.Decimal(20, 5)
+  total_cost Decimal? @default(0) @db.Decimal(20, 5)
 
   discount_rate          Decimal? @default(0) @db.Decimal(15, 5)
-  discount_amount        Decimal? @db.Decimal(20, 5)
+  discount_amount        Decimal? @default(0) @db.Decimal(20, 5)
   is_discount_adjustment Boolean? @default(false)
 
   expired_date DateTime? @db.Timestamptz(6)
@@ -691,7 +694,7 @@ model tb_good_received_note_detail {
   note        String? @db.VarChar
   info        Json?   @db.Json
   dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -745,38 +748,64 @@ model tb_inventory_transaction_detail {
   from_lot_no              String? @db.VarChar
   current_lot_no           String? @db.VarChar
 
-  location_id String? @db.Uuid
-  product_id  String  @db.Uuid
+  location_id   String? @db.Uuid
+  location_code String? @db.VarChar
+  product_id    String  @db.Uuid
 
-  qty           Decimal? @db.Decimal(20, 5)
-  cost_per_unit Decimal? @db.Decimal(20, 5)
-  total_cost    Decimal? @db.Decimal(20, 5)
+  qty           Decimal? @default(0) @db.Decimal(20, 5)
+  cost_per_unit Decimal? @default(0) @db.Decimal(20, 5)
+  total_cost    Decimal? @default(0) @db.Decimal(20, 5)
 
   note      String? @db.VarChar
   info      Json?   @db.Json
   dimension Json?   @db.Json
 
-  created_at                               DateTime?                                  @default(now()) @db.Timestamptz(6)
-  created_by_id                            String?                                    @db.Uuid
-  updated_at                               DateTime?                                  @default(now()) @db.Timestamptz(6)
-  updated_by_id                            String?                                    @db.Uuid
-  tb_inventory_transaction_closing_balance tb_inventory_transaction_closing_balance[]
-  tb_inventory_transaction                 tb_inventory_transaction                   @relation(fields: [inventory_transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  created_at                          DateTime?                             @default(now()) @db.Timestamptz(6)
+  created_by_id                       String?                               @db.Uuid
+  updated_at                          DateTime?                             @default(now()) @db.Timestamptz(6)
+  updated_by_id                       String?                               @db.Uuid
+  tb_inventory_transaction_cost_layer tb_inventory_transaction_cost_layer[]
+  tb_inventory_transaction            tb_inventory_transaction              @relation(fields: [inventory_transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model tb_inventory_transaction_closing_balance {
+enum enum_transaction_type {
+  good_received_note
+
+  transfer_in
+  transfer_out
+
+  issue
+  adjustment
+  credit_note
+
+  close_period
+  open_period
+}
+
+model tb_inventory_transaction_cost_layer {
   id                              String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   inventory_transaction_detail_id String  @db.Uuid
   lot_no                          String? @db.VarChar
   lot_index                       Int     @default(1)
 
-  location_id String? @db.Uuid
-  product_id  String? @db.Uuid
+  location_id   String?   @db.Uuid
+  location_code String?   @db.VarChar
+  lot_at_date   DateTime? @db.Timestamptz(6)
+  lot_seq_no    Int?      @default(1)
+  product_id    String?   @db.Uuid
 
-  in_qty        Decimal? @db.Decimal(20, 5)
-  out_qty       Decimal? @db.Decimal(20, 5)
-  cost_per_unit Decimal? @db.Decimal(20, 5)
-  total_cost    Decimal? @db.Decimal(20, 5)
+  parent_lot_no String? @db.VarChar
+  period_id     String? @db.Uuid
+  at_period     String? @db.VarChar // YYMM
+
+  transaction_type enum_transaction_type?
+  in_qty           Decimal?               @default(0) @db.Decimal(20, 5)
+  out_qty          Decimal?               @default(0) @db.Decimal(20, 5)
+  cost_per_unit    Decimal?               @default(0) @db.Decimal(20, 5)
+  total_cost       Decimal?               @default(0) @db.Decimal(20, 5)
+  diff_amount      Decimal?               @default(0) @db.Decimal(20, 5)
+
+  average_cost_per_unit Decimal? @default(0) @db.Decimal(20, 5)
 
   note      String? @db.VarChar
   info      Json?   @db.Json
@@ -787,12 +816,100 @@ model tb_inventory_transaction_closing_balance {
   updated_at                      DateTime?                       @default(now()) @db.Timestamptz(6)
   updated_by_id                   String?                         @db.Uuid
   tb_inventory_transaction_detail tb_inventory_transaction_detail @relation(fields: [inventory_transaction_detail_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "tb_inventory_transaction_clos_inventory_transaction_detail_fkey")
+  tb_period                      tb_period?                      @relation(fields: [period_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([lot_no, lot_index], map: "inventorytransactionclosingbalance_lotno_lot_index_u")
 }
 
+enum enum_period_status {
+  open
+  closed
+  locked
+}
+
+model tb_period {
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  period String @unique @db.VarChar // YYMM
+
+  fiscal_year  Int @db.Integer // YYYY
+  fiscal_month Int @db.Integer // 1-12
+
+  start_at DateTime           @db.Timestamptz(6)
+  end_at   DateTime           @db.Timestamptz(6)
+  status   enum_period_status @default(open)
+
+  note      String? @db.VarChar
+  info      Json?   @db.Json
+  dimension Json?   @db.Json
+
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+  created_by_id String?   @db.Uuid
+  updated_at    DateTime? @default(now()) @db.Timestamptz(6)
+  updated_by_id String?   @db.Uuid
+  deleted_at    DateTime? @db.Timestamptz(6)
+  deleted_by_id String?   @db.Uuid
+
+  tb_period_snapshot tb_period_snapshot[]
+  tb_inventory_transaction_cost_layer tb_inventory_transaction_cost_layer[]
+
+  @@index([fiscal_year, fiscal_month], map: "period_fiscal_year_month_u")
+  
+}
+
+model tb_period_snapshot {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  period_id   String   @db.Uuid
+  snapshot_at DateTime @db.Timestamptz(6)
+
+  location_id   String  @db.Uuid
+  location_code String? @db.VarChar
+  location_name String? @db.VarChar
+
+  product_id   String  @db.Uuid
+  product_name String? @db.VarChar
+
+  lot_no      String?   @db.VarChar
+  lot_index   Int?      @default(1) @db.Integer
+  lot_at_date DateTime? @db.Timestamptz(6)
+  lot_seq_no  Int?      @default(1) @db.Integer
+
+  opening_qty           Decimal? @default(0) @db.Decimal(20, 5)
+  opening_cost_per_unit Decimal? @default(0) @db.Decimal(20, 5)
+  opening_total_cost    Decimal? @default(0) @db.Decimal(20, 5)
+
+  receipt_qty        Decimal? @default(0) @db.Decimal(20, 5)
+  receipt_total_cost Decimal? @default(0) @db.Decimal(20, 5)
+
+  issue_qty        Decimal? @default(0) @db.Decimal(20, 5)
+  issue_total_cost Decimal? @default(0) @db.Decimal(20, 5)
+
+  adjustment_qty        Decimal? @default(0) @db.Decimal(20, 5)
+  adjustment_total_cost Decimal? @default(0) @db.Decimal(20, 5)
+
+  closing_qty           Decimal? @default(0) @db.Decimal(20, 5)
+  closing_cost_per_unit Decimal? @default(0) @db.Decimal(20, 5)
+  closing_total_cost    Decimal? @default(0) @db.Decimal(20, 5)
+  diff_amount           Decimal? @default(0) @db.Decimal(20, 5)
+
+  note      String? @db.VarChar
+  info      Json?   @db.Json
+  dimension Json?   @db.Json
+
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+  created_by_id String?   @db.Uuid
+  updated_at    DateTime? @default(now()) @db.Timestamptz(6)
+  updated_by_id String?   @db.Uuid
+  deleted_at    DateTime? @db.Timestamptz(6)
+  deleted_by_id String?   @db.Uuid
+
+  tb_period tb_period @relation(fields: [period_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([period_id, snapshot_at], map: "periodsnapshot_period_id_snapshot_at_u")
+}
+
 model tb_location {
   id            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code          String             @unique @db.VarChar
   name          String             @unique @db.VarChar
   location_type enum_location_type @default(inventory)
   description   String?
@@ -1042,15 +1159,15 @@ model tb_purchase_order {
   vendor_name   String?   @db.VarChar
   currency_id   String?   @db.Uuid
   currency_name String?   @db.VarChar
-  exchange_rate Decimal?  @db.Decimal(15, 5)
+  exchange_rate Decimal?  @default(1) @db.Decimal(15, 5)
   approval_date DateTime? @db.Timestamptz(6)
 
-  email             String?  @db.VarChar
-  buyer_id          String?  @db.Uuid
-  buyer_name        String?  @db.VarChar
-  credit_term_id    String?  @db.Uuid
-  credit_term_name  String?  @db.VarChar
-  credit_term_value Decimal? @db.Decimal(15, 5)
+  email             String? @db.VarChar
+  buyer_id          String? @db.Uuid
+  buyer_name        String? @db.VarChar
+  credit_term_id    String? @db.Uuid
+  credit_term_name  String? @db.VarChar
+  credit_term_value Int?    @default(0) @db.Integer
 
   remarks   String?  @db.VarChar
   history   Json?    @db.Json
@@ -1059,7 +1176,7 @@ model tb_purchase_order {
   note        String? @db.VarChar
   info        Json?   @db.Json
   dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -1084,12 +1201,12 @@ model tb_purchase_order_detail {
 
   is_active Boolean? @default(true)
 
-  order_qty                    Decimal? @db.Decimal(20, 5)
+  order_qty                    Decimal? @default(0) @db.Decimal(20, 5)
   order_unit_id                String?  @db.Uuid
-  order_unit_conversion_factor Decimal? @db.Decimal(20, 5)
+  order_unit_conversion_factor Decimal? @default(0) @db.Decimal(20, 5)
   order_unit_name              String?  @db.VarChar
 
-  base_qty       Decimal? @db.Decimal(20, 5)
+  base_qty       Decimal? @default(0) @db.Decimal(20, 5)
   base_unit_id   String?  @db.Uuid
   base_unit_name String?  @db.VarChar
 
@@ -1097,25 +1214,25 @@ model tb_purchase_order_detail {
 
   tax_profile_id    String?  @db.Uuid
   tax_profile_name  String?  @db.VarChar
-  tax_rate          Decimal? @db.Decimal(15, 5)
-  tax_amount        Decimal? @db.Decimal(20, 5)
-  base_tax_amount   Decimal? @db.Decimal(20, 5)
+  tax_rate          Decimal? @default(0) @db.Decimal(15, 5)
+  tax_amount        Decimal? @default(0) @db.Decimal(20, 5)
+  base_tax_amount   Decimal? @default(0) @db.Decimal(20, 5)
   is_tax_adjustment Boolean? @default(false)
 
   discount_rate          Decimal? @default(0) @db.Decimal(15, 5)
   discount_amount        Decimal? @default(0) @db.Decimal(20, 5)
-  base_discount_amount   Decimal? @db.Decimal(20, 5)
+  base_discount_amount   Decimal? @default(0) @db.Decimal(20, 5)
   is_discount_adjustment Boolean? @default(false)
 
-  price           Decimal? @db.Decimal(20, 5)
-  sub_total_price Decimal? @db.Decimal(20, 5)
-  net_amount      Decimal? @db.Decimal(20, 5)
-  total_price     Decimal? @db.Decimal(20, 5)
+  price           Decimal? @default(0) @db.Decimal(20, 5)
+  sub_total_price Decimal? @default(0) @db.Decimal(20, 5)
+  net_amount      Decimal? @default(0) @db.Decimal(20, 5)
+  total_price     Decimal? @default(0) @db.Decimal(20, 5)
 
-  base_price           Decimal? @db.Decimal(20, 5)
-  base_sub_total_price Decimal? @db.Decimal(20, 5)
+  base_price           Decimal? @default(0) @db.Decimal(20, 5)
+  base_sub_total_price Decimal? @default(0) @db.Decimal(20, 5)
   base_net_amount      Decimal? @default(0) @db.Decimal(20, 5)
-  base_total_price     Decimal? @db.Decimal(20, 5)
+  base_total_price     Decimal? @default(0) @db.Decimal(20, 5)
 
   received_qty  Decimal? @default(0) @db.Decimal(20, 5)
   cancelled_qty Decimal? @default(0) @db.Decimal(20, 5)
@@ -1125,7 +1242,7 @@ model tb_purchase_order_detail {
   note        String? @db.VarChar
   info        Json?   @db.Json
   dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -1152,9 +1269,9 @@ model tb_purchase_order_detail_tb_purchase_request_detail {
 
   pr_detail_order_unit_id   String   @db.Uuid
   pr_detail_order_unit_name String   @db.VarChar
-  pr_detail_qty             Decimal? @db.Decimal(20, 5)
+  pr_detail_qty             Decimal? @default(0) @db.Decimal(20, 5)
 
-  pr_detail_base_qty       Decimal? @db.Decimal(20, 5)
+  pr_detail_base_qty       Decimal? @default(0) @db.Decimal(20, 5)
   pr_detail_base_unit_id   String?  @db.Uuid
   pr_detail_base_unit_name String?  @db.VarChar
 
@@ -1168,6 +1285,7 @@ enum enum_stage_role {
   create
   approve
   purchase
+  issue
   view_only
 }
 
@@ -1200,9 +1318,9 @@ model tb_purchase_request {
 
   note String? @db.VarChar
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -1230,6 +1348,7 @@ model tb_purchase_request_detail {
   sequence_no         Int?    @default(1)
 
   location_id         String? @db.Uuid
+  location_code       String? @db.VarChar
   location_name       String? @db.VarChar
   delivery_point_id   String? @db.Uuid
   delivery_point_name String? @db.VarChar
@@ -1252,60 +1371,61 @@ model tb_purchase_request_detail {
   pricelist_detail_id String?  @db.Uuid
   pricelist_no        String?  @db.VarChar
   pricelist_unit      String?  @db.VarChar
-  pricelist_price     Decimal? @db.Decimal(15, 5)
+  pricelist_price     Decimal? @default(0) @db.Decimal(20, 5)
 
   currency_id        String?   @db.Uuid
   currency_name      String?   @db.VarChar
-  exchange_rate      Decimal?  @db.Decimal(15, 5)
+  exchange_rate      Decimal?  @default(1) @db.Decimal(15, 5)
   exchange_rate_date DateTime? @db.Timestamptz(6)
 
-  requested_qty                    Decimal? @db.Decimal(20, 5)
+  requested_qty                    Decimal? @default(0) @db.Decimal(20, 5)
   requested_unit_id                String?  @db.Uuid
   requested_unit_name              String?  @db.VarChar
-  requested_unit_conversion_factor Decimal? @db.Decimal(20, 5)
-  requested_base_qty               Decimal? @db.Decimal(20, 5)
+  requested_unit_conversion_factor Decimal? @default(0) @db.Decimal(20, 5)
+  requested_base_qty               Decimal? @default(0) @db.Decimal(20, 5)
 
-  approved_qty                    Decimal? @db.Decimal(20, 5)
+  approved_qty                    Decimal? @default(0) @db.Decimal(20, 5)
   approved_unit_id                String?  @db.Uuid
   approved_unit_name              String?  @db.VarChar
-  approved_unit_conversion_factor Decimal? @db.Decimal(20, 5)
-  approved_base_qty               Decimal? @db.Decimal(20, 5)
+  approved_unit_conversion_factor Decimal? @default(0) @db.Decimal(20, 5)
+  approved_base_qty               Decimal? @default(0) @db.Decimal(20, 5)
 
-  foc_qty                    Decimal? @db.Decimal(20, 5)
+  foc_qty                    Decimal? @default(0) @db.Decimal(20, 5)
   foc_unit_id                String?  @db.Uuid
   foc_unit_name              String?  @db.VarChar
-  foc_unit_conversion_factor Decimal? @db.Decimal(20, 5)
-  foc_base_qty               Decimal? @db.Decimal(20, 5)
+  foc_unit_conversion_factor Decimal? @default(0) @db.Decimal(20, 5)
+  foc_base_qty               Decimal? @default(0) @db.Decimal(20, 5)
 
   tax_profile_id    String?  @db.Uuid
   tax_profile_name  String?  @db.VarChar
-  tax_rate          Decimal? @db.Decimal(15, 5)
-  tax_amount        Decimal? @db.Decimal(20, 5)
-  base_tax_amount   Decimal? @db.Decimal(20, 5)
+  tax_rate          Decimal? @default(0) @db.Decimal(15, 5)
+  tax_amount        Decimal? @default(0) @db.Decimal(20, 5)
+  base_tax_amount   Decimal? @default(0) @db.Decimal(20, 5)
   is_tax_adjustment Boolean? @default(false)
 
   discount_rate          Decimal? @default(0) @db.Decimal(15, 5)
   discount_amount        Decimal? @default(0) @db.Decimal(20, 5)
-  base_discount_amount   Decimal? @db.Decimal(20, 5)
+  base_discount_amount   Decimal? @default(0) @db.Decimal(20, 5)
   is_discount_adjustment Boolean? @default(false)
 
-  sub_total_price Decimal? @db.Decimal(20, 5) // pricelist_price * approved qty
-  net_amount      Decimal? @db.Decimal(20, 5) // subtotal_price - discount_amount
-  total_price     Decimal? @db.Decimal(20, 5) // net_amount + tax_amount
+  sub_total_price Decimal? @default(0) @db.Decimal(20, 5) // pricelist_price * approved qty
+  net_amount      Decimal? @default(0) @db.Decimal(20, 5) // subtotal_price - discount_amount
+  total_price     Decimal? @default(0) @db.Decimal(20, 5) // net_amount + tax_amount
 
-  base_price           Decimal? @db.Decimal(20, 5) // pricelist_price * exchange_rate
-  base_sub_total_price Decimal? @db.Decimal(20, 5) // base_price * approved qty
-  base_net_amount      Decimal? @db.Decimal(20, 5) // base_sub_total_price - base_discount_amount
-  base_total_price     Decimal? @db.Decimal(20, 5) // base_net_amount + base_tax_amount
+  base_price           Decimal? @default(0) @db.Decimal(20, 5) // pricelist_price * exchange_rate
+  base_sub_total_price Decimal? @default(0) @db.Decimal(20, 5) // base_price * approved qty
+  base_net_amount      Decimal? @default(0) @db.Decimal(20, 5) // base_sub_total_price - base_discount_amount
+  base_total_price     Decimal? @default(0) @db.Decimal(20, 5) // base_net_amount + base_tax_amount
 
   history Json? @db.Json
-  // Example history JSON structure:
-  // [
-  // {"seq" : 1, "name" : "stage1", "status": "submit", "message": "", "by_id": "xxxxxx", "by_name" : "User1", "at_date" : "2024-01-01 01:01:01"},
-  // {"seq" : 2, "name" : "stage2", "status": "approved", "message": "", "by_id": "xxxxxx", "by_name" : "User2", "at_date" : "2024-01-01 01:01:01"},
-  // {"seq" : 3, "name" : "stage3", "status": "review", "to_stage" : "stage2", "message": "check price" , "by_id": "xxxxxx", "by_name" : "User3", "at_date" : "2024-01-01 01:01:01"},
-  // {"seq" : 4, "name" : "stage2", "status": "rejected", "message": "void item", "by_id": "xxxxxx", "by_name" : "User2", "at_date" : "2024-01-01 01:01:01"},
-  // ]
+  /**
+   * [
+   * {"seq" : 1, "name" : "stage1", "status": "submit", "message": "", "by_id": "xxxxxx", "by_name" : "User1", "at_date" : "2024-01-01 01:01:01"},
+   * {"seq" : 2, "name" : "stage2", "status": "approved", "message": "", "by_id": "xxxxxx", "by_name" : "User2", "at_date" : "2024-01-01 01:01:01"},
+   * {"seq" : 3, "name" : "stage3", "status": "review", "to_stage" : "stage2", "message": "check price" , "by_id": "xxxxxx", "by_name" : "User3", "at_date" : "2024-01-01 01:01:01"},
+   * {"seq" : 4, "name" : "stage2", "status": "rejected", "message": "void item", "by_id": "xxxxxx", "by_name" : "User2", "at_date" : "2024-01-01 01:01:01"},
+   * ]
+   */
 
   // approved_message String?   @db.VarChar
   // approved_by_id   String?   @db.Uuid
@@ -1323,17 +1443,19 @@ model tb_purchase_request_detail {
   // reject_date_at DateTime? @db.Timestamptz(6)
 
   stages_status Json? @db.Json
-  // Example stages_status JSON structure:
-  // [
-  // {"seq" : 1, "name" : "stage1", "status": "submit"},
-  // {"seq" : 2, "name" : "stage2", "status": "approved"},
-  // {"seq" : 3, "name" : "stage3", "status": null},
-  // {"seq" : 4, "name" : "stage4", "status": null},
-  // ]
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  /**
+   * [
+   * {"seq" : 1, "name" : "stage1", "status": "submit"},
+   * {"seq" : 2, "name" : "stage2", "status": "approved"},
+   * {"seq" : 3, "name" : "stage3", "status": null},
+   * {"seq" : 4, "name" : "stage4", "status": null},
+   * ]
+   */
+
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -1391,6 +1513,7 @@ model tb_purchase_request_template_detail {
   purchase_request_template_id String? @db.Uuid
 
   location_id         String? @db.Uuid
+  location_code       String? @db.VarChar
   location_name       String? @db.VarChar
   delivery_point_id   String? @db.Uuid
   delivery_point_name String? @db.VarChar
@@ -1416,14 +1539,14 @@ model tb_purchase_request_template_detail {
 
   currency_id        String?   @db.Uuid
   currency_name      String?   @db.VarChar
-  exchange_rate      Decimal?  @db.Decimal(15, 5)
+  exchange_rate      Decimal?  @default(1) @db.Decimal(15, 5)
   exchange_rate_date DateTime? @db.Timestamptz(6)
 
-  requested_qty                    Decimal? @db.Decimal(20, 5)
+  requested_qty                    Decimal? @default(0) @db.Decimal(20, 5)
   requested_unit_id                String?  @db.Uuid
   requested_unit_name              String?  @db.VarChar
-  requested_unit_conversion_factor Decimal? @db.Decimal(20, 5)
-  requested_base_qty               Decimal? @db.Decimal(20, 5)
+  requested_unit_conversion_factor Decimal? @default(0) @db.Decimal(20, 5)
+  requested_base_qty               Decimal? @default(0) @db.Decimal(20, 5)
 
   // approved_qty                    Decimal? @db.Decimal(20, 5)
   // approved_unit_id                String?  @db.Uuid
@@ -1437,29 +1560,29 @@ model tb_purchase_request_template_detail {
   // foc_unit_conversion_factor Decimal? @db.Decimal(20, 5)
   // foc_base_qty               Decimal? @db.Decimal(20, 5)
 
-  foc_qty                    Decimal? @db.Decimal(20, 5)
+  foc_qty                    Decimal? @default(0) @db.Decimal(20, 5)
   foc_unit_id                String?  @db.Uuid
   foc_unit_name              String?  @db.VarChar
-  foc_unit_conversion_factor Decimal? @db.Decimal(20, 5)
-  foc_base_qty               Decimal? @db.Decimal(20, 5)
+  foc_unit_conversion_factor Decimal? @default(0) @db.Decimal(20, 5)
+  foc_base_qty               Decimal? @default(0) @db.Decimal(20, 5)
 
   tax_profile_id    String?  @db.Uuid
   tax_profile_name  String?  @db.VarChar
-  tax_rate          Decimal? @db.Decimal(15, 5)
-  tax_amount        Decimal? @db.Decimal(20, 5)
-  base_tax_amount   Decimal? @db.Decimal(20, 5)
+  tax_rate          Decimal? @default(0) @db.Decimal(15, 5)
+  tax_amount        Decimal? @default(0) @db.Decimal(20, 5)
+  base_tax_amount   Decimal? @default(0) @db.Decimal(20, 5)
   is_tax_adjustment Boolean? @default(false)
 
   discount_rate          Decimal? @default(0) @db.Decimal(15, 5)
   discount_amount        Decimal? @default(0) @db.Decimal(20, 5)
-  base_discount_amount   Decimal? @db.Decimal(20, 5)
+  base_discount_amount   Decimal? @default(0) @db.Decimal(20, 5)
   is_discount_adjustment Boolean? @default(false)
 
   is_active Boolean? @default(true)
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -1501,7 +1624,7 @@ model tb_stock_in {
   note        String? @db.VarChar
   info        Json?   @db.Json
   dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at         DateTime?            @default(now()) @db.Timestamptz(6)
   created_by_id      String?              @db.Uuid
@@ -1518,17 +1641,18 @@ model tb_stock_in_detail {
   description              String? @db.VarChar
 
   location_id   String? @db.Uuid
+  location_code String? @db.VarChar
   location_name String? @db.VarChar
 
   product_id         String   @db.Uuid
   product_name       String?  @db.VarChar
   product_local_name String?  @db.VarChar
-  qty                Decimal? @db.Decimal(20, 5)
+  qty                Decimal? @default(0) @db.Decimal(20, 5)
 
   note        String? @db.VarChar
   info        Json?   @db.Json
   dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -1565,7 +1689,7 @@ model tb_stock_out {
   note        String? @db.VarChar
   info        Json?   @db.Json
   dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -1585,17 +1709,18 @@ model tb_stock_out_detail {
   description              String? @db.VarChar
 
   location_id   String? @db.Uuid
+  location_code String? @db.VarChar
   location_name String? @db.VarChar
 
   product_id         String   @db.Uuid
   product_name       String?  @db.VarChar
   product_local_name String?  @db.VarChar
-  qty                Decimal? @db.Decimal(20, 5)
+  qty                Decimal? @default(0) @db.Decimal(20, 5)
 
   note        String? @db.VarChar
   info        Json?   @db.Json
   dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -1633,7 +1758,7 @@ model tb_stock_take {
   note        String? @db.VarChar
   info        Json?   @db.Json
   dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -1655,17 +1780,18 @@ model tb_stock_take_detail {
   description              String? @db.VarChar
 
   location_id   String? @db.Uuid
+  location_code String? @db.VarChar
   location_name String? @db.VarChar
 
   product_id         String   @db.Uuid
   product_name       String?  @db.VarChar
   product_local_name String?  @db.VarChar
-  qty                Decimal? @db.Decimal(20, 5)
+  qty                Decimal? @default(0) @db.Decimal(20, 5)
 
   note        String? @db.VarChar
   info        Json?   @db.Json
   dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -1690,6 +1816,7 @@ model tb_store_requisition {
   doc_status  enum_doc_status @default(draft)
 
   from_location_id   String? @db.Uuid
+  from_location_code String? @db.VarChar
   from_location_name String? @db.VarChar
 
   workflow_id             String? @db.Uuid
@@ -1710,9 +1837,9 @@ model tb_store_requisition {
   department_id   String? @db.Uuid
   department_name String? @db.VarChar
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -1736,15 +1863,16 @@ model tb_store_requisition_detail {
   description              String? @db.VarChar
 
   to_location_id   String? @db.Uuid
+  to_location_code String? @db.VarChar
   to_location_name String? @db.VarChar
 
   product_id         String  @db.Uuid
   product_name       String? @db.VarChar
   product_local_name String? @db.VarChar
 
-  requested_qty Decimal? @db.Decimal(20, 5)
-  approved_qty  Decimal? @db.Decimal(20, 5)
-  issued_qty    Decimal? @db.Decimal(20, 5)
+  requested_qty Decimal? @default(0) @db.Decimal(20, 5)
+  approved_qty  Decimal? @default(0) @db.Decimal(20, 5)
+  issued_qty    Decimal? @default(0) @db.Decimal(20, 5)
 
   history     Json?             @db.Json
   last_action enum_last_action? @default(submitted)
@@ -1764,9 +1892,9 @@ model tb_store_requisition_detail {
   reject_by_name String?   @db.VarChar
   reject_date_at DateTime? @db.Timestamptz(6)
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -1823,11 +1951,11 @@ model tb_unit_conversion {
 
   from_unit_id   String?  @db.Uuid
   from_unit_name String   @db.VarChar
-  from_unit_qty  Decimal? @default(1) @db.Decimal(20, 5)
+  from_unit_qty  Decimal? @default(0) @db.Decimal(20, 5)
 
   to_unit_id   String?  @db.Uuid
   to_unit_name String   @db.VarChar
-  to_unit_qty  Decimal? @default(1) @db.Decimal(20, 5)
+  to_unit_qty  Decimal? @default(0) @db.Decimal(20, 5)
 
   is_default  Boolean? @default(false)
   description Json?    @db.Json
@@ -1861,7 +1989,7 @@ model tb_vendor {
 
   tax_profile_id   String?  @db.Uuid
   tax_profile_name String?  @db.VarChar
-  tax_rate         Decimal? @db.Decimal(15, 5)
+  tax_rate         Decimal? @default(0) @db.Decimal(15, 5)
 
   is_active Boolean? @default(true)
 
@@ -1875,15 +2003,15 @@ model tb_vendor {
   deleted_at    DateTime? @db.Timestamptz(6)
   deleted_by_id String?   @db.Uuid
 
-  tb_good_received_note      tb_good_received_note[]
-  tb_product_tb_vendor       tb_product_tb_vendor[]
-  tb_purchase_order          tb_purchase_order[]
-  tb_purchase_request_detail tb_purchase_request_detail[]
-  tb_vendor_business_type    tb_vendor_business_type?     @relation(fields: [business_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  tb_vendor_address          tb_vendor_address[]
-  tb_vendor_contact          tb_vendor_contact[]
-  tb_credit_note             tb_credit_note[]
-  tb_pricelist               tb_pricelist[]
+  tb_good_received_note         tb_good_received_note[]
+  tb_product_tb_vendor          tb_product_tb_vendor[]
+  tb_purchase_order             tb_purchase_order[]
+  tb_purchase_request_detail    tb_purchase_request_detail[]
+  tb_vendor_business_type       tb_vendor_business_type?        @relation(fields: [business_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tb_vendor_address             tb_vendor_address[]
+  tb_vendor_contact             tb_vendor_contact[]
+  tb_credit_note                tb_credit_note[]
+  tb_pricelist                  tb_pricelist[]
   tb_request_for_pricing_detail tb_request_for_pricing_detail[]
 
   @@index([name], map: "vendor_name_u")
@@ -1970,6 +2098,7 @@ model tb_count_stock {
   end_date   DateTime? @db.Timestamptz(6)
 
   location_id      String                  @db.Uuid
+  location_code    String?                 @db.VarChar
   location_name    String?                 @db.VarChar
   doc_status       enum_count_stock_status @default(pending)
   count_stock_type enum_count_stock_type   @default(physical)
@@ -1977,9 +2106,9 @@ model tb_count_stock {
   description String? @db.VarChar
   note        String? @db.VarChar
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2000,14 +2129,14 @@ model tb_count_stock_detail {
 
   product_id   String   @db.Uuid
   product_name String?  @db.VarChar
-  qty          Decimal? @db.Decimal(20, 5)
+  qty          Decimal? @default(0) @db.Decimal(20, 5)
 
   description String? @db.VarChar
   note        String? @db.VarChar
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2030,7 +2159,7 @@ model tb_jv_detail {
 
   currency_id   String?  @db.Uuid
   currency_name String?  @db.VarChar
-  exchange_rate Decimal? @db.Decimal(15, 5)
+  exchange_rate Decimal? @default(1) @db.Decimal(15, 5)
   debit         Decimal? @default(0) @db.Decimal(20, 5)
   credit        Decimal? @default(0) @db.Decimal(20, 5)
 
@@ -2042,9 +2171,9 @@ model tb_jv_detail {
   description String? @db.VarChar
   note        String? @db.VarChar
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2062,7 +2191,7 @@ model tb_jv_header {
   id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   currency_id        String?  @db.Uuid
   currency_name      String?  @db.VarChar
-  exchange_rate      Decimal? @db.Decimal(15, 5)
+  exchange_rate      Decimal? @default(1) @db.Decimal(15, 5)
   base_currency_id   String?  @db.Uuid
   base_currency_name String?  @db.VarChar
 
@@ -2082,16 +2211,17 @@ model tb_jv_header {
   workflow_next_stage     String? @db.VarChar
 
   user_action         Json?             @db.Json
-  // Example user_action JSON structure:
-  // {"read_only": ["@me","@department"], "execute": [{id: "00000000-0000-0000-0000-000000000000"}, {id : "00000000-0000-0000-0000-123123123"}]}
+  /**
+   * {"read_only": ["@me","@department"], "execute": [{id: "00000000-0000-0000-0000-000000000000"}, {id : "00000000-0000-0000-0000-123123123"}]}
+   */
   last_action         enum_last_action? @default(submitted)
   last_action_at_date DateTime?         @db.Timestamptz(6)
   last_action_by_id   String?           @db.Uuid
   last_action_by_name String?           @db.VarChar
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2112,8 +2242,9 @@ enum enum_pricelist_template_status {
   active
   inactive
 }
+
 model tb_pricelist_template {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name String @unique @db.VarChar
 
   description String? @db.VarChar
@@ -2121,9 +2252,22 @@ model tb_pricelist_template {
 
   status enum_pricelist_template_status @default(draft)
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  // Currency and validity
+  currency_id     String? @db.Uuid
+  currency_name   String? @db.VarChar
+  validity_period Int? // number of days
+
+  // Vendor instructions
+  vendor_instructions String? @db.Text
+
+  // Notification settings
+  send_reminders        Boolean? @default(false)
+  reminder_days         Json?    @db.Json // array of days before deadline, e.g., [14, 7, 3, 1]
+  escalation_after_days Int? // number of days after which to escalate
+
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2134,27 +2278,30 @@ model tb_pricelist_template {
 
   tb_pricelist_template_detail tb_pricelist_template_detail[]
   tb_request_for_pricing       tb_request_for_pricing[]
+  tb_currency                  tb_currency?                   @relation(fields: [currency_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([name], map: "pricelist_template_name_u")
+  @@index([currency_id], map: "pricelist_template_currency_id_idx")
   @@map("tb_pricelist_template")
 }
 
 model tb_pricelist_template_detail {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   pricelist_template_id String @db.Uuid
-  sequence_no Int? @default(1)
+  sequence_no           Int?   @default(1)
 
-  product_id String @db.Uuid
+  product_id   String  @db.Uuid
   product_name String? @db.VarChar
 
   array_order_unit Json? @db.Json
-  // Example array_order_unit JSON structure:
-  // [{"unit_id" : "00000000-0000-0000-0000-000000000000", "unit_name" : "pcs"},
-  // {"unit_id" : "00000000-0000-0000-0000-000000000001", "unit_name" : "Box/12"}]
+  /**
+   * [{"unit_id" : "00000000-0000-0000-0000-000000000000", "unit_name" : "pcs"},
+   * {"unit_id" : "00000000-0000-0000-0000-000000000001", "unit_name" : "Box/12"}]
+   */
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2164,7 +2311,7 @@ model tb_pricelist_template_detail {
   deleted_by_id String?   @db.Uuid
 
   tb_pricelist_template tb_pricelist_template @relation(fields: [pricelist_template_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  tb_product           tb_product           @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tb_product            tb_product            @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([pricelist_template_id, product_id], map: "pricelist_template_detail_pricelist_template_id_product_id_u")
   @@map("tb_pricelist_template_detail")
@@ -2178,9 +2325,9 @@ model tb_request_for_pricing {
   start_date DateTime? @db.Timestamptz(6)
   end_date   DateTime? @db.Timestamptz(6)
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2190,30 +2337,30 @@ model tb_request_for_pricing {
   deleted_by_id String?   @db.Uuid
 
   tb_request_for_pricing_detail tb_request_for_pricing_detail[]
-  tb_pricelist_template        tb_pricelist_template        @relation(fields: [pricelist_template_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tb_pricelist_template         tb_pricelist_template           @relation(fields: [pricelist_template_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([pricelist_template_id], map: "request_for_pricing_pricelist_template_id_u")
   @@map("tb_request_for_pricing")
 }
 
 model tb_request_for_pricing_detail {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   request_for_pricing_id String @db.Uuid
-  sequence_no Int? @default(1)
+  sequence_no            Int?   @default(1)
 
-  vendor_id String @db.Uuid
+  vendor_id   String  @db.Uuid
   vendor_name String? @db.VarChar
 
   contact_person String? @db.VarChar
-  contact_phone String? @db.VarChar
-  contact_email String? @db.VarChar
+  contact_phone  String? @db.VarChar
+  contact_email  String? @db.VarChar
 
-  pricelist_id String? @db.Uuid
+  pricelist_id   String? @db.Uuid
   pricelist_name String? @db.VarChar
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2223,7 +2370,7 @@ model tb_request_for_pricing_detail {
   deleted_by_id String?   @db.Uuid
 
   tb_request_for_pricing tb_request_for_pricing @relation(fields: [request_for_pricing_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  tb_vendor tb_vendor @relation(fields: [vendor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tb_vendor              tb_vendor              @relation(fields: [vendor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([request_for_pricing_id, vendor_id], map: "request_for_pricing_detail_request_for_pricing_id_vendor_id_u")
   @@map("tb_request_for_pricing_detail")
@@ -2251,9 +2398,9 @@ model tb_pricelist {
   description String? @db.VarChar
   note        String? @db.VarChar
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2264,7 +2411,7 @@ model tb_pricelist {
 
   tb_vendor           tb_vendor?            @relation(fields: [vendor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   tb_pricelist_detail tb_pricelist_detail[]
-  tb_currency        tb_currency?        @relation(fields: [currency_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tb_currency         tb_currency?          @relation(fields: [currency_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([name], map: "pricelist_name_u")
   @@map("tb_pricelist")
@@ -2280,18 +2427,18 @@ model tb_pricelist_detail {
   unit_name         String?  @db.VarChar
   tax_profile_id    String?  @db.Uuid
   tax_profile_name  String?  @db.VarChar
-  tax_rate          Decimal? @db.Decimal(15, 5)
-  price             Decimal? @db.Decimal(20, 5)
-  price_without_vat Decimal? @db.Decimal(20, 5)
-  price_with_vat    Decimal? @db.Decimal(20, 5)
+  tax_rate          Decimal? @default(0) @db.Decimal(15, 5)
+  price             Decimal? @default(0) @db.Decimal(20, 5)
+  price_without_vat Decimal? @default(0) @db.Decimal(20, 5)
+  price_with_vat    Decimal? @default(0) @db.Decimal(20, 5)
   is_active         Boolean? @default(true)
 
   description String? @db.VarChar
   note        String? @db.VarChar
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2312,6 +2459,7 @@ model tb_product_location {
   product_id    String  @db.Uuid
   product_name  String? @db.VarChar
   location_id   String? @db.Uuid
+  location_code String? @db.VarChar
   location_name String? @db.VarChar
 
   min_qty      Decimal? @default(0) @db.Decimal(20, 5)
@@ -2322,7 +2470,7 @@ model tb_product_location {
   note        String? @db.VarChar
   info        Json?   @db.Json
   dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2346,7 +2494,7 @@ model tb_department_user {
   note        String? @db.VarChar
   info        Json?   @db.Json
   dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2373,8 +2521,8 @@ model tb_attachment {
   file_size BigInt? @db.BigInt
   file_url  String? @db.VarChar(255)
 
-  info        Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2464,7 +2612,7 @@ model tb_config_running_code {
 
   note        String? @db.VarChar
   info        Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2478,16 +2626,16 @@ model tb_config_running_code {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model tb_credit_term {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String   @unique @db.VarChar
-  value       Decimal? @db.Decimal(15, 5)
-  description String?  @db.VarChar
-  note        String?  @db.VarChar
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String  @unique @db.VarChar
+  value       Int?    @default(0) @db.Integer
+  description String? @db.VarChar
+  note        String? @db.VarChar
 
   is_active Boolean? @default(true)
 
-  info        Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2514,8 +2662,8 @@ model tb_dimension {
   default_value Json?    @db.Json
   is_active     Boolean? @default(true)
 
-  info        Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2536,7 +2684,7 @@ model tb_dimension_display_in {
 
   note        String? @db.VarChar
   info        Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  doc_version Int     @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2560,8 +2708,8 @@ model tb_extra_cost {
   description String? @db.VarChar
   note        String? @db.VarChar
 
-  info        Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2588,17 +2736,17 @@ model tb_extra_cost_detail {
   description String? @db.VarChar
   note        String? @db.VarChar
 
-  amount Decimal? @db.Decimal(20, 5)
+  amount Decimal? @default(0) @db.Decimal(20, 5)
 
   tax_profile_id    String?  @db.Uuid
   tax_profile_name  String?  @db.VarChar
-  tax_rate          Decimal? @db.Decimal(15, 5)
-  tax_amount        Decimal? @db.Decimal(20, 5)
+  tax_rate          Decimal? @default(0) @db.Decimal(15, 5)
+  tax_amount        Decimal? @default(0) @db.Decimal(20, 5)
   is_tax_adjustment Boolean? @default(false)
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2621,9 +2769,9 @@ model tb_extra_cost_type {
 
   is_active Boolean? @default(true)
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid
@@ -2645,9 +2793,9 @@ model tb_vendor_business_type {
   note        String?  @db.VarChar
   is_active   Boolean? @default(true)
 
-  info        Json?   @db.Json
-  dimension   Json?   @db.Json
-  doc_version Decimal @default(0) @db.Decimal
+  info        Json? @db.Json
+  dimension   Json? @db.Json
+  doc_version Int   @default(0) @db.Integer
 
   created_at    DateTime? @default(now()) @db.Timestamptz(6)
   created_by_id String?   @db.Uuid

@@ -2,9 +2,9 @@
 
 **📌 Schema Reference**: Data structures defined in `/app/data-struc/schema.prisma`
 
-**Version**: 2.0.0 (Future Enhancement Specification)
+**Version**: 1.1.0 (Future Enhancement Specification)
 **Status**: ⚠️ **PLANNED - NOT YET IMPLEMENTED**
-**Last Updated**: 2025-11-03
+**Last Updated**: 2025-11-06
 
 ---
 
@@ -129,8 +129,10 @@ OPEN → CLOSED → LOCKED
   receipts_total_cost: 0.00000,
   issues_quantity: 75.00000,
   issues_total_cost: 937.50000,
-  adjustments_quantity: 0.00000,
-  adjustments_total_cost: 0.00000,
+  adjustments_in_quantity: 0.00000,
+  adjustments_in_total_cost: 0.00000,
+  adjustments_out_quantity: 0.00000,
+  adjustments_out_total_cost: 0.00000,
   transfers_in_quantity: 0.00000,
   transfers_in_total_cost: 0.00000,
   transfers_out_quantity: 0.00000,
@@ -173,8 +175,10 @@ OPEN → CLOSED → LOCKED
   receipts_total_cost: 2600.00000,
   issues_quantity: 180.00000,
   issues_total_cost: 2340.00000,  // Using period average $13.00
-  adjustments_quantity: 5.00000,
-  adjustments_total_cost: 65.00000,
+  adjustments_in_quantity: 10.00000,
+  adjustments_in_total_cost: 130.00000,
+  adjustments_out_quantity: 5.00000,
+  adjustments_out_total_cost: 65.00000,
   transfers_in_quantity: 50.00000,
   transfers_in_total_cost: 650.00000,
   transfers_out_quantity: 75.00000,
@@ -184,6 +188,11 @@ OPEN → CLOSED → LOCKED
   closing_quantity: 150.00000,
   closing_unit_cost: 13.00000,  // Period average cost
   closing_total_cost: 1950.00000,
+
+  // Cost variance analysis (Periodic Average only)
+  cost_variance_per_unit: 0.25000,  // closing_unit_cost - opening_unit_cost ($13.00 - $12.75)
+  cost_variance_total: 37.50000,    // cost_variance_per_unit × closing_quantity
+  cost_variance_percentage: 1.96,   // (closing_unit_cost / opening_unit_cost - 1) × 100
 
   snapshot_date: "2025-02-01 00:00:00",
   created_by: "USER-001",
@@ -224,8 +233,10 @@ All movement properties track **quantities** and **total costs** for the period:
 | `receipts_total_cost` | DECIMAL(20,5) | Total receipt costs | SUM(GRN costs) |
 | `issues_quantity` | DECIMAL(20,5) | Total issues | SUM(Issue quantities) |
 | `issues_total_cost` | DECIMAL(20,5) | Total issue costs | SUM(Issue costs via FIFO) |
-| `adjustments_quantity` | DECIMAL(20,5) | Net adjustments | SUM(Increase) - SUM(Decrease) |
-| `adjustments_total_cost` | DECIMAL(20,5) | Net adjustment costs | Cost impact of adjustments |
+| `adjustments_in_quantity` | DECIMAL(20,5) | Total adjustment increases | SUM(Adjustment IN via in_qty) |
+| `adjustments_in_total_cost` | DECIMAL(20,5) | Total adjustment increase costs | SUM(Adjustment IN costs) |
+| `adjustments_out_quantity` | DECIMAL(20,5) | Total adjustment decreases | SUM(Adjustment OUT via out_qty) |
+| `adjustments_out_total_cost` | DECIMAL(20,5) | Total adjustment decrease costs | SUM(Adjustment OUT costs) |
 | `transfers_in_quantity` | DECIMAL(20,5) | Total transfers in | SUM(Transfer In quantities) |
 | `transfers_in_total_cost` | DECIMAL(20,5) | Total transfer in costs | SUM(Transfer In costs) |
 | `transfers_out_quantity` | DECIMAL(20,5) | Total transfers out | SUM(Transfer Out quantities) |
@@ -235,9 +246,19 @@ All movement properties track **quantities** and **total costs** for the period:
 
 | Property | Data Type | Description | Formula |
 |----------|-----------|-------------|---------|
-| `closing_quantity` | DECIMAL(20,5) | Ending quantity | opening_quantity + receipts + transfers_in + adjustments - issues - transfers_out |
+| `closing_quantity` | DECIMAL(20,5) | Ending quantity | opening_quantity + receipts + transfers_in + adjustments_in - adjustments_out - issues - transfers_out |
 | `closing_unit_cost` | DECIMAL(20,5) | Ending unit cost | For FIFO: lot unit_cost<br>For AVG: total_value ÷ total_quantity |
 | `closing_total_cost` | DECIMAL(20,5) | Ending total value | closing_quantity × closing_unit_cost |
+
+### Cost Variance Properties (Periodic Average Only)
+
+| Property | Data Type | Description | Formula |
+|----------|-----------|-------------|---------|
+| `cost_variance_per_unit` | DECIMAL(20,5) | Unit cost change from prior period | closing_unit_cost - opening_unit_cost |
+| `cost_variance_total` | DECIMAL(20,5) | Total cost impact of variance | cost_variance_per_unit × closing_quantity |
+| `cost_variance_percentage` | DECIMAL(10,2) | Percentage cost change | (closing_unit_cost / opening_unit_cost - 1) × 100 |
+
+**Note**: Cost variance fields are NULL for FIFO snapshots (cost per lot remains constant).
 
 ## Snapshot Creation Process
 
@@ -443,10 +464,11 @@ SET closing_total_cost = closing_quantity × closing_unit_cost
 After creating all snapshots for a period:
 
 **Validation Checks**:
-1. **Balance Equation**: Verify closing = opening + receipts + transfers_in + adj - issues - transfers_out
+1. **Balance Equation**: Verify closing = opening + receipts + transfers_in + adj_in - adj_out - issues - transfers_out
 2. **No Negative Values**: Confirm no negative quantities or costs
 3. **Completeness**: Verify snapshot exists for every active item-location (and lot for FIFO)
 4. **Total Inventory Value**: Compare to expected total from general ledger
+5. **Adjustment Balance**: Verify adjustments_in_quantity and adjustments_out_quantity are non-negative
 
 **Finalization Steps**:
 1. Mark all snapshots with `status = 'FINALIZED'`
@@ -649,7 +671,8 @@ Closing Quantity =
   Opening Quantity
   + Receipts Quantity
   + Transfers In Quantity
-  + Adjustments Quantity (net: increases - decreases)
+  + Adjustments In Quantity
+  - Adjustments Out Quantity
   - Issues Quantity
   - Transfers Out Quantity
 ```
@@ -670,7 +693,8 @@ function calculateFIFOClosingBalance(
     openingBalance.opening_quantity +
     movements.receipts_quantity +
     movements.transfers_in_quantity +
-    movements.adjustments_quantity -
+    movements.adjustments_in_quantity -
+    movements.adjustments_out_quantity -
     movements.issues_quantity -
     movements.transfers_out_quantity
 
@@ -707,7 +731,8 @@ function calculateAvgClosingBalance(
     openingBalance.opening_quantity +
     movements.receipts_quantity +
     movements.transfers_in_quantity +
-    movements.adjustments_quantity -
+    movements.adjustments_in_quantity -
+    movements.adjustments_out_quantity -
     movements.issues_quantity -
     movements.transfers_out_quantity
 
@@ -716,13 +741,15 @@ function calculateAvgClosingBalance(
     openingBalance.opening_total_cost +
     movements.receipts_total_cost +
     movements.transfers_in_total_cost +
-    movements.adjustments_total_cost
+    movements.adjustments_in_total_cost -
+    movements.adjustments_out_total_cost
 
   const totalQuantity =
     openingBalance.opening_quantity +
     movements.receipts_quantity +
     movements.transfers_in_quantity +
-    movements.adjustments_quantity
+    movements.adjustments_in_quantity -
+    movements.adjustments_out_quantity
 
   const periodAvgCost = totalValue / totalQuantity
 
@@ -730,10 +757,21 @@ function calculateAvgClosingBalance(
   const closingUnitCost = periodAvgCost
   const closingTotalCost = closingQty * closingUnitCost
 
+  // Calculate cost variance (Periodic Average only)
+  const costVariancePerUnit = closingUnitCost - openingBalance.opening_unit_cost
+  const costVarianceTotal = costVariancePerUnit * closingQty
+  const costVariancePercentage = openingBalance.opening_unit_cost > 0
+    ? ((closingUnitCost / openingBalance.opening_unit_cost - 1) * 100)
+    : 0
+
   return {
     closing_quantity: closingQty,
     closing_unit_cost: closingUnitCost,
-    closing_total_cost: closingTotalCost
+    closing_total_cost: closingTotalCost,
+    // Cost variance analysis
+    cost_variance_per_unit: costVariancePerUnit,
+    cost_variance_total: costVarianceTotal,
+    cost_variance_percentage: costVariancePercentage
   }
 }
 ```
@@ -806,21 +844,47 @@ WHERE item_id = :item_id
 - Inventory Adjustments (Increase and Decrease)
 - Write-Offs
 
-**Net Calculation**:
+**Separate IN/OUT Tracking**:
 ```sql
--- Net quantity = Increases - Decreases
+-- FIFO Method: Track adjustments via parent_lot_no pattern
+SELECT
+  -- Adjustment increases (in_qty)
+  SUM(CASE WHEN parent_lot_no IS NOT NULL AND in_qty > 0
+    THEN in_qty ELSE 0 END) as adjustments_in_quantity,
+  SUM(CASE WHEN parent_lot_no IS NOT NULL AND in_qty > 0
+    THEN total_cost ELSE 0 END) as adjustments_in_total_cost,
+
+  -- Adjustment decreases (out_qty)
+  SUM(CASE WHEN parent_lot_no IS NOT NULL AND out_qty > 0
+    THEN out_qty ELSE 0 END) as adjustments_out_quantity,
+  SUM(CASE WHEN parent_lot_no IS NOT NULL AND out_qty > 0
+    THEN total_cost ELSE 0 END) as adjustments_out_total_cost
+FROM tb_inventory_transaction_closing_balance
+WHERE lot_no = :lot_number
+  AND created_at BETWEEN :period_start AND :period_end
+
+-- Periodic Average: By item-location
 SELECT
   SUM(CASE WHEN transaction_type = 'ADJUSTMENT_INCREASE'
-    THEN quantity ELSE 0 END) -
-  SUM(CASE WHEN transaction_type IN ('ADJUSTMENT_DECREASE', 'WRITE_OFF')
-    THEN quantity ELSE 0 END) as adjustments_quantity,
-
+    THEN quantity ELSE 0 END) as adjustments_in_quantity,
   SUM(CASE WHEN transaction_type = 'ADJUSTMENT_INCREASE'
-    THEN total_cost ELSE 0 END) -
+    THEN total_cost ELSE 0 END) as adjustments_in_total_cost,
+
   SUM(CASE WHEN transaction_type IN ('ADJUSTMENT_DECREASE', 'WRITE_OFF')
-    THEN total_cost ELSE 0 END) as adjustments_total_cost
-FROM tb_inventory_transaction_detail  -- or tb_adjustment_layers for FIFO
-WHERE -- filter criteria
+    THEN quantity ELSE 0 END) as adjustments_out_quantity,
+  SUM(CASE WHEN transaction_type IN ('ADJUSTMENT_DECREASE', 'WRITE_OFF')
+    THEN total_cost ELSE 0 END) as adjustments_out_total_cost
+FROM tb_inventory_transaction_detail
+WHERE item_id = :item_id
+  AND location_id = :location_id
+  AND transaction_date BETWEEN :period_start AND :period_end
+  AND status = 'POSTED'
+```
+
+**Net Adjustment Calculation**:
+```
+Net Adjustment Quantity = adjustments_in_quantity - adjustments_out_quantity
+Net Adjustment Cost = adjustments_in_total_cost - adjustments_out_total_cost
 ```
 
 ### Transfer Movements
@@ -933,6 +997,96 @@ All re-open actions logged:
 }
 ```
 
+## Cost Variance Analysis Example (Periodic Average)
+
+### Scenario: Rice Cost Increase Over 3 Months
+
+**Item**: Thai Jasmine Rice (25kg bag)
+**Location**: Main Kitchen (MK)
+**Costing Method**: Periodic Average
+
+#### January 2025 (Period 25-01)
+```
+Opening Balance: 100 bags @ $25.00/bag = $2,500
+Receipts: 200 bags @ $26.00/bag = $5,200
+Total Available: 300 bags @ $7,700
+
+Period Average Cost: $7,700 ÷ 300 = $25.67/bag
+
+Issues: 250 bags @ $25.67 = $6,417.50
+Closing Balance: 50 bags @ $25.67 = $1,283.50
+
+Cost Variance:
+  - Opening: $25.00/bag
+  - Closing: $25.67/bag
+  - Variance per unit: +$0.67 (2.68% increase)
+  - Total variance impact: $0.67 × 50 = $33.50
+```
+
+#### February 2025 (Period 25-02)
+```
+Opening Balance: 50 bags @ $25.67/bag = $1,283.50
+Receipts: 300 bags @ $28.50/bag = $8,550
+Total Available: 350 bags @ $9,833.50
+
+Period Average Cost: $9,833.50 ÷ 350 = $28.10/bag
+
+Issues: 280 bags @ $28.10 = $7,868
+Closing Balance: 70 bags @ $28.10 = $1,967
+
+Cost Variance:
+  - Opening: $25.67/bag
+  - Closing: $28.10/bag
+  - Variance per unit: +$2.43 (9.47% increase) ← HIGH INCREASE alert
+  - Total variance impact: $2.43 × 70 = $170.10
+```
+
+#### March 2025 (Period 25-03)
+```
+Opening Balance: 70 bags @ $28.10/bag = $1,967
+Receipts: 250 bags @ $27.50/bag = $6,875
+Total Available: 320 bags @ $8,842
+
+Period Average Cost: $8,842 ÷ 320 = $27.63/bag
+
+Issues: 270 bags @ $27.63 = $7,460.10
+Closing Balance: 50 bags @ $27.63 = $1,381.50
+
+Cost Variance:
+  - Opening: $28.10/bag
+  - Closing: $27.63/bag
+  - Variance per unit: -$0.47 (-1.67% decrease)
+  - Total variance impact: -$0.47 × 50 = -$23.50
+```
+
+#### Analysis Summary
+
+**Cumulative Cost Change**: $25.00 → $27.63 (+$2.63 or +10.52% over 3 months)
+
+**3-Month Trend**:
+```
+Period    | Cost/Bag | Monthly Variance | Cumulative Change
+----------|----------|------------------|------------------
+Jan (25-01)| $25.67  | +2.68%           | +$0.67
+Feb (25-02)| $28.10  | +9.47%           | +$3.10
+Mar (25-03)| $27.63  | -1.67%           | +$2.63
+```
+
+**Management Insights**:
+- February showed sharp 9.47% increase (triggers HIGH INCREASE alert)
+- March showed slight correction (-1.67%) but still above January baseline
+- Overall 10.52% increase over 3 months indicates sustained price pressure
+- Budget impact: If budgeted at $25.00/bag, actual cost of $27.63 = +10.52% over budget
+- Recommendation: Review supplier contracts, consider bulk purchasing or alternative suppliers
+
+**Financial Impact** (on closing inventory):
+```
+January closing value impact: +$33.50
+February closing value impact: +$170.10
+March closing value impact: -$23.50
+Total variance over 3 months: +$180.10 on just this one item
+```
+
 ## Snapshot Usage and Reporting
 
 ### Financial Statement Reports
@@ -995,7 +1149,9 @@ SELECT
   opening_quantity,
   receipts_quantity,
   transfers_in_quantity,
-  adjustments_quantity,
+  adjustments_in_quantity,
+  adjustments_out_quantity,
+  (adjustments_in_quantity - adjustments_out_quantity) as net_adjustments,
   issues_quantity,
   transfers_out_quantity,
   closing_quantity,
@@ -1004,6 +1160,125 @@ FROM tb_period_snapshots
 WHERE period_id = :period_id
   AND status = 'FINALIZED'
 ORDER BY ABS(closing_quantity - opening_quantity) DESC
+```
+
+### Cost Variance Analysis Reports (Periodic Average)
+
+**Cost Variance Summary by Item**:
+```sql
+SELECT
+  item_id,
+  period_id,
+  closing_quantity,
+  opening_unit_cost,
+  closing_unit_cost,
+  cost_variance_per_unit,
+  cost_variance_total,
+  cost_variance_percentage,
+  CASE
+    WHEN cost_variance_percentage > 10 THEN 'HIGH INCREASE'
+    WHEN cost_variance_percentage > 5 THEN 'MODERATE INCREASE'
+    WHEN cost_variance_percentage > 0 THEN 'SLIGHT INCREASE'
+    WHEN cost_variance_percentage = 0 THEN 'NO CHANGE'
+    WHEN cost_variance_percentage > -5 THEN 'SLIGHT DECREASE'
+    WHEN cost_variance_percentage > -10 THEN 'MODERATE DECREASE'
+    ELSE 'HIGH DECREASE'
+  END as variance_category
+FROM tb_period_snapshots
+WHERE period_id = :period_id
+  AND lot_number IS NULL  -- Periodic Average only
+  AND status = 'FINALIZED'
+ORDER BY ABS(cost_variance_percentage) DESC
+```
+
+**Cost Inflation/Deflation Trend**:
+```sql
+SELECT
+  item_id,
+  period_id,
+  closing_unit_cost,
+  cost_variance_per_unit,
+  cost_variance_percentage,
+  -- Running average of cost variance
+  AVG(cost_variance_percentage) OVER (
+    PARTITION BY item_id
+    ORDER BY period_id
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+  ) as three_month_avg_variance,
+  -- Cumulative cost change
+  SUM(cost_variance_per_unit) OVER (
+    PARTITION BY item_id
+    ORDER BY period_id
+  ) as cumulative_cost_change
+FROM tb_period_snapshots
+WHERE lot_number IS NULL  -- Periodic Average only
+  AND status = 'FINALIZED'
+ORDER BY item_id, period_id
+```
+
+**Top Cost Movers Report**:
+```sql
+-- Items with highest absolute cost variance impact
+SELECT
+  ps.item_id,
+  ps.period_id,
+  ps.closing_quantity,
+  ps.cost_variance_per_unit,
+  ps.cost_variance_total,
+  ps.cost_variance_percentage,
+  -- Total inventory value impact
+  ps.closing_total_cost,
+  -- Percentage of total inventory value
+  (ps.cost_variance_total / ps.closing_total_cost * 100) as variance_impact_pct
+FROM tb_period_snapshots ps
+WHERE ps.period_id = :period_id
+  AND ps.lot_number IS NULL  -- Periodic Average only
+  AND ps.status = 'FINALIZED'
+ORDER BY ABS(ps.cost_variance_total) DESC
+LIMIT 20
+```
+
+**Category Cost Variance Summary**:
+```sql
+SELECT
+  p.category_id,
+  c.category_name,
+  COUNT(ps.item_id) as item_count,
+  SUM(ps.closing_quantity) as total_quantity,
+  AVG(ps.cost_variance_percentage) as avg_cost_variance_pct,
+  SUM(ps.cost_variance_total) as total_cost_variance,
+  SUM(ps.closing_total_cost) as total_closing_value,
+  (SUM(ps.cost_variance_total) / SUM(ps.closing_total_cost) * 100) as category_impact_pct
+FROM tb_period_snapshots ps
+JOIN tb_products p ON ps.item_id = p.id
+JOIN tb_categories c ON p.category_id = c.id
+WHERE ps.period_id = :period_id
+  AND ps.lot_number IS NULL  -- Periodic Average only
+  AND ps.status = 'FINALIZED'
+GROUP BY p.category_id, c.category_name
+ORDER BY ABS(total_cost_variance) DESC
+```
+
+**Cost Variance vs Budget Analysis**:
+```sql
+SELECT
+  ps.item_id,
+  ps.period_id,
+  ps.closing_unit_cost as actual_cost,
+  b.budgeted_unit_cost,
+  (ps.closing_unit_cost - b.budgeted_unit_cost) as cost_vs_budget,
+  ((ps.closing_unit_cost / b.budgeted_unit_cost - 1) * 100) as variance_vs_budget_pct,
+  ps.cost_variance_per_unit as period_over_period_variance,
+  ps.closing_quantity,
+  ((ps.closing_unit_cost - b.budgeted_unit_cost) * ps.closing_quantity) as total_budget_impact
+FROM tb_period_snapshots ps
+LEFT JOIN tb_budget_costs b
+  ON ps.item_id = b.item_id
+  AND ps.period_id = b.period_id
+WHERE ps.period_id = :period_id
+  AND ps.lot_number IS NULL  -- Periodic Average only
+  AND ps.status = 'FINALIZED'
+ORDER BY ABS(total_budget_impact) DESC
 ```
 
 ### Audit and Compliance Reports
@@ -1029,7 +1304,7 @@ HAVING COUNT(DISTINCT ps.snapshot_id) = 0
 
 **Balance Equation Validation**:
 ```sql
--- Verify closing = opening + receipts + transfers_in + adj - issues - transfers_out
+-- Verify closing = opening + receipts + transfers_in + adj_in - adj_out - issues - transfers_out
 SELECT
   snapshot_id,
   period_id,
@@ -1038,13 +1313,13 @@ SELECT
   lot_number,
   closing_quantity as recorded_closing,
   (opening_quantity + receipts_quantity + transfers_in_quantity +
-   adjustments_quantity - issues_quantity - transfers_out_quantity) as calculated_closing,
+   adjustments_in_quantity - adjustments_out_quantity - issues_quantity - transfers_out_quantity) as calculated_closing,
   (closing_quantity - (opening_quantity + receipts_quantity + transfers_in_quantity +
-   adjustments_quantity - issues_quantity - transfers_out_quantity)) as variance
+   adjustments_in_quantity - adjustments_out_quantity - issues_quantity - transfers_out_quantity)) as variance
 FROM tb_period_snapshots
 WHERE period_id = :period_id
   AND ABS(closing_quantity - (opening_quantity + receipts_quantity +
-      transfers_in_quantity + adjustments_quantity - issues_quantity -
+      transfers_in_quantity + adjustments_in_quantity - adjustments_out_quantity - issues_quantity -
       transfers_out_quantity)) > 0.001  -- Allow for rounding
 ```
 
@@ -1131,7 +1406,7 @@ async function validateSnapshotIntegrity(periodId: string): Promise<boolean> {
     FROM tb_period_snapshots
     WHERE period_id = $1
       AND ABS(closing_quantity - (opening_quantity + receipts_quantity +
-          transfers_in_quantity + adjustments_quantity - issues_quantity -
+          transfers_in_quantity + adjustments_in_quantity - adjustments_out_quantity - issues_quantity -
           transfers_out_quantity)) > 0.001
   `, [periodId])
 
@@ -1189,8 +1464,8 @@ async function validateSnapshotIntegrity(periodId: string): Promise<boolean> {
 
 ---
 
-**Version**: 1.0.0
-**Last Updated**: 2025-11-03
+**Version**: 1.1.0
+**Last Updated**: 2025-11-06
 **Status**: Active
 **Maintained By**: Architecture Team
 **Review Cycle**: Quarterly
@@ -1198,6 +1473,32 @@ async function validateSnapshotIntegrity(periodId: string): Promise<boolean> {
 ---
 
 ## Document Revision Notes
+
+**Version 1.1.0** (2025-11-06):
+- **Breaking Change**: Split adjustments into separate IN/OUT tracking
+  - Changed from single `adjustments_quantity` / `adjustments_total_cost`
+  - Now uses `adjustments_in_quantity` / `adjustments_in_total_cost` and `adjustments_out_quantity` / `adjustments_out_total_cost`
+- **Rationale**: Aligns with current implementation using `in_qty`/`out_qty` pattern in `tb_inventory_transaction_closing_balance`
+- **Benefits**: Better audit trail, consistent with LOT/ADJUSTMENT transaction type tracking via parent_lot_no
+- Updated all formulas, SQL queries, and TypeScript examples to reflect split adjustments
+- Added net adjustment calculation formula: `net = adjustments_in - adjustments_out`
+- Updated FIFO adjustment tracking to use parent_lot_no pattern
+- Enhanced validation checks to verify non-negative adjustment quantities
+
+- **New Feature**: Cost variance tracking for Periodic Average method
+  - Added `cost_variance_per_unit`: Unit cost change from prior period
+  - Added `cost_variance_total`: Total cost impact of variance on closing inventory
+  - Added `cost_variance_percentage`: Percentage cost change for trend analysis
+  - **Purpose**: Track cost inflation/deflation, variance analysis, budget comparisons
+  - **Benefits**: Better financial analysis, cost trend identification, management reporting
+  - Added comprehensive cost variance analysis reports:
+    - Cost Variance Summary by Item (with variance categories)
+    - Cost Inflation/Deflation Trend (3-month moving average, cumulative changes)
+    - Top Cost Movers Report (highest absolute variance impact)
+    - Category Cost Variance Summary (aggregated by category)
+    - Cost Variance vs Budget Analysis (actual vs budgeted cost comparison)
+  - Updated Periodic Average closing balance calculation to include variance computation
+  - **Note**: Cost variance fields are NULL for FIFO snapshots (lot cost remains constant)
 
 **Version 1.0.0** (2025-11-03):
 - Initial creation of period-end snapshots specification

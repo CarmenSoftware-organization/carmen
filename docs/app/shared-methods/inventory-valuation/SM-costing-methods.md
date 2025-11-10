@@ -2,20 +2,21 @@
 
 **📌 Schema Reference**: Data structures defined in `/app/data-struc/schema.prisma`
 
-**Version**: 2.0.0 (Schema-Aligned)
-**Status**: Documentation Updated to Match Current Schema
-**Last Updated**: 2025-11-03
+**Version**: 2.1.0 (LOT/ADJUSTMENT Implementation)
+**Status**: Transaction Type System Implemented
+**Last Updated**: 2025-11-06
 
 ---
 
 ## ⚠️ IMPORTANT: Schema Alignment Notice
 
-This document has been updated to reflect the **actual current database schema**.
+This document has been updated to reflect the **actual current database schema** and recent implementation updates.
 
 - ✅ **Current Implementation**: Documented with actual table/field names from schema.prisma
+- ✅ **Transaction Type System**: LOT and ADJUSTMENT distinction implemented via parent_lot_no pattern
 - ⚠️ **Future Enhancements**: Marked with warnings and cross-referenced to SCHEMA-ALIGNMENT.md
 
-**For implementation roadmap of desired features, see**: `SCHEMA-ALIGNMENT.md`
+**For implementation roadmap of remaining features, see**: `SCHEMA-ALIGNMENT.md`
 
 ---
 
@@ -55,13 +56,13 @@ FIFO assumes that the **oldest inventory is used/sold first**. This method track
 - Cost tracking via `cost_per_unit` and `total_cost`
 - Lot index for multiple entries with same lot number
 - Date embedded in lot number (no separate receipt_date needed)
-
-**⚠️ Limitations of Current Schema**:
-- No parent lot linkage for adjustments
-- No transaction_type distinction (LOT vs ADJUSTMENT)
+- **Transaction type distinction**: LOT vs ADJUSTMENT via parent_lot_no pattern
+  - **LOT transactions**: `parent_lot_no` is NULL/empty (creates new lot)
+  - **ADJUSTMENT transactions**: `parent_lot_no` is populated (references parent lot)
 
 **✅ Correct Design**:
 - Balance calculated as `SUM(in_qty) - SUM(out_qty)` (single source of truth, complete audit trail)
+- Parent-child lot relationship tracked via `parent_lot_no` field
 
 ### How Current FIFO Works
 
@@ -75,6 +76,7 @@ model tb_inventory_transaction_closing_balance {
 
   lot_no                          String?  @db.VarChar  // ✅ Free-form text
   lot_index                       Int      @default(1)  // ✅ For multiple entries
+  parent_lot_no                   String?  @db.VarChar  // ✅ Parent lot reference (NULL for LOT, populated for ADJUSTMENT)
 
   location_id                     String?  @db.Uuid
   product_id                      String?  @db.Uuid
@@ -106,12 +108,17 @@ SELECT
   SUM(in_qty) - SUM(out_qty) as remaining_quantity,
   cost_per_unit,
   -- Date extracted from lot_no format: {LOCATION}-{YYMMDD}-{SEQ}
-  SUBSTRING(lot_no FROM POSITION('-' IN lot_no) + 1 FOR 6) as embedded_date
+  SUBSTRING(lot_no FROM POSITION('-' IN lot_no) + 1 FOR 6) as embedded_date,
+  -- Transaction type identification
+  CASE
+    WHEN parent_lot_no IS NULL THEN 'LOT'      -- New lot creation
+    ELSE 'ADJUSTMENT'                           -- Adjustment to existing lot
+  END as transaction_type
 FROM tb_inventory_transaction_closing_balance
 WHERE product_id = :product_id
   AND location_id = :location_id
   AND lot_no IS NOT NULL
-GROUP BY lot_no, cost_per_unit
+GROUP BY lot_no, cost_per_unit, parent_lot_no
 HAVING SUM(in_qty) - SUM(out_qty) > 0
 ORDER BY lot_no ASC  -- FIFO order: lot_no naturally sorts chronologically
 ```
@@ -125,6 +132,7 @@ interface FIFOLayer {
   itemId: string                // product_id
   lotNumber: string             // lot_no (free-form text)
   lotIndex: number              // lot_index (for multiple entries)
+  parentLotNumber?: string      // parent_lot_no (NULL for LOT, populated for ADJUSTMENT)
   locationId?: string           // location_id
 
   // ✅ Current fields
@@ -134,6 +142,9 @@ interface FIFOLayer {
   totalCost: number             // total_cost (DECIMAL 20,5)
 
   transactionDetailId: string   // inventory_transaction_detail_id
+
+  // ✅ Transaction type helper
+  transactionType: 'LOT' | 'ADJUSTMENT'  // Derived from parent_lot_no
 
   // Audit fields
   createdAt?: Date
@@ -149,6 +160,7 @@ interface CalculatedLotBalance {
   unitCost: number
   embeddedDate: string          // Extracted from lot_no (YYMMDD portion)
   totalValue: number            // Calculated: remaining_quantity * unit_cost
+  transactionType: 'LOT' | 'ADJUSTMENT'  // Derived from parent_lot_no presence
 }
 ```
 
@@ -231,6 +243,51 @@ Calculated Remaining Balances:
 └───────────────┴──────────────────────┴───────────┴─────────────┘
 Total: 270 units @ $3,140
 ```
+
+#### Parent Lot Linkage Example
+
+**Scenario**: Understanding LOT vs ADJUSTMENT transaction types
+
+```
+Initial GRN Receipt (LOT transaction):
+┌────────┬───────────────┬──────────────────┬────────┬──────────┬────────────┐
+│ id     │ lot_no        │ parent_lot_no    │ in_qty │ out_qty  │ Layer Type │
+├────────┼───────────────┼──────────────────┼────────┼──────────┼────────────┤
+│ uuid-1 │ MK-250130-01  │ NULL             │ 200    │ 0        │ LOT        │
+└────────┴───────────────┴──────────────────┴────────┴──────────┴────────────┘
+Status: New lot created from GRN commitment
+
+Store Requisition (ADJUSTMENT transaction):
+┌────────┬───────────────┬──────────────────┬────────┬──────────┬────────────┐
+│ id     │ lot_no        │ parent_lot_no    │ in_qty │ out_qty  │ Layer Type │
+├────────┼───────────────┼──────────────────┼────────┼──────────┼────────────┤
+│ uuid-1 │ MK-250130-01  │ NULL             │ 200    │ 0        │ LOT        │
+│ uuid-2 │ MK-250130-01  │ MK-250130-01     │ 0      │ 50       │ ADJUSTMENT │
+└────────┴───────────────┴──────────────────┴────────┴──────────┴────────────┘
+Status: Adjustment linked to parent lot MK-250130-01
+
+Calculated Balance:
+  Lot MK-250130-01: 200 - 50 = 150 units remaining
+
+Query to get only new lots (LOT layer):
+  WHERE parent_lot_no IS NULL
+  Result: MK-250130-01 (200 units initial)
+
+Query to get adjustments (ADJUSTMENT layer):
+  WHERE parent_lot_no IS NOT NULL
+  Result: MK-250130-01 adjustment (-50 units consumption)
+
+Traceability:
+  UUID-2 transaction references UUID-1 via parent_lot_no
+  Full audit trail: LOT creation → ADJUSTMENT consumption
+```
+
+**Benefits of parent_lot_no Pattern**:
+- ✅ Clear distinction between lot creation and consumption
+- ✅ Parent-child relationship for full traceability
+- ✅ No need for separate transaction_type enum field
+- ✅ Simple NULL check for filtering transaction types
+- ✅ Maintains complete audit trail
 
 ---
 
@@ -593,14 +650,17 @@ Impact:
 5. Date embedded in lot_no (no separate receipt_date field needed)
 6. Multiple entries per lot using `lot_index`
 7. Remaining balance calculated as SUM(in_qty) - SUM(out_qty)
+8. **Transaction type distinction**: LOT vs ADJUSTMENT via `parent_lot_no` pattern
+   - **LOT**: `parent_lot_no` is NULL (new lot creation - GRN, transfers)
+   - **ADJUSTMENT**: `parent_lot_no` is populated (consumption, adjustments)
+9. Parent-child lot traceability via `parent_lot_no` field
 
 **⚠️ Current Limitations**:
-1. Cannot distinguish lot creation from adjustments programmatically (no transaction_type field)
-2. No parent lot linkage for traceability (no parent_lot_no reference)
-3. Transfers don't automatically create new lot numbers at destination
+1. Transfers don't automatically create new lot numbers at destination (manual process)
 
 **✅ Correct Design**:
 - Balance calculated from transaction history: `SUM(in_qty) - SUM(out_qty)`
+- Transaction type derived from `parent_lot_no` presence
 
 ### FIFO Advantages
 
@@ -631,48 +691,70 @@ The following features are **planned but not yet implemented**:
 
 1. **✅ Structured Lot Numbers**: `{LOCATION}-{YYMMDD}-{SEQ}` format (e.g., `MK-251102-01`) - **IMPLEMENTED**
 2. **✅ FIFO Ordering**: ORDER BY lot_no ASC (natural chronological sort) - **IMPLEMENTED**
-3. **⚠️ Transaction Types**: Distinguish LOT (new lots) from ADJUSTMENT (consumption) layers - **NOT IMPLEMENTED**
-4. **⚠️ Parent Linkage**: `parent_lot_no` field for adjustment layer traceability - **NOT IMPLEMENTED**
+3. **✅ Transaction Types**: Distinguish LOT (new lots) from ADJUSTMENT (consumption) layers - **IMPLEMENTED** (via parent_lot_no pattern)
+4. **✅ Parent Linkage**: `parent_lot_no` field for adjustment layer traceability - **IMPLEMENTED**
 5. **✅ Automatic Lot Creation**: GRN commitment automatically generates lot numbers - **IMPLEMENTED**
 6. **⚠️ Lot Number Parsing**: Function to extract date from lot_no when needed - **NOT IMPLEMENTED**
+7. **⚠️ Automatic Transfer Lot Creation**: Automatically generate new lot numbers at destination location - **NOT IMPLEMENTED**
 
 **Note**:
 - Balance continues to be calculated as `SUM(in_qty) - SUM(out_qty)` (correct design)
 - No separate `receipt_date` field needed - date embedded in lot_no
+- Transaction type derived from `parent_lot_no` presence (NULL = LOT, populated = ADJUSTMENT)
 
-### How Enhanced System Would Work (Future)
+### How Enhanced System Works (Current Implementation)
 
-**⚠️ This is the DESIRED state from SCHEMA-ALIGNMENT.md - NOT current implementation**
+**✅ This is the CURRENT implementation using parent_lot_no pattern**
 
 ```sql
--- ⚠️ FUTURE ENHANCEMENT (See SCHEMA-ALIGNMENT.md Phase 3)
--- Enhanced schema with transaction_type field:
+-- ✅ CURRENT: Query LOT transactions (exclude adjustments)
 SELECT
   lot_no,  -- Format: {LOCATION}-{YYMMDD}-{SEQ} (e.g., MK-251102-01)
   SUM(in_qty) - SUM(out_qty) as remaining_quantity,  -- Calculated from transaction history
   cost_per_unit,
+  parent_lot_no,  -- NULL for LOT, populated for ADJUSTMENT
   -- Date can be extracted from lot_no if needed:
   SUBSTRING(lot_no FROM POSITION('-' IN lot_no) + 1 FOR 6) as embedded_date
 FROM tb_inventory_transaction_closing_balance
 WHERE product_id = :product_id
   AND location_id = :location_id
-  AND transaction_type = 'LOT'     -- ⚠️ New field (not yet implemented)
-GROUP BY lot_no, cost_per_unit
+  AND parent_lot_no IS NULL  -- ✅ Only LOT transactions (new lots)
+GROUP BY lot_no, cost_per_unit, parent_lot_no
 HAVING SUM(in_qty) - SUM(out_qty) > 0
 ORDER BY lot_no ASC  -- FIFO order: lot_no naturally sorts chronologically
+
+-- ✅ CURRENT: Query ADJUSTMENT transactions (linked to parent lot)
+SELECT
+  lot_no,
+  parent_lot_no,  -- References the parent lot
+  SUM(in_qty) as total_in,
+  SUM(out_qty) as total_out,
+  cost_per_unit
+FROM tb_inventory_transaction_closing_balance
+WHERE product_id = :product_id
+  AND location_id = :location_id
+  AND parent_lot_no IS NOT NULL  -- ✅ Only ADJUSTMENT transactions
+GROUP BY lot_no, parent_lot_no, cost_per_unit
+ORDER BY created_at ASC
 ```
 
-### Transaction Type Behavior (Partial Implementation)
+### Transaction Type Behavior (Current Implementation)
 
-**✅ Implemented**: GRN auto-lot generation | **⚠️ Not yet implemented**: Layer types, parent linkage - see SCHEMA-ALIGNMENT.md Phase 3
+**✅ Implemented**: Transaction type distinction via parent_lot_no pattern
 
-| Transaction Type | Layer Type | Creates New Lot? | Implementation Status |
-|-----------------|------------|------------------|----------------------|
-| **GRN Commitment** | LOT | ✅ Yes | ✅ Auto-generates lot number |
-| **Transfer In** | LOT | ✅ Yes | ⚠️ Future: New lot at destination |
-| **Store Requisition** | ADJUSTMENT | ❌ No | ⚠️ Future: Link via parent_lot_no |
-| **Credit Note** | ADJUSTMENT | ❌ No | ⚠️ Future: Link via parent_lot_no |
-| **Inventory Adjustment** | ADJUSTMENT | ❌ No | ⚠️ Future: Link via parent_lot_no |
+| Transaction Type | Layer Type | Creates New Lot? | parent_lot_no | Implementation Status |
+|-----------------|------------|------------------|---------------|----------------------|
+| **GRN Commitment** | LOT | ✅ Yes | NULL | ✅ Auto-generates lot number |
+| **Transfer In** | LOT | ✅ Yes | NULL | ⚠️ Manual lot creation at destination |
+| **Store Requisition** | ADJUSTMENT | ❌ No | Populated | ✅ Links via parent_lot_no |
+| **Credit Note** | ADJUSTMENT | ❌ No | Populated | ✅ Links via parent_lot_no |
+| **Inventory Adjustment** | ADJUSTMENT | ❌ No | Populated | ✅ Links via parent_lot_no |
+| **Production Output** | LOT | ✅ Yes | NULL | ✅ Auto-generates lot number |
+| **Production Consumption** | ADJUSTMENT | ❌ No | Populated | ✅ Links via parent_lot_no |
+
+**Pattern Rules**:
+- **LOT transactions** (parent_lot_no = NULL): Create new inventory lots with new lot numbers
+- **ADJUSTMENT transactions** (parent_lot_no = value): Modify existing lots, maintain audit trail
 
 </div>
 
@@ -907,16 +989,18 @@ interface PeriodSnapshot {
 
 ## Comparison Matrix
 
-| Feature | FIFO (Current) | Periodic Average (Current) | Enhanced FIFO (Future) |
-|---------|----------------|---------------------------|----------------------|
+| Feature | FIFO (Current) | Periodic Average (Current) | Future Enhancements |
+|---------|----------------|---------------------------|---------------------|
 | **Complexity** | Moderate | Low | High |
-| **Performance** | Moderate (aggregation) | Low (no cache) | High (direct fields) |
-| **Cost Accuracy** | Good (lot-based) | Approximate (averaged) | Excellent (precise) |
-| **Lot Traceability** | Basic (lot_no) | ❌ None | ✅ Full (parent linkage) |
-| **Storage** | Moderate | Low | High |
+| **Performance** | Moderate (aggregation) | Low (no cache) | High (with caching) |
+| **Cost Accuracy** | Good (lot-based) | Approximate (averaged) | Excellent (optimized) |
+| **Lot Traceability** | ✅ Full (parent_lot_no) | ❌ None | ✅ Enhanced queries |
+| **Transaction Types** | ✅ LOT/ADJUSTMENT | N/A | ✅ Maintained |
+| **Storage** | Moderate | Low | Moderate |
 | **Period Management** | ❌ None | ❌ None | ⚠️ Future (tb_period) |
 | **Snapshots** | ❌ None | ❌ None | ⚠️ Future (tb_period_snapshot) |
 | **Automatic Lot Numbers** | ✅ Auto-generate | N/A | ✅ Auto-generate |
+| **Transfer Lot Creation** | ⚠️ Manual | N/A | ⚠️ Future (automatic) |
 
 ---
 
@@ -1068,6 +1152,31 @@ class InventoryValuationService {
 
 ## Document Revision History
 
+### Version 2.1.0 (LOT/ADJUSTMENT Implementation) - 2025-11-06
+
+**✅ Transaction Type System Implemented**
+
+This update reflects the implementation of LOT and ADJUSTMENT transaction type distinction via the `parent_lot_no` pattern.
+
+**Key Changes**:
+1. **Transaction Type Distinction Implemented**:
+   - LOT transactions: `parent_lot_no` is NULL (new lot creation)
+   - ADJUSTMENT transactions: `parent_lot_no` is populated (references parent lot)
+   - Parent-child lot traceability now available
+   - Updated Prisma model to include `parent_lot_no` field
+
+2. **Documentation Updates**:
+   - Moved LOT/ADJUSTMENT from "Future Enhancements" to "Current Implementation"
+   - Updated SQL queries to demonstrate transaction type filtering
+   - Added transaction type to TypeScript interfaces
+   - Updated business rules to reflect implementation status
+   - Enhanced transaction type behavior table with pattern rules
+
+3. **Examples Enhanced**:
+   - Added queries for LOT-only and ADJUSTMENT-only transactions
+   - Demonstrated parent_lot_no usage patterns
+   - Updated comparison matrix to reflect current capabilities
+
 ### Version 2.0.0 (Schema-Aligned) - 2025-11-03
 
 **✅ Major Update: Schema Alignment Completed**
@@ -1111,9 +1220,9 @@ This document has been updated to accurately reflect the **actual Prisma databas
 
 ---
 
-**Version**: 2.0.0 (Schema-Aligned)
-**Status**: Current schema documented, future enhancements marked
-**Last Updated**: 2025-11-03
+**Version**: 2.1.0 (LOT/ADJUSTMENT Implementation)
+**Status**: Transaction type system implemented via parent_lot_no pattern
+**Last Updated**: 2025-11-06
 **Maintained By**: Architecture Team
 
 **Related Documents**:
