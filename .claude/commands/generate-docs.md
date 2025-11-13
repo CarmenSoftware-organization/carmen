@@ -10,6 +10,7 @@ Generate complete documentation set (BR, UC, TS, DS, FD, VAL) for: **{module}/{s
 2. **Use hospitality personas** - chefs, housekeepers, purchasing staff, etc. (not generic roles)
 3. **Follow templates exactly** - see docs/app/template-guide/ for structure and format
 4. **Verify everything** - every feature must have code evidence
+5. **Be specific, not verbose** - create document in a more concise format to avoid the token limit.
 
 ---
 

@@ -17,6 +17,7 @@ Shared methods serve as:
 | Method | Purpose | Service Location | Documentation |
 |--------|---------|------------------|---------------|
 | [Inventory Valuation](./inventory-valuation/SM-inventory-valuation.md) | Calculate inventory costs using FIFO or Periodic Average | `/lib/services/db/inventory-valuation-service.ts` | [View](./inventory-valuation/) |
+| [Inventory Operations](./inventory-operations/SM-inventory-operations.md) | Standardized inventory operations: balance tracking, transaction recording, state management | `/lib/services/db/inventory-*-service.ts` | [View](./inventory-operations/) |
 
 ## When to Use Shared Methods
 

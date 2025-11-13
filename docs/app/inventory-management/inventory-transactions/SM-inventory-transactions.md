@@ -28,6 +28,23 @@ The Inventory Transactions system manages all **physical inventory movements** a
 
 **Note**: GRN and Credit Note are **Procurement sub-modules** with their own complete documentation. This document focuses on the **inventory transaction processing** triggered by these procurement events.
 
+## Related Shared Methods
+
+This module uses standardized **Inventory Operations** shared methods for common functionality:
+- **[Inventory Operations](../../shared-methods/inventory-operations/SM-inventory-operations.md)** - Shared services for balance tracking, transaction recording, state management, validation, and audit trail
+
+**Key Shared Services Used**:
+- `InventoryBalanceService` - Real-time balance updates with concurrency control
+- `TransactionRecordingService` - Standardized transaction audit trail
+- `StateManagementService` - Transaction lifecycle state transitions
+- `LocationManagementService` - Location-based access control
+- `OperationValidationService` - Pre-transaction validation
+- `AtomicTransactionService` - Database transaction management
+- `AuditTrailService` - Comprehensive audit logging
+- `IntegrationEventService` - Event-driven module integration
+
+Refer to the shared methods documentation for detailed API specifications and usage patterns.
+
 ### Application-Wide Usage
 
 This system integrates with multiple modules:
