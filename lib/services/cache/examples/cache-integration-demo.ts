@@ -81,7 +81,7 @@ async function demoInventoryCalculations() {
   const valuationResult = await inventory.calculateStockValuation({
     itemId: 'laptop-001',
     quantityOnHand: 50,
-    costingMethod: CostingMethod.WEIGHTED_AVERAGE,
+    costingMethod: CostingMethod.FIFO,
     averageCost: { amount: 800, currency: 'USD' }
   });
   console.log(`   Item: ${valuationResult.value.itemId}`);

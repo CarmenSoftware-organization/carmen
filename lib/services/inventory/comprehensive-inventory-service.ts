@@ -848,14 +848,10 @@ export class ComprehensiveInventoryService {
     switch (method) {
       case CostingMethod.FIFO:
         return await this.calculateFIFOCost(item.id, asOfDate)
-      case CostingMethod.LIFO:
-        return await this.calculateLIFOCost(item.id, asOfDate)
-      case CostingMethod.WEIGHTED_AVERAGE:
+    
+      case CostingMethod.PERIODIC_AVERAGE:
         return await this.calculateWeightedAverageCost(item.id, asOfDate)
-      case CostingMethod.MOVING_AVERAGE:
-        return await this.calculateMovingAverageCost(item.id, asOfDate)
-      case CostingMethod.STANDARD_COST:
-        return await this.calculateStandardCost(item.id)
+
       default:
         throw new Error(`Unsupported costing method: ${method}`)
     }

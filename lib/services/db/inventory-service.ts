@@ -425,7 +425,7 @@ export class InventoryService {
           description: input.description,
           category_id: input.categoryId,
           base_unit_id: input.baseUnitId,
-          costing_method: input.costingMethod || CostingMethod.WEIGHTED_AVERAGE,
+          costing_method: input.costingMethod || CostingMethod.PERIODIC_AVERAGE,
           is_active: input.isActive ?? true,
           is_serialized: input.isSerialized ?? false,
           minimum_quantity: input.minimumQuantity,

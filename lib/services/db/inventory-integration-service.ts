@@ -308,7 +308,7 @@ export class InventoryIntegrationService {
         description: product.description,
         categoryId: product.categoryId,
         baseUnitId: product.baseUnit,
-        costingMethod: CostingMethod.WEIGHTED_AVERAGE,
+        costingMethod: CostingMethod.PERIODIC_AVERAGE,
         isActive: product.isActive,
         isSerialized: product.isSerialTrackingRequired,
         minimumQuantity: product.minimumOrderQuantity,

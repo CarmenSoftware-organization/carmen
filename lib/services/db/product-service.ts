@@ -788,7 +788,7 @@ export class ProductService {
       const stockValuationInput: StockValuationInput = {
         itemId: productId,
         quantityOnHand: mockInventoryData.quantityOnHand,
-        costingMethod: CostingMethod.WEIGHTED_AVERAGE,
+        costingMethod: CostingMethod.PERIODIC_AVERAGE,
         averageCost: mockInventoryData.averageCost
       }
 

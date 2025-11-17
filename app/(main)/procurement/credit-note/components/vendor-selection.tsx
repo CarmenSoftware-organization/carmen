@@ -278,7 +278,7 @@ const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     totalQuantity: 0,
     totalValue: { amount: 15675, currency: 'THB' },
     discrepancies: 0,
-    qualityCheckRequired: false,
+    // qualityCheckRequired: false,
     invoiceNumber: 'INV-001',
     invoiceDate: new Date('2023-10-15'),
   },
@@ -295,7 +295,7 @@ const mockGoodsReceiveNotes: GoodsReceiveNote[] = [
     totalQuantity: 0,
     totalValue: { amount: 15675, currency: 'THB' },
     discrepancies: 0,
-    qualityCheckRequired: false,
+    // qualityCheckRequired: false,
     invoiceNumber: 'INV-002',
     invoiceDate: new Date('2023-10-15'),
   }

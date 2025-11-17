@@ -141,27 +141,8 @@ export class InventoryCalculations extends BaseCalculator {
           unitCost = await this.calculateFifoCost(input);
           break;
 
-        case CostingMethod.MOVING_AVERAGE:
+        case CostingMethod.PERIODIC_AVERAGE:
           unitCost = await this.calculateMovingAverageCost(input);
-          break;
-
-        case CostingMethod.WEIGHTED_AVERAGE:
-          unitCost = await this.calculateWeightedAverageCost(input);
-          break;
-
-        case CostingMethod.STANDARD_COST:
-          if (!input.standardCost) {
-            throw this.createError(
-              'Standard cost is required for STANDARD_COST method',
-              'MISSING_STANDARD_COST',
-              context
-            );
-          }
-          unitCost = input.standardCost;
-          break;
-
-        case CostingMethod.LIFO:
-          unitCost = await this.calculateLifoCost(input);
           break;
 
         default:
