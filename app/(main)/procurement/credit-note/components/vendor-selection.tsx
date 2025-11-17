@@ -335,7 +335,7 @@ export function VendorSelection({ onCreditNoteCreate = () => {} }: { onCreditNot
     //   })
     // }
     return sortableGRNs
-  }, [sortConfig])
+  }, [])
 
   const filteredGRNs = useMemo(() => {
     return sortedGRNs.filter(grn =>
