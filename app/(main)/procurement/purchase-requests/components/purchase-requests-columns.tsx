@@ -65,7 +65,7 @@ export const purchaseRequestColumns: ColumnDef<PurchaseRequest>[] = [
     },
   },
   {
-    accessorKey: "date",
+    accessorKey: "requestDate",
     header: ({ column }) => {
       return (
         <Button
@@ -79,7 +79,8 @@ export const purchaseRequestColumns: ColumnDef<PurchaseRequest>[] = [
       )
     },
     cell: ({ row }) => {
-      const date = row.getValue("date") as Date
+      const dateValue = row.getValue("requestDate")
+      const date = dateValue instanceof Date ? dateValue : new Date(dateValue as string)
       return <div className="text-xs">{format(date, "dd/MM/yyyy")}</div>
     },
   },
