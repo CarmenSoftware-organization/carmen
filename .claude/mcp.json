@@ -27,6 +27,13 @@
            "PGUSER": "postgres",
            "PGPASSWORD": "password"
          }
+       },
+      "wordpress": {
+         "command": "npx",
+         "args": ["-y", "claudeus-wp-mcp"],
+         "env": {
+           "WP_SITES_PATH": "/Users/peak/Documents/GitHub/carmen/wp-sites.json"
+         }
        }
    }
 }

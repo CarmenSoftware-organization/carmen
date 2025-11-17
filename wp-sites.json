@@ -1,0 +1,8 @@
+{
+  "peak-local": {
+    "URL": "http://peak.local",
+    "USER": "admin",
+    "PASS": "admin",
+    "authType": "basic"
+  }
+}
