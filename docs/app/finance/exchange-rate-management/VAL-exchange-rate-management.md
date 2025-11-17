@@ -1679,20 +1679,6 @@ Variance 32.1%:
 - Key rotation requires re-encryption of all existing keys with new encryption key
 - Decrypted values never logged, never sent to client, used only for API calls
 
-**Encryption Example**:
-```
-Plain API Key (user input): sk_live_12345abcdefghijklmnopqrstuvwxyz
-
-Encrypted Value (stored in DB):
-{
-  "encrypted_key": "AES256:v1:a1b2c3d4e5f6...{base64 encrypted blob}",
-  "key_version": 1,
-  "encryption_timestamp": "2025-01-13T14:30:00Z"
-}
-
-Displayed to User: ••••••••••••••••••••••••••••••••••••
-```
-
 **Test Cases**:
 - ✅ Valid: API key encrypted and stored securely
 - ✅ Valid: Decryption successful for API call
