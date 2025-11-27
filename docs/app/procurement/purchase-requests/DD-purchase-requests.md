@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Requests
 - **Database**: Carmen ERP PostgreSQL
-- **Schema Version**: 2.0.0
-- **Last Updated**: 2025-01-01
+- **Schema Version**: 2.1.0
+- **Last Updated**: 2025-11-26
 - **Owner**: Procurement Team
 - **Status**: Active
 
@@ -14,6 +14,20 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-01-30 | System Architect | Initial SQL-based schema |
 | 2.0.0 | 2025-01-01 | Development Team | Converted to text-based DD format + added new fields for 9/7/2025 requirements |
+| 2.1.0 | 2025-11-26 | Documentation Team | Synchronized with BR document - updated status values, removed fictional features, added implementation status markers |
+
+## Implementation Status
+
+This document defines the **target data model** for Purchase Requests. Each entity and field includes an implementation status marker:
+
+| Status | Meaning |
+|--------|---------|
+| ✅ Implemented | Data model complete and functional |
+| 🔧 Partial | Frontend exists, backend development needed |
+| 🚧 Pending | Not yet implemented |
+| ⏳ Future | Post-MVP enhancement |
+
+**Current State**: Frontend prototype with mock data. Database schema and API pending development.
 
 ---
 
@@ -87,6 +101,8 @@ erDiagram
 
 ### Entity: PurchaseRequest
 
+**Implementation Status**: 🔧 Partial
+
 **Description**: Represents a formal request submitted by staff to purchase goods or services for their department. The purchase request header contains organizational context, dates, status, approval workflow state, and financial totals.
 
 **Business Purpose**: Centralizes all purchase requisitions, ensures proper approval workflows, maintains budget control, and provides audit trail for procurement activities.
@@ -151,14 +167,21 @@ erDiagram
 - **Status**: Current status in PR lifecycle
   - Required: Yes
   - Default: Draft
-  - Allowed values: Draft, Submitted, Approved, Rejected, Cancelled, Converted
+  - Allowed values: Draft, In-progress, Approved, Void, Completed, Cancelled
   - Status transitions:
-    * Draft → Submitted (when user submits for approval)
-    * Submitted → Approved (when all approvals complete)
-    * Submitted → Rejected (when any approver rejects)
-    * Draft/Rejected → Cancelled (user cancels)
-    * Approved → Converted (converted to Purchase Order)
-  - Example: "Submitted"
+    * Draft → In-progress (when user submits for approval)
+    * In-progress → Approved (when all approvals complete)
+    * In-progress → Void (when any approver rejects)
+    * Draft/Void → Cancelled (user cancels)
+    * Approved → Completed (converted to Purchase Order)
+  - Status meanings:
+    * **Draft**: Saved but not submitted (editable by requestor)
+    * **In-progress**: Some approvals received, others pending
+    * **Approved**: All approvals received (ready for PO conversion)
+    * **Void**: Approval denied (returned to requestor with comments)
+    * **Completed**: Converted to Purchase Order(s) (read-only)
+    * **Cancelled**: Manually cancelled by requestor or approver (with reason)
+  - Example: "In-progress"
 
 - **Approval Status**: Current approval workflow state
   - Required: No (NULL for Draft status)
@@ -274,18 +297,12 @@ erDiagram
   - Visibility: Restricted based on user role
   - Example: "Budget code confirmed with Finance Manager"
 
-- **Priority**: Urgency level for processing
-  - Required: No
-  - Default: Normal
-  - Allowed values: Low, Normal, High, Urgent
-  - Purpose: Helps prioritize procurement and approvals
-  - Example: "High"
-
-**Template Information**:
+**Template Information** (⏳ Future):
 - **Template ID**: Reference to PR template if created from template
   - Required: No (NULL if created manually)
   - References: pr_templates table
   - Purpose: Tracks template usage, enables repeat orders
+  - Implementation: Post-MVP enhancement
   - Example: uuid for "Monthly Kitchen Supplies Template"
 
 **Flexible Data**:
@@ -319,7 +336,7 @@ erDiagram
 | delivery_date | DATE | Yes | - | Expected delivery date | 2025-01-22 | >= date field |
 | department_id | UUID | Yes | - | Department reference | 550e8400-... | Must exist in departments |
 | location_id | UUID | Yes | - | Location reference | 550e8400-... | Must exist in locations, belong to department |
-| status | VARCHAR(20) | Yes | Draft | Current PR status | Draft, Submitted, Approved | Must be in allowed values |
+| status | VARCHAR(20) | Yes | Draft | Current PR status | Draft, In-progress, Approved, Void, Completed, Cancelled | Must be in allowed values |
 | approval_status | VARCHAR(20) | No | NULL | Approval workflow status | Pending, Approved, Rejected | Must be in allowed values |
 | current_approval_stage_id | UUID | No | NULL | Current approval stage | 550e8400-... | Must exist in approval_stages |
 | subtotal | DECIMAL(15,2) | Yes | 0.00 | Sum of line totals | 1500.00 | >= 0, auto-calculated |
@@ -335,8 +352,7 @@ erDiagram
 | exchange_rate | DECIMAL(15,6) | Yes | 1.000000 | Currency conversion rate | 1.185432 | > 0 |
 | notes | TEXT | No | NULL | Public notes | "Equipment needed..." | Full-text searchable |
 | internal_notes | TEXT | No | NULL | Internal notes | "Budget code confirmed..." | Restricted visibility |
-| priority | VARCHAR(20) | No | Normal | Processing priority | Low, Normal, High, Urgent | Must be in allowed values |
-| template_id | UUID | No | NULL | Template reference | 550e8400-... | Must exist in pr_templates |
+| template_id | UUID | No | NULL | Template reference (⏳ Future) | 550e8400-... | Must exist in pr_templates |
 | metadata | JSONB | No | {} | Flexible data | {"urgency_reason": "..."} | Valid JSON |
 | created_at | TIMESTAMPTZ | Yes | NOW() | Creation timestamp | 2025-01-15T10:30:00Z | Immutable |
 | created_by | UUID | Yes | - | Creator user reference | 550e8400-... | Must exist in users |
@@ -392,9 +408,8 @@ erDiagram
 
 **Check Constraints**:
 - **Type values**: Must be one of: General, Market List, Asset
-- **Status values**: Must be one of: Draft, Submitted, Approved, Rejected, Cancelled, Converted
+- **Status values**: Must be one of: Draft, In-progress, Approved, Void, Completed, Cancelled
 - **Approval status values**: Must be one of: Pending, Approved, Rejected, Recalled
-- **Priority values**: Must be one of: Low, Normal, High, Urgent
 - **Date validation**: delivery_date >= date
 - **Amount validation**: All financial fields (subtotal, tax_amount, discount_amount, total_amount, base amounts) must be >= 0
 - **Exchange rate validation**: exchange_rate > 0
@@ -416,7 +431,6 @@ erDiagram
 - `currency_code`: From location's default currency
 - `base_currency_code`: Organization's base currency (USD)
 - `exchange_rate`: 1.000000
-- `priority`: Normal
 - `version`: 1
 - `metadata`: {}
 
@@ -438,6 +452,8 @@ erDiagram
 ---
 
 ### Entity: PurchaseRequestItem
+
+**Implementation Status**: 🔧 Partial
 
 **Description**: Represents individual line items within a purchase request. Each item specifies a product or service to be purchased, including quantity, pricing, vendor information, inventory availability, delivery details, and associated taxes and discounts. Items support both catalog products and free-text descriptions.
 
@@ -840,7 +856,9 @@ erDiagram
 
 ---
 
-### Entity: DeliveryPoint (NEW ENTITY)
+### Entity: DeliveryPoint
+
+**Implementation Status**: 🚧 Pending
 
 **Description**: Master data table storing valid delivery locations for purchase request items. Delivery points represent specific physical locations where purchased items can be delivered, such as loading docks, kitchen entrances, storage rooms, or department-specific locations.
 
@@ -963,9 +981,11 @@ erDiagram
 
 ### Entity: PRApproval
 
-**Description**: Tracks approval workflow records for each purchase request. Each approval record represents one approval stage in the workflow chain, including the assigned approver, current status, decision comments, and notification history.
+**Implementation Status**: 🔧 Partial
 
-**Business Purpose**: Manages multi-level approval workflows, ensures proper authorization before procurement, provides audit trail of all approval decisions, supports delegation and notification.
+**Description**: Tracks approval workflow records for each purchase request. Each approval record represents one approval stage in the workflow chain, including the assigned approver, current status, and decision comments.
+
+**Business Purpose**: Manages multi-level approval workflows, ensures proper authorization before procurement, provides audit trail of all approval decisions.
 
 **Data Ownership**: System-generated based on approval workflow rules; decisions recorded by approvers
 
@@ -987,19 +1007,13 @@ erDiagram
 - **Status**: Current approval status
   - Allowed values: Pending, Approved, Rejected, Skipped, Recalled
 - **Sequence Number**: Order in approval chain (1, 2, 3, ...)
-- **Comments**: Approver's decision comments
+- **Comments**: Approver's decision comments (minimum 10 characters required for rejection)
 - **Approved At**: Timestamp when approved
 - **Rejected At**: Timestamp when rejected
-
-**Notification Tracking**:
 - **Notified At**: When approver was first notified
-- **Reminder Count**: Number of reminder notifications sent
-- **Last Reminder At**: Timestamp of most recent reminder
 
-**Delegation**:
-- **Delegated To**: User to whom approval was delegated
-- **Delegated At**: When delegation occurred
-- **Delegation Reason**: Why approval was delegated
+**Delegation** (⏳ Future):
+- Delegation support mentioned in BR but detailed implementation is post-MVP
 
 #### Field Definitions Table
 
@@ -1011,15 +1025,10 @@ erDiagram
 | approver_id | UUID | Yes | - | Assigned approver | 550e8400-... | Must exist in users |
 | status | VARCHAR(20) | Yes | Pending | Approval status | Pending, Approved, Rejected | Must be in allowed values |
 | sequence_number | INTEGER | Yes | - | Order in chain | 1, 2, 3 | > 0 |
-| comments | TEXT | No | NULL | Decision comments | "Approved for budget..." | - |
+| comments | TEXT | No | NULL | Decision comments | "Approved for budget..." | Min 10 chars for rejection |
 | approved_at | TIMESTAMPTZ | No | NULL | Approval timestamp | 2025-01-15T14:00:00Z | - |
 | rejected_at | TIMESTAMPTZ | No | NULL | Rejection timestamp | NULL | - |
 | notified_at | TIMESTAMPTZ | No | NULL | First notification | 2025-01-15T10:00:00Z | - |
-| reminder_count | INTEGER | Yes | 0 | Reminder count | 2 | >= 0 |
-| last_reminder_at | TIMESTAMPTZ | No | NULL | Last reminder sent | 2025-01-16T10:00:00Z | - |
-| delegated_to | UUID | No | NULL | Delegate user | 550e8400-... | Must exist in users |
-| delegated_at | TIMESTAMPTZ | No | NULL | Delegation timestamp | NULL | - |
-| delegation_reason | TEXT | No | NULL | Why delegated | "On vacation..." | - |
 | metadata | JSONB | No | {} | Flexible data | {} | Valid JSON |
 | created_at | TIMESTAMPTZ | Yes | NOW() | Creation timestamp | 2025-01-15T10:00:00Z | Immutable |
 | created_by | UUID | Yes | - | Creator reference | 550e8400-... | Must exist in users |
@@ -1129,7 +1138,12 @@ base_total_amount = total_amount × exchange_rate
 - All monetary amounts must be >= 0 and have exactly 2 decimal places
 - All percentages must be between 0 and 100
 - Dates must follow logical sequence (delivery_date >= date, required_date >= current_date)
-- Status transitions follow defined workflow (Draft → Submitted → Approved/Rejected)
+- Status transitions follow defined workflow:
+  * Draft → In-progress (submission)
+  * In-progress → Approved (all approvals complete)
+  * In-progress → Void (rejected)
+  * Approved → Completed (PO conversion)
+  * Draft/Void → Cancelled (user cancellation)
 - Unique business keys enforced (PR ref_number, line numbers within PR, delivery point codes)
 
 ### Audit Trail
@@ -1233,7 +1247,8 @@ base_total_amount = total_amount × exchange_rate
 **Document Control**:
 - **Created**: 2025-01-30 (Original DS version)
 - **Converted to DD**: 2025-01-01
+- **Last Synchronized with BR**: 2025-11-26
 - **Author**: Development Team
 - **Reviewed By**: Database Administrator, Security Team, Procurement Team
-- **Next Review**: 2025-04-01
-- **Status**: Active - Ready for Implementation
+- **Next Review**: 2026-02-01
+- **Status**: Active - Synchronized with BR-purchase-requests.md

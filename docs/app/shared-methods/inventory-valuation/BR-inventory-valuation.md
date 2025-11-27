@@ -17,8 +17,6 @@
 | 1.2.0 | 2025-11-03 | Architecture Team | **Lot-Based Cost Layers & Period-End Snapshots**: Added business rules for lot-based FIFO system and period-end balance snapshots |
 | 2.0.0 | 2025-11-03 | Architecture Team | **Major Update**: Separated current implementation from future enhancements, cross-referenced SCHEMA-ALIGNMENT.md |
 
----
-
 ## ⚠️ IMPORTANT: Schema Alignment Notice
 
 This document defines business requirements for inventory valuation. Requirements are categorized as:

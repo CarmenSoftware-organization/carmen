@@ -201,22 +201,38 @@ export interface Contact {
 // ====== MEASUREMENT AND UNITS ======
 
 /**
- * Unit of measurement
+ * Unit type classification (BR-UNIT-006)
+ * - INVENTORY: Units for stock tracking (KG, L, PC)
+ * - ORDER: Units for purchasing and receiving (BOX, CASE, CTN, PLT)
+ * - RECIPE: Units for food preparation (TSP, TBSP, CUP, OZ)
+ */
+export type UnitType = 'INVENTORY' | 'ORDER' | 'RECIPE';
+
+/**
+ * Unit categories for measurement classification
+ */
+export type UnitCategory = 'weight' | 'volume' | 'length' | 'count' | 'time' | 'temperature';
+
+/**
+ * Unit of measurement (BR-units.md aligned)
  */
 export interface Unit {
   id: string;
-  name: string;
-  symbol: string;
-  category: UnitCategory;
-  baseUnit?: string; // For conversion calculations
+  code: string;                     // Unit code (e.g., KG, ML, BOX) - unique, immutable (BR-UNIT-001)
+  name: string;                     // Full unit name (e.g., Kilogram, Milliliter)
+  symbol: string;                   // Display symbol (kept for backward compatibility)
+  description?: string;             // Optional detailed description (BR-UNIT-007)
+  type: UnitType;                   // INVENTORY | ORDER | RECIPE (BR-UNIT-006)
+  category: UnitCategory;           // Physical measurement category
+  baseUnit?: string;                // For conversion calculations
   conversionFactor?: number;
-  isActive: boolean;
+  isActive: boolean;                // Active (true) or Inactive (false) (BR-UNIT-008)
+  // Audit fields (BR-UNIT-009, BR-UNIT-010)
+  createdAt?: Date;
+  createdBy?: string;
+  updatedAt?: Date;
+  updatedBy?: string;
 }
-
-/**
- * Unit categories
- */
-export type UnitCategory = 'weight' | 'volume' | 'length' | 'count' | 'time' | 'temperature';
 
 /**
  * Quantity with unit
@@ -224,6 +240,20 @@ export type UnitCategory = 'weight' | 'volume' | 'length' | 'count' | 'time' | '
 export interface Quantity {
   value: number;
   unit: string;
+}
+
+/**
+ * Unit usage statistics for deletion validation (BR-UNIT-006)
+ * Used to check if a unit can be safely deleted
+ */
+export interface UnitUsageStats {
+  unitId: string;
+  unitCode: string;
+  unitName: string;
+  productCount: number;      // Number of products using this unit
+  recipeCount: number;       // Number of recipes using this unit
+  canBeDeleted: boolean;     // True if unit is not in use
+  deletionBlockedReason?: string;  // Reason why deletion is blocked
 }
 
 // ====== WORKFLOW AND APPROVAL ======
@@ -293,15 +323,28 @@ export interface Tag {
 }
 
 /**
- * Category interface
+ * Category interface (BR-categories.md aligned)
+ * Supports three-level hierarchy: CATEGORY → SUBCATEGORY → ITEM_GROUP
  */
 export interface Category {
   id: string;
   name: string;
   description?: string;
   parentId?: string;
-  level: number;
+  level: number;                    // Hierarchy level: 1=Category, 2=Subcategory, 3=ItemGroup
+  sortOrder?: number;               // Sort position within siblings (BR-CAT-008)
+  path?: string;                    // Full hierarchy path (e.g., "Food > Dairy > Cheese")
+  itemCount?: number;               // Direct product count (BR-CAT-012)
+  totalItemCount?: number;          // Nested product count including children (BR-CAT-012)
   isActive: boolean;
+  // Audit fields (BR-CAT-015, BR-CAT-016)
+  createdAt?: Date;
+  createdBy?: string;
+  updatedAt?: Date;
+  updatedBy?: string;
+  // Soft delete fields (BR-CAT-017)
+  deletedAt?: Date | null;
+  deletedBy?: string | null;
 }
 
 // ====== NOTIFICATIONS ======

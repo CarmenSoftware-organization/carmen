@@ -2,9 +2,16 @@
 
 ## Document Information
 - **Module**: System Administration / Location Management
-- **Version**: 1.0
-- **Last Updated**: 2025-01-16
+- **Version**: 1.1
+- **Last Updated**: 2025-11-26
 - **Status**: Active
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+| 1.1.0 | 2025-11-26 | Documentation Team | Code compliance review - aligned with BR document, simplified flows |
 
 ## Overview
 
@@ -18,49 +25,24 @@ This document provides comprehensive flow diagrams for all Location Management w
 flowchart TD
     Start([User Opens Location Management]) --> List[Display Location List]
     List --> ClickCreate{User Clicks<br/>Create Location}
-    ClickCreate --> LoadForm[Load Empty Form]
-    LoadForm --> DisplayForm[Display Form with Tabs:<br/>- Basic Information<br/>- User Assignment<br/>- Product Assignment]
+    ClickCreate --> LoadForm[Load LocationForm Component]
+    LoadForm --> DisplayForm[Display Form with Fields:<br/>- Code, Name, Description<br/>- Type, Status<br/>- Physical Count<br/>- Department, Cost Center]
 
-    DisplayForm --> FillBasic[User Fills Basic Info:<br/>- Code<br/>- Name<br/>- Type<br/>- EOP<br/>- Delivery Point]
+    DisplayForm --> FillBasic[User Fills Required Fields]
 
-    FillBasic --> AssignUsers{Assign<br/>Users?}
-    AssignUsers -->|Yes| UserTab[Switch to User Assignment Tab]
-    UserTab --> SearchUsers[Search Users]
-    SearchUsers --> SelectUsers[Select Users from Available List]
-    SelectUsers --> AssignAction[Click Left Chevron to Assign]
-    AssignAction --> UsersAssigned[Users Moved to Assigned Pane]
-    UsersAssigned --> AssignProducts{Assign<br/>Products?}
-
-    AssignUsers -->|No| AssignProducts
-
-    AssignProducts -->|Yes| ProductTab[Switch to Product Assignment Tab]
-    ProductTab --> ChooseMode{Choose<br/>View Mode}
-    ChooseMode -->|Product Mode| ProductList[View Flat Product List]
-    ChooseMode -->|Category Mode| CategoryList[View Categorized Products]
-
-    ProductList --> SearchProducts[Search Products]
-    CategoryList --> SearchProducts
-    SearchProducts --> SelectProducts[Select Products]
-    SelectProducts --> AssignProductAction[Click Left Chevron]
-    AssignProductAction --> ProductsAssigned[Products Moved to Assigned]
-
-    ProductsAssigned --> ClickSave[User Clicks Save Location]
-    AssignProducts -->|No| ClickSave
+    FillBasic --> TypeCheck{Location<br/>Type?}
+    TypeCheck -->|Consignment| ShowVendor[Show Vendor Selection]
+    ShowVendor --> ClickSave
+    TypeCheck -->|Other| ClickSave[User Clicks Save]
 
     ClickSave --> ValidateForm{Form<br/>Valid?}
 
     ValidateForm -->|No| ShowErrors[Show Inline Error Messages]
     ShowErrors --> DisplayForm
 
-    ValidateForm -->|Yes| CheckCode{Location<br/>Code Unique?}
-    CheckCode -->|No| DuplicateError[Show Error: Code Already Exists]
-    DuplicateError --> DisplayForm
-
-    CheckCode -->|Yes| CreateRecord[Create Location Record]
-    CreateRecord --> CreateUserLinks[Create User-Location Records]
-    CreateUserLinks --> CreateProductLinks[Create Product-Location Records]
-    CreateProductLinks --> Success[Show Success Message]
-    Success --> Navigate[Navigate to Location Detail Page]
+    ValidateForm -->|Yes| CreateRecord[Create Location in State]
+    CreateRecord --> Success[Show Success Message]
+    Success --> Navigate[Navigate to Location List]
     Navigate --> End([End])
 ```
 
@@ -70,55 +52,35 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([User on Location List/Detail]) --> Action{Edit<br/>Action}
-    Action -->|From List| ClickEditList[Click Edit Icon in Row]
-    Action -->|From Detail| ClickEditDetail[Click Edit Button]
+    Start([User on Location List]) --> ClickView[Click Location Row or View Button]
+    ClickView --> LoadDetail[Load Location Detail Page]
+    LoadDetail --> DisplayTabs[Display Tabbed Interface:<br/>General, Shelves, Users,<br/>Products, Delivery Points]
 
-    ClickEditList --> LoadLocation[Fetch Location Data]
-    ClickEditDetail --> LoadLocation
+    DisplayTabs --> ClickEdit[User Clicks Edit Button]
+    ClickEdit --> EnableEdit[Set isEditing = true]
+    EnableEdit --> TabsEditable[All Tabs Become Editable]
 
-    LoadLocation --> LoadAssignments[Load User & Product Assignments]
-    LoadAssignments --> DisplayForm[Display Pre-filled Form:<br/>- Basic Info (Code disabled)<br/>- Current User Assignments<br/>- Current Product Assignments]
+    TabsEditable --> UserAction{User<br/>Action}
+    UserAction -->|Modify General| EditGeneral[Edit Name, Description,<br/>Type, Status, Organization]
+    UserAction -->|Modify Shelves| EditShelves[Add/Edit/Delete Shelves]
+    UserAction -->|Modify Users| EditUsers[Assign/Remove Users]
+    UserAction -->|Modify Products| EditProducts[Assign/Remove Products]
+    UserAction -->|Modify Delivery| EditDelivery[Add/Edit/Delete<br/>Delivery Points]
 
-    DisplayForm --> ModifyFields{User<br/>Modifies<br/>Fields?}
+    EditGeneral --> ClickSave
+    EditShelves --> ClickSave
+    EditUsers --> ClickSave
+    EditProducts --> ClickSave
+    EditDelivery --> ClickSave[User Clicks Save]
 
-    ModifyFields -->|Basic Info| UpdateBasic[Update Name, Type, EOP,<br/>Delivery Point, Active Status]
-    UpdateBasic --> ModifyUsers
-
-    ModifyFields -->|User Assignments| ModifyUsers{Modify<br/>Users?}
-    ModifyUsers -->|Add| AddUsers[Select Users from Available]
-    AddUsers --> ClickAssign[Click Left Chevron]
-    ClickAssign --> UsersAdded[Users Added to Assigned]
-    UsersAdded --> ModifyProducts
-
-    ModifyUsers -->|Remove| RemoveUsers[Select Users from Assigned]
-    RemoveUsers --> ClickRemove[Click Right Chevron]
-    ClickRemove --> UsersRemoved[Users Removed]
-    UsersRemoved --> ModifyProducts
-
-    ModifyUsers -->|No Change| ModifyProducts
-
-    ModifyProducts{Modify<br/>Products?}
-    ModifyProducts -->|Yes| UpdateProducts[Add/Remove Products<br/>via Dual-Pane Interface]
-    UpdateProducts --> ClickSave
-
-    ModifyProducts -->|No| ClickSave[User Clicks Save]
-
-    ClickSave --> ValidateChanges{Form<br/>Valid?}
+    ClickSave --> ValidateChanges{Validation<br/>Passes?}
     ValidateChanges -->|No| ShowErrors[Show Validation Errors]
-    ShowErrors --> DisplayForm
+    ShowErrors --> TabsEditable
 
-    ValidateChanges -->|Yes| CheckConstraints{Has Active<br/>Transactions?}
-    CheckConstraints -->|Yes - Type Change| RestrictFields[Block Type/Active Changes<br/>Show Warning]
-    RestrictFields --> AllowOtherChanges[Allow Other Modifications]
-    AllowOtherChanges --> UpdateRecord
-
-    CheckConstraints -->|No| UpdateRecord[Update Location Record]
-    UpdateRecord --> UpdateUserLinks[Update User-Location Records:<br/>- Delete removed assignments<br/>- Create new assignments]
-    UpdateUserLinks --> UpdateProductLinks[Update Product-Location Records]
-    UpdateProductLinks --> UpdateAudit[Update Audit Fields:<br/>- updated_at<br/>- updated_by_id]
-    UpdateAudit --> ShowSuccess[Show Success Message]
-    ShowSuccess --> RefreshDetail[Refresh Location Detail Page]
+    ValidateChanges -->|Yes| UpdateRecord[Update Location State]
+    UpdateRecord --> DisableEdit[Set isEditing = false]
+    DisableEdit --> ShowSuccess[Show Success Message]
+    ShowSuccess --> RefreshDetail[Refresh Detail View]
     RefreshDetail --> End([End])
 ```
 
@@ -130,40 +92,41 @@ flowchart TD
 flowchart TD
     Start([User on Location List]) --> SearchFilter{Search/<br/>Filter?}
     SearchFilter -->|Yes| EnterSearch[Enter Search Term]
-    EnterSearch --> ApplyFilters[Apply Status/Type Filters]
+    EnterSearch --> ApplyFilters[Apply Type/Status/Count Filters]
     ApplyFilters --> ShowResults[Show Filtered Results]
     ShowResults --> ClickView
 
-    SearchFilter -->|No| ClickView[Click View Icon for Location]
+    SearchFilter -->|No| ClickView[Click Location Row]
 
-    ClickView --> FetchLocation[Fetch Location Data]
-    FetchLocation --> FetchUsers[Fetch Assigned Users]
-    FetchUsers --> FetchProducts[Fetch Assigned Products (Future)]
-    FetchProducts --> DisplayDetail[Display Location Detail Page]
+    ClickView --> FetchLocation[Load Location Data]
+    FetchLocation --> DisplayDetail[Display Location Detail Page]
 
-    DisplayDetail --> ShowBasicCard[Card 1: Basic Information<br/>- Code<br/>- Name<br/>- Type Badge<br/>- Status Badge]
-    ShowBasicCard --> ShowDeliveryCard[Card 2: Delivery Information<br/>- Physical Count Required<br/>- Delivery Point]
-    ShowDeliveryCard --> ShowUsersCard{Has<br/>Assigned<br/>Users?}
+    DisplayDetail --> ShowTabs[Display 5 Tabs]
 
-    ShowUsersCard -->|Yes| DisplayUsers[Card 3: Assigned Users<br/>- User Count<br/>- Avatar Grid<br/>- Name, Email per User]
-    ShowUsersCard -->|No| EmptyUsers[Card 3: No Users Assigned]
+    ShowTabs --> GeneralTab[General Tab:<br/>- Basic Information<br/>- Type & Status<br/>- Organization<br/>- Address<br/>- Audit Info]
 
-    DisplayUsers --> ShowActions
-    EmptyUsers --> ShowActions[Show Action Buttons:<br/>- Back<br/>- Edit<br/>- Delete]
+    ShowTabs --> ShelvesTab[Shelves Tab:<br/>- Shelf Table<br/>- Add/Edit/Delete]
 
-    ShowActions --> UserAction{User<br/>Action}
+    ShowTabs --> UsersTab[Users Tab:<br/>- Assigned Users<br/>- Roles & Permissions]
+
+    ShowTabs --> ProductsTab[Products Tab:<br/>- Assigned Products<br/>- Inventory Parameters]
+
+    ShowTabs --> DeliveryTab[Delivery Points Tab:<br/>- Delivery Addresses<br/>- Contact Info]
+
+    GeneralTab --> UserAction{User<br/>Action}
+    ShelvesTab --> UserAction
+    UsersTab --> UserAction
+    ProductsTab --> UserAction
+    DeliveryTab --> UserAction
+
     UserAction -->|Back| GoBack[Navigate to Location List]
     GoBack --> End([End])
 
-    UserAction -->|Edit| NavigateEdit[Navigate to Edit Page]
-    NavigateEdit --> End
+    UserAction -->|Edit| TriggerEdit[Enter Edit Mode<br/>See FD-002]
+    TriggerEdit --> End
 
-    UserAction -->|Delete| TriggerDelete[Trigger Delete Flow]
-    TriggerDelete --> DeleteDialog
-
-    UserAction -->|None| End
-
-    DeleteDialog[See FD-004 Delete Flow]
+    UserAction -->|Delete| TriggerDelete[Trigger Delete Flow<br/>See FD-004]
+    TriggerDelete --> End
 ```
 
 ---
@@ -172,30 +135,22 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([User Triggers Delete]) --> OpenDialog[Open Confirmation Dialog:<br/>Title: Delete Location<br/>Message: Action cannot be undone]
+    Start([User Triggers Delete]) --> CheckProducts{Has Assigned<br/>Products?}
+
+    CheckProducts -->|Yes| BlockDelete[Show Error:<br/>Cannot delete location<br/>with assigned products]
+    BlockDelete --> End([End])
+
+    CheckProducts -->|No| OpenDialog[Open Confirmation Dialog:<br/>Delete Location?<br/>This action cannot be undone]
+
     OpenDialog --> UserChoice{User<br/>Choice}
 
     UserChoice -->|Cancel| CloseDialog[Close Dialog]
-    CloseDialog --> End([End])
+    CloseDialog --> End
 
-    UserChoice -->|Confirm Delete| ValidateDelete{Validation<br/>Checks}
-
-    ValidateDelete -->|Check 1| HasStock{Has Active<br/>Stock?}
-    HasStock -->|Yes| StockError[Show Error:<br/>Cannot delete location<br/>with inventory]
-    StockError --> CloseDialog
-
-    HasStock -->|No| HasTransactions{Has Open<br/>Transactions?}
-    HasTransactions -->|Yes| TransError[Show Error:<br/>Cannot delete location<br/>with open transactions]
-    TransError --> CloseDialog
-
-    HasTransactions -->|No| CanDelete[All Validation Passed]
-    CanDelete --> SoftDeleteLocation[Soft Delete Location:<br/>- Set deleted_at<br/>- Set deleted_by_id]
-    SoftDeleteLocation --> SoftDeleteUsers[Soft Delete User Assignments]
-    SoftDeleteUsers --> SoftDeleteProducts[Soft Delete Product Assignments]
-    SoftDeleteProducts --> ShowSuccess[Show Success Toast:<br/>Location Deleted Successfully]
+    UserChoice -->|Confirm Delete| DeleteLocation[Remove Location from State]
+    DeleteLocation --> ShowSuccess[Show Success Toast:<br/>Location Deleted]
     ShowSuccess --> RefreshList[Refresh Location List]
-    RefreshList --> UpdateDisplay[Remove Location from Active List]
-    UpdateDisplay --> End
+    RefreshList --> End
 ```
 
 ---
@@ -204,48 +159,43 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([User on Location List]) --> InitialDisplay[Display All Active Locations]
+    Start([User on Location List]) --> InitialDisplay[Display All Locations]
 
     InitialDisplay --> SearchAction{User<br/>Action}
 
     SearchAction -->|Enter Search| CaptureSearch[Capture Search Input:<br/>Real-time onChange]
-    CaptureSearch --> FilterBySearch[Filter Locations:<br/>- Name ILIKE search<br/>- Type ILIKE search<br/>- Code ILIKE search]
-    FilterBySearch --> ApplyStatus
+    CaptureSearch --> FilterBySearch[Filter Locations by:<br/>- Name<br/>- Code<br/>- Description<br/>- Department Name]
+    FilterBySearch --> ApplyOtherFilters
 
-    SearchAction -->|Select Status| SelectStatus[Select from Dropdown:<br/>- All Status<br/>- Active<br/>- Inactive]
-    SelectStatus --> ApplyStatus[Apply Status Filter:<br/>AND logic with search]
-    ApplyStatus --> ApplyType
+    SearchAction -->|Select Type| SelectType[Select from Dropdown:<br/>- All Types<br/>- Inventory<br/>- Direct<br/>- Consignment]
+    SelectType --> ApplyOtherFilters
 
-    SearchAction -->|Select Type| SelectType[Select from Dropdown:<br/>- All Types<br/>- Direct<br/>- Inventory<br/>- Consignment]
-    SelectType --> ApplyType[Apply Type Filter:<br/>AND logic with previous]
+    SearchAction -->|Select Status| SelectStatus[Select from Dropdown:<br/>- All Status<br/>- Active<br/>- Inactive<br/>- Closed<br/>- Pending Setup]
+    SelectStatus --> ApplyOtherFilters
 
-    ApplyType --> RecalculateResults[Recalculate Filtered List<br/>using useMemo]
+    SearchAction -->|Select Physical Count| SelectCount[Select from Dropdown:<br/>- All<br/>- Count Enabled<br/>- Count Disabled]
+    SelectCount --> ApplyOtherFilters
+
+    ApplyOtherFilters[Apply All Filters<br/>with AND Logic]
+    ApplyOtherFilters --> RecalculateResults[Recalculate Filtered List<br/>using useMemo]
+
     RecalculateResults --> ApplySort{Current<br/>Sort?}
-
     ApplySort -->|Has Sort| SortResults[Sort by Field & Direction]
     ApplySort -->|No Sort| DisplayResults
     SortResults --> DisplayResults[Display Filtered Results]
 
-    DisplayResults --> ShowCount[Show Count:<br/>Showing X of Y records]
+    DisplayResults --> ShowCount[Show Count:<br/>Showing X of Y locations]
     ShowCount --> HasResults{Has<br/>Results?}
 
     HasResults -->|Yes| RenderView{View<br/>Mode?}
     RenderView -->|Table| ShowTable[Render Table View]
     RenderView -->|Card| ShowCards[Render Card Grid]
 
-    HasResults -->|No| ShowEmpty[Show Empty State:<br/>No data found]
+    HasResults -->|No| ShowEmpty[Show Empty State]
 
-    ShowTable --> ClearAction
-    ShowCards --> ClearAction
-    ShowEmpty --> ClearAction{Show Clear<br/>Filters?}
-
-    ClearAction -->|Filters Active| ShowClearButton[Show Clear Filters Button]
-    ShowClearButton --> UserClear{User<br/>Clicks<br/>Clear?}
-    UserClear -->|Yes| ResetFilters[Reset All Filters:<br/>- search = ''<br/>- active = 'all'<br/>- type = 'all']
-    ResetFilters --> RecalculateResults
-
-    UserClear -->|No| End([End])
-    ClearAction -->|No Filters| End
+    ShowTable --> End([End])
+    ShowCards --> End
+    ShowEmpty --> End
 ```
 
 ---
@@ -255,32 +205,26 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start([User on Location List<br/>Table View]) --> InitialSort[Default Sort:<br/>Name ASC]
-    InitialSort --> DisplayList[Display Sorted List<br/>with Chevron-Up Icon]
+    InitialSort --> DisplayList[Display Sorted List<br/>with Sort Indicator]
 
     DisplayList --> UserClick{User Clicks<br/>Column Header}
 
     UserClick -->|Same Column| CheckDirection{Current<br/>Direction?}
     CheckDirection -->|ASC| ReverseSort[Change to DESC]
-    ReverseSort --> UpdateIcon[Update Icon to Chevron-Down]
-    UpdateIcon --> ReSort
-
     CheckDirection -->|DESC| ChangeToASC[Change to ASC]
-    ChangeToASC --> UpdateIconUp[Update Icon to Chevron-Up]
-    UpdateIconUp --> ReSort
+    ReverseSort --> UpdateIcon[Update Sort Indicator]
+    ChangeToASC --> UpdateIcon
 
     UserClick -->|Different Column| NewSort[Change Sort Field]
     NewSort --> DefaultASC[Set Direction to ASC]
-    DefaultASC --> UpdateNewIcon[Show Chevron-Up on New Column]
-    UpdateNewIcon --> RemoveOldIcon[Remove Icon from Old Column]
-    RemoveOldIcon --> ReSort[Re-sort Filtered Data]
+    DefaultASC --> UpdateIcon
 
-    ReSort --> ApplySort[Apply Sort Logic:<br/>Compare field values<br/>Handle undefined values<br/>Apply direction]
-    ApplySort --> UpdateDisplay[Update Table Display]
+    UpdateIcon --> ReSort[Re-sort Filtered Data]
+    ReSort --> UpdateDisplay[Update Table Display]
     UpdateDisplay --> MaintainFilters[Filters Remain Active]
     MaintainFilters --> End([End])
 
-    Note1[Sortable Columns:<br/>- Code<br/>- Name<br/>- Type]
-    Note2[Non-sortable:<br/>- EOP<br/>- Delivery Point<br/>- Status<br/>- Actions]
+    Note1[Sortable Columns:<br/>- Code<br/>- Name<br/>- Type<br/>- Status<br/>- Shelves Count<br/>- Products Count<br/>- Users Count]
 ```
 
 ---
@@ -299,212 +243,209 @@ flowchart TD
     NoChange --> End([End])
 
     IsTable -->|Card Mode| SwitchToTable[Switch to Table Mode]
-    SwitchToTable --> UpdateTableButton[Highlight Table Button]
-    UpdateTableButton --> ShowTableView[Render Table View:<br/>- Sortable columns<br/>- Row actions<br/>- Table footer]
-    ShowTableView --> PreserveData1
+    SwitchToTable --> ShowTableView[Render Table View:<br/>- Sortable columns<br/>- Row actions<br/>- Checkbox selection]
+    ShowTableView --> PreserveState
 
     UserClick -->|Grid Icon| IsCard{Current<br/>Mode?}
     IsCard -->|Already Card| NoChange
 
     IsCard -->|Table Mode| SwitchToCard[Switch to Card Mode]
-    SwitchToCard --> UpdateCardButton[Highlight Card Button]
-    UpdateCardButton --> ShowCardView[Render Card Grid:<br/>- Responsive grid<br/>- Card layout<br/>- Card actions]
-    ShowCardView --> PreserveData1[Preserve Filter State]
+    SwitchToCard --> ShowCardView[Render Card Grid:<br/>- Responsive grid<br/>- Card layout<br/>- Card actions]
+    ShowCardView --> PreserveState[Preserve Filter State]
 
-    PreserveData1 --> PreserveData2[Preserve Search State]
-    PreserveData2 --> PreserveData3[Preserve Sort State]
-    PreserveData3 --> ShowSameData[Display Same Filtered<br/>and Sorted Results]
+    PreserveState --> PreserveSort[Preserve Sort State]
+    PreserveSort --> ShowSameData[Display Same Filtered<br/>and Sorted Results]
     ShowSameData --> End
 ```
 
 ---
 
-## FD-008: Assign Users to Location Flow
+## FD-008: Shelf Management Flow
 
 ```mermaid
 flowchart TD
-    Start([User on Location Edit Form]) --> ClickUserTab[Click User Assignment Tab]
-    ClickUserTab --> LoadInterface[Load Dual-Pane Interface]
+    Start([User on Shelves Tab]) --> DisplayShelves{Has<br/>Shelves?}
 
-    LoadInterface --> SplitUsers[Split Users:<br/>- Assigned (left pane)<br/>- Available (right pane)]
-    SplitUsers --> DisplayPanes[Display Both Panes with:<br/>- Search fields<br/>- Select All checkboxes<br/>- User lists<br/>- Chevron buttons]
+    DisplayShelves -->|Yes| ShowTable[Display Shelf Table:<br/>Code, Name, Status, Actions]
+    DisplayShelves -->|No| ShowEmpty[Show Empty State:<br/>No shelves configured]
 
-    DisplayPanes --> UserAction{User<br/>Action}
+    ShowTable --> UserAction{User<br/>Action}
+    ShowEmpty --> UserAction
 
-    UserAction -->|Search Available| SearchAvailable[Enter Search in Available Pane]
-    SearchAvailable --> FilterAvailable[Filter by Name or Email<br/>Real-time onChange]
-    FilterAvailable --> UpdateAvailableList[Update Available User List]
-    UpdateAvailableList --> UserAction
+    UserAction -->|Add Shelf| ClickAdd[Click Add Shelf Button]
+    ClickAdd --> OpenAddDialog[Open Add Shelf Dialog]
+    OpenAddDialog --> FillShelf[Enter Code and Name]
+    FillShelf --> ClickSaveShelf[Click Add Shelf]
+    ClickSaveShelf --> ValidateShelf{Valid?}
+    ValidateShelf -->|No| ShowShelfErrors[Show Validation Errors]
+    ShowShelfErrors --> FillShelf
+    ValidateShelf -->|Yes| AddToList[Add Shelf to List]
+    AddToList --> CloseDialog[Close Dialog]
+    CloseDialog --> RefreshTable[Refresh Shelf Table]
+    RefreshTable --> End([End])
 
-    UserAction -->|Search Assigned| SearchAssigned[Enter Search in Assigned Pane]
-    SearchAssigned --> FilterAssigned[Filter by Name or Email]
-    FilterAssigned --> UpdateAssignedList[Update Assigned User List]
-    UpdateAssignedList --> UserAction
+    UserAction -->|Edit Shelf| ClickEdit[Click Edit in Dropdown]
+    ClickEdit --> OpenEditDialog[Open Edit Shelf Dialog]
+    OpenEditDialog --> ModifyShelf[Modify Code or Name]
+    ModifyShelf --> ClickUpdate[Click Save Changes]
+    ClickUpdate --> UpdateShelf[Update Shelf in List]
+    UpdateShelf --> CloseDialog
 
-    UserAction -->|Select Users| SelectFromAvailable[Click Checkboxes in Available]
-    SelectFromAvailable --> HighlightSelected[Highlight Selected Users<br/>Blue Background]
-    HighlightSelected --> EnableAssignButton[Enable Left Chevron Button]
-    EnableAssignButton --> ClickAssign{Click<br/>Assign<br/>Button?}
-
-    ClickAssign -->|Yes| MoveToAssigned[Move Selected Users to Assigned Pane]
-    MoveToAssigned --> UpdateState[Update assignedUserIds State]
-    UpdateState --> ClearSelection[Clear Selection]
-    ClearSelection --> DisableButton[Disable Chevron Button]
-    DisableButton --> UserAction
-
-    ClickAssign -->|No| UserAction
-
-    UserAction -->|Remove Users| SelectFromAssigned[Click Checkboxes in Assigned]
-    SelectFromAssigned --> HighlightRemove[Highlight Selected Users]
-    HighlightRemove --> EnableRemoveButton[Enable Right Chevron Button]
-    EnableRemoveButton --> ClickRemove{Click<br/>Remove<br/>Button?}
-
-    ClickRemove -->|Yes| MoveToAvailable[Move Selected Users to Available Pane]
-    MoveToAvailable --> UpdateStateRemove[Update assignedUserIds State]
-    UpdateStateRemove --> ClearSelectionRemove[Clear Selection]
-    ClearSelectionRemove --> DisableRemoveButton[Disable Chevron Button]
-    DisableRemoveButton --> UserAction
-
-    ClickRemove -->|No| UserAction
-
-    UserAction -->|Select All Available| ClickSelectAllAvail[Click Select All Checkbox]
-    ClickSelectAllAvail --> SelectAllAvailable[Select All Filtered Users<br/>in Available Pane]
-    SelectAllAvailable --> EnableAssignButton
-
-    UserAction -->|Select All Assigned| ClickSelectAllAssigned[Click Select All Checkbox]
-    ClickSelectAllAssigned --> SelectAllAssigned[Select All Filtered Users<br/>in Assigned Pane]
-    SelectAllAssigned --> EnableRemoveButton
-
-    UserAction -->|Save Form| SaveLocation[Save Location<br/>See FD-001 or FD-002]
-    SaveLocation --> CreateUserRecords[Create tb_user_location Records<br/>for New Assignments]
-    CreateUserRecords --> DeleteUserRecords[Soft Delete tb_user_location Records<br/>for Removed Assignments]
-    DeleteUserRecords --> End([End])
+    UserAction -->|Delete Shelf| ClickDelete[Click Delete in Dropdown]
+    ClickDelete --> ConfirmDelete[Confirm Deletion]
+    ConfirmDelete --> RemoveShelf[Remove from List]
+    RemoveShelf --> RefreshTable
 ```
 
 ---
 
-## FD-009: Assign Products to Location Flow
+## FD-009: User Assignment Flow
 
 ```mermaid
 flowchart TD
-    Start([User on Location Edit Form]) --> ClickProductTab[Click Product Assignment Tab]
-    ClickProductTab --> ShowModeToggle[Show View Mode Toggle:<br/>- Product Mode<br/>- Category Mode]
+    Start([User on Users Tab]) --> DisplayUsers[Display User Assignments Table]
+    DisplayUsers --> UserAction{User<br/>Action}
 
-    ShowModeToggle --> DefaultMode[Default: Product Mode]
-    DefaultMode --> LoadDualPane[Load Dual-Pane Interface]
+    UserAction -->|Add User| ClickAdd[Click Assign User Button]
+    ClickAdd --> OpenDialog[Open User Selection Dialog]
+    OpenDialog --> SearchUser[Search Available Users]
+    SearchUser --> SelectUser[Select User from List]
+    SelectUser --> SelectRole[Select Role at Location]
+    SelectRole --> SetPermissions[Configure Permissions]
+    SetPermissions --> MarkPrimary{Set as<br/>Primary?}
+    MarkPrimary -->|Yes| SetPrimary[Mark as Primary Location]
+    MarkPrimary -->|No| SaveAssignment
+    SetPrimary --> SaveAssignment[Click Assign]
+    SaveAssignment --> AddToAssigned[Add to Assigned Users]
+    AddToAssigned --> CloseDialog[Close Dialog]
+    CloseDialog --> RefreshTable[Refresh Users Table]
+    RefreshTable --> End([End])
 
-    LoadDualPane --> ModeCheck{View<br/>Mode?}
+    UserAction -->|Edit Assignment| ClickEdit[Click Edit Action]
+    ClickEdit --> OpenEditDialog[Open Edit Dialog]
+    OpenEditDialog --> ModifyRole[Modify Role/Permissions]
+    ModifyRole --> SaveEdit[Save Changes]
+    SaveEdit --> UpdateAssignment[Update Assignment]
+    UpdateAssignment --> CloseDialog
 
-    ModeCheck -->|Product Mode| DisplayProducts[Display Flat Product Lists:<br/>- Assigned (left)<br/>- Available (right)]
-    DisplayProducts --> ProductInfo[Each Product Shows:<br/>- Product Code with Icon<br/>- Product Name<br/>- Category & Base Unit]
-    ProductInfo --> ProductActions
-
-    ModeCheck -->|Category Mode| DisplayCategories[Display Category Trees:<br/>- Expandable folders<br/>- Product count badges<br/>- Nested products]
-    DisplayCategories --> CategoryActions[Category Actions:<br/>- Click to expand/collapse<br/>- Select products within]
-    CategoryActions --> ProductActions
-
-    ProductActions{User<br/>Action}
-
-    ProductActions -->|Search| SearchProducts[Enter Search Term]
-    SearchProducts --> FilterProducts[Filter by Code or Name]
-    FilterProducts --> UpdateLists[Update Both Panes]
-    UpdateLists --> ProductActions
-
-    ProductActions -->|Switch Mode| ToggleMode{Current<br/>Mode?}
-    ToggleMode -->|Product| SwitchToCategory[Switch to Category Mode]
-    SwitchToCategory --> PreserveSelections1[Preserve Current Selections]
-    PreserveSelections1 --> DisplayCategories
-
-    ToggleMode -->|Category| SwitchToProduct[Switch to Product Mode]
-    SwitchToProduct --> PreserveSelections2[Preserve Current Selections]
-    PreserveSelections2 --> DisplayProducts
-
-    ProductActions -->|Select Products| SelectAvailable[Click Product Checkboxes]
-    SelectAvailable --> HighlightProducts[Highlight Selected<br/>Blue Background]
-    HighlightProducts --> EnableAssign[Enable Left Chevron]
-    EnableAssign --> ClickAssignProduct{Click<br/>Assign?}
-
-    ClickAssignProduct -->|Yes| MoveProducts[Move to Assigned Pane]
-    MoveProducts --> UpdateProductState[Update assignedProductIds]
-    UpdateProductState --> ClearProductSelection[Clear Selection]
-    ClearProductSelection --> ProductActions
-
-    ClickAssignProduct -->|No| ProductActions
-
-    ProductActions -->|Remove Products| SelectAssigned[Select from Assigned Pane]
-    SelectAssigned --> EnableRemove[Enable Right Chevron]
-    EnableRemove --> ClickRemoveProduct{Click<br/>Remove?}
-
-    ClickRemoveProduct -->|Yes| MoveToAvailable[Move to Available Pane]
-    MoveToAvailable --> UpdateRemoveState[Update assignedProductIds]
-    UpdateRemoveState --> ProductActions
-
-    ClickRemoveProduct -->|No| ProductActions
-
-    ProductActions -->|Expand Category| CategoryMode{In Category<br/>Mode?}
-    CategoryMode -->|Yes| ToggleExpand[Toggle Category Expansion]
-    ToggleExpand --> ShowNested{Expanded?}
-    ShowNested -->|Yes| DisplayNested[Show Nested Products]
-    ShowNested -->|No| HideNested[Hide Nested Products]
-    DisplayNested --> ProductActions
-    HideNested --> ProductActions
-
-    CategoryMode -->|No| ProductActions
-
-    ProductActions -->|Save Form| SaveWithProducts[Save Location with Products]
-    SaveWithProducts --> CreateProductLinks[Create Product-Location Records]
-    CreateProductLinks --> End([End])
+    UserAction -->|Remove User| ClickRemove[Click Remove Action]
+    ClickRemove --> ConfirmRemove[Confirm Removal]
+    ConfirmRemove --> RemoveAssignment[Remove from List]
+    RemoveAssignment --> RefreshTable
 ```
 
 ---
 
-## FD-010: Permission Validation Flow
+## FD-010: Product Assignment Flow
 
 ```mermaid
 flowchart TD
-    Start([User Attempts Action]) --> GetAction{Action<br/>Type}
+    Start([User on Products Tab]) --> DisplayProducts[Display Product Assignments]
+    DisplayProducts --> UserAction{User<br/>Action}
 
-    GetAction -->|View| CheckViewPerm{Has View<br/>Permission?}
-    CheckViewPerm -->|Yes - All Users| AllowView[Display Location List/Detail]
-    AllowView --> ApplyRLS[Apply Row-Level Security:<br/>Show only assigned locations<br/>(unless admin)]
-    ApplyRLS --> DisplayFiltered[Display Filtered Results]
-    DisplayFiltered --> End([End])
+    UserAction -->|Add Product| ClickAdd[Click Assign Product Button]
+    ClickAdd --> OpenDialog[Open Product Selection Dialog]
+    OpenDialog --> SearchProduct[Search Products by Name/Code]
+    SearchProduct --> SelectProduct[Select Product from Catalog]
+    SelectProduct --> SetParameters[Set Inventory Parameters:<br/>- Min Quantity<br/>- Max Quantity<br/>- Reorder Point<br/>- PAR Level]
+    SetParameters --> SelectShelf[Select Default Shelf]
+    SelectShelf --> SaveAssignment[Click Assign]
+    SaveAssignment --> AddToAssigned[Add to Assigned Products]
+    AddToAssigned --> CloseDialog[Close Dialog]
+    CloseDialog --> RefreshTable[Refresh Products Table]
+    RefreshTable --> End([End])
 
-    CheckViewPerm -->|No| DenyAccess[Show Error: Access Denied]
-    DenyAccess --> End
+    UserAction -->|Edit Parameters| ClickEdit[Click Edit Action]
+    ClickEdit --> OpenEditDialog[Open Edit Dialog]
+    OpenEditDialog --> ModifyParams[Modify Parameters/Shelf]
+    ModifyParams --> SaveEdit[Save Changes]
+    SaveEdit --> UpdateAssignment[Update Assignment]
+    UpdateAssignment --> CloseDialog
 
-    GetAction -->|Create| CheckCreatePerm{Has Create<br/>Permission?}
-    CheckCreatePerm -->|Yes - Ops Manager/Admin| AllowCreate[Show Create Form]
-    AllowCreate --> End
+    UserAction -->|Remove Product| ClickRemove[Click Remove Action]
+    ClickRemove --> ConfirmRemove[Confirm Removal]
+    ConfirmRemove --> RemoveAssignment[Remove from List]
+    RemoveAssignment --> RefreshTable
+```
 
-    CheckCreatePerm -->|No| DenyAccess
+---
 
-    GetAction -->|Edit| CheckEditPerm{Has Edit<br/>Permission?}
-    CheckEditPerm -->|Yes - Store Mgr/Ops/Admin| CheckLocationAccess{User Assigned<br/>to Location?}
-    CheckLocationAccess -->|Yes| AllowEdit[Show Edit Form]
-    AllowEdit --> End
+## FD-011: Delivery Point Management Flow
 
-    CheckLocationAccess -->|No - But Admin| AllowEdit
-    CheckLocationAccess -->|No - Not Admin| DenyAccessLocation[Error: No access to location]
-    DenyAccessLocation --> End
+```mermaid
+flowchart TD
+    Start([User on Delivery Points Tab]) --> DisplayPoints{Has Delivery<br/>Points?}
 
-    CheckEditPerm -->|No| DenyAccess
+    DisplayPoints -->|Yes| ShowTable[Display Delivery Points Table]
+    DisplayPoints -->|No| ShowEmpty[Show Empty State]
 
-    GetAction -->|Delete| CheckDeletePerm{Has Delete<br/>Permission?}
-    CheckDeletePerm -->|Yes - Admin Only| CheckConstraints{Has Active<br/>Stock/Trans?}
-    CheckConstraints -->|No| AllowDelete[Allow Deletion]
-    AllowDelete --> End
+    ShowTable --> UserAction{User<br/>Action}
+    ShowEmpty --> UserAction
 
-    CheckConstraints -->|Yes| DenyConstraint[Error: Cannot delete]
-    DenyConstraint --> End
+    UserAction -->|Add Point| ClickAdd[Click Add Delivery Point]
+    ClickAdd --> OpenDialog[Open Add Dialog]
+    OpenDialog --> FillDetails[Fill Details:<br/>- Name, Code, Address<br/>- Contact Info<br/>- Instructions<br/>- Logistics Settings]
+    FillDetails --> SetPrimary{Set as<br/>Primary?}
+    SetPrimary -->|Yes| MarkPrimary[Mark as Primary]
+    SetPrimary -->|No| SavePoint
+    MarkPrimary --> SavePoint[Click Save]
+    SavePoint --> ValidatePoint{Valid?}
+    ValidatePoint -->|No| ShowErrors[Show Validation Errors]
+    ShowErrors --> FillDetails
+    ValidatePoint -->|Yes| AddToList[Add to List]
+    AddToList --> CloseDialog[Close Dialog]
+    CloseDialog --> RefreshTable[Refresh Table]
+    RefreshTable --> End([End])
 
-    CheckDeletePerm -->|No| DenyAccess
+    UserAction -->|Edit Point| ClickEdit[Click Edit Action]
+    ClickEdit --> OpenEditDialog[Open Edit Dialog]
+    OpenEditDialog --> ModifyDetails[Modify Details]
+    ModifyDetails --> UpdatePoint[Save Changes]
+    UpdatePoint --> CloseDialog
 
-    GetAction -->|Assign Users| CheckAssignPerm{Has Assign<br/>Permission?}
-    CheckAssignPerm -->|Yes - Ops/Admin| AllowAssign[Allow User Assignment]
-    AllowAssign --> End
+    UserAction -->|Delete Point| ClickDelete[Click Delete Action]
+    ClickDelete --> ConfirmDelete[Confirm Deletion]
+    ConfirmDelete --> RemovePoint[Remove from List]
+    RemovePoint --> RefreshTable
+```
 
-    CheckAssignPerm -->|No| DenyAccess
+---
+
+## FD-012: Bulk Actions Flow
+
+```mermaid
+flowchart TD
+    Start([User on Location List]) --> SelectLocations[Select Locations via Checkboxes]
+    SelectLocations --> ShowSelected[Show: X location(s) selected]
+    ShowSelected --> BulkAction{Select<br/>Bulk Action}
+
+    BulkAction -->|Activate| ConfirmActivate[Confirm Activation]
+    ConfirmActivate --> ActivateAll[Set Status = Active for Selected]
+    ActivateAll --> ShowSuccess[Show Success Message]
+    ShowSuccess --> ClearSelection[Clear Selection]
+    ClearSelection --> RefreshList[Refresh List]
+    RefreshList --> End([End])
+
+    BulkAction -->|Deactivate| ConfirmDeactivate[Confirm Deactivation]
+    ConfirmDeactivate --> DeactivateAll[Set Status = Inactive for Selected]
+    DeactivateAll --> ShowSuccess
+
+    BulkAction -->|Delete| CheckProducts{Any Have<br/>Products?}
+    CheckProducts -->|Yes| ShowWarning[Show Warning:<br/>Some locations have products]
+    ShowWarning --> End
+    CheckProducts -->|No| ConfirmDelete[Confirm Deletion]
+    ConfirmDelete --> DeleteAll[Delete Selected Locations]
+    DeleteAll --> ShowSuccess
+
+    BulkAction -->|Clear Selection| ClearAll[Clear All Selections]
+    ClearAll --> RefreshList
+
+    BulkAction -->|Export CSV| GenerateCSV[Generate CSV File]
+    GenerateCSV --> DownloadCSV[Download CSV]
+    DownloadCSV --> End
+
+    BulkAction -->|Print| OpenPrint[Open Browser Print Dialog]
+    OpenPrint --> End
 ```
 
 ---
@@ -513,31 +454,37 @@ flowchart TD
 
 ### Critical Paths
 
-1. **Create Location**: FD-001 (7-12 steps depending on assignments)
-2. **Edit Location**: FD-002 (6-10 steps depending on changes)
-3. **View Details**: FD-003 (3-5 steps)
-4. **Delete Location**: FD-004 (4-6 steps with validations)
-5. **Search & Filter**: FD-005 (2-5 steps for each filter)
+1. **Create Location**: FD-001 (4-6 steps)
+2. **Edit Location**: FD-002 (6-8 steps with tabbed interface)
+3. **View Details**: FD-003 (3-4 steps)
+4. **Delete Location**: FD-004 (3-5 steps with validation)
+5. **Search & Filter**: FD-005 (2-4 steps for each filter)
+
+### Tab-Based Workflows
+
+- **Shelf Management**: FD-008 (Add/Edit/Delete shelves)
+- **User Assignment**: FD-009 (Assign users with roles)
+- **Product Assignment**: FD-010 (Assign products with parameters)
+- **Delivery Points**: FD-011 (Manage delivery addresses)
+
+### Bulk Operations
+
+- **Bulk Actions**: FD-012 (Activate/Deactivate/Delete/Export/Print)
 
 ### Integration Points
 
 **With User Management**:
-- FD-008: User assignment workflow
-- FD-010: Permission validation
+- FD-009: User assignment workflow
 
 **With Product Management**:
-- FD-009: Product assignment workflow
+- FD-010: Product assignment workflow
 
-**With Inventory Management**:
-- FD-004: Stock validation before deletion
-
-**With Procurement**:
-- FD-001, FD-002: Delivery point configuration
+**With Vendor Management**:
+- FD-001, FD-002: Consignment vendor selection
 
 ### Error Handling Flows
 
 All flows include error handling for:
 - Validation errors (inline display)
+- Business rule violations (cannot delete with products)
 - Network errors (toast notifications)
-- Permission errors (access denial)
-- Business rule violations (constraint errors)

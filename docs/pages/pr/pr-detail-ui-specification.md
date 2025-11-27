@@ -1,5 +1,10 @@
 # Purchase Request Detail Page: UI/UX Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document provides comprehensive UI/UX specifications for the Purchase Request Detail page, including the new two-column layout with collapsible sidebar, enhanced RBAC integration, and modern responsive design patterns.
 
 ## 1. Layout Architecture Overview

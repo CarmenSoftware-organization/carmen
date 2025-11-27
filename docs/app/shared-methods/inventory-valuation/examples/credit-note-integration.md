@@ -1,5 +1,11 @@
 # Credit Note Integration - Complete Example
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+
 ## Overview
 
 This example demonstrates how to integrate the centralized Inventory Valuation Service into credit note processing for accurate return costing.

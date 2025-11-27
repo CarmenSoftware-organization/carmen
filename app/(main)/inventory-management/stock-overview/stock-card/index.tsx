@@ -1,2 +1,2 @@
 export * from './types'
-export { generateMockStockCardData } from './mock-data' 
+export { generateMockStockCardData } from '@/lib/mock-data' 

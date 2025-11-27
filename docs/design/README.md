@@ -1,5 +1,10 @@
 # System Design Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This directory contains system-wide design documents for the Carmen F&B Management System. These documents provide guidelines, specifications, and architectural information that apply across multiple modules.
 
 ## Core Architecture

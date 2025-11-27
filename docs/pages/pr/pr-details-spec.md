@@ -4,6 +4,11 @@
 **Last Updated**: January 2025  
 **Status**: Current Implementation with Enhanced Features
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document outlines the product requirements, technical specifications, and functional design for the Purchase Request (PR) Details page, reflecting the current implementation state including the Workflow Decision Engine, vendor comparison functionality, and enhanced RBAC system.
 
 ## 1. Product Overview & Current Implementation

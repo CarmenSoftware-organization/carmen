@@ -1,5 +1,10 @@
 # Purchase Request Approval Module Page Flow
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This diagram illustrates the user flow through the purchase request approval module of the Hotel Supply Chain Mobile Application.
 
 ```mermaid

@@ -6,6 +6,12 @@
 - **Version**: 1.0
 - **Last Updated**: 2024-01-15
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial creation with 10 comprehensive flow diagrams |
+
 ---
 
 ## 1. Dashboard Data Loading and Display Workflow
@@ -1714,14 +1720,6 @@ flowchart TD
     style OfflineMode fill:#fff9c4
     style ShowPermanentError1 fill:#ffebee
 ```
-
----
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial creation with 10 comprehensive flow diagrams |
 
 ---
 

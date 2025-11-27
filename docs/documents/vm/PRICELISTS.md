@@ -13,6 +13,11 @@
 **Submodule Name**: Pricelists
 **Route**: `/vendor-management/pricelists`
 **Status**: 🚧 Prototype
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Purpose**: Vendor pricelist management, approval workflows, and price comparison
 
 **Key Features**:

@@ -1,1063 +1,586 @@
-# Requests for Pricing (RFQ) - Business Requirements (BR)
+# Requests for Pricing - Business Requirements (BR)
 
 ## Document Information
 - **Document Type**: Business Requirements Document
-- **Module**: Vendor Management > Requests for Pricing (RFQ)
-- **Version**: 1.0
-- **Last Updated**: 2024-01-15
-- **Document Status**: Draft
+- **Module**: Vendor Management > Requests for Pricing
+- **Version**: 2.0.0
+- **Last Updated**: 2025-11-25
+- **Document Status**: Updated
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.0.0 | 2025-11-25 | System | Complete rewrite to match actual code implementation; Removed fictional RFQ features (bidding, evaluation, negotiation, awards, contracts); Updated to reflect price collection campaign functionality |
+| 1.1 | 2025-11-18 | System | Previous version with RFQ features |
+| 1.0 | 2024-01-15 | System | Initial creation |
 
 ---
 
 ## 1. Executive Summary
 
-The Requests for Pricing (RFQ) module provides a formal competitive bidding system to solicit quotes from multiple vendors for specific procurement needs. The module streamlines the entire RFQ lifecycle from campaign creation through bid evaluation, negotiation, award, and contract generation.
+The Requests for Pricing module provides a campaign-based system to collect pricing information from vendors. This module enables procurement staff to create pricing collection campaigns, select vendors to invite, and track submission progress. It integrates with Pricelist Templates and the Vendor Directory.
 
 ### 1.1 Purpose
-- Facilitate competitive bidding process for procurement
-- Ensure fair and transparent vendor selection
-- Enable systematic bid comparison and evaluation
-- Support multi-round bidding and negotiations
-- Document award decisions with complete audit trail
-- Auto-generate contracts from awarded bids
-- Integrate with vendor directory and price lists
+- Create pricing collection campaigns to gather vendor pricing
+- Select and invite multiple vendors to submit pricing
+- Track vendor response and submission progress
+- Support recurring pricing collection schedules
+- Integrate with pricelist templates for structured pricing requests
 
 ### 1.2 Scope
 **In Scope**:
-- RFQ campaign creation and management
-- Vendor invitation and targeting
-- Multi-round bidding support
-- Bid submission and tracking
-- Bid evaluation and comparison
-- Scoring and ranking system
-- Negotiation management
-- Award notification and documentation
-- Contract generation from awarded bids
-- RFQ templates for recurring campaigns
-- Analytics and reporting
+- Campaign creation and management
+- Vendor selection and invitation
+- Template-based pricing requests
+- Progress tracking and monitoring
+- Campaign settings and reminders
+- Recurring campaign patterns
 
 **Out of Scope**:
-- Vendor onboarding (covered in Vendor Directory module)
-- Price list management (covered in Price Lists module)
-- Purchase order creation (covered in Procurement module)
-- Contract management post-award (covered in Contracts module)
-- Payment processing (covered in Finance module)
+- Competitive bidding evaluation (not implemented)
+- Scoring and ranking systems (not implemented)
+- Negotiation workflows (not implemented)
+- Award decisions and contracts (not implemented)
+- Vendor portal submission interface (separate module)
+- Purchase order creation (Procurement module)
 
 ---
 
 ## 2. Functional Requirements
 
-### FR-RFQ-001: RFQ Campaign Creation and Management
+### FR-RFP-001: Campaign List Management
 **Priority**: Critical
-**Description**: System shall provide comprehensive RFQ campaign creation and management capabilities.
+**Description**: System shall provide a campaign list view with filtering and search capabilities.
 
 **Requirements**:
-- Create new RFQ campaigns with required metadata:
-  - RFQ number (unique identifier)
-  - Title and description
-  - Category/type (goods, services, works)
-  - Project/department reference
-  - Budget range (optional)
-  - Delivery/completion requirements
-- Create RFQ from:
-  - Scratch (manual entry)
-  - Existing template
-  - Previous RFQ (clone)
-  - Pricelist template
-  - Purchase request
-- Edit RFQ before publication
-- Cancel RFQ with reason
-- Extend bidding period
-- Amendment/addendum support
-- RFQ status management
-- Bulk operations (publish, close multiple RFQs)
-- Import RFQ items from Excel/CSV
-- Export RFQ to Excel/PDF
+- Display all pricing campaigns in table or card view
+- Filter campaigns by status (active, draft, paused, completed, cancelled)
+- Search campaigns by name and description
+- Toggle between table view and card view
+- Show campaign progress summary (vendors, completion rate)
+- Support pagination for large campaign lists
 
 **Business Rules**:
-- RFQ number must be unique and auto-generated
-- RFQ must have at least 1 line item/requirement
-- Published RFQs cannot be edited (must create amendment)
-- Cancelled RFQs cannot be reopened
-- RFQ changes after publication require formal amendment
-- All amendments visible to invited vendors
+- Default view displays all campaigns sorted by most recent
+- Card view shows 3 columns on desktop, 2 on tablet, 1 on mobile
+- Search is case-insensitive and matches name/description
 
 **Acceptance Criteria**:
-- User can create RFQ in <5 minutes using template
-- RFQ number follows configurable format (e.g., RFQ-2024-001)
-- Version control maintained for all amendments
-- Cloning preserves 80% of original RFQ data
-- All changes logged with user and timestamp
+- Campaign list loads in <2 seconds
+- Filters update results immediately
+- View toggle persists during session
+- Empty state shown when no campaigns match filters
 
 ---
 
-### FR-RFQ-002: Requirements and Specifications Definition
+### FR-RFP-002: Campaign Creation Wizard
 **Priority**: Critical
-**Description**: System shall support comprehensive definition of procurement requirements and specifications.
+**Description**: System shall provide a 4-step wizard for creating pricing campaigns.
 
 **Requirements**:
-- Define line items with:
-  - Item description
-  - Quantity required
-  - Unit of measure (UOM)
-  - Technical specifications
-  - Quality standards
-  - Compliance requirements
-  - Delivery location
-  - Delivery date/timeframe
-  - Service level agreements (for services)
-  - Warranty requirements
-- Attach supporting documents:
-  - Technical drawings
-  - Specifications sheets
-  - Samples
-  - Compliance certificates
-  - Previous quotes/benchmarks
-- Define terms and conditions:
-  - Payment terms
-  - Delivery terms (Incoterms)
-  - Warranty requirements
-  - Liquidated damages
-  - Performance bonds
-  - Insurance requirements
-- Add clarification questions and answers
-- Support grouped items (lots)
-- Alternative/substitute items option
+- Step 1 - Basic Information:
+  - Campaign name (required)
+  - Description (required)
+  - Priority (normal, urgent)
+  - Start date (required)
+  - End date (required)
+- Step 2 - Template Selection:
+  - Select from available pricelist templates
+  - Display template details (validity period, currency)
+  - Pre-select template if passed via URL parameter
+- Step 3 - Vendor Selection:
+  - Search vendors by name, email, or company
+  - Filter vendors by status (active, inactive, pending)
+  - Bulk select/deselect all filtered vendors
+  - Display vendor response rate metrics
+  - Show selection count summary
+- Step 4 - Review & Launch:
+  - Display campaign summary
+  - Confirm all selections
+  - Launch campaign to send invitations
 
 **Business Rules**:
-- Minimum required fields: description, quantity, UOM, delivery date
-- File uploads limited to 50MB per file
-- Specifications must be clear and unambiguous
-- Technical requirements cannot discriminate against vendors
-- All vendors receive same specifications and amendments
-- Clarifications published to all invited vendors
+- All fields in Step 1 must be complete to proceed
+- At least one template must be selected in Step 2
+- At least one vendor must be selected in Step 3
+- Campaign cannot be launched without completing all steps
 
 **Acceptance Criteria**:
-- Support up to 500 line items per RFQ
-- File uploads complete in <30 seconds for 10MB files
-- Specifications support rich text formatting
-- Grouped items (lots) clearly identified
-- Clarification Q&A published within 24 hours
+- Wizard step navigation with progress indicator
+- Form validation prevents proceeding with incomplete data
+- Template pre-selection works from URL parameter
+- Vendor search filters in real-time
+- Launch sends invitations to all selected vendors
 
 ---
 
-### FR-RFQ-003: Vendor Selection and Invitation
-**Priority**: Critical
-**Description**: System shall support strategic vendor selection and invitation management.
-
-**Requirements**:
-- Select vendors based on:
-  - Vendor category/capabilities
-  - Performance rating
-  - Location/geography
-  - Certification/qualification
-  - Previous RFQ participation
-  - Approved/preferred status
-  - Custom filters
-- Invitation methods:
-  - Individual vendor selection
-  - Vendor groups/panels
-  - All vendors in category
-  - Public tender (open to all)
-- Pre-qualification criteria definition
-- Invitation timeline management
-- Email and portal notifications
-- Vendor acknowledgment tracking
-- Invitation acceptance/decline tracking
-- Late vendor requests to participate
-- Vendor disqualification with reason
-
-**Business Rules**:
-- Minimum 3 vendors required for competitive RFQ
-- Only approved/preferred vendors can be invited
-- Public tenders open to all registered vendors
-- Vendors must acknowledge invitation before bidding
-- Pre-qualification must be completed before bidding
-- Disqualified vendors notified with reason
-- Vendor selection documented in audit trail
-
-**Acceptance Criteria**:
-- Bulk invitation supports 100+ vendors
-- Invitations sent within 5 minutes of publication
-- Vendor acknowledgment deadline configurable
-- Pre-qualification scoring automated
-- Disqualification reason required and logged
-
----
-
-### FR-RFQ-004: Bidding Timeline Management
+### FR-RFP-003: Campaign Status Management
 **Priority**: High
-**Description**: System shall manage comprehensive bidding timeline with automated controls.
+**Description**: System shall support multiple campaign statuses with appropriate transitions.
 
 **Requirements**:
-- Define key dates:
-  - Publication date
-  - Site visit/pre-bid meeting dates
-  - Clarification deadline
-  - Bid opening date
-  - Bid closing date/time
-  - Evaluation period
-  - Award notification date
-- Automated timeline enforcement:
-  - Bid submission only during open period
-  - Clarifications only before deadline
-  - Amendments extend closing date automatically
-- Countdown timers for vendors
-- Timeline extension with reason
-- Timeline change notifications
-- Time zone support for international bidding
-- Holidays/non-working days consideration
-- Grace period for technical issues
+- Support campaign statuses:
+  - `draft`: Campaign created but not launched
+  - `active`: Campaign is live, accepting submissions
+  - `paused`: Campaign temporarily suspended
+  - `completed`: Campaign finished successfully
+  - `cancelled`: Campaign terminated
+- Status badges with color coding:
+  - Active: Green
+  - Draft: Gray
+  - Paused: Yellow
+  - Completed: Blue
+  - Cancelled: Red
 
 **Business Rules**:
-- Minimum 7 business days between publication and closing
-- Amendments require minimum 2-day extension
-- Clarifications must be answered 3 days before closing
-- Late bids rejected automatically
-- Timeline changes require approval
-- All vendors notified of timeline changes
+- New campaigns start in `draft` status
+- Draft campaigns can be edited freely
+- Active campaigns have limited editing options
+- Paused campaigns can be resumed
+- Completed/cancelled campaigns are read-only
 
 **Acceptance Criteria**:
-- Countdown timer accurate to the second
-- Automatic bid submission cutoff at closing time
-- Business days calculation excludes holidays
-- Time zone conversions handled correctly
-- Timeline extension notifications sent immediately
+- Status displayed consistently across list and detail views
+- Status transitions logged with timestamp
+- Appropriate actions available based on status
 
 ---
 
-### FR-RFQ-005: Bid Submission and Management
-**Priority**: Critical
-**Description**: System shall facilitate comprehensive bid submission process for vendors.
-
-**Requirements**:
-- Bid submission components:
-  - Line item pricing (unit price, total price)
-  - Quantity offered (equal or alternative)
-  - Currency specification
-  - Payment terms offered
-  - Delivery lead time
-  - Validity period (bid validity)
-  - Alternative offers/variants
-  - Technical proposal/documents
-  - Samples submission
-  - Compliance declarations
-- Draft bid saving (auto-save)
-- Bid withdrawal/modification before deadline
-- Bid revision tracking
-- Bid receipt acknowledgment
-- Bid security/earnest money deposit
-- Digital signatures
-- Bid opening ceremony (date/time)
-- Sealed bid until opening
-
-**Business Rules**:
-- Bids cannot be viewed by other vendors until evaluation
-- Bids can be modified until closing deadline
-- Bid withdrawal requires written request
-- Bid validity must be minimum 30 days
-- Late bids automatically rejected
-- Bid security amount defined in RFQ
-- All bids opened simultaneously at specified time
-
-**Acceptance Criteria**:
-- Auto-save every 2 minutes
-- File uploads support 100MB total per bid
-- Bid submission confirmation email immediate
-- Bid modification history preserved
-- Digital signature validation automated
-
----
-
-### FR-RFQ-006: Bid Evaluation and Scoring
-**Priority**: Critical
-**Description**: System shall provide comprehensive bid evaluation and scoring framework.
-
-**Requirements**:
-- Define evaluation criteria:
-  - Price (weight %)
-  - Technical capability (weight %)
-  - Delivery time (weight %)
-  - Service/support (weight %)
-  - Quality/past performance (weight %)
-  - Custom criteria (weight %)
-- Scoring methods:
-  - Lowest price (100% price-based)
-  - Weighted average (multiple criteria)
-  - Two-envelope (technical + financial)
-  - Cost-plus scoring
-- Evaluation stages:
-  - Initial screening (responsiveness)
-  - Technical evaluation
-  - Financial evaluation
-  - Final ranking
-- Comparative analysis:
-  - Side-by-side bid comparison
-  - Price normalization (currency, quantity)
-  - Total cost of ownership calculation
-  - Outlier detection
-- Evaluation team management
-- Individual evaluator scoring
-- Consensus scoring
-- Evaluation report generation
-
-**Business Rules**:
-- Evaluation criteria weights must sum to 100%
-- Price evaluation only after technical qualification
-- Minimum 2 evaluators required
-- Technical evaluation before opening financial bids (two-envelope)
-- Non-responsive bids disqualified before evaluation
-- Evaluation criteria defined before bid opening
-- All scores documented with justification
-
-**Acceptance Criteria**:
-- Evaluation matrix supports 10+ criteria
-- Automated score calculation with weighting
-- Currency conversion for fair comparison
-- Outlier prices flagged automatically
-- Evaluation report export to PDF/Excel
-
----
-
-### FR-RFQ-007: Negotiation Management
-**Priority**: Medium
-**Description**: System shall support post-bid negotiation process with vendors.
-
-**Requirements**:
-- Shortlist vendors for negotiation
-- Best and Final Offer (BAFO) requests
-- Multi-round negotiation support
-- Negotiation meeting scheduling
-- Discussion thread per vendor
-- Counter-offer management
-- Price improvement tracking
-- Term modification tracking
-- Negotiation timeline
-- Conditional awards (subject to negotiation)
-- Final offer deadlines
-- Negotiation history log
-
-**Business Rules**:
-- Negotiations only with shortlisted vendors
-- All negotiation rounds documented
-- Final offer deadlines binding
-- Price reductions accepted, increases require justification
-- Negotiation scope limited to RFQ terms
-- All vendors offered equal negotiation opportunity
-- Negotiation outcomes logged in audit trail
-
-**Acceptance Criteria**:
-- Support 3+ negotiation rounds
-- Negotiation thread preserves full history
-- Price improvement tracking automatic
-- Meeting notes linkable to RFQ
-- Final offer comparison with original bid
-
----
-
-### FR-RFQ-008: Award and Contract Generation
-**Priority**: Critical
-**Description**: System shall facilitate bid award process and automatic contract generation.
-
-**Requirements**:
-- Award decision workflow:
-  - Recommend vendor for award
-  - Approval routing based on value
-  - Award authorization
-  - Award notification (winner and losers)
-  - Award reason documentation
-- Award types:
-  - Full award (all items to one vendor)
-  - Partial award (split between vendors)
-  - Item-level award (by line item)
-  - Lot-based award
-- Contract generation:
-  - Auto-populate contract from RFQ and bid
-  - Include all terms and conditions
-  - Attach technical specifications
-  - Include price schedule
-  - Generate contract number
-- Regret letters for non-awarded vendors
-- Standby vendor designation
-- Award announcement (if public tender)
-- Appeal/protest period management
-
-**Business Rules**:
-- Award requires approval based on value thresholds:
-  - <$50K: Procurement Manager
-  - $50K-$500K: Finance Manager
-  - >$500K: Executive approval
-- All invited vendors notified of award within 48 hours
-- Regret letters include debriefing offer
-- Award cannot be reversed without approval
-- Standby vendor valid for 30 days
-- Contract generated automatically upon award approval
-
-**Acceptance Criteria**:
-- Award approval routing automated
-- Contract generation <2 minutes
-- Email notifications sent immediately
-- Regret letters personalized with scores/ranking
-- Appeal period configurable (default 10 days)
-
----
-
-### FR-RFQ-009: Multi-Round Bidding
-**Priority**: Medium
-**Description**: System shall support multi-round bidding for complex procurements.
-
-**Requirements**:
-- Configure number of rounds
-- Round-specific requirements:
-  - Technical round (qualification)
-  - Financial round (pricing)
-  - Best and Final Offer (BAFO) round
-- Round advancement criteria
-- Vendor shortlisting between rounds
-- Round closing dates
-- Results disclosure policy per round
-- Feedback between rounds (optional)
-- Round-by-round comparison
-
-**Business Rules**:
-- Maximum 3 bidding rounds per RFQ
-- Technical qualification before financial bids
-- Only shortlisted vendors advance to next round
-- Minimum 5 business days between rounds
-- Results disclosure configurable per round
-- Final round is binding
-
-**Acceptance Criteria**:
-- Round transitions automated
-- Vendor shortlisting based on defined criteria
-- Email notifications for each round
-- Round-by-round comparison reports
-- Final round deadline strictly enforced
-
----
-
-### FR-RFQ-010: RFQ Templates and Automation
-**Priority**: Medium
-**Description**: System shall provide RFQ templates and automation capabilities.
-
-**Requirements**:
-- Create RFQ templates for recurring procurements
-- Template library management
-- Template categories/types
-- Template fields:
-  - Standard terms and conditions
-  - Common line items
-  - Evaluation criteria
-  - Timeline defaults
-  - Document requirements
-  - Pre-qualification criteria
-- Template cloning and customization
-- Template versioning
-- Automated RFQ generation from:
-  - Purchase requests exceeding threshold
-  - Periodic/scheduled procurements
-  - Inventory reorder points
-- Pre-filled invitation lists
-- Standard email templates
-
-**Business Rules**:
-- Templates require approval before use
-- Templates must comply with procurement policies
-- Template modifications tracked in version control
-- Automated RFQs require review before publication
-- Standard terms cannot contradict policies
-
-**Acceptance Criteria**:
-- Template library supports 50+ templates
-- RFQ creation from template <3 minutes
-- Template customization preserves 70% of content
-- Automated RFQ generation includes review step
-- Template usage analytics available
-
----
-
-### FR-RFQ-011: Analytics and Reporting
-**Priority**: Medium
-**Description**: System shall provide comprehensive RFQ analytics and reporting.
-
-**Requirements**:
-- RFQ metrics:
-  - Number of RFQs by category, department, period
-  - Average bid count per RFQ
-  - Vendor participation rate
-  - Cycle time (creation to award)
-  - Award value by vendor
-  - Savings achieved vs. budget
-- Vendor performance in RFQs:
-  - Win rate by vendor
-  - Average bid competitiveness
-  - Response time
-  - Compliance rate
-- Competitive analysis:
-  - Price distribution by item
-  - Vendor pricing trends
-  - Market price benchmarks
-  - Bid count trends
-- Evaluation analytics:
-  - Average evaluation time
-  - Evaluator workload
-  - Award approval times
-- Exportable reports (Excel, PDF, CSV)
-- Dashboards for active RFQs
-- Scheduled reports
-
-**Business Rules**:
-- Metrics updated daily
-- Historical data retained for 5 years
-- Sensitive pricing data access-controlled
-- Vendor performance scores calculated quarterly
-- Reports anonymize competitive data
-
-**Acceptance Criteria**:
-- Dashboard loads in <3 seconds
-- Reports exportable in multiple formats
-- Filters support date range, category, vendor
-- Trend charts display 24-month history
-- Scheduled reports delivered automatically
-
----
-
-### FR-RFQ-012: Integration with Other Modules
+### FR-RFP-004: Campaign Types
 **Priority**: High
-**Description**: System shall integrate seamlessly with other procurement modules.
+**Description**: System shall support different campaign types for various pricing collection needs.
 
 **Requirements**:
-- **Vendor Directory Integration**:
-  - Access vendor master data
-  - Link to vendor performance ratings
-  - Use vendor capabilities for targeting
-  - Update vendor performance from RFQ outcomes
-- **Pricelist Templates Integration**:
-  - Create RFQ from pricelist template
-  - Use template structure for RFQ items
-  - Link template submissions to RFQ bids
-- **Price Lists Integration**:
-  - Awarded bids create price lists
-  - Link price lists to RFQ and contract
-  - Price list validity based on bid validity
-- **Procurement Integration**:
-  - RFQ triggered from purchase requests
-  - Awarded RFQs feed into PO creation
-  - PO auto-populated from awarded bid
-- **Contracts Integration**:
-  - Auto-generate contract from award
-  - Link contract to RFQ and bid
-  - Contract terms from RFQ T&Cs
-- **Finance Integration**:
-  - Budget checking before RFQ publication
-  - Commitment accounting for awarded bids
-  - Invoice matching to RFQ pricing
-- **Audit Integration**:
-  - Complete audit trail of RFQ lifecycle
-  - Compliance reporting
-  - Procurement policy adherence tracking
+- One-time campaigns: Single pricing collection event
+- Recurring campaigns: Repeated at scheduled intervals
+  - Frequency options: weekly, monthly, quarterly, annually
+  - Configurable interval (e.g., every 2 weeks)
+  - Optional end date or max occurrences
+  - Day of week selection for weekly patterns
+  - Day of month for monthly patterns
+- Event-based campaigns: Triggered by specific events
 
 **Business Rules**:
-- Vendor must be approved before invitation
-- RFQ value checked against budget availability
-- Awarded bids create binding commitments
-- Price lists linked to contract terms
-- All integrations logged in system audit trail
+- Recurring pattern stored with campaign
+- Recurring campaigns auto-create new instances based on pattern
+- Each recurring instance tracked independently
 
 **Acceptance Criteria**:
-- Vendor data synchronized real-time
-- Budget checks complete in <2 seconds
-- PO creation from RFQ <5 clicks
-- Contract generation includes all RFQ data
-- Audit trail captures all system interactions
+- Campaign type selection in creation wizard
+- Recurring pattern configuration options
+- Pattern displayed in campaign details
+
+---
+
+### FR-RFP-005: Campaign Detail View
+**Priority**: High
+**Description**: System shall provide detailed campaign view with tabs for different aspects.
+
+**Requirements**:
+- Overview Tab:
+  - Campaign details (template, schedule, creator)
+  - Performance summary (response rate, avg response time, completion rate)
+  - Progress statistics (submissions count)
+- Vendors Tab:
+  - List of invited vendors
+  - Individual vendor status (pending, in progress, completed)
+  - Progress bar per vendor
+  - Last activity timestamp
+  - Send reminder action
+- Settings Tab:
+  - Portal access duration
+  - Submission methods (manual, upload)
+  - Approval requirement
+  - Auto-reminders configuration
+  - Reminder schedule with intervals
+  - Escalation rules
+  - Email template
+  - Custom instructions
+  - Priority setting
+
+**Business Rules**:
+- Reminder button disabled for completed vendors
+- Settings tab shows all configured options
+- Performance metrics calculated from progress data
+
+**Acceptance Criteria**:
+- Tab navigation with content areas
+- Vendor list with status indicators
+- Settings displayed read-only in detail view
+
+---
+
+### FR-RFP-006: Campaign Progress Tracking
+**Priority**: High
+**Description**: System shall track and display campaign progress metrics.
+
+**Requirements**:
+- Track the following metrics:
+  - Total vendors invited
+  - Vendors who responded
+  - Completed submissions
+  - Pending submissions
+  - Failed submissions
+  - Completion rate (percentage)
+  - Response rate (percentage)
+  - Average response time (hours)
+- Display progress in:
+  - Campaign list cards
+  - Campaign detail overview
+  - Vendor-level status
+
+**Business Rules**:
+- Completion rate = (completedSubmissions / totalVendors) × 100
+- Response rate = (respondedVendors / totalVendors) × 100
+- Metrics updated when submissions received
+
+**Acceptance Criteria**:
+- Progress metrics displayed accurately
+- Progress bar visualization for completion
+- Metrics refresh on page load
+
+---
+
+### FR-RFP-007: Campaign Settings
+**Priority**: Medium
+**Description**: System shall support configurable campaign settings.
+
+**Requirements**:
+- Portal Access Duration: Number of days vendors can access submission portal
+- Submission Methods: Manual entry, file upload, or both
+- Require Approval: Flag to require manager approval of submissions
+- Auto Reminders: Enable/disable automatic reminder emails
+- Reminder Schedule:
+  - Enable/disable reminders
+  - Interval days before deadline (e.g., 7, 3, 1 days)
+  - Escalation rules with overdue thresholds
+  - Escalation recipients
+- Email Template: Template for invitation emails
+- Custom Instructions: Additional instructions for vendors
+- Priority: low, medium, high, urgent
+
+**Business Rules**:
+- Default portal access duration: 30 days
+- Default submission methods: manual and upload
+- Reminder intervals in descending order (days before deadline)
+- Escalation triggers based on days overdue
+
+**Acceptance Criteria**:
+- All settings configurable during creation
+- Settings displayed in campaign detail
+- Reminder schedule with escalation rules
+
+---
+
+### FR-RFP-008: Campaign Actions
+**Priority**: Medium
+**Description**: System shall support various actions on campaigns.
+
+**Requirements**:
+- View: Navigate to campaign detail page
+- Edit: Modify campaign settings (draft campaigns only)
+- Duplicate: Create copy of campaign with new name
+- Export: Download campaign data
+- Mark as Expired: Update campaign status
+- Delete: Remove campaign (with confirmation)
+- Send Reminder: Send reminder to specific vendor
+
+**Business Rules**:
+- Edit available only for draft campaigns
+- Delete requires confirmation dialog
+- Duplicate copies all settings except status
+- Send Reminder disabled for completed vendors
+
+**Acceptance Criteria**:
+- Actions available from dropdown menu
+- Confirmation dialogs for destructive actions
+- Navigation to appropriate pages after action
+
+---
+
+### FR-RFP-009: Campaign Templates Integration
+**Priority**: Medium
+**Description**: System shall integrate with pricelist templates for structured pricing requests.
+
+**Requirements**:
+- Select pricelist template during campaign creation
+- Template defines:
+  - Validity period
+  - Default currency
+  - Product categories/items
+  - Custom fields
+- Template can be pre-selected via URL parameter
+- Display template information in campaign details
+
+**Business Rules**:
+- Campaign must have exactly one template
+- Template cannot be changed after campaign launch
+- Template ID passed via `?templateId=` parameter
+
+**Acceptance Criteria**:
+- Template selection step in wizard
+- Template details displayed when selected
+- Pre-selection from URL parameter works
+
+---
+
+### FR-RFP-010: Vendor Selection and Filtering
+**Priority**: High
+**Description**: System shall provide comprehensive vendor selection capabilities.
+
+**Requirements**:
+- Search vendors by:
+  - Name
+  - Email
+  - Company registration number
+- Filter vendors by status:
+  - All statuses
+  - Active
+  - Inactive
+  - Pending
+- Bulk selection:
+  - Select all filtered vendors
+  - Deselect all vendors
+  - Clear selection
+- Display vendor metrics:
+  - Response rate percentage
+  - Status badge
+- Selection summary:
+  - Count of selected vendors
+  - List of selected vendor names
+
+**Business Rules**:
+- Search is case-insensitive
+- Only filtered vendors affected by bulk select
+- Minimum 1 vendor required to proceed
+
+**Acceptance Criteria**:
+- Search filters vendor list in real-time
+- Status filter works correctly
+- Bulk select toggles all filtered vendors
+- Selection count updates immediately
 
 ---
 
 ## 3. Non-Functional Requirements
 
 ### 3.1 Performance Requirements
-- **Response Time**:
-  - Page load: <2 seconds for list views
-  - RFQ detail view: <3 seconds
-  - Bid comparison: <5 seconds for 50 vendors
-  - Report generation: <10 seconds for standard reports
-  - Search results: <1 second
+- **Page Load**: Campaign list loads in <2 seconds
+- **Search**: Vendor search filters in <500ms
+- **Form Submission**: Campaign creation completes in <3 seconds
+- **Pagination**: Support 100+ campaigns per page
 
-- **Scalability**:
-  - Support 1000+ concurrent RFQs
-  - Handle 500+ bids per RFQ
-  - Support 10,000+ vendors in directory
-  - Process 100+ RFQ amendments daily
-  - Generate 1000+ contracts monthly
+### 3.2 Usability Requirements
+- **Wizard Navigation**: Clear step indicators with progress
+- **Form Validation**: Real-time validation with error messages
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Accessibility**: WCAG 2.1 AA compliance
 
-- **Throughput**:
-  - 100 concurrent bid submissions without degradation
-  - 50 simultaneous evaluators scoring bids
-  - 1000+ email notifications per minute
-  - Bulk operations on 100+ RFQs in <30 seconds
-
-### 3.2 Security Requirements
-- **Authentication**:
-  - Multi-factor authentication for high-value RFQs
-  - Separate vendor portal authentication
-  - Session timeout after 30 minutes inactivity
-  - Password complexity requirements
-  - Account lockout after 5 failed attempts
-
-- **Authorization**:
-  - Role-based access control (RBAC)
-  - RFQ-level permissions
-  - Bid viewing restricted until evaluation
-  - Evaluation access limited to assigned evaluators
-  - Award approval workflow enforcement
-
-- **Data Protection**:
-  - Bid data encrypted at rest and in transit
-  - Sealed bids until opening time
-  - Vendor pricing confidential
-  - PII protection for vendor contacts
-  - Audit logs tamper-proof
-
-- **Compliance**:
-  - SOX compliance for financial thresholds
-  - GDPR compliance for vendor data
-  - Industry-specific regulations (e.g., government procurement)
-  - Data retention policies
-  - Right to be forgotten support
-
-### 3.3 Usability Requirements
-- **Ease of Use**:
-  - Intuitive RFQ creation wizard
-  - In-context help and tooltips
-  - Field validation with clear error messages
-  - Keyboard shortcuts for power users
-  - Consistent UI/UX across module
-
-- **Accessibility**:
-  - WCAG 2.1 AA compliance
-  - Screen reader compatibility
-  - Keyboard navigation
-  - High contrast mode
-  - Resizable text (up to 200%)
-
-- **Learning Curve**:
-  - New users create first RFQ in <30 minutes with tutorial
-  - Vendor portal requires <10 minutes training
-  - Context-sensitive help available
-  - Video tutorials for complex features
-  - Interactive product tour
-
-### 3.4 Reliability Requirements
-- **Availability**:
-  - 99.9% uptime during business hours
-  - Scheduled maintenance windows <2 hours/month
-  - Zero data loss guarantee
-  - Automatic failover for critical services
-
-- **Backup and Recovery**:
-  - Real-time database replication
-  - Hourly incremental backups
-  - Daily full backups retained 30 days
-  - Point-in-time recovery capability
-  - Disaster recovery RTO: 4 hours, RPO: 15 minutes
-
-- **Error Handling**:
-  - Graceful degradation for service outages
-  - Automatic retry for transient errors
-  - User-friendly error messages
-  - Detailed error logging for support
-  - Automatic error notification to support team
-
-### 3.5 Maintainability Requirements
-- **Code Quality**:
-  - TypeScript strict mode
-  - Comprehensive unit test coverage (>80%)
-  - Integration tests for critical paths
-  - Documented API contracts
-  - Code review mandatory
-
-- **Monitoring**:
-  - Application performance monitoring (APM)
-  - Real-time error tracking
-  - User activity monitoring
-  - Resource utilization alerts
-  - SLA monitoring dashboards
-
-- **Logging**:
-  - Structured logging with correlation IDs
-  - Centralized log aggregation
-  - Searchable log history (90 days)
-  - Separate audit logs (7 years retention)
-  - Log levels configurable per environment
+### 3.3 Security Requirements
+- **Authentication**: User must be logged in
+- **Authorization**: Role-based access to campaigns
+- **Data Protection**: Vendor pricing data confidential
 
 ---
 
-## 4. Data Requirements
+## 4. Data Model
 
-### 4.1 Data Entities
-- **RFQ Campaign**:
-  - Estimated records: 10,000 per year
-  - Average size: 500 KB per RFQ
-  - Retention: 7 years
-  - Archive policy: After 3 years, move to cold storage
+### 4.1 Campaign Entity (PriceCollectionCampaign)
 
-- **Bid Submissions**:
-  - Estimated records: 50,000 per year
-  - Average size: 2 MB per bid (including attachments)
-  - Retention: 7 years
-  - Archive policy: After 3 years, move to cold storage
+| Field | Type | Description |
+|-------|------|-------------|
+| id | string | Unique identifier |
+| name | string | Campaign name |
+| description | string | Campaign description |
+| status | enum | draft, active, paused, completed, cancelled |
+| campaignType | enum | one-time, recurring, event-based |
+| selectedVendors | string[] | Array of vendor IDs |
+| selectedCategories | string[] | Array of category names |
+| scheduledStart | Date | Start date |
+| scheduledEnd | Date | End date (optional) |
+| recurringPattern | object | Recurring schedule (optional) |
+| progress | object | Progress metrics |
+| createdBy | string | Creator email |
+| createdAt | Date | Creation timestamp |
+| updatedAt | Date | Last update timestamp |
+| settings | object | Campaign settings |
+| template | object | Associated template (optional) |
 
-- **Evaluation Data**:
-  - Estimated records: 100,000 evaluations per year
-  - Average size: 50 KB per evaluation
-  - Retention: 7 years
-  - Archive policy: After 5 years, move to cold storage
+### 4.2 Progress Object (CampaignProgress)
 
-- **Contracts Generated**:
-  - Estimated records: 5,000 per year
-  - Average size: 1 MB per contract
-  - Retention: Indefinite
-  - Archive policy: After 10 years, move to cold storage
+| Field | Type | Description |
+|-------|------|-------------|
+| totalVendors | number | Total invited vendors |
+| invitedVendors | number | Vendors who received invitation |
+| respondedVendors | number | Vendors who accessed portal |
+| completedSubmissions | number | Completed submissions |
+| pendingSubmissions | number | In-progress submissions |
+| failedSubmissions | number | Failed submissions |
+| completionRate | number | Percentage completed |
+| responseRate | number | Percentage responded |
+| averageResponseTime | number | Avg response time (hours) |
+| lastUpdated | Date | Last metrics update |
 
-### 4.2 Data Quality
-- **Accuracy**: 99.9% data accuracy through validation rules
-- **Completeness**: Required fields enforced at data entry
-- **Consistency**: Referential integrity maintained across modules
-- **Timeliness**: Real-time updates for bid status and evaluations
-- **Validity**: Data validation rules prevent invalid entries
+### 4.3 Settings Object (CampaignSettings)
 
-### 4.3 Data Storage
-- **Primary Storage**: PostgreSQL database with JSONB for flexible data
-- **File Storage**: AWS S3 for bid attachments and documents
-- **Cache Layer**: Redis for performance optimization
-- **Search Index**: Elasticsearch for full-text search
-- **Archive Storage**: AWS Glacier for long-term retention
+| Field | Type | Description |
+|-------|------|-------------|
+| portalAccessDuration | number | Days vendor can access portal |
+| allowedSubmissionMethods | string[] | ['manual', 'upload'] |
+| requireApproval | boolean | Require manager approval |
+| autoReminders | boolean | Enable auto reminders |
+| reminderSchedule | object | Reminder configuration |
+| emailTemplate | string | Email template name |
+| customInstructions | string | Additional instructions |
+| priority | enum | low, medium, high, urgent |
+
+### 4.4 Recurring Pattern Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| frequency | enum | weekly, monthly, quarterly, annually |
+| interval | number | Interval between occurrences |
+| endDate | Date | Pattern end date (optional) |
+| maxOccurrences | number | Max occurrences (optional) |
+| daysOfWeek | number[] | Days for weekly (0-6) |
+| dayOfMonth | number | Day for monthly (1-31) |
+| monthOfYear | number | Month for annual (1-12) |
 
 ---
 
 ## 5. Business Rules Summary
 
-### 5.1 RFQ Creation Rules
-- **BR-RFQ-001**: Minimum 3 vendors must be invited for competitive RFQ
-- **BR-RFQ-002**: Bid submission period must be at least 7 business days
-- **BR-RFQ-003**: RFQ number must be unique and follow configured format
-- **BR-RFQ-004**: Published RFQs require amendment process for changes
-- **BR-RFQ-005**: Cancelled RFQs cannot be reopened (must create new)
+### 5.1 Campaign Creation Rules
+- **BR-RFP-001**: Campaign name is required
+- **BR-RFP-002**: Campaign description is required
+- **BR-RFP-003**: Start date must be provided
+- **BR-RFP-004**: End date must be after start date
+- **BR-RFP-005**: At least one template must be selected
+- **BR-RFP-006**: At least one vendor must be selected
 
-### 5.2 Vendor Participation Rules
-- **BR-RFQ-006**: Only approved/preferred vendors can be invited
-- **BR-RFQ-007**: Vendors must acknowledge invitation before bidding
-- **BR-RFQ-008**: Vendors cannot see other bids until evaluation
-- **BR-RFQ-009**: Pre-qualification must be completed before bid submission
-- **BR-RFQ-010**: Late vendor requests require approval
+### 5.2 Campaign Status Rules
+- **BR-RFP-007**: New campaigns start in draft status
+- **BR-RFP-008**: Draft campaigns can be freely edited
+- **BR-RFP-009**: Active campaigns have limited editing
+- **BR-RFP-010**: Completed/cancelled campaigns are read-only
 
-### 5.3 Bidding Rules
-- **BR-RFQ-011**: Bids can be modified only before closing deadline
-- **BR-RFQ-012**: Late bids automatically rejected
-- **BR-RFQ-013**: Bid validity must be minimum 30 days
-- **BR-RFQ-014**: Bid modifications tracked in version history
-- **BR-RFQ-015**: Bid withdrawal requires written request
+### 5.3 Vendor Selection Rules
+- **BR-RFP-011**: Minimum 1 vendor required to launch
+- **BR-RFP-012**: Only active vendors can be invited (recommended)
+- **BR-RFP-013**: Vendor selection cannot change after launch
 
-### 5.4 Evaluation Rules
-- **BR-RFQ-016**: Evaluation criteria weights must sum to 100%
-- **BR-RFQ-017**: Technical evaluation before financial (two-envelope method)
-- **BR-RFQ-018**: Minimum 2 evaluators required per RFQ
-- **BR-RFQ-019**: Non-responsive bids disqualified before scoring
-- **BR-RFQ-020**: All scores documented with justification
-
-### 5.5 Award Rules
-- **BR-RFQ-021**: Award requires approval based on value thresholds
-- **BR-RFQ-022**: All invited vendors notified of award within 48 hours
-- **BR-RFQ-023**: Regret letters include debriefing offer
-- **BR-RFQ-024**: Award decision cannot be reversed without approval
-- **BR-RFQ-025**: Contract auto-generated upon award approval
+### 5.4 Progress Calculation Rules
+- **BR-RFP-014**: Completion rate = completedSubmissions / totalVendors × 100
+- **BR-RFP-015**: Response rate = respondedVendors / totalVendors × 100
 
 ---
 
 ## 6. User Roles and Permissions
 
-### 6.1 Procurement Manager
+### 6.1 Procurement Staff
 **Permissions**:
-- Create and edit RFQs
+- Create new campaigns
+- Edit draft campaigns
+- View all campaigns
 - Invite vendors
-- Publish RFQs
-- Extend deadlines
-- Create amendments
-- Assign evaluators
-- View all bids after opening
-- Recommend award
-- Generate contracts
+- Send reminders
+- Export campaign data
+- Duplicate campaigns
 
-**Restrictions**:
-- Cannot approve high-value awards (>$500K)
-- Cannot modify bids
-- Cannot see sealed bids before opening
-
-### 6.2 Evaluator
+### 6.2 Procurement Manager
 **Permissions**:
-- View assigned RFQs
-- Access bids for assigned RFQs
-- Score and evaluate bids
-- Add evaluation comments
-- View comparative analysis
-- Submit recommendations
-
-**Restrictions**:
-- Can only view assigned RFQs
-- Cannot modify RFQ or bids
-- Cannot see other evaluators' scores until finalized
-- Cannot approve awards
-
-### 6.3 Finance Manager
-**Permissions**:
-- Approve RFQs exceeding financial threshold
-- View all RFQ financial data
-- Access budget vs. actual reports
-- Approve awards ($50K-$500K)
-- Override payment terms
-
-**Restrictions**:
-- Cannot create or modify RFQs
-- Cannot evaluate bids
-- Cannot communicate directly with vendors
-
-### 6.4 Executive/Management
-**Permissions**:
-- View all RFQs and bids
-- Approve high-value RFQs (>$500K)
-- Final award authority
-- Access all analytics and reports
-- Override business rules (with audit log)
-
-**Restrictions**:
-- Overrides logged and require justification
-- Cannot modify evaluation scores
-
-### 6.5 Vendor User
-**Permissions**:
-- View assigned RFQs
-- Download RFQ documents
-- Submit clarification questions
-- Submit bids
-- Modify bids before deadline
-- View own bid status
-- Receive award notifications
-
-**Restrictions**:
-- Can only view RFQs they're invited to
-- Cannot see other vendors' bids
-- Cannot modify RFQ requirements
-- Cannot extend deadlines
-
-### 6.6 Auditor (Read-Only)
-**Permissions**:
-- View all RFQs and bids
-- Access complete audit trail
-- Generate compliance reports
-- Export data for analysis
-
-**Restrictions**:
-- Read-only access
-- Cannot modify any data
-- Cannot approve or award
+- All Procurement Staff permissions
+- Delete campaigns
+- Approve submissions (if required)
+- Cancel campaigns
+- Modify active campaigns
 
 ---
 
-## 7. Workflow Specifications
+## 7. User Interface Specifications
 
-### 7.1 RFQ Creation Workflow
-1. **Draft RFQ**: User creates RFQ with basic information
-2. **Add Requirements**: Define line items and specifications
-3. **Select Vendors**: Invite target vendors
-4. **Define Evaluation**: Set criteria and weights
-5. **Review**: Procurement manager reviews RFQ
-6. **Approval** (if required): Finance/management approval for high-value
-7. **Publish**: RFQ published and vendors notified
-8. **Live**: RFQ open for clarifications and bid submissions
+### 7.1 Campaign List Page
+**Route**: `/vendor-management/campaigns`
 
-**Duration**: 2-5 days depending on complexity and approvals
+**Layout**:
+- Card container with header and content
+- Header: Title, description, Export button, Create Template button
+- Filters: Search input, status dropdown, saved filters, add filters, view toggle
+- Content: Table or Card view based on toggle
 
-### 7.2 Bidding Workflow
-1. **Invitation Sent**: Vendors receive email/portal notification
-2. **Vendor Acknowledgment**: Vendors acknowledge receipt
-3. **Clarifications**: Vendors submit questions, procurement responds
-4. **Bid Preparation**: Vendors prepare bids (draft saved)
-5. **Bid Submission**: Vendors submit final bids before deadline
-6. **Bid Receipt**: System confirms receipt with timestamp
-7. **Bid Opening**: Bids opened at scheduled time
+**Table Columns**:
+- Name (clickable link)
+- Status (badge)
+- Description (truncated)
+- Validity Period
+- Created date
+- Updated date
+- Actions (dropdown menu)
 
-**Duration**: Minimum 7 business days from publication to closing
+**Card Layout**:
+- Name and status badges
+- Description (2-line clamp)
+- Validity and progress stats
+- Created/Updated dates
+- Vendor count and completion count
 
-### 7.3 Evaluation Workflow
-1. **Initial Screening**: Check bid responsiveness
-2. **Disqualification**: Non-responsive bids removed
-3. **Technical Evaluation**: Score technical aspects
-4. **Financial Evaluation**: Score pricing (after technical qualification)
-5. **Consensus Meeting**: Evaluators discuss and finalize scores
-6. **Ranking**: Bids ranked by total score
-7. **Recommendation**: Top-ranked vendor recommended for award
+### 7.2 Campaign Creation Page
+**Route**: `/vendor-management/campaigns/new`
 
-**Duration**: 5-10 business days depending on complexity
+**Layout**:
+- Header with back button and title
+- Step indicator (4 steps)
+- Step content card
+- Navigation buttons (Previous, Next/Launch)
 
-### 7.4 Award Workflow
-1. **Award Recommendation**: Procurement recommends vendor
-2. **Approval Routing**: Routed based on value threshold
-3. **Approval Decision**: Approver accepts or rejects recommendation
-4. **Award Notification**: Winner notified with award letter
-5. **Regret Letters**: Non-awarded vendors notified
-6. **Contract Generation**: System generates contract from RFQ and bid
-7. **Contract Signing**: Contract signed by both parties
+**Steps**:
+1. Basic Information form
+2. Template selection cards
+3. Vendor selection with search/filters
+4. Review summary with launch confirmation
 
-**Duration**: 3-7 business days depending on approval levels
+### 7.3 Campaign Detail Page
+**Route**: `/vendor-management/campaigns/[id]`
+
+**Layout**:
+- Card container with header
+- Header: Back button, title, status/priority badges, Duplicate/Edit buttons
+- Tabs: Overview, Vendors, Settings
+
+**Overview Tab**:
+- Campaign Details card (template, schedule, creator)
+- Performance Summary card (metrics)
+
+**Vendors Tab**:
+- Table with vendor name, status, progress bar, last activity, actions
+
+**Settings Tab**:
+- Two-column layout with all settings
+- Reminder schedule section (if enabled)
 
 ---
 
-## 8. Integration Requirements
+## 8. Integration Points
 
 ### 8.1 Internal Integrations
-- **Vendor Directory**: Vendor master data, performance ratings
-- **Pricelist Templates**: Template structure, submissions
-- **Price Lists**: Awarded bid pricing
-- **Procurement**: Purchase requests, purchase orders
-- **Contracts**: Contract generation and management
-- **Finance**: Budget validation, commitment accounting
-- **Inventory**: Reorder point triggers
-- **Audit**: Complete activity logging
+- **Vendor Directory**: Access vendor master data for selection
+- **Pricelist Templates**: Use templates for structured pricing requests
+- **Mock Data**: Uses centralized mock data from lib/mock-data
 
-### 8.2 External Integrations
-- **Email Service**: SendGrid/AWS SES for notifications
-- **File Storage**: AWS S3 for document management
-- **E-signature**: DocuSign/Adobe Sign for contract signing
-- **ERP System**: SAP/Oracle integration for financial data
-- **Supplier Portal**: Third-party supplier portals
-- **Market Data**: Benchmark pricing services
-- **Compliance Systems**: Regulatory reporting
-
-### 8.3 API Requirements
-- RESTful API for all CRUD operations
-- Webhook support for real-time notifications
-- Bulk operations API for large datasets
-- GraphQL for flexible querying
-- API rate limiting: 1000 requests/hour per user
-- API versioning for backward compatibility
-- Comprehensive API documentation (OpenAPI spec)
+### 8.2 Navigation Integration
+- Entry: Vendor Management > Requests for Pricing
+- Template link: Create from pricelist template detail page
 
 ---
 
-## 9. Success Criteria
-
-### 9.1 Business Metrics
-- **Cost Savings**: Achieve 10-15% cost savings through competitive bidding
-- **Cycle Time**: Reduce RFQ cycle time by 30% compared to manual process
-- **Vendor Participation**: Average 5+ bids per RFQ
-- **Compliance**: 100% compliance with procurement policies
-- **User Adoption**: 90% of procurement staff using system within 3 months
-
-### 9.2 System Metrics
-- **Availability**: 99.9% uptime achieved
-- **Performance**: 95% of operations complete within SLA
-- **Data Quality**: <0.1% error rate in RFQ and bid data
-- **User Satisfaction**: >4.0/5.0 satisfaction score
-- **Support Tickets**: <5% of transactions require support intervention
-
-### 9.3 Adoption Metrics
-- **Active Users**: 80% of procurement team actively using system
-- **RFQ Volume**: 100% of RFQs processed through system
-- **Training Completion**: 100% of users complete training
-- **Vendor Portal Usage**: 70% of vendors use portal for bid submission
-- **Mobile Access**: 30% of vendor interactions via mobile devices
-
----
-
-## 10. Constraints and Assumptions
-
-### 10.1 Constraints
-- **Technical Constraints**:
-  - Must integrate with existing ERP system
-  - PostgreSQL database required for compliance
-  - Browser support: Chrome, Firefox, Safari (latest 2 versions)
-  - Mobile responsive design required
-  - Maximum file upload size: 50MB
-
-- **Business Constraints**:
-  - Implementation timeline: 6 months
-  - Budget: Defined in project charter
-  - Must comply with existing procurement policies
-  - Phased rollout by department
-  - Training required before go-live
-
-- **Regulatory Constraints**:
-  - SOX compliance for financial controls
-  - GDPR compliance for vendor data
-  - Industry-specific regulations
-  - Data retention: 7 years minimum
-  - Audit trail immutable
-
-### 10.2 Assumptions
-- **Technical Assumptions**:
-  - Vendor directory module operational
-  - Network bandwidth sufficient for file uploads
-  - Users have modern browsers
-  - Email delivery rates >98%
-  - Cloud infrastructure available
-
-- **Business Assumptions**:
-  - Vendors willing to adopt portal
-  - Procurement staff available for training
-  - Management support for change management
-  - Existing RFQ data can be migrated
-  - Procurement policies will be updated if needed
-
-- **Operational Assumptions**:
-  - IT support available during rollout
-  - Data migration support provided
-  - Users have basic computer literacy
-  - Vendors have internet access
-  - Email is primary communication channel
-
----
-
-## 11. Risks and Mitigation
-
-### 11.1 Technical Risks
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-| Integration complexity with ERP | High | Medium | Early integration testing, dedicated integration team |
-| Performance with 100+ concurrent bids | High | Low | Load testing, caching strategy, horizontal scaling |
-| File upload failures | Medium | Medium | Chunked uploads, resume capability, S3 direct upload |
-| Email delivery failures | Medium | Low | Backup SMS notifications, retry logic, multiple providers |
-
-### 11.2 Business Risks
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-| Vendor adoption resistance | High | Medium | Training, incentives, gradual rollout, support hotline |
-| User adoption resistance | High | Low | Change management, training, management support |
-| Process compliance issues | High | Low | Policy alignment, approval workflows, audit trails |
-| Data migration challenges | Medium | Medium | Phased migration, data validation, rollback plan |
-
-### 11.3 Operational Risks
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-| Insufficient training | Medium | Medium | Comprehensive training program, ongoing support |
-| Support overload at launch | Medium | High | Staged rollout, support team readiness, self-service help |
-| Business process changes | Medium | Medium | Change management, process documentation, stakeholder alignment |
-
----
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial creation |
-
----
-
-## Related Documents
-- VENDOR-MANAGEMENT-OVERVIEW.md - Module Overview
-- UC-requests-for-pricing.md - Use Cases (TBD)
-- TS-requests-for-pricing.md - Technical Specification (TBD)
-- FD-requests-for-pricing.md - Flow Diagrams (TBD)
-- VAL-requests-for-pricing.md - Validations (TBD)
+## 9. Related Documents
+- [Pricelist Templates BR](../pricelist-templates/BR-pricelist-templates.md) - Template management
+- [Vendor Directory BR](../vendor-directory/BR-vendor-directory.md) - Vendor data
+- [UC-requests-for-pricing.md](./UC-requests-for-pricing.md) - Use Cases
+- [TS-requests-for-pricing.md](./TS-requests-for-pricing.md) - Technical Specification
+- [FD-requests-for-pricing.md](./FD-requests-for-pricing.md) - Flow Diagrams
+- [VAL-requests-for-pricing.md](./VAL-requests-for-pricing.md) - Validations
 
 ---
 

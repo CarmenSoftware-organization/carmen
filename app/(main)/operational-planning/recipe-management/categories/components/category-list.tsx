@@ -60,7 +60,28 @@ import {
   CheckCircle2,
   XCircle,
 } from "lucide-react"
-import { RecipeCategory, mockCategories } from "../data/mock-categories"
+import { RecipeCategory } from "@/lib/types"
+import { mockCategories } from "@/lib/mock-data"
+
+// Extended interface for form data with additional UI-specific properties
+interface CategoryFormData extends Omit<Partial<RecipeCategory>, 'id'> {
+  id: string; // id is required
+  status?: string;
+  recipeCount?: number;
+  activeRecipeCount?: number;
+  averageCost?: number;
+  averageMargin?: number;
+  lastUpdated?: string;
+  defaultCostSettings?: {
+    laborCostPercentage: number;
+    overheadPercentage: number;
+    targetFoodCostPercentage: number;
+  };
+  defaultMargins?: {
+    minimumMargin: number;
+    targetMargin: number;
+  };
+}
 
 interface FilterState {
   status: string[]
@@ -106,7 +127,7 @@ export function CategoryList() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<RecipeCategory | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<CategoryFormData | null>(null)
   const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState(false)
   const [filters, setFilters] = useState<FilterState>({
     status: [],
@@ -117,11 +138,14 @@ export function CategoryList() {
     maxMargin: null,
   })
   const [quickFilters, setQuickFilters] = useState<string[]>([])
-  const [formData, setFormData] = useState<Partial<RecipeCategory>>({
+  const [formData, setFormData] = useState<CategoryFormData>({
+    id: "",
     name: "",
     code: "",
     description: "",
-    parentId: null,
+    parentId: undefined,
+    level: 1,
+    isActive: true,
     status: "active",
     defaultCostSettings: {
       laborCostPercentage: 30,
@@ -148,7 +172,7 @@ export function CategoryList() {
     })
   }
 
-  const handleEdit = (category: RecipeCategory) => {
+  const handleEdit = (category: CategoryFormData) => {
     setSelectedCategory(category)
     setFormData({
       ...category,
@@ -156,17 +180,20 @@ export function CategoryList() {
     setIsEditDialogOpen(true)
   }
 
-  const handleDelete = (category: RecipeCategory) => {
+  const handleDelete = (category: CategoryFormData) => {
     setSelectedCategory(category)
     setIsDeleteDialogOpen(true)
   }
 
   const handleCreate = () => {
     setFormData({
+      id: "",
       name: "",
       code: "",
       description: "",
-      parentId: null,
+      parentId: undefined,
+      level: 1,
+      isActive: true,
       status: "active",
       defaultCostSettings: {
         laborCostPercentage: 30,
@@ -193,10 +220,13 @@ export function CategoryList() {
     
     // Reset form
     setFormData({
+      id: "",
       name: "",
       code: "",
       description: "",
-      parentId: null,
+      parentId: undefined,
+      level: 1,
+      isActive: true,
       status: "active",
       defaultCostSettings: {
         laborCostPercentage: 30,
@@ -255,13 +285,13 @@ export function CategoryList() {
     )
   }
 
-  const applyFilters = (category: RecipeCategory) => {
+  const applyFilters = (category: CategoryFormData) => {
     // Quick filters
     if (quickFilters.length > 0) {
-      if (quickFilters.includes('noRecipes') && category.recipeCount > 0) return false
-      if (quickFilters.includes('hasRecipes') && category.recipeCount === 0) return false
-      if (quickFilters.includes('topLevel') && category.parentId !== null) return false
-      if (quickFilters.includes('subLevel') && category.parentId === null) return false
+      if (quickFilters.includes('noRecipes') && (category.recipeCount ?? 0) > 0) return false
+      if (quickFilters.includes('hasRecipes') && (category.recipeCount ?? 0) === 0) return false
+      if (quickFilters.includes('topLevel') && category.parentId !== null && category.parentId !== undefined) return false
+      if (quickFilters.includes('subLevel') && (category.parentId === null || category.parentId === undefined)) return false
     }
 
     // Advanced filters
@@ -323,7 +353,7 @@ export function CategoryList() {
     }
   }
 
-  const renderCategoryRow = (category: RecipeCategory, depth = 0): JSX.Element => {
+  const renderCategoryRow = (category: CategoryFormData, depth = 0): JSX.Element => {
     const isExpanded = expandedCategories.has(category.id)
     const childCategories = categories.filter(c => c.parentId === category.id)
     const hasChildren = childCategories.length > 0
@@ -364,11 +394,11 @@ export function CategoryList() {
               {category.status}
             </Badge>
           </TableCell>
-          <TableCell className="text-right">{category.recipeCount}</TableCell>
-          <TableCell className="text-right">{category.activeRecipeCount}</TableCell>
-          <TableCell className="text-right">${category.averageCost.toFixed(2)}</TableCell>
-          <TableCell className="text-right">{category.averageMargin.toFixed(1)}%</TableCell>
-          <TableCell>{category.lastUpdated}</TableCell>
+          <TableCell className="text-right">{category.recipeCount ?? 0}</TableCell>
+          <TableCell className="text-right">{category.activeRecipeCount ?? 0}</TableCell>
+          <TableCell className="text-right">${(category.averageCost ?? 0).toFixed(2)}</TableCell>
+          <TableCell className="text-right">{(category.averageMargin ?? 0).toFixed(1)}%</TableCell>
+          <TableCell>{category.lastUpdated ?? 'N/A'}</TableCell>
           <TableCell>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -401,9 +431,9 @@ export function CategoryList() {
 
   const rootCategories = categories.filter(category => !category.parentId)
   const filteredCategories = rootCategories
-    .filter(category => 
-      (category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       category.code.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    .filter(category =>
+      (category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       category.code?.toLowerCase().includes(searchTerm.toLowerCase())) &&
       applyFilters(category)
     )
 
@@ -764,7 +794,7 @@ export function CategoryList() {
                 <Label htmlFor="parent">Parent Category</Label>
                 <Select
                   value={formData.parentId || "none"}
-                  onValueChange={(value) => setFormData({ ...formData, parentId: value === "none" ? null : value })}
+                  onValueChange={(value) => setFormData({ ...formData, parentId: value === "none" ? undefined : value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select parent category" />

@@ -13,6 +13,13 @@
 - **Imported**: All 298 Carmen ERP documentation pages
 - **Source**: `wordpress-migration-data.json` (29MB)
 - **Status**: 100% successful (298 created, 6 updated, 0 errors)
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+
+---
 - **Tables**: All formatted with proper HTML
 - **Links**: All internal links converted to WordPress permalinks
 

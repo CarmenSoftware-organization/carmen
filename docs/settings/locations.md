@@ -1,5 +1,10 @@
 # Location Management System Interface Layout
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Location Listing Screen
 
 ### Header Section

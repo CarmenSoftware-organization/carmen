@@ -1,5 +1,10 @@
 # System Architecture Overview
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ```mermaid
 graph TD
     A[Food Service Management System] --> B[Core Modules]

@@ -25,7 +25,7 @@ The use cases encompass category viewing and navigation, creation and editing op
 **Related Documents**:
 - [Business Requirements](./BR-categories.md)
 - [Technical Specification](./TS-categories.md)
-- [Data Schema](./DS-categories.md)
+- [Data Dictionary](./DD-categories.md)
 - [Flow Diagrams](./FD-categories.md)
 - [Validations](./VAL-categories.md)
 

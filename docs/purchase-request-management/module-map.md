@@ -1,5 +1,10 @@
 # Purchase Request Module Map
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 This document provides a comprehensive map of the Purchase Request (PR) module, including its pages, components, state management, and workflows.

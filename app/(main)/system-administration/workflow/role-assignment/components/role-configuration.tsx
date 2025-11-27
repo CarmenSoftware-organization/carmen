@@ -7,13 +7,13 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { roles } from "../data/mockData"
+import { mockRoles } from '@/lib/mock-data'
 import { Role } from "../types/approver"
 import type { RoleConfiguration } from "../types/approver"
 import { Edit, Save, X } from "lucide-react"
 
 interface RoleConfigurationProps {
-  selectedRoleId: number | null
+  selectedRoleId: string | null
 }
 
 export function RoleConfiguration({ selectedRoleId }: RoleConfigurationProps) {
@@ -23,7 +23,7 @@ export function RoleConfiguration({ selectedRoleId }: RoleConfigurationProps) {
 
   useEffect(() => {
     if (selectedRoleId) {
-      const role = roles.find(role => role.id === selectedRoleId)
+      const role = mockRoles.find(role => role.id === selectedRoleId)
       if (role) {
         setSelectedRole(role)
         setConfiguration({
@@ -150,7 +150,7 @@ export function RoleConfiguration({ selectedRoleId }: RoleConfigurationProps) {
               <Label htmlFor="role-description">Description</Label>
               <Textarea
                 id="role-description"
-                value={configuration.description}
+                value={configuration.description || ''}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 disabled={!isEditing}
                 className="mt-1"

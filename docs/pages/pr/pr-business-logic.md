@@ -1,5 +1,10 @@
 # Purchase Request: Business Logic
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document outlines the business logic, rules, and constraints for the Purchase Request (PR) module.
 
 ## 1. PR Creation and Submission

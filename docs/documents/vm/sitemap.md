@@ -586,4 +586,9 @@ Home > Vendor Management > Pricelists > {Pricelist Number}
 ---
 
 **Last Updated**: 2025-10-02
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Version**: 1.0.0

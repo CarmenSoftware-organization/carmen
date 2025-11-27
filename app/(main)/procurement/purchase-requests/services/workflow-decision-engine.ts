@@ -1,5 +1,5 @@
 // Workflow Decision Engine - Priority-Based Logic for PR Approval
-import { PurchaseRequestItem, DocumentStatus } from "@/lib/types";
+import { PurchaseRequestItem, PRStatus } from "@/lib/types";
 
 export interface WorkflowDecision {
   canSubmit: boolean;
@@ -109,16 +109,16 @@ export class WorkflowDecisionEngine {
     
     items.forEach(item => {
       switch (item.status) {
-        case DocumentStatus.Approved:
+        case PRStatus.Approved:
           summary.approved++;
           break;
-        case DocumentStatus.Rejected:
+        case PRStatus.Cancelled:
           summary.rejected++;
           break;
-        case DocumentStatus.InProgress:
+        case PRStatus.InProgress:
           summary.review++;
           break;
-        case DocumentStatus.Draft:
+        case PRStatus.Draft:
         default:
           summary.pending++;
           break;
@@ -145,7 +145,7 @@ export class WorkflowDecisionEngine {
     };
     
     // Only allow actions on Pending or Review status items
-    if (![DocumentStatus.Draft, DocumentStatus.InProgress].includes(item.status)) {
+    if (![PRStatus.Draft, PRStatus.InProgress].includes(item.status)) {
       // No users can add comments
       state.availableActions = ['history'];
       return state;
@@ -184,7 +184,7 @@ export class WorkflowDecisionEngine {
     }
     
     // Requestor can only mark for review on pending items
-    if (['Staff', 'Requestor'].includes(userRole) && item.status === DocumentStatus.Draft) {
+    if (['Staff', 'Requestor'].includes(userRole) && item.status === PRStatus.Draft) {
       state.canReview = true;
       state.availableActions = ['review', 'history'];
     }

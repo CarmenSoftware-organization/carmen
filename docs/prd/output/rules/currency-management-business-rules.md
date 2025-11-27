@@ -6,6 +6,11 @@
 **Date**: January 15, 2025  
 **Status**: Active  
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 This document defines business rules for managing multi-currency operations within the Carmen ERP system, including exchange rate management, currency conversion, hedging strategies, and financial reporting for hospitality operations with international suppliers and customers.

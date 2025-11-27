@@ -1,5 +1,10 @@
 # Inventory Adjustments Documentation - Generation Complete
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Summary
 
 Successfully generated complete documentation for the Inventory Adjustments module based on source code analysis.

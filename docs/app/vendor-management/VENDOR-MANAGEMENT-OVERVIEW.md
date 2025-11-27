@@ -3,9 +3,49 @@
 ## Document Information
 - **Document Type**: Module Overview Document
 - **Module**: Vendor Management (All Submodules)
-- **Version**: 1.0
-- **Last Updated**: 2024-01-15
-- **Document Status**: Draft
+- **Version**: 1.1
+- **Last Updated**: 2025-11-17
+- **Document Status**: Active
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.1 | 2025-11-17 | Documentation Team | Updated for ARC-2024-001: Added Recent Architecture Changes section, updated document status to Active, added references to new documentation (ARC, CODE-TODO, CHANGE-HISTORY, updated DDs) |
+| 1.0 | 2024-01-15 | System | Initial consolidated overview |
+
+---
+- **Recent Changes**: ARC-2024-001 (Architecture Redesign)
+
+---
+
+## Recent Architecture Changes
+
+### ARC-2024-001: Vendor Management Redesign (2025-11-17)
+
+**Status**: ✅ Approved - Implementation Pending
+**Impact**: High - Affects Price Lists, Request for Pricing, Price List Templates
+
+**Key Changes Summary**:
+- **16 Total Changes**: 6 Simplifications, 7 Enhancements, 3 Modifications
+- **Effective Date Model**: Replaced date ranges with single effective date
+- **Currency Enhancement**: Added explicit currency code field (ISO 4217)
+- **FOC Support**: Added Free of Charge item handling
+- **Preferred Vendor**: Added preferred vendor tracking
+- **Bulk Import**: Excel/CSV import for price list items
+- **Simplified Workflow**: Removed approval and submission method tracking
+- **Description Primary**: Description field now primary display (removed name field)
+
+**Implementation**:
+- **Timeline**: 10 weeks (4 phases)
+- **Team**: 6 developers (2 backend, 2 frontend, 1 QA, 1 designer)
+- **Documentation**: Complete (ARC, CODE-TODO, DD updates, CHANGE-HISTORY)
+
+**Reference Documents**:
+- **ARC Document**: `ARC-2024-001-vendor-management-redesign.md`
+- **Implementation Checklist**: `CODE-CHANGE-TODO.md` (87 tasks)
+- **Change History**: `CHANGE-HISTORY.md`
+- **Updated DD**: `price-lists/DD-price-lists.md` (v1.1.0)
+- **Updated DD**: `requests-for-pricing/DD-requests-for-pricing.md` (v1.1.0)
 
 ---
 
@@ -703,15 +743,17 @@ GET    /api/portal/performance     - Performance metrics
 
 ---
 
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial consolidated overview |
-
----
-
 ## Related Documents
+
+### Module-Level Documentation
+- **VENDOR-MANAGEMENT-OVERVIEW.md** - This document (Module overview)
+- **CHANGE-HISTORY.md** - Complete change tracking and history (v1.0.0)
+- **DOCUMENTATION-STATUS.md** - Documentation completion status
+- **data-structure-gaps.md** - Data structure analysis
+
+### Architecture Change Requests
+- **ARC-2024-001-vendor-management-redesign.md** - Comprehensive redesign (16 changes)
+- **CODE-CHANGE-TODO.md** - Implementation checklist (87 tasks across 4 phases)
 
 ### Vendor Directory (Complete)
 - BR-vendor-directory.md
@@ -721,16 +763,30 @@ GET    /api/portal/performance     - Performance metrics
 - FD-vendor-directory.md
 - VAL-vendor-directory.md
 
+### Price Lists (Updated for ARC-2024-001)
+- **DD-price-lists.md** (v1.1.0) - Data Dictionary with ARC-2024-001 changes
+- BR-price-lists.md (pending update)
+- UC-price-lists.md (pending update)
+- TS-price-lists.md (pending update)
+- VAL-price-lists.md (pending update)
+
+### Request for Pricing (Updated for ARC-2024-001)
+- **DD-requests-for-pricing.md** (v1.1.0) - Data Dictionary with ARC-2024-001 changes
+- BR-requests-for-pricing.md (pending update)
+- UC-requests-for-pricing.md (pending update)
+- TS-requests-for-pricing.md (pending update)
+- VAL-requests-for-pricing.md (pending update)
+
 ### Pricelist Templates
 - BR-pricelist-templates.md
+- DD-pricelist-templates.md (pending ARC-2024-001 update)
 - UC-pricelist-templates.md (to be created)
 - TS-pricelist-templates.md (to be created)
-- DS-pricelist-templates.md (to be created)
 - FD-pricelist-templates.md (to be created)
 - VAL-pricelist-templates.md (to be created)
 
-### Other Modules
-Individual documentation to be created following similar patterns established in Vendor Directory.
+### Vendor Portal
+- Documentation to be created following similar patterns established in Vendor Directory
 
 ---
 

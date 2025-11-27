@@ -39,8 +39,8 @@ import {
 } from "lucide-react"
 
 // Import mock data and types
-import { mockUnits } from "../data/mock-units"
-import { Unit } from "./unit-list"
+import { mockUnits } from "@/lib/mock-data/units"
+import { Unit } from "@/lib/types"
 
 export function UnitListImproved() {
   const router = useRouter()
@@ -53,14 +53,13 @@ export function UnitListImproved() {
   const filteredUnits = useMemo(() => {
     return mockUnits.filter(unit => {
       const matchesSearch = unit.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           unit.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           (unit.description && unit.description.toLowerCase().includes(searchTerm.toLowerCase()))
-      
-      const matchesStatus = statusFilter === "all" || 
-                           (statusFilter === "active" && unit.isActive) ||
-                           (statusFilter === "inactive" && !unit.isActive)
-      
-      const matchesType = typeFilter === "all" || unit.type === typeFilter
+        unit.symbol.toLowerCase().includes(searchTerm.toLowerCase())
+
+      const matchesStatus = statusFilter === "all" ||
+        (statusFilter === "active" && unit.isActive) ||
+        (statusFilter === "inactive" && !unit.isActive)
+
+      const matchesType = typeFilter === "all" || unit.category === typeFilter
 
       return matchesSearch && matchesStatus && matchesType
     })
@@ -121,12 +120,12 @@ export function UnitListImproved() {
               <SelectItem value="RECIPE">Recipe</SelectItem>
             </SelectContent>
           </Select>
-          
+
           {/* View Toggle - positioned at far right */}
           <div className="flex items-center border rounded-md ml-auto">
-            <Button 
-              variant={viewMode === 'table' ? 'default' : 'ghost'} 
-              size="sm" 
+            <Button
+              variant={viewMode === 'table' ? 'default' : 'ghost'}
+              size="sm"
               className="h-8 px-2 rounded-r-none border-0"
               onClick={() => setViewMode('table')}
               aria-label="Table view"
@@ -134,8 +133,8 @@ export function UnitListImproved() {
             >
               <List className="h-3 w-3" />
             </Button>
-            <Button 
-              variant={viewMode === 'cards' ? 'default' : 'ghost'} 
+            <Button
+              variant={viewMode === 'cards' ? 'default' : 'ghost'}
               size="sm"
               className="h-8 px-2 rounded-l-none border-0"
               onClick={() => setViewMode('cards')}
@@ -160,11 +159,10 @@ export function UnitListImproved() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
-                <TableHead className="font-semibold text-xs py-2">Code</TableHead>
+                <TableHead className="font-semibold text-xs py-2">Symbol</TableHead>
                 <TableHead className="font-semibold text-xs py-2">Name</TableHead>
-                <TableHead className="font-semibold text-xs py-2">Type</TableHead>
+                <TableHead className="font-semibold text-xs py-2">Category</TableHead>
                 <TableHead className="font-semibold text-xs py-2">Status</TableHead>
-                <TableHead className="font-semibold text-xs py-2">Description</TableHead>
                 <TableHead className="font-semibold text-xs py-2 w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -178,15 +176,15 @@ export function UnitListImproved() {
               ) : (
                 filteredUnits.map((unit) => (
                   <TableRow key={unit.id} className="hover:bg-muted/30 transition-colors">
-                    <TableCell className="py-2 text-xs font-medium">{unit.code}</TableCell>
+                    <TableCell className="py-2 text-xs font-medium">{unit.symbol}</TableCell>
                     <TableCell className="py-2 text-xs">{unit.name}</TableCell>
                     <TableCell className="py-2">
                       <Badge variant="secondary" className="text-xs px-2 py-0.5 capitalize">
-                        {unit.type}
+                        {unit.category}
                       </Badge>
                     </TableCell>
                     <TableCell className="py-2">
-                      <Badge 
+                      <Badge
                         variant={unit.isActive ? "default" : "secondary"}
                         className={cn(
                           "text-xs px-2 py-0.5",
@@ -195,9 +193,6 @@ export function UnitListImproved() {
                       >
                         {unit.isActive ? "Active" : "Inactive"}
                       </Badge>
-                    </TableCell>
-                    <TableCell className="py-2 text-xs max-w-[200px] truncate">
-                      {unit.description || "-"}
                     </TableCell>
                     <TableCell className="py-2">
                       <DropdownMenu>
@@ -211,7 +206,7 @@ export function UnitListImproved() {
                             <Edit className="h-3 w-3 mr-2" />
                             <span className="text-xs">Edit</span>
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => handleDelete(unit)}
                             className="text-destructive focus:text-destructive"
                           >
@@ -241,9 +236,9 @@ export function UnitListImproved() {
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="font-semibold text-sm">{unit.name}</h3>
-                      <p className="text-xs text-muted-foreground font-mono">{unit.code}</p>
+                      <p className="text-xs text-muted-foreground font-mono">{unit.symbol}</p>
                     </div>
-                    <Badge 
+                    <Badge
                       variant={unit.isActive ? "default" : "secondary"}
                       className={cn(
                         "text-xs px-2 py-0.5",
@@ -257,14 +252,10 @@ export function UnitListImproved() {
                 <CardContent>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Type</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Category</p>
                       <Badge variant="secondary" className="text-xs px-2 py-0.5 capitalize">
-                        {unit.type}
+                        {unit.category}
                       </Badge>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Description</p>
-                      <p className="text-xs line-clamp-2">{unit.description || "No description available"}</p>
                     </div>
                     <div className="flex justify-end pt-2">
                       <DropdownMenu>
@@ -278,7 +269,7 @@ export function UnitListImproved() {
                             <Edit className="h-3 w-3 mr-2" />
                             <span className="text-xs">Edit</span>
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => handleDelete(unit)}
                             className="text-destructive focus:text-destructive"
                           >

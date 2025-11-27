@@ -1,5 +1,10 @@
 # Functional Specification Agent Prompt
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Agent Purpose
 Create comprehensive functional specifications based on actual source code implementation and business requirements using the functional-spec-prompt-template.md methodology.
 

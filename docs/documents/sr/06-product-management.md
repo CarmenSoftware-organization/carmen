@@ -1,5 +1,10 @@
 # Feature: Product Management and Catalog System
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Description
 The Carmen ERP Product Management System provides comprehensive product catalog management with sophisticated product profiling, multi-unit conversions, environmental impact tracking, location assignment management, and inventory integration. The system supports complex product configurations including pricing structures, tax management, unit conversions for ordering/inventory/recipes, location-specific parameters, and environmental sustainability metrics. Products can be configured for sale items, ingredients, or both, with complete lifecycle management from creation to discontinuation.
 

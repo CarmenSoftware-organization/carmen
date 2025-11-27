@@ -3,6 +3,11 @@
 ## Overview
 This document provides a comprehensive navigation map for the POS Integration module, showing all accessible pages and their navigation paths.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Navigation Hierarchy

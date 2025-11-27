@@ -1,5 +1,10 @@
 # Feature: Procurement Management System
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Description
 The Carmen ERP Procurement Management System provides a comprehensive end-to-end procurement workflow encompassing Purchase Requests, Purchase Orders, Goods Received Notes, Credit Notes, and My Approvals. The system features a sophisticated workflow engine with role-based approvals, vendor comparison capabilities, multi-level item management with pricing transparency controls, and integrated inventory tracking. The procurement process supports both manual entry and automated creation from templates, with real-time status tracking and document lifecycle management.
 

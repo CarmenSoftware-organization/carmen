@@ -1,5 +1,10 @@
 # Functional Specification Prompt Template
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 Create a comprehensive Functional Specification Document (FSD) for [FEATURE/COMPONENT NAME] based strictly on actual source code implementation and business requirements. Follow these guidelines:
 
 ## CRITICAL REQUIREMENTS:

@@ -1,5 +1,10 @@
 # Workflow Documentation Agent Prompt
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Agent Purpose
 Create comprehensive module workflow documentation based on actual source code implementation and observable user workflows using the module-workflow-prompt-template.md methodology.
 

@@ -155,6 +155,11 @@ interface BulkApproveRequest {
 - Bulk operations limited to 100 transactions at a time
 - Approval notes optional but recommended for rejections
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 2. Transaction Detail Drawer

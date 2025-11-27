@@ -25,6 +25,11 @@ This document provides visual representations of Inventory Overview workflows, i
 - [Data Schema](./DS-inventory-overview.md)
 - [Validations](./VAL-inventory-overview.md)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Diagram Index

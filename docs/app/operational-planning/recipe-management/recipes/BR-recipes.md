@@ -6,7 +6,12 @@
 - **Version**: 1.0
 - **Last Updated**: 2024-01-15
 
----
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial business requirements document created |
+
 
 ## 1. Overview
 
@@ -1209,9 +1214,3 @@ enum FractionalSalesType {
 **Yield Variant**: A defined serving size or portion of a recipe available for individual sale (e.g., whole pizza, half pizza, slice).
 
 ---
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial business requirements document created |

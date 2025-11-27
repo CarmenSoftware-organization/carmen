@@ -5,10 +5,10 @@
  * cross-variant analysis, strategic recommendations, and performance optimization.
  */
 
-import { 
-  Recipe, 
-  RecipeYieldVariant 
-} from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
+import {
+  Recipe,
+  RecipeYieldVariant
+} from "@/lib/types"
 import {
   FractionalSalesTransaction,
   ConsumptionPeriod,

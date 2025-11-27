@@ -1,5 +1,10 @@
 # Recipe Yield Variants Management Functional Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 The Recipe Yield Variants Management system enables comprehensive multi-yield recipe management supporting fractional product sales in hospitality environments. This component allows single recipes to have multiple selling configurations (whole, half, slice, portion) with independent pricing, conversion rates, and operational parameters.
 

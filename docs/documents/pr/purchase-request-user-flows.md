@@ -480,6 +480,11 @@ flowchart TD
     Y --> Z
 ```
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 This comprehensive user flow documentation provides detailed insight into all user interactions within the Purchase Request system, covering every aspect from basic navigation to complex workflow approvals and error handling scenarios.

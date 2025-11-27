@@ -1,5 +1,10 @@
 # Pricelist Management - Navigation Integration Complete
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## 🎯 **Navigation Structure Added**
 
 The pricelist management module has been successfully integrated into the Carmen sidebar navigation under **Vendor Management**.

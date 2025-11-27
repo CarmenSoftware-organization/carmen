@@ -23,14 +23,13 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { Unit } from "./unit-list"
+import { Unit } from "@/lib/types"
 
 const unitSchema = z.object({
-  code: z.string().min(1, "Code is required").max(10, "Code must be 10 characters or less"),
+  symbol: z.string().min(1, "Symbol is required").max(10, "Symbol must be 10 characters or less"),
   name: z.string().min(1, "Name is required").max(50, "Name must be 50 characters or less"),
-  description: z.string().max(200, "Description must be 200 characters or less").optional(),
-  type: z.enum(["INVENTORY", "ORDER", "RECIPE"], {
-    required_error: "Please select a unit type",
+  category: z.enum(["weight", "volume", "length", "count", "time", "temperature"], {
+    required_error: "Please select a unit category",
   }),
   isActive: z.boolean().default(true),
 })
@@ -47,10 +46,9 @@ export function UnitForm({ unit, onSuccess, onCancel }: UnitFormProps) {
   const form = useForm<UnitFormValues>({
     resolver: zodResolver(unitSchema),
     defaultValues: {
-      code: unit?.code || "",
+      symbol: unit?.symbol || "",
       name: unit?.name || "",
-      description: unit?.description || "",
-      type: unit?.type || "INVENTORY",
+      category: unit?.category || "weight",
       isActive: unit?.isActive ?? true,
     },
   })
@@ -65,15 +63,15 @@ export function UnitForm({ unit, onSuccess, onCancel }: UnitFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="code"
+          name="symbol"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Code</FormLabel>
+              <FormLabel>Symbol</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
               <FormDescription>
-                A unique code for the unit (e.g., KG, L, PC)
+                A short identifier for the unit (e.g., kg, L, pc)
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -97,40 +95,27 @@ export function UnitForm({ unit, onSuccess, onCancel }: UnitFormProps) {
         />
         <FormField
           control={form.control}
-          name="description"
+          name="category"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea {...field} />
-              </FormControl>
-              <FormDescription>
-                Optional description or notes about the unit
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Type</FormLabel>
+              <FormLabel>Category</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a unit type" />
+                    <SelectValue placeholder="Select a unit category" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="INVENTORY">Inventory</SelectItem>
-                  <SelectItem value="ORDER">Order</SelectItem>
-                  <SelectItem value="RECIPE">Recipe</SelectItem>
+                  <SelectItem value="weight">Weight</SelectItem>
+                  <SelectItem value="volume">Volume</SelectItem>
+                  <SelectItem value="length">Length</SelectItem>
+                  <SelectItem value="count">Count</SelectItem>
+                  <SelectItem value="time">Time</SelectItem>
+                  <SelectItem value="temperature">Temperature</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>
-                The category this unit belongs to
+                The measurement category this unit belongs to
               </FormDescription>
               <FormMessage />
             </FormItem>

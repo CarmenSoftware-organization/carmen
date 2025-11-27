@@ -23,6 +23,43 @@ export const mockLocations: Location[] = permissionLocations;
 
 export const mockUsers: User[] = [
   {
+    id: 'user-default-001',
+    name: 'John Doe',
+    email: 'john@example.com',
+    avatar: '/avatars/default.png',
+    availableRoles: mockRoles,
+    availableDepartments: mockDepartments,
+    availableLocations: mockLocations,
+    // Permission-related fields
+    roles: [mockRoles.find(r => r.id === 'role-013')!], // Store Staff
+    primaryRole: mockRoles.find(r => r.id === 'role-013')!,
+    departments: [mockDepartments.find(d => d.id === 'dept-001')!], // Administration
+    locations: [mockLocations.find(l => l.id === 'loc-006')!], // Corporate Office
+    clearanceLevel: 'basic',
+    effectiveFrom: new Date('2024-01-01'),
+    effectiveTo: new Date('2025-12-31'),
+    accountStatus: 'active',
+    isHod: false,
+    businessUnit: 'operations',
+    specialPermissions: [],
+    delegatedAuthorities: [],
+    effectivePermissions: [
+      'store_requisition:create', 'inventory_item:view_availability',
+      'wastage_report:create', 'product:view'
+    ],
+    // Legacy compatibility fields
+    role: 'role-013',
+    department: 'dept-001',
+    location: 'loc-006',
+    assignedWorkflowStages: [],
+    context: {
+      currentRole: mockRoles.find(r => r.id === 'role-013')!,
+      currentDepartment: mockDepartments.find(d => d.id === 'dept-001')!,
+      currentLocation: mockLocations.find(l => l.id === 'loc-006')!,
+      showPrices: false,
+    }
+  },
+  {
     id: 'user-chef-001',
     name: 'Chef Maria Rodriguez',
     email: 'maria.rodriguez@grandhotel.com',

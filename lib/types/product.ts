@@ -20,6 +20,14 @@ export type ProductType = 'raw_material' | 'finished_good' | 'semi_finished' | '
 export type ProductStatus = 'active' | 'inactive' | 'discontinued' | 'pending_approval' | 'draft';
 
 /**
+ * Tax calculation type for products
+ * - ADDED: Tax calculated on top of price (price + tax)
+ * - INCLUDED: Tax already included in price (price with tax embedded)
+ * - NONE: No tax applies to this product
+ */
+export type TaxType = 'ADDED' | 'INCLUDED' | 'NONE';
+
+/**
  * Main product interface
  */
 export interface Product {
@@ -31,8 +39,10 @@ export interface Product {
   shortDescription?: string;
   productType: ProductType;
   status: ProductStatus;
+  // Category hierarchy (BR-PROD-004, BR-PROD-005) - 3-level required
   categoryId: string;
   subcategoryId?: string;
+  itemGroupId?: string;              // Third level of category hierarchy (BR-PROD-005)
   brandId?: string;
   manufacturerId?: string;
   // Specifications
@@ -60,6 +70,16 @@ export interface Product {
   standardCost?: Money;
   lastPurchaseCost?: Money;
   averageCost?: Money;
+  // Deviation Control (BR-PROD-008, BR-PROD-009)
+  priceDeviation?: number;          // Allowed price variance % (0-100, 2 decimals)
+  quantityDeviation?: number;       // Allowed quantity variance % (0-100, 2 decimals)
+  // Tax Configuration (BR-PROD-017)
+  taxType?: TaxType;                // Tax calculation method
+  taxRate?: number;                 // Tax percentage (0-100, 2 decimals)
+  // Product Identification (BR-PROD-018)
+  barcode?: string;                 // Primary barcode (EAN-13, UPC, Code 128)
+  // Quantity Display Precision (BR-PROD-014, BR-PROD-015)
+  quantityDecimalPlaces?: number;   // Decimal places for quantity display (0-5, default: 3)
   // Physical properties
   weight?: number;
   weightUnit?: string;
@@ -82,6 +102,9 @@ export interface Product {
   tags: string[];
   notes?: string;
   isActive: boolean;
+  // Product type flags (BR-PROD-011)
+  isUsedInRecipes?: boolean;         // True if product is used as recipe ingredient
+  isSoldDirectly?: boolean;          // True if product can be sold to customers
 }
 
 /**

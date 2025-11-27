@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-import { WorkflowStage, WorkflowStatus, PurchaseRequest, DocumentStatus, asMockPurchaseRequest } from "@/lib/types";
+import { WorkflowStage, WorkflowStatus, PurchaseRequest, PRStatus, asMockPurchaseRequest } from "@/lib/types";
 
 import { CheckCircle, Clock, XCircle, User, Building, CreditCard, UserCheck, CheckSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -68,7 +68,7 @@ export function WorkflowProgressTimeline({ prData, className }: WorkflowProgress
 
       const mockPrData = asMockPurchaseRequest(prData);
 
-      if (prData.status === DocumentStatus.Rejected && step.stage === mockPrData.currentWorkflowStage) {
+      if (prData.status === PRStatus.Cancelled && step.stage === mockPrData.currentWorkflowStage) {
         status = 'rejected';
       } else if (step.stage === mockPrData.currentWorkflowStage) {
         status = 'current';
@@ -138,7 +138,7 @@ export function WorkflowProgressTimeline({ prData, className }: WorkflowProgress
           })}
         </div>
         
-        {prData.status === DocumentStatus.Rejected && (
+        {prData.status === PRStatus.Cancelled && (
           <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs">
             <div className="text-red-800 font-medium">
               Request Rejected at {workflowSteps.find(s => s.status === 'rejected')?.title} stage

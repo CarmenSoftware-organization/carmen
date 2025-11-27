@@ -22,6 +22,14 @@ import type { Role, Department, Location, User } from "@/lib/types/user";
 // Demo users based on PR mock data requestorIds
 const demoUsers = [
   {
+    id: 'user-default-001',
+    name: 'John Doe',
+    email: 'john@example.com',
+    department: 'Administration',
+    role: 'Staff',
+    avatar: '👤'
+  },
+  {
     id: 'user-chef-001',
     name: 'Chef Maria Rodriguez',
     email: 'maria.rodriguez@example.com',
@@ -120,7 +128,11 @@ export function UserContextSwitcher() {
     // Create a new user object with the demo user's properties
     // but keep the same available roles, departments, and locations
     if (!user) return;
-    
+
+    // Determine showPrices based on role - Staff/Requestor roles should not see prices by default
+    const staffRoles = ['Staff', 'Requestor', 'Store Staff', 'Chef', 'Counter Staff'];
+    const shouldShowPrices = !staffRoles.includes(demoUser.role);
+
     const updatedUser: User = {
       ...user,
       id: demoUser.id,
@@ -133,9 +145,10 @@ export function UserContextSwitcher() {
         ...user.context,
         currentRole: user.availableRoles.find(r => r.name === demoUser.role) || user.context.currentRole,
         currentDepartment: user.availableDepartments.find(d => d.name === demoUser.department) || user.context.currentDepartment,
+        showPrices: shouldShowPrices,
       }
     };
-    
+
     setUser(updatedUser);
     setIsOpen(false);
   };

@@ -1,5 +1,10 @@
 # Carmen SaaS Notification Service - Project Task Checklist
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Phase 1: Foundation (Months 1-3)
 
 ### Sprint 1: Project Setup & Architecture

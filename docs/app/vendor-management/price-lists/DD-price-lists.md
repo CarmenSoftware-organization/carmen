@@ -3,37 +3,35 @@
 ## Module Information
 - **Module**: Vendor Management
 - **Sub-module**: Price Lists
-- **Version**: 1.0.0
+- **Version**: 2.1.0
 - **Status**: Active
-- **Last Updated**: 2025-11-15
+- **Last Updated**: 2025-11-26
 
 ## Document History
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0.0 | 2025-11-15 | Documentation Team | Initial DD document created from schema.prisma |
+| 2.1.0 | 2025-11-26 | System | Updated to reflect actual Prisma schema (tb_pricelist, tb_pricelist_detail); Added proposed fields section highlighting deviations from current database |
+| 2.0.0 | 2025-11-26 | System | Complete rewrite to match BR v2.0.0 and actual code implementation |
+| 1.2.0 | 2025-11-18 | Documentation Team | Previous version with vendor portal UI specifications |
+| 1.1.0 | 2025-11-17 | Documentation Team | Added effective date range per user clarification |
+| 1.0.0 | 2025-11-15 | Documentation Team | Initial DD document |
 
-**⚠️ IMPORTANT: This is a Data Definition Document - TEXT FORMAT ONLY**
-
-This document describes data structures, entities, relationships, and constraints in TEXT FORMAT.
-It does NOT contain executable SQL code, database scripts, or implementation code.
-For database implementation details, refer to the Technical Specification document.
-
-**✅ SCHEMA COVERAGE**: All tables exist in `data-struc/schema.prisma`
+**Note**: This document describes data structures based on the Prisma schema (`docs/app/data-struc/schema.prisma`). Proposed fields not yet in the database are highlighted.
 
 ---
 
 ## Overview
 
-The Price Lists module manages vendor pricing information including product prices, validity periods, multi-currency support, and tiered pricing structures. Price lists are created by vendors and used during procurement processes to determine product costs.
+The Price Lists module manages vendor pricing information including product prices, effective dates, and tax configurations. Price lists are created by procurement staff and used during procurement processes to determine product costs.
 
 ### Key Features
-- Vendor-specific pricing management
-- Multi-currency support
-- Validity period tracking
-- Tax profile integration
-- Tiered pricing via JSONB info field
-- Price version control
-- Soft delete support
+- Price list viewing and management
+- Price list creation with line items
+- Tax profile integration per item
+- Status management via `is_active` flag
+- Price list duplication
+- Export functionality
+- Search and filtering
 
 ---
 
@@ -41,197 +39,237 @@ The Price Lists module manages vendor pricing information including product pric
 
 ```
 tb_vendor (1) ──── (N) tb_pricelist
-tb_currency (1) ──── (N) tb_pricelist
 tb_pricelist (1) ──── (N) tb_pricelist_detail
-tb_product (1) ──── (N) tb_pricelist_detail
-tb_unit (1) ──── (N) tb_pricelist_detail
+tb_pricelist_detail (N) ──── (1) tb_product
+tb_pricelist_detail (N) ──── (1) tb_unit
+tb_currency (1) ──── (N) tb_pricelist
 ```
 
 ---
 
-## Core Entities
+## Core Entities (Database Schema)
 
-### 1. Price List Header (tb_pricelist)
+### 1. tb_pricelist
 
-**Source**: `schema.prisma` lines 2255-2294
+**Purpose**: Stores price list header information including vendor reference, currency, and validity period.
 
-**Purpose**: Stores price list header information including vendor, currency, and validity period.
+**Database Table**: `tb_pricelist`
 
-**Table Name**: `tb_pricelist`
-
-**Primary Key**: `id` (UUID)
-
-#### Fields
+#### Current Database Fields
 
 | Field Name | Data Type | Constraints | Description |
 |-----------|-----------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique identifier |
-| `pricelist_no` | VARCHAR | UNIQUE, NOT NULL | Price list document number |
-| `name` | VARCHAR | UNIQUE | Price list name/description |
-| `url_token` | VARCHAR | | Secure token for vendor portal access |
-| `vendor_id` | UUID | FOREIGN KEY → tb_vendor.id | Associated vendor |
-| `vendor_name` | VARCHAR | DENORMALIZED | Vendor name for quick reference |
-| `from_date` | TIMESTAMPTZ | | Price list start date |
-| `to_date` | TIMESTAMPTZ | | Price list end date |
-| `currency_id` | UUID | FOREIGN KEY → tb_currency.id | Price list currency |
-| `currency_name` | VARCHAR | DENORMALIZED | Currency name for quick reference |
+| `id` | UUID | PRIMARY KEY, auto-generated | Unique identifier |
+| `pricelist_no` | VARCHAR | UNIQUE, NOT NULL | Price list reference number |
+| `name` | VARCHAR | UNIQUE | Display name of price list |
+| `url_token` | VARCHAR | | Token for external access |
+| `vendor_id` | UUID | FK → tb_vendor | Associated vendor ID |
+| `vendor_name` | VARCHAR | | Denormalized vendor name |
+| `from_date` | TIMESTAMPTZ | | Start of validity period |
+| `to_date` | TIMESTAMPTZ | | End of validity period |
+| `currency_id` | UUID | FK → tb_currency | Currency reference |
+| `currency_name` | VARCHAR | | Denormalized currency name |
 | `is_active` | BOOLEAN | DEFAULT TRUE | Active status flag |
-| `description` | VARCHAR | | Additional description |
-| `note` | VARCHAR | | Internal notes |
-| `info` | JSON | | Additional metadata (tiered pricing, special terms) |
-| `dimension` | JSON | | Multi-dimensional attributes |
-| `doc_version` | DECIMAL | DEFAULT 0 | Document version for optimistic locking |
-| `created_at` | TIMESTAMPTZ | DEFAULT now() | Record creation timestamp |
-| `created_by_id` | UUID | | User who created the record |
+| `description` | VARCHAR | | Description of price list |
+| `note` | VARCHAR | | Additional notes |
+| `info` | JSON | | Extended information |
+| `dimension` | JSON | | Dimensional data |
+| `doc_version` | DECIMAL | DEFAULT 0 | Document version number |
+| `created_at` | TIMESTAMPTZ | DEFAULT now() | Creation timestamp |
+| `created_by_id` | UUID | | Creator user ID |
 | `updated_at` | TIMESTAMPTZ | DEFAULT now() | Last update timestamp |
-| `updated_by_id` | UUID | | User who last updated |
+| `updated_by_id` | UUID | | Last updater user ID |
 | `deleted_at` | TIMESTAMPTZ | | Soft delete timestamp |
 | `deleted_by_id` | UUID | | User who deleted |
 
-#### Relationships
-- **tb_vendor**: Many-to-One (multiple price lists per vendor)
-- **tb_currency**: Many-to-One (price list in specific currency)
-- **tb_pricelist_detail**: One-to-Many (price list contains multiple line items)
+#### 🔶 PROPOSED: Additional Fields (Not in Current Database)
 
-#### Business Rules
-1. **Uniqueness**: `pricelist_no` must be unique across all price lists
-2. **Validity Period**: `to_date` must be greater than or equal to `from_date`
-3. **Active Status**: Only one active price list per vendor-currency combination at any time
-4. **Denormalization**: `vendor_name` and `currency_name` cached for performance
-5. **Soft Delete**: Records marked as deleted via `deleted_at` instead of physical deletion
+The following fields are used in the UI/mock data but **NOT YET** in the database schema:
 
-#### Indexes
-```
-INDEX pricelist_name_u ON tb_pricelist(name)
-```
+| Field Name | Proposed Type | Purpose | Priority |
+|-----------|---------------|---------|----------|
+| `status` | ENUM (draft, pending, active, expired) | Workflow status management | **HIGH** |
+| `approved_by_id` | UUID | Approver user reference | MEDIUM |
+| `approved_at` | TIMESTAMPTZ | Approval timestamp | MEDIUM |
+| `total_items` | INT | Computed count of line items | LOW (can be computed) |
+| `volume_discounts` | JSON | Volume-based discount rules | MEDIUM |
 
-#### JSON Field Structures
+> **Note**: Currently, the database uses `is_active` boolean. The UI implements status (draft, pending, active, expired) in mock data. A `status` enum field is recommended for full workflow support.
 
-**info field** - Tiered pricing and special terms:
-```json
-{
-  "tiered_pricing": {
-    "enabled": true,
-    "tiers": [
-      {
-        "min_quantity": 1,
-        "max_quantity": 99,
-        "discount_percentage": 0
-      },
-      {
-        "min_quantity": 100,
-        "max_quantity": 499,
-        "discount_percentage": 5
-      },
-      {
-        "min_quantity": 500,
-        "max_quantity": null,
-        "discount_percentage": 10
-      }
-    ]
-  },
-  "payment_terms": {
-    "net_days": 30,
-    "discount_percentage": 2,
-    "discount_days": 10
-  },
-  "special_terms": "Free shipping on orders over $1000"
-}
-```
+#### Database Indexes
+- `pricelist_name_u` on `name` field
 
-**dimension field** - Multi-dimensional attributes:
-```json
-{
-  "department_id": "uuid",
-  "location_id": "uuid",
-  "cost_center_id": "uuid",
-  "project_id": "uuid"
-}
-```
+#### Relations
+- `tb_vendor` → vendor_id
+- `tb_currency` → currency_id
+- `tb_pricelist_detail[]` → child line items
 
 ---
 
-### 2. Price List Line Items (tb_pricelist_detail)
-
-**Source**: `schema.prisma` lines 2296-2330
+### 2. tb_pricelist_detail
 
 **Purpose**: Stores individual product pricing information within a price list.
 
-**Table Name**: `tb_pricelist_detail`
+**Database Table**: `tb_pricelist_detail`
 
-**Primary Key**: `id` (UUID)
-
-#### Fields
+#### Current Database Fields
 
 | Field Name | Data Type | Constraints | Description |
 |-----------|-----------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique identifier |
-| `pricelist_id` | UUID | FOREIGN KEY → tb_pricelist.id, NOT NULL | Parent price list |
-| `sequence_no` | INTEGER | DEFAULT 1 | Line item order/sequence |
-| `product_id` | UUID | FOREIGN KEY → tb_product.id, NOT NULL | Product being priced |
-| `product_name` | VARCHAR | DENORMALIZED | Product name for quick reference |
-| `unit_id` | UUID | FOREIGN KEY → tb_unit.id | Pricing unit of measure |
-| `unit_name` | VARCHAR | DENORMALIZED | Unit name for quick reference |
-| `tax_profile_id` | UUID | | Tax profile for this line item |
-| `tax_profile_name` | VARCHAR | DENORMALIZED | Tax profile name |
+| `id` | UUID | PRIMARY KEY, auto-generated | Unique identifier |
+| `pricelist_id` | UUID | NOT NULL, FK → tb_pricelist | Parent price list ID |
+| `sequence_no` | INT | DEFAULT 1 | Line item sequence number |
+| `product_id` | UUID | NOT NULL, FK → tb_product | Product reference |
+| `product_name` | VARCHAR | | Denormalized product name |
+| `unit_id` | UUID | FK → tb_unit | Unit of measure reference |
+| `unit_name` | VARCHAR | | Denormalized unit name |
+| `tax_profile_id` | UUID | | Tax profile reference |
+| `tax_profile_name` | VARCHAR | | Denormalized tax profile name |
 | `tax_rate` | DECIMAL(15,5) | | Tax rate percentage |
-| `price` | DECIMAL(20,5) | | Base price amount |
-| `price_without_vat` | DECIMAL(20,5) | | Price excluding tax |
-| `price_with_vat` | DECIMAL(20,5) | | Price including tax |
-| `is_active` | BOOLEAN | DEFAULT TRUE | Active status flag |
-| `description` | VARCHAR | | Line item description |
-| `note` | VARCHAR | | Internal notes |
-| `info` | JSON | | Additional metadata (quantity breaks, special pricing) |
-| `dimension` | JSON | | Multi-dimensional attributes |
-| `doc_version` | DECIMAL | DEFAULT 0 | Version for optimistic locking |
-| `created_at` | TIMESTAMPTZ | DEFAULT now() | Record creation timestamp |
-| `created_by_id` | UUID | | User who created |
+| `price` | DECIMAL(20,5) | | Base unit price |
+| `price_without_vat` | DECIMAL(20,5) | | Price excluding VAT |
+| `price_with_vat` | DECIMAL(20,5) | | Price including VAT |
+| `is_active` | BOOLEAN | DEFAULT TRUE | Active status |
+| `description` | VARCHAR | | Item description |
+| `note` | VARCHAR | | Item notes |
+| `info` | JSON | | Extended information |
+| `dimension` | JSON | | Dimensional data |
+| `doc_version` | DECIMAL | DEFAULT 0 | Document version number |
+| `created_at` | TIMESTAMPTZ | DEFAULT now() | Creation timestamp |
+| `created_by_id` | UUID | | Creator user ID |
 | `updated_at` | TIMESTAMPTZ | DEFAULT now() | Last update timestamp |
-| `updated_by_id` | UUID | | User who last updated |
+| `updated_by_id` | UUID | | Last updater user ID |
 | `deleted_at` | TIMESTAMPTZ | | Soft delete timestamp |
 | `deleted_by_id` | UUID | | User who deleted |
 
-#### Relationships
-- **tb_pricelist**: Many-to-One (line items belong to one price list)
-- **tb_product**: Many-to-One (multiple line items can reference same product)
-- **tb_unit**: Many-to-One (pricing in specific unit)
-- **tb_purchase_request_detail**: One-to-Many (price list used in purchase requests)
+#### 🔶 PROPOSED: Additional Fields (Not in Current Database)
 
-#### Business Rules
-1. **Price Calculation**: `price_with_vat = price_without_vat * (1 + tax_rate / 100)`
-2. **Unit Consistency**: `unit_id` must be valid for the referenced product
-3. **Sequencing**: `sequence_no` determines display order within price list
-4. **Tax Handling**: If `tax_profile_id` is null, use vendor's default tax profile
-5. **Denormalization**: Product and unit names cached for performance
+The following fields are used in the UI/mock data but **NOT YET** in the database schema:
 
-#### JSON Field Structures
+| Field Name | Proposed Type | Purpose | Priority |
+|-----------|---------------|---------|----------|
+| `minimum_order_quantity` | DECIMAL(20,5) | MOQ for this price tier | **HIGH** |
+| `lead_time_days` | INT | Lead time in days | **HIGH** |
+| `is_foc` | BOOLEAN | Free of charge flag | MEDIUM |
+| `is_preferred_vendor` | BOOLEAN | Preferred vendor indicator | LOW |
 
-**info field** - Quantity breaks and special pricing:
-```json
-{
-  "quantity_breaks": [
-    {
-      "min_quantity": 1,
-      "max_quantity": 49,
-      "unit_price": 10.00
-    },
-    {
-      "min_quantity": 50,
-      "max_quantity": 199,
-      "unit_price": 9.50
-    },
-    {
-      "min_quantity": 200,
-      "max_quantity": null,
-      "unit_price": 9.00
-    }
-  ],
-  "lead_time_days": 7,
-  "minimum_order_quantity": 10,
-  "packaging_type": "case",
-  "items_per_package": 12
+> **Note**: The `info` JSON field could potentially store MOQ and lead time data, but explicit columns are recommended for query performance and data integrity.
+
+#### Relations
+- `tb_pricelist` → pricelist_id (parent)
+- `tb_product` → product_id
+- `tb_unit` → unit_id
+- `tb_purchase_request_detail[]` → referenced by purchase requests
+
+---
+
+### 3. 🔶 PROPOSED: tb_pricelist_discount (Not in Current Database)
+
+**Purpose**: Stores quantity-based discount tiers for price list items.
+
+> **Note**: This entity exists in mock data but has NO corresponding database table. Implementation required for volume discount functionality.
+
+#### Proposed Schema
+
+```prisma
+model tb_pricelist_discount {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pricelist_detail_id String   @db.Uuid
+  min_quantity        Decimal  @db.Decimal(20, 5)
+  discount_type       enum_discount_type  // percentage, fixed_amount
+  discount_value      Decimal  @db.Decimal(20, 5)
+  description         String?  @db.VarChar
+  is_active           Boolean  @default(true)
+
+  created_at          DateTime? @default(now()) @db.Timestamptz(6)
+  created_by_id       String?   @db.Uuid
+
+  tb_pricelist_detail tb_pricelist_detail @relation(fields: [pricelist_detail_id], references: [id])
+
+  @@map("tb_pricelist_discount")
+}
+
+enum enum_discount_type {
+  percentage
+  fixed_amount
 }
 ```
+
+---
+
+## Status Management
+
+### Current Implementation (Database)
+
+The database uses a simple boolean `is_active` field:
+
+| is_active | Meaning |
+|-----------|---------|
+| `true` | Price list is active and can be used |
+| `false` | Price list is inactive/disabled |
+
+### 🔶 PROPOSED: Status Enum
+
+For full workflow support matching the UI implementation:
+
+```prisma
+enum enum_pricelist_status {
+  draft
+  pending
+  active
+  expired
+}
+```
+
+| Status | Description | UI Color Code |
+|--------|-------------|---------------|
+| `draft` | Initial creation, not finalized | Gray (bg-gray-100 text-gray-800) |
+| `pending` | Awaiting review/approval | Yellow (bg-yellow-100 text-yellow-800) |
+| `active` | Current and in use | Green (bg-green-100 text-green-800) |
+| `expired` | Past effective end date | Red (bg-red-100 text-red-800) |
+
+---
+
+## Field Mapping: Database ↔ UI
+
+### Price List Header
+
+| Database Field | UI Field | Notes |
+|----------------|----------|-------|
+| `id` | `id` | Direct mapping |
+| `pricelist_no` | `priceListCode` | Reference number |
+| `name` | `priceListName` | Display name |
+| `vendor_id` | `vendorId` | Foreign key |
+| `vendor_name` | `vendorName` | Denormalized |
+| `from_date` | `effectiveStartDate` | Validity start |
+| `to_date` | `effectiveEndDate` | Validity end |
+| `currency_id` | `currencyId` | Foreign key |
+| `currency_name` | `currency` / `currencyCode` | Denormalized |
+| `is_active` | `status` (derived) | 🔶 Status logic needed |
+| `description` | `description` | Direct mapping |
+| `note` | `notes` | Direct mapping |
+| `created_by_id` | `createdBy` | Creator reference |
+| *(not in DB)* | `approvedBy` | 🔶 PROPOSED |
+| *(not in DB)* | `approvedAt` | 🔶 PROPOSED |
+| *(not in DB)* | `status` | 🔶 PROPOSED enum |
+
+### Price List Detail
+
+| Database Field | UI Field | Notes |
+|----------------|----------|-------|
+| `id` | `id` | Direct mapping |
+| `pricelist_id` | `priceListId` | Foreign key |
+| `product_id` | `productId` | Foreign key |
+| `product_name` | `itemName` | Denormalized |
+| `unit_id` | `unitId` | Foreign key |
+| `unit_name` | `unit` | Denormalized |
+| `price` | `unitPrice.amount` | Base price |
+| `price_with_vat` | *(computed)* | Price + tax |
+| `is_active` | `isActive` | Direct mapping |
+| `note` | `notes` | Direct mapping |
+| *(not in DB)* | `minimumOrderQuantity` | 🔶 PROPOSED |
+| *(not in DB)* | `leadTimeDays` | 🔶 PROPOSED |
+| *(not in DB)* | `itemDiscounts[]` | 🔶 PROPOSED table |
 
 ---
 
@@ -239,178 +277,119 @@ INDEX pricelist_name_u ON tb_pricelist(name)
 
 ### Price List Header Validation
 
-1. **VAL-PL-001**: Price list number format
-   - Rule: `pricelist_no` must follow format "PL-YYYY-NNNNNN"
-   - Example: "PL-2025-000001"
+| Rule ID | Rule | Database Constraint | Error Message |
+|---------|------|---------------------|---------------|
+| VAL-PL-001 | `name` is required | NOT NULL (implicit via UNIQUE) | "Price list name is required" |
+| VAL-PL-002 | `vendor_id` must be valid | FK constraint | "Vendor is required" |
+| VAL-PL-003 | `currency_id` must be valid | FK constraint | "Currency is required" |
+| VAL-PL-004 | `from_date` should be provided | Application level | "Start date is required" |
+| VAL-PL-005 | `to_date > from_date` when provided | Application level | "End date must be after start date" |
+| VAL-PL-006 | `pricelist_no` must be unique | UNIQUE constraint | "Price list number already exists" |
 
-2. **VAL-PL-002**: Validity period consistency
-   - Rule: `to_date >= from_date`
-   - Error: "End date must be on or after start date"
+### Line Item Validation
 
-3. **VAL-PL-003**: Active price list uniqueness
-   - Rule: Only one active price list per vendor-currency at any time
-   - Error: "Active price list already exists for this vendor and currency"
-
-4. **VAL-PL-004**: Currency consistency
-   - Rule: All line items must use price list's currency
-   - Error: "Line item currency must match price list currency"
-
-### Price List Detail Validation
-
-5. **VAL-PL-101**: Price amount constraints
-   - Rule: `price > 0 AND price_without_vat >= 0 AND price_with_vat >= 0`
-   - Error: "Price amounts must be positive"
-
-6. **VAL-PL-102**: Tax calculation accuracy
-   - Rule: `price_with_vat = price_without_vat * (1 + tax_rate / 100)`
-   - Tolerance: ±0.01 for rounding
-   - Error: "Tax calculation mismatch"
-
-7. **VAL-PL-103**: Product-unit compatibility
-   - Rule: `unit_id` must be in product's allowed units list
-   - Error: "Unit not valid for this product"
-
-8. **VAL-PL-104**: Duplicate product prevention
-   - Rule: Same product-unit combination cannot appear twice in same price list
-   - Error: "Product-unit combination already exists in this price list"
+| Rule ID | Rule | Database Constraint | Error Message |
+|---------|------|---------------------|---------------|
+| VAL-ITM-001 | `product_id` is required | NOT NULL, FK constraint | "Product is required" |
+| VAL-ITM-002 | `pricelist_id` is required | NOT NULL, FK constraint | "Price list reference required" |
+| VAL-ITM-003 | `price` must be positive | Application level | "Unit price must be positive" |
+| VAL-ITM-004 | `unit_id` should be specified | Application level | "Unit is required" |
 
 ---
 
 ## Integration Points
 
-### 1. Vendor Management
+### 1. Vendor Directory
+- **Table**: `tb_vendor`
 - **Direction**: Inbound
-- **Purpose**: Price lists are created for specific vendors
+- **Purpose**: Price lists created for specific vendors
 - **Key Fields**: `vendor_id`, `vendor_name`
 
-### 2. Currency Management
+### 2. Product Catalog
+- **Table**: `tb_product`
 - **Direction**: Inbound
-- **Purpose**: Price lists denominated in specific currencies
+- **Purpose**: Line items reference products
+- **Key Fields**: `product_id`, `product_name`
+
+### 3. Unit of Measure
+- **Table**: `tb_unit`
+- **Direction**: Inbound
+- **Purpose**: Unit reference for pricing
+- **Key Fields**: `unit_id`, `unit_name`
+
+### 4. Currency
+- **Table**: `tb_currency`
+- **Direction**: Inbound
+- **Purpose**: Currency for price list
 - **Key Fields**: `currency_id`, `currency_name`
 
-### 3. Product Management
-- **Direction**: Inbound
-- **Purpose**: Price list line items reference products
-- **Key Fields**: `product_id`, `product_name`, `unit_id`
-
-### 4. Purchase Request Process
+### 5. Purchase Request
+- **Table**: `tb_purchase_request_detail`
 - **Direction**: Outbound
-- **Purpose**: Price lists used to auto-populate purchase request pricing
-- **Key Fields**: `pricelist_id` in purchase_request_detail
-
-### 5. Purchase Order Creation
-- **Direction**: Outbound
-- **Purpose**: Active price lists provide default pricing for PO creation
-- **Process**: System suggests prices from active price lists
+- **Purpose**: Price list items referenced in purchase requests
+- **Key Fields**: `pricelist_detail_id`, `pricelist_no`, `pricelist_price`
 
 ---
 
-## Performance Considerations
+## UI Data Mapping
 
-### Indexing Strategy
-1. **Primary Access**: `pricelist_no` (unique lookup)
-2. **Vendor Search**: `vendor_id` + `is_active` (composite index needed)
-3. **Validity Search**: `from_date`, `to_date` (range queries)
-4. **Product Lookup**: `product_id` in tb_pricelist_detail
+### List Page
+- **Route**: `/vendor-management/pricelists`
+- **Data Source**: Array of tb_pricelist with computed status
+- **Display Fields**: pricelist_no, name, vendor_name, status (derived), validity period, item count
 
-### Denormalization
-- `vendor_name`, `currency_name`, `product_name`, `unit_name` cached to avoid joins
-- Trade-off: Faster reads, slower writes, potential staleness
-- Update Strategy: Cascade updates via triggers or application logic
+### Detail Page
+- **Route**: `/vendor-management/pricelists/[id]`
+- **Data Source**: Single tb_pricelist with tb_pricelist_detail[]
+- **Display Fields**: Header info, line items with pricing
 
-### Query Optimization
-1. **Active Price Lists**: Filter on `is_active = TRUE AND deleted_at IS NULL`
-2. **Valid Price Lists**: Additional filter on date ranges
-3. **Vendor Price Lists**: Use vendor_id index for fast filtering
-
----
-
-## Security & Access Control
-
-### Field-Level Security
-- **Sensitive Fields**: `price`, `price_without_vat`, `price_with_vat`
-- **Access Control**: ABAC policies for viewing/editing prices
-- **Audit Trail**: All price changes logged via `updated_at`, `updated_by_id`
-
-### Row-Level Security
-- **Vendor Portal**: Vendors can only view their own price lists via `url_token`
-- **Department Access**: Filtered by `dimension.department_id` if applicable
-- **Role-Based**: Purchasing staff can view all, managers can approve
+### Add Page
+- **Route**: `/vendor-management/pricelists/add`
+- **Form Fields**: pricelist_no (auto), vendor_id, currency_id, from_date, to_date, note
+- **Line Item Fields**: product_id, unit_id, price, tax_profile_id, note
 
 ---
 
-## Audit & Compliance
+## Migration Recommendations
 
-### Change Tracking
-- **Version Control**: `doc_version` incremented on each update
-- **User Tracking**: `created_by_id`, `updated_by_id`, `deleted_by_id`
-- **Timestamp Tracking**: `created_at`, `updated_at`, `deleted_at`
+### Priority 1 (High) - Required for Full Functionality
 
-### Compliance Requirements
-- **Price History**: Maintain all historical prices via soft delete
-- **Tax Records**: Preserve tax rates and calculations
-- **Audit Trail**: Complete history of price changes for financial audits
+1. **Add `status` enum to tb_pricelist**
+   ```sql
+   CREATE TYPE enum_pricelist_status AS ENUM ('draft', 'pending', 'active', 'expired');
+   ALTER TABLE tb_pricelist ADD COLUMN status enum_pricelist_status DEFAULT 'draft';
+   ```
 
----
+2. **Add MOQ and Lead Time to tb_pricelist_detail**
+   ```sql
+   ALTER TABLE tb_pricelist_detail
+     ADD COLUMN minimum_order_quantity DECIMAL(20,5),
+     ADD COLUMN lead_time_days INT;
+   ```
 
-## Sample Data Scenarios
+### Priority 2 (Medium) - Enhanced Workflow
 
-### Scenario 1: Simple Price List
-```
-Price List Header:
-- pricelist_no: "PL-2025-000001"
-- vendor_name: "ABC Suppliers Ltd"
-- currency: "USD"
-- from_date: 2025-01-01
-- to_date: 2025-12-31
+3. **Add approval fields to tb_pricelist**
+   ```sql
+   ALTER TABLE tb_pricelist
+     ADD COLUMN approved_by_id UUID,
+     ADD COLUMN approved_at TIMESTAMPTZ;
+   ```
 
-Line Items:
-- Product: "Coffee Beans 1kg", Unit: "kg", Price: $15.00 (ex VAT)
-- Product: "Tea Leaves 500g", Unit: "pack", Price: $8.50 (ex VAT)
-```
+### Priority 3 (Low) - Volume Discounts
 
-### Scenario 2: Tiered Pricing
-```
-Price List Header:
-- info.tiered_pricing: {
-    tiers: [
-      {min: 1, max: 99, discount: 0%},
-      {min: 100, max: 499, discount: 5%},
-      {min: 500, max: null, discount: 10%}
-    ]
-  }
-
-Line Item:
-- Product: "Flour 25kg", Base Price: $20.00
-- Effective Prices:
-  * Qty 1-99: $20.00 each
-  * Qty 100-499: $19.00 each (5% off)
-  * Qty 500+: $18.00 each (10% off)
-```
+4. **Create tb_pricelist_discount table** (see proposed schema above)
 
 ---
 
-## Migration Notes
+## Related Documents
 
-### From DS to DD
-- **Date**: 2025-11-15
-- **Schema Source**: `data-struc/schema.prisma` lines 2255-2330
-- **Coverage**: ✅ 100% - All required tables exist in schema
-- **Changes**: None - DD document describes existing schema structure
-
-### Future Enhancements
-- Consider separate table for tiered pricing rules (currently in JSONB)
-- Add price approval workflow tables
-- Add price comparison/analytics tables
-
----
-
-## Document Metadata
-
-**Created**: 2025-11-15
-**Schema Version**: As of schema.prisma commit 9fbc771
-**Coverage**: 2 entities from schema.prisma
-**Status**: Active - Ready for use
+- [BR-price-lists.md](./BR-price-lists.md) - Business Requirements v2.0.0
+- [FD-price-lists.md](./FD-price-lists.md) - Flow Diagrams
+- [TS-price-lists.md](./TS-price-lists.md) - Technical Specification
+- [UC-price-lists.md](./UC-price-lists.md) - Use Cases
+- [VAL-price-lists.md](./VAL-price-lists.md) - Validations
+- [schema.prisma](../../data-struc/schema.prisma) - Database Schema
 
 ---
 

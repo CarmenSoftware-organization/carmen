@@ -7,7 +7,7 @@ import { WorkflowDataTable } from "./components/workflow-data-table"
 import { WorkflowCardView } from "./components/workflow-card-view"
 import { createWorkflowColumns } from "./components/workflow-columns"
 import { WorkflowTemplates } from "./components/workflow-templates"
-import { sampleWorkflows } from "./data/mockData"
+import { sampleWorkflows } from '@/lib/mock-data'
 import { useSearchParams, useRouter } from "next/navigation"
 import { Suspense, useState } from "react"
 

@@ -2,6 +2,11 @@
 
 **Learn to use Carmen's mock data system** while the database is not yet connected.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Current Status

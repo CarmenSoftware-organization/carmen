@@ -1,5 +1,10 @@
 # Carmen ERP Application Route Map
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 This document provides a comprehensive map of all routes in the Carmen ERP system, organized by module and functionality. The application follows Next.js 14 App Router conventions with a hospitality-focused ERP structure.

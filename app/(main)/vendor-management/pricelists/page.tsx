@@ -126,8 +126,8 @@ const transformedPricelists = mockPricelists.map(pricelist => ({
   totalValue: (pricelist.totalItems || 0) * 100, // Mock calculation
   taxProfile: 'VAT',
   taxRate: 7,
-  validFrom: formatDate(pricelist.effectiveDate),
-  validTo: pricelist.expiryDate ? formatDate(pricelist.expiryDate) : 'N/A',
+  validFrom: formatDate(pricelist.effectiveStartDate),
+  validTo: pricelist.effectiveEndDate ? formatDate(pricelist.effectiveEndDate) : 'N/A',
   lastUpdated: pricelist.approvedAt ? formatDate(pricelist.approvedAt) : 'N/A',
   categories: ['Equipment', 'Supplies'] // Mock categories
 }))

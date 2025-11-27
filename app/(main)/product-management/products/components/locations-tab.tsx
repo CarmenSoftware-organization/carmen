@@ -17,10 +17,19 @@ interface LocationAssignment {
   locationId: string
   locationName: string
   locationCode: string
+  shelfId: string
+  shelfName: string
   minQuantity: number
   maxQuantity: number
   reorderPoint: number
   parLevel: number
+}
+
+interface Shelf {
+  id: string
+  name: string
+  code: string
+  locationId: string
 }
 
 interface LocationsTabProps {
@@ -40,18 +49,55 @@ const availableLocations = [
   { id: 'LOC5', name: 'Prep Kitchen', code: 'PK-001' },
 ]
 
-export function LocationsTab({ 
+// Mock data for available shelves per location
+const availableShelves: Shelf[] = [
+  // Main Kitchen shelves
+  { id: 'SH1-1', name: 'Shelf A1', code: 'MK-A1', locationId: 'LOC1' },
+  { id: 'SH1-2', name: 'Shelf A2', code: 'MK-A2', locationId: 'LOC1' },
+  { id: 'SH1-3', name: 'Shelf B1', code: 'MK-B1', locationId: 'LOC1' },
+  // Dry Storage shelves
+  { id: 'SH2-1', name: 'Rack 1', code: 'DS-R1', locationId: 'LOC2' },
+  { id: 'SH2-2', name: 'Rack 2', code: 'DS-R2', locationId: 'LOC2' },
+  { id: 'SH2-3', name: 'Rack 3', code: 'DS-R3', locationId: 'LOC2' },
+  { id: 'SH2-4', name: 'Floor Storage', code: 'DS-FL', locationId: 'LOC2' },
+  // Cold Storage shelves
+  { id: 'SH3-1', name: 'Freezer Shelf 1', code: 'CS-F1', locationId: 'LOC3' },
+  { id: 'SH3-2', name: 'Freezer Shelf 2', code: 'CS-F2', locationId: 'LOC3' },
+  { id: 'SH3-3', name: 'Chiller Shelf 1', code: 'CS-C1', locationId: 'LOC3' },
+  { id: 'SH3-4', name: 'Chiller Shelf 2', code: 'CS-C2', locationId: 'LOC3' },
+  // Bar Storage shelves
+  { id: 'SH4-1', name: 'Top Shelf', code: 'BS-T1', locationId: 'LOC4' },
+  { id: 'SH4-2', name: 'Middle Shelf', code: 'BS-M1', locationId: 'LOC4' },
+  { id: 'SH4-3', name: 'Bottom Shelf', code: 'BS-B1', locationId: 'LOC4' },
+  // Prep Kitchen shelves
+  { id: 'SH5-1', name: 'Prep Station 1', code: 'PK-P1', locationId: 'LOC5' },
+  { id: 'SH5-2', name: 'Prep Station 2', code: 'PK-P2', locationId: 'LOC5' },
+]
+
+export function LocationsTab({
   isEditing,
   locations = [],
   onAddLocation,
   onUpdateLocation,
-  onRemoveLocation 
+  onRemoveLocation
 }: LocationsTabProps) {
   const [selectedLocation, setSelectedLocation] = React.useState('')
+  const [selectedShelf, setSelectedShelf] = React.useState('')
   const [minQuantity, setMinQuantity] = React.useState('')
   const [maxQuantity, setMaxQuantity] = React.useState('')
   const [reorderPoint, setReorderPoint] = React.useState('')
   const [parLevel, setParLevel] = React.useState('')
+
+  // Get shelves for the selected location
+  const shelvesForSelectedLocation = React.useMemo(() => {
+    if (!selectedLocation) return []
+    return availableShelves.filter(shelf => shelf.locationId === selectedLocation)
+  }, [selectedLocation])
+
+  // Reset shelf when location changes
+  React.useEffect(() => {
+    setSelectedShelf('')
+  }, [selectedLocation])
 
   const handleAddLocation = () => {
     if (!selectedLocation) return
@@ -59,11 +105,15 @@ export function LocationsTab({
     const location = availableLocations.find(loc => loc.id === selectedLocation)
     if (!location) return
 
+    const shelf = availableShelves.find(s => s.id === selectedShelf)
+
     const newAssignment: LocationAssignment = {
       id: `${location.id}-${Date.now()}`,
       locationId: location.id,
       locationName: location.name,
       locationCode: location.code,
+      shelfId: shelf?.id || '',
+      shelfName: shelf?.name || '',
       minQuantity: Number(minQuantity) || 0,
       maxQuantity: Number(maxQuantity) || 0,
       reorderPoint: Number(reorderPoint) || 0,
@@ -71,13 +121,19 @@ export function LocationsTab({
     }
 
     onAddLocation?.(newAssignment)
-    
+
     // Reset form
     setSelectedLocation('')
+    setSelectedShelf('')
     setMinQuantity('')
     setMaxQuantity('')
     setReorderPoint('')
     setParLevel('')
+  }
+
+  // Helper function to get shelves for a specific location
+  const getShelvesForLocation = (locationId: string) => {
+    return availableShelves.filter(shelf => shelf.locationId === locationId)
   }
 
   const unassignedLocations = availableLocations.filter(
@@ -92,7 +148,7 @@ export function LocationsTab({
             <CardTitle>Add Location Assignment</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-6 gap-4">
+            <div className="grid grid-cols-7 gap-4">
               <div className="col-span-2">
                 <Select
                   value={selectedLocation}
@@ -105,6 +161,24 @@ export function LocationsTab({
                     {unassignedLocations.map(location => (
                       <SelectItem key={location.id} value={location.id}>
                         {location.name} ({location.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Select
+                  value={selectedShelf}
+                  onValueChange={setSelectedShelf}
+                  disabled={!selectedLocation}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select shelf" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {shelvesForSelectedLocation.map(shelf => (
+                      <SelectItem key={shelf.id} value={shelf.id}>
+                        {shelf.name} ({shelf.code})
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -135,7 +209,7 @@ export function LocationsTab({
                 />
               </div>
               <div>
-                <Button 
+                <Button
                   onClick={handleAddLocation}
                   disabled={!selectedLocation}
                   className="w-full"
@@ -158,6 +232,7 @@ export function LocationsTab({
             <TableHeader>
               <TableRow>
                 <TableHead>Location</TableHead>
+                <TableHead>Shelf (Storage)</TableHead>
                 <TableHead className="text-right">Min Qty</TableHead>
                 <TableHead className="text-right">Max Qty</TableHead>
                 <TableHead className="text-right">Reorder Point</TableHead>
@@ -173,6 +248,44 @@ export function LocationsTab({
                       <div className="font-medium">{assignment.locationName}</div>
                       <div className="text-sm text-muted-foreground">{assignment.locationCode}</div>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {isEditing ? (
+                      <Select
+                        value={assignment.shelfId || ''}
+                        onValueChange={(value) => {
+                          const shelf = availableShelves.find(s => s.id === value)
+                          onUpdateLocation?.(assignment.id, {
+                            shelfId: value,
+                            shelfName: shelf?.name || ''
+                          })
+                        }}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select shelf" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getShelvesForLocation(assignment.locationId).map(shelf => (
+                            <SelectItem key={shelf.id} value={shelf.id}>
+                              {shelf.name} ({shelf.code})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div>
+                        {assignment.shelfName ? (
+                          <>
+                            <div className="font-medium">{assignment.shelfName}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {availableShelves.find(s => s.id === assignment.shelfId)?.code || ''}
+                            </div>
+                          </>
+                        ) : (
+                          <span className="text-muted-foreground">Not assigned</span>
+                        )}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     {isEditing ? (
@@ -237,7 +350,7 @@ export function LocationsTab({
               ))}
               {locations.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={isEditing ? 6 : 5} className="text-center text-muted-foreground">
+                  <TableCell colSpan={isEditing ? 7 : 6} className="text-center text-muted-foreground">
                     No locations assigned
                   </TableCell>
                 </TableRow>

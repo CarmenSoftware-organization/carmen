@@ -1,5 +1,10 @@
 # Credit Note Module - Development Tasks
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 Based on: `docs/cn/CN-PRD.md` and `docs/cn/CN-API-Specification.md`
 
 ## Frontend Tasks

@@ -1,5 +1,10 @@
 # Credit Note Module - API and Stored Procedures Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## 1. API Endpoints
 
 ### 1.1 Credit Note Management

@@ -41,8 +41,6 @@ firstname: z.string()
   .regex(/^[a-zA-Z\s'-]+$/, "First name can only contain letters, spaces, hyphens, and apostrophes")
 ```
 
----
-
 #### Middlename Field
 **Field Name**: `middlename`
 **Data Type**: String
@@ -64,6 +62,11 @@ middlename: z.string()
   .or(z.literal(''))
 ```
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 #### Lastname Field

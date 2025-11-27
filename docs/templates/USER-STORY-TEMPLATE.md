@@ -6,6 +6,11 @@
 - **Last Updated**: 2025-10-31
 - **Applies To**: All Business Requirements (BR) documents
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Overview

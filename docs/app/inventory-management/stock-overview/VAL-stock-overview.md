@@ -18,6 +18,11 @@ This document defines comprehensive validation rules for the Stock Overview modu
 - [Data Schema](./DS-stock-overview.md)
 - [Flow Diagrams](./FD-stock-overview.md)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Validation Categories

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { PurchaseRequestItem, MockPurchaseRequestItem, DocumentStatus } from "@/lib/types";
+import { PurchaseRequestItem, MockPurchaseRequestItem, PRStatus } from "@/lib/types";
 import { Check, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -25,7 +25,7 @@ export function NewItemRow({ onSave, onCancel, locations, products, units, showP
     unit: "",
     price: 0,
     currency: "USD",
-    status: DocumentStatus.Draft,
+    status: PRStatus.Draft,
     comment: "",
     deliveryDate: undefined,
     deliveryPoint: "",

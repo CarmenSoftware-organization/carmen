@@ -14,7 +14,11 @@
 - [Fractional Inventory Management Business Rules](../../../prd/output/rules/fractional-inventory-management-business-rules.md)
 - [Fractional Stock Deduction Service Spec](../../../prd/output/functions/fractional-stock-deduction-service-spec.md)
 
----
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 
 ## 1. Overview
 

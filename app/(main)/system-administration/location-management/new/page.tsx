@@ -1,38 +1,62 @@
 "use client"
 
-import { useRouter } from 'next/navigation'
-import { LocationDetailForm } from '../components/location-detail-form'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft } from 'lucide-react'
-import { toast } from 'sonner'
+import React, { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft } from "lucide-react"
+import { LocationForm } from "../components/location-form"
 
-export default function LocationNewPage() {
+export default function NewLocationPage() {
   const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  function handleSubmit() {
-    toast.success('Location created successfully!')
+  const handleSubmit = async (data: any) => {
+    setIsSubmitting(true)
+    try {
+      // In a real app, this would be an API call
+      console.log('Creating location:', data)
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      // Redirect to the list page on success
+      router.push('/system-administration/location-management')
+    } catch (error) {
+      console.error('Error creating location:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleCancel = () => {
     router.push('/system-administration/location-management')
   }
 
-  function handleCancel() {
-    router.back()
-  }
-
   return (
-    <div className="max-w-xl mx-auto mt-10 px-4">
-      <div className="flex items-center gap-2 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ChevronLeft className="h-5 w-5" />
+    <div className="container mx-auto py-6 px-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-start gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.push('/system-administration/location-management')}
+        >
+          <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-2xl font-bold">Create New Location</h1>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight">Create New Location</h1>
+          <p className="text-muted-foreground">
+            Add a new inventory location to the system
+          </p>
+        </div>
       </div>
-      <Card className="p-6 bg-background border rounded-lg shadow-sm">
-        <LocationDetailForm
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-        />
-      </Card>
+
+      {/* Form */}
+      <LocationForm
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        isSubmitting={isSubmitting}
+      />
     </div>
   )
-} 
+}

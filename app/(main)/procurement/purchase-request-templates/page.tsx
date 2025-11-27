@@ -4,8 +4,8 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { PRListTemplate } from "@/components/templates/PRListTemplate"
 import { Button } from "@/components/ui/button"
-import { PurchaseRequest, PurchaseRequestType, DocumentStatus } from "@/lib/types"
-import { samplePRData } from "../purchase-requests/components/sampleData"
+import { PurchaseRequest, PurchaseRequestType, PRStatus } from "@/lib/types"
+import { samplePRData } from "@/lib/mock-data/purchase-requests"
 import { AdvancedFilter } from "@/components/ui/advanced-filter"
 import { FilterType } from "@/lib/utils/filter-storage"
 import { toast } from "@/components/ui/use-toast"
@@ -72,9 +72,9 @@ export default function PRTemplatesPage() {
 
   const statusOptions = [
     { label: "All Statuses", value: "all" },
-    { label: "Draft", value: DocumentStatus.Draft },
-    { label: "In Progress", value: DocumentStatus.InProgress },
-    { label: "Completed", value: DocumentStatus.Completed },
+    { label: "Draft", value: PRStatus.Draft },
+    { label: "In Progress", value: PRStatus.InProgress },
+    { label: "Completed", value: PRStatus.Completed },
   ]
 
   const fieldConfigs: Array<{
@@ -82,38 +82,38 @@ export default function PRTemplatesPage() {
     field: keyof PurchaseRequest | 'requestor.name'
     format?: (value: any) => string
   }> = [
-    {
-      label: "Date",
-      field: "requestDate" as any,
-      format: (value: Date) => value.toLocaleDateString()
-    },
-    {
-      label: "Type",
-      field: "requestType" as any
-    },
-    {
-      label: "Requestor",
-      field: "requestedBy" as any
-    },
-    {
-      label: "Department",
-      field: "departmentId" as any
-    },
-    {
-      label: "Amount",
-      field: "estimatedTotal" as any,
-      format: (value: any) => `$${value?.amount || 0}`
-    },
-    {
-      label: "Workflow Stage",
-      field: "status" as any
-    }
-  ]
+      {
+        label: "Date",
+        field: "requestDate" as any,
+        format: (value: Date) => value.toLocaleDateString()
+      },
+      {
+        label: "Type",
+        field: "requestType" as any
+      },
+      {
+        label: "Requestor",
+        field: "requestedBy" as any
+      },
+      {
+        label: "Department",
+        field: "departmentId" as any
+      },
+      {
+        label: "Amount",
+        field: "estimatedTotal" as any,
+        format: (value: any) => `$${value?.amount || 0}`
+      },
+      {
+        label: "Workflow Stage",
+        field: "status" as any
+      }
+    ]
 
   const customActions = (
     <>
-      <Button 
-        variant="outline" 
+      <Button
+        variant="outline"
         onClick={() => {
           if (selectedItems.length > 0) {
             // Implement bulk delete
@@ -147,8 +147,8 @@ export default function PRTemplatesPage() {
   }
 
   const handleSelectItem = (id: string) => {
-    setSelectedItems(prev => 
-      prev.includes(id) 
+    setSelectedItems(prev =>
+      prev.includes(id)
         ? prev.filter(item => item !== id)
         : [...prev, id]
     )
@@ -193,15 +193,15 @@ export default function PRTemplatesPage() {
     if (templateToDelete) {
       // In a real app, this would be an API call
       setTemplates(templates.filter(template => template.id !== templateToDelete))
-      
+
       // If the deleted item was selected, remove it from selection
       setSelectedItems(prev => prev.filter(id => id !== templateToDelete))
-      
+
       toast({
         title: "Template deleted",
         description: "The template has been deleted successfully.",
       })
-      
+
       setTemplateToDelete(null)
       setDeleteDialogOpen(false)
     }
@@ -273,7 +273,7 @@ export default function PRTemplatesPage() {
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground mb-1">Total Amount</p>
-                <p className="text-sm font-medium">${template.estimatedTotal.amount.toFixed(2)}</p>
+                <p className="text-sm font-medium">${template.estimatedTotal?.amount.toFixed(2) ?? '0.00'}</p>
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground mb-1">Workflow Stage</p>
@@ -356,7 +356,7 @@ export default function PRTemplatesPage() {
               <TableCell>{template.departmentId}</TableCell>
               <TableCell>{template.requestedBy}</TableCell>
               <TableCell className="text-right font-medium">
-                ${template.estimatedTotal.amount.toFixed(2)}
+                ${template.estimatedTotal?.amount.toFixed(2) ?? '0.00'}
               </TableCell>
               <TableCell>
                 <Badge variant="outline">{template.status}</Badge>
@@ -449,7 +449,7 @@ export default function PRTemplatesPage() {
         onStatusChange={handleStatusChange}
         fieldConfigs={fieldConfigs}
         advancedFilter={
-          <AdvancedFilter 
+          <AdvancedFilter
             onApplyFilters={handleApplyFilters}
             onClearFilters={handleClearFilters}
             filterFields={filterFields}

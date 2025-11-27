@@ -1,5 +1,10 @@
 # Purchase Request List: RBAC Update Summary
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document summarizes all the updates made to properly reflect RBAC-controlled widget access for the Purchase Request List page.
 
 ## 📋 Updated Documents

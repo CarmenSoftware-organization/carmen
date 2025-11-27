@@ -9,6 +9,11 @@
 
 This comprehensive documentation suite provides detailed information about the Carmen ERP system for different stakeholder groups including senior developers, system analysts, business analysts, and decision-makers.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 🎯 Quick Navigation by Role

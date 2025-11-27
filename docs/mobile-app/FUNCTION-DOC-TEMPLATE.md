@@ -4,6 +4,11 @@
 **Function**: [Function Name]  
 **Version**: 1.0  
 **Last Updated**: [DATE]  
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Owner**: [OWNER NAME]
 
 ---

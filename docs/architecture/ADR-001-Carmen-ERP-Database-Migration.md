@@ -223,6 +223,11 @@ This architectural decision represents a comprehensive transformation of Carmen 
 
 The migration establishes Carmen ERP as a competitive hospitality management platform ready for enterprise deployment while maintaining the flexibility for future enhancements and scaling requirements.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 **Decision Date**: December 2024  

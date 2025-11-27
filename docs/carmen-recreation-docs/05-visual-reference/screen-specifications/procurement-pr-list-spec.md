@@ -5,6 +5,11 @@
 **User Roles**: All (with role-based filtering)  
 **Last Updated**: August 22, 2025  
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 📸 Visual Reference

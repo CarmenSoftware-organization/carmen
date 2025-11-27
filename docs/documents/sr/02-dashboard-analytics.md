@@ -1,5 +1,10 @@
 # Feature: Dashboard and Analytics
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Description
 The Carmen ERP Dashboard and Analytics system provides a comprehensive overview of the organization's procurement, inventory, and operational performance through an interactive dashboard interface. The system displays real-time key performance indicators (KPIs), trend analysis charts, and recent activity monitoring. It features responsive card-based layouts with metric cards showing current values and percentage changes, interactive charts for trend visualization, and a comprehensive activity table that tracks recent system activities across all modules.
 

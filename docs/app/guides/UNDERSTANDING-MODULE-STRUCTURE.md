@@ -2,6 +2,11 @@
 
 **Learn Carmen's consistent module organization** to navigate and extend the codebase effectively.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Standard Module Structure

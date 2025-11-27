@@ -1,5 +1,10 @@
 # Fractional Stock Deduction Service Functional Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 The Fractional Stock Deduction Service is a specialized inventory management component designed to handle complex stock calculations when fractional products are sold through Point of Sale (POS) systems. This service supports scenarios such as selling pizza slices from whole pizzas, cake portions from whole cakes, and other fractional product sales while maintaining accurate inventory levels and cost tracking.
 

@@ -26,6 +26,11 @@
 | UC-USR-014 | Search and Filter Users | Medium | Active |
 | UC-USR-015 | Set Special Permissions | Medium | Active |
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## UC-USR-001: Create New User

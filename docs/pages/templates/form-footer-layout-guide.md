@@ -1,5 +1,10 @@
 # Form Footer Layout Guide
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This guide provides standardized patterns for form footers in the Carmen ERP system, based on successful implementations in the PR (Purchase Request) detail forms.
 
 ## Overview

@@ -1,5 +1,10 @@
 # Carmen F&B Management System - Development Tasks
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This directory contains development tasks organized by module based on the Product Requirements Documents (PRDs) and API specifications found in the docs/ directory.
 
 ## Task Organization

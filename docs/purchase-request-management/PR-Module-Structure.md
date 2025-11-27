@@ -1,5 +1,10 @@
 # Purchase Request Module - Module Structure
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 > **Document Status**: Final - Content Refined (Phase 3 Complete)  
 > **Last Updated**: March 14, 2024  
 > **Next Update**: As needed for maintenance or feature additions

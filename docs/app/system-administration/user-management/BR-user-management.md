@@ -6,6 +6,11 @@
 - **Last Updated**: 2025-01-16
 - **Status**: Active
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 The User Management module enables system administrators to create, configure, and manage user accounts across the Carmen ERP system. It provides comprehensive user lifecycle management including registration, role assignment, department allocation, and permission configuration.
@@ -37,8 +42,6 @@ The User Management module enables system administrators to create, configure, a
 - System validates email format before creation
 - User cannot be deleted if they have active transactions
 - Audit trail captures all profile modifications
-
----
 
 ### FR-USR-002: Department Assignment
 **Priority**: High

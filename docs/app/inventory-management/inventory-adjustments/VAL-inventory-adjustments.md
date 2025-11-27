@@ -22,6 +22,11 @@ This document defines comprehensive validation rules for the Inventory Adjustmen
 - [Data Schema](./DS-inventory-adjustments.md)
 - [Flow Diagrams](./FD-inventory-adjustments.md)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Validation Categories

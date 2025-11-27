@@ -55,6 +55,11 @@ Create a GRN manually without referencing existing POs. This option is useful fo
 - PO-Based: Proceeds to Vendor Selection screen
 - Manual: Proceeds to Manual GRN Creation screen
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ### Screen M1: Manual GRN Creation

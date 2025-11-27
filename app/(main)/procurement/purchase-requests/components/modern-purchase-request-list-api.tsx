@@ -11,7 +11,7 @@ import {
   useBulkApprovePurchaseRequests
 } from "@/lib/hooks/api"
 import { PurchaseRequestFilters } from "@/lib/api/procurement"
-import { PurchaseRequest, DocumentStatus } from "@/lib/types"
+import { PurchaseRequest, PRStatus } from "@/lib/types"
 import { ProcurementErrorBoundary } from "@/components/api/api-error-boundary"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -62,13 +62,13 @@ const PRIORITY_COLORS: Record<string, string> = {
   urgent: "bg-red-100 text-red-800"
 }
 
-const STATUS_COLORS: Record<DocumentStatus, string> = {
-  [DocumentStatus.Draft]: "bg-gray-100 text-gray-800",
-  [DocumentStatus.InProgress]: "bg-blue-100 text-blue-800",
-  [DocumentStatus.Approved]: "bg-green-100 text-green-800",
-  [DocumentStatus.Rejected]: "bg-red-100 text-red-800",
-  [DocumentStatus.Converted]: "bg-emerald-100 text-emerald-800",
-  [DocumentStatus.Void]: "bg-gray-100 text-gray-400"
+const STATUS_COLORS: Record<PRStatus, string> = {
+  [PRStatus.Draft]: "bg-gray-100 text-gray-800",
+  [PRStatus.InProgress]: "bg-blue-100 text-blue-800",
+  [PRStatus.Approved]: "bg-green-100 text-green-800",
+  [PRStatus.Void]: "bg-gray-100 text-gray-400",
+  [PRStatus.Completed]: "bg-emerald-100 text-emerald-800",
+  [PRStatus.Cancelled]: "bg-red-100 text-red-800"
 }
 
 export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseRequestListProps) {
@@ -77,7 +77,7 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
   
   // State for filters and pagination
   const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<DocumentStatus | "all">("all")
+  const [statusFilter, setStatusFilter] = useState<PRStatus | "all">("all")
   const [priorityFilter, setPriorityFilter] = useState<string>("all")
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [page, setPage] = useState(1)
@@ -263,10 +263,10 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
   const groupedPRs = useMemo(() => {
     return {
       all: purchaseRequests,
-      draft: purchaseRequests.filter(pr => pr.status === DocumentStatus.Draft),
-      submitted: purchaseRequests.filter(pr => pr.status === DocumentStatus.InProgress),
-      approved: purchaseRequests.filter(pr => pr.status === DocumentStatus.Approved),
-      rejected: purchaseRequests.filter(pr => pr.status === DocumentStatus.Rejected)
+      draft: purchaseRequests.filter(pr => pr.status === PRStatus.Draft),
+      submitted: purchaseRequests.filter(pr => pr.status === PRStatus.InProgress),
+      approved: purchaseRequests.filter(pr => pr.status === PRStatus.Approved),
+      cancelled: purchaseRequests.filter(pr => pr.status === PRStatus.Cancelled)
     }
   }, [purchaseRequests])
 
@@ -350,7 +350,7 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
           </div>
           
           <div className="flex gap-2">
-            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as DocumentStatus | "all")}>
+            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as PRStatus | "all")}>
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -386,7 +386,7 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
             <TabsTrigger value="draft">Draft ({groupedPRs.draft.length})</TabsTrigger>
             <TabsTrigger value="submitted">Submitted ({groupedPRs.submitted.length})</TabsTrigger>
             <TabsTrigger value="approved">Approved ({groupedPRs.approved.length})</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected ({groupedPRs.rejected.length})</TabsTrigger>
+            <TabsTrigger value="cancelled">Cancelled ({groupedPRs.cancelled.length})</TabsTrigger>
           </TabsList>
 
           {Object.entries(groupedPRs).map(([status, prs]) => (
@@ -463,7 +463,7 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
                               View
                             </Button>
 
-                            {pr.status === DocumentStatus.Draft && (
+                            {pr.status === PRStatus.Draft && (
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -473,7 +473,7 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
                               </Button>
                             )}
 
-                            {pr.status === DocumentStatus.Draft && (
+                            {pr.status === PRStatus.Draft && (
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -484,7 +484,7 @@ export function ModernPurchaseRequestListAPI({ className }: ModernPurchaseReques
                               </Button>
                             )}
 
-                            {pr.status === DocumentStatus.InProgress && (
+                            {pr.status === PRStatus.InProgress && (
                               <>
                                 <Button
                                   variant="ghost"

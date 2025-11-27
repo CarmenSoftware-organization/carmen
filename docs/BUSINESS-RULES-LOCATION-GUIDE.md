@@ -2,6 +2,11 @@
 
 **Document Version**: 1.0
 **Last Updated**: January 2025
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Purpose**: Guide to locate actual business rule implementations in the Carmen ERP codebase
 
 ---

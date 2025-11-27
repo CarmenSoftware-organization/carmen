@@ -3,6 +3,11 @@
 **Document Status:** Draft  
 **Last Updated:** March 27, 2024
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Table of Contents
 - [Introduction](#introduction)
 - [Data Models](#data-models)

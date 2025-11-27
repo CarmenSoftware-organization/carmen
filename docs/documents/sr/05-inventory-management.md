@@ -1,5 +1,10 @@
 # Feature: Inventory Management System
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Description
 The Carmen ERP Inventory Management System provides comprehensive inventory control through multiple specialized modules including Stock Overview, Inventory Adjustments, Physical Count Management, Spot Checks, and Period End processing. The system features real-time inventory tracking with multiple views (stock cards, inventory balance, aging analysis), sophisticated count management with variance tracking, automated stock movement recording, and integration with procurement and production processes. The inventory system supports multi-location operations with location-specific stock tracking and movement history.
 

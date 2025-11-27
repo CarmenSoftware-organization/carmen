@@ -1,5 +1,10 @@
 # Purchase Request Module Documentation Consolidation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 This document outlines the consolidation process for the Purchase Request (PR) module documentation. The goal of this consolidation was to improve organization, reduce redundancy, enhance maintainability, and provide a more consistent documentation experience.

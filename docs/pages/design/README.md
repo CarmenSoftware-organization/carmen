@@ -315,6 +315,11 @@ This design system is based on the production implementation of the Purchase Req
 
 For questions or contributions to the design system, reference the actual implementation in the Purchase Request module as the source of truth.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 **Document Status**: Living documentation - updated with new patterns as they are proven in production

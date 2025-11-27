@@ -1,3 +1,5 @@
+import { User } from '@/lib/types'
+
 export type OperatorType = "eq" | "lt" | "gt" | "lte" | "gte"
 export type ActionType = "SKIP_STAGE" | "NEXT_STAGE"
 export type NotificationChannel = "Email" | "System"
@@ -24,12 +26,7 @@ export interface Stage {
     pricePerUnit: boolean
     totalPrice: boolean
   }
-  assignedUsers: {
-    id: number
-    name: string
-    department: string
-    location: string
-  }[]
+  assignedUsers: User[]
   roleType: WorkflowRoleType
 }
 

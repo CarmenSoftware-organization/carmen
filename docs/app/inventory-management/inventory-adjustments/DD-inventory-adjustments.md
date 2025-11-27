@@ -2,6 +2,11 @@
 
 **Document Version**: 2.0 (Aligned with Shared Methods)
 **Last Updated**: 2025-01-10
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Module**: Inventory Management
 **Sub-Module**: Inventory Adjustments
 

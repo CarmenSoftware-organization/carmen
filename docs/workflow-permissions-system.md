@@ -1,5 +1,10 @@
 # Workflow-Based Permissions System
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 The Workflow-Based Permissions System replaces the previous hardcoded role-based permissions with a flexible, workflow-stage-based approach. This system allows users to have different permissions based on their assignments to specific workflow stages, providing more granular and contextual access control.

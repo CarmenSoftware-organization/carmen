@@ -1,6 +1,11 @@
 # Recipe Module - Business Requirements
 
 **Status**: Draft  
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Last Updated**: March 27, 2024
 
 ## 1. Introduction

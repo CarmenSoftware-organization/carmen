@@ -19,6 +19,11 @@
 9. User Invitation Workflow
 10. Permission Validation Workflow
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. User Creation Workflow

@@ -9,6 +9,12 @@
   - [BR-cuisine-types.md](./BR-cuisine-types.md) - Business Requirements
   - [UC-cuisine-types.md](./UC-cuisine-types.md) - Use Cases
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial technical specification created |
+
 ---
 
 ## 1. System Architecture
@@ -1180,6 +1186,135 @@ const ExportDialog = dynamic(() => import('./export-dialog'), {
 
 ---
 
+## Sitemap
+
+### Overview
+This section provides a complete navigation structure of all pages, tabs, and dialogues in the Cuisine Types sub-module.
+
+### Page Hierarchy
+
+```mermaid
+graph TD
+    ListPage["List Page<br/>(/operational-planning/recipe-management/cuisine-types)"]
+    CreatePage["Create Page<br/>(/operational-planning/recipe-management/cuisine-types/new)"]
+    DetailPage["Detail Page<br/>(/operational-planning/recipe-management/cuisine-types/[id])"]
+    EditPage["Edit Page<br/>(/operational-planning/recipe-management/cuisine-types/[id]/edit)"]
+
+    %% List Page Tabs
+    ListPage --> ListTab1["Tab: All Items"]
+    ListPage --> ListTab2["Tab: Active"]
+    ListPage --> ListTab3["Tab: Archived"]
+
+    %% List Page Dialogues
+    ListPage -.-> ListDialog1["Dialog: Quick Create"]
+    ListPage -.-> ListDialog2["Dialog: Bulk Actions"]
+    ListPage -.-> ListDialog3["Dialog: Export"]
+    ListPage -.-> ListDialog4["Dialog: Filter"]
+
+    %% Detail Page Tabs
+    DetailPage --> DetailTab1["Tab: Overview"]
+    DetailPage --> DetailTab2["Tab: History"]
+    DetailPage --> DetailTab3["Tab: Activity Log"]
+
+    %% Detail Page Dialogues
+    DetailPage -.-> DetailDialog1["Dialog: Edit"]
+    DetailPage -.-> DetailDialog2["Dialog: Delete Confirm"]
+    DetailPage -.-> DetailDialog3["Dialog: Status Change"]
+
+    %% Create/Edit Dialogues
+    CreatePage -.-> CreateDialog1["Dialog: Cancel Confirm"]
+    CreatePage -.-> CreateDialog2["Dialog: Save Draft"]
+
+    EditPage -.-> EditDialog1["Dialog: Discard Changes"]
+    EditPage -.-> EditDialog2["Dialog: Save Draft"]
+
+    %% Navigation Flow
+    ListPage --> DetailPage
+    ListPage --> CreatePage
+    DetailPage --> EditPage
+    CreatePage --> DetailPage
+    EditPage --> DetailPage
+
+    style ListPage fill:#e1f5ff
+    style CreatePage fill:#fff4e1
+    style DetailPage fill:#e8f5e9
+    style EditPage fill:#fce4ec
+```
+
+### Pages
+
+#### 1. List Page
+**Route**: `/operational-planning/recipe-management/cuisine-types`
+**File**: `page.tsx`
+**Purpose**: Display paginated list of all cuisine types
+
+**Sections**:
+- Header: Title, breadcrumbs, primary actions
+- Filters: Quick filters, advanced filter panel
+- Search: Global search with autocomplete
+- Data Table: Sortable columns, row actions, bulk selection
+- Pagination: Page size selector, page navigation
+
+**Tabs**:
+- **All Items**: Complete list of all cuisine types
+- **Active**: Filter active items only
+- **Archived**: View archived items
+
+**Dialogues**:
+- **Quick Create**: Fast creation form with essential fields only
+- **Bulk Actions**: Multi-select actions (delete, export, status change)
+- **Export**: Export data in various formats (CSV, Excel, PDF)
+- **Filter**: Advanced filtering with multiple criteria
+
+#### 2. Detail Page
+**Route**: `/operational-planning/recipe-management/cuisine-types/[id]`
+**File**: `[id]/page.tsx`
+**Purpose**: Display comprehensive cuisine type details
+
+**Sections**:
+- Header: Breadcrumbs, cuisine type title, action buttons
+- Info Cards: Multiple cards showing different aspects
+- Related Data: Associated records and relationships
+
+**Tabs**:
+- **Overview**: Key information and summary
+- **History**: Change history and audit trail
+- **Activity Log**: User actions and system events
+
+**Dialogues**:
+- **Edit**: Navigate to edit form
+- **Delete Confirm**: Confirmation before deletion
+- **Status Change**: Change cuisine type status with reason
+
+#### 3. Create Page
+**Route**: `/operational-planning/recipe-management/cuisine-types/new`
+**File**: `new/page.tsx`
+**Purpose**: Create new cuisine type
+
+**Sections**:
+- Form Header: Title, Save/Cancel actions
+- Form Fields: All required and optional fields
+- Validation: Real-time field validation
+
+**Dialogues**:
+- **Cancel Confirm**: Confirm discarding unsaved changes
+- **Save Draft**: Save incomplete form as draft
+
+#### 4. Edit Page
+**Route**: `/operational-planning/recipe-management/cuisine-types/[id]/edit`
+**File**: `[id]/edit/page.tsx`
+**Purpose**: Modify existing cuisine type
+
+**Sections**:
+- Form Header: Title, Save/Cancel/Delete actions
+- Form Fields: Pre-populated with existing data
+- Change Tracking: Highlight modified fields
+
+**Dialogues**:
+- **Discard Changes**: Confirm discarding modifications
+- **Save Draft**: Save changes as draft
+
+
 ## 10. Security Considerations
 
 - Server-side permission checks on all actions
@@ -1189,9 +1324,3 @@ const ExportDialog = dynamic(() => import('./export-dialog'), {
 - CSRF protection via Next.js
 
 ---
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial technical specification created |

@@ -2,6 +2,11 @@
 
 **Get up and running with Carmen ERP in 15 minutes.** This guide covers installation, basic navigation, and your first code changes.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## ⏱️ Time Estimate: 15 Minutes

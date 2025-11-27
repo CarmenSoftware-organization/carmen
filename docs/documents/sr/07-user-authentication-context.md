@@ -1,5 +1,10 @@
 # Feature: User Authentication and Context Management
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Description
 The Carmen ERP User Authentication and Context Management System provides a sophisticated multi-role, multi-department, and multi-location user management framework. The system features dynamic user context switching allowing users to operate with different roles across various departments and locations within a single session. It implements role-based access control with granular permissions, price visibility controls based on user roles, and comprehensive user profile management with department and location assignments.
 

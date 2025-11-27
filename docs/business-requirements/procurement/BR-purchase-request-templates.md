@@ -1,5 +1,10 @@
 # Business Requirements: Purchase Request Templates
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Module Information
 - **Module**: Procurement
 - **Sub-Module**: Purchase Request Templates

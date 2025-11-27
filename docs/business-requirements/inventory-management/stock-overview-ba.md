@@ -1,5 +1,10 @@
 # Stock Overview Module - Business Analysis Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 The Stock Overview module serves as the central hub for real-time inventory visibility across the entire F&B operation. It provides a comprehensive dashboard that consolidates stock information from all locations, offering instant insights into current stock levels, stock movements, valuation, and potential inventory issues. The module is designed to support quick decision-making by presenting critical inventory metrics, alerts, and trends in an intuitive interface, enabling managers to maintain optimal stock levels while identifying and addressing potential problems before they impact operations.

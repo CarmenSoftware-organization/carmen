@@ -1,5 +1,10 @@
 # Feature: System Administration
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Description
 The Carmen ERP System Administration module provides comprehensive system management capabilities including user management, permission management, workflow configuration, location management, system integrations (particularly POS integration), and business rule configuration. The system features advanced role-based policy management, sophisticated workflow engines, location hierarchy management, and extensive integration capabilities. System administration supports both simple and complex organizational structures with scalable permission models and workflow configurations.
 

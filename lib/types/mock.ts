@@ -17,27 +17,38 @@ import {
   PurchaseRequest,
   PurchaseRequestItem,
   PurchaseRequestPriority,
-  PurchaseRequestType
+  PurchaseRequestType,
+  Requestor
 } from './procurement'
-import { DocumentStatus, Money, Comment } from './common'
+import { Money, Comment } from './common'
 
 /**
  * Extended Purchase Request for mock/sample data
  * Includes legacy and UI-specific fields not in the production schema
  */
-export interface MockPurchaseRequest extends PurchaseRequest {
+/**
+ * Mock requestor type for legacy/sample data compatibility
+ * Extends base Requestor with optional id/departmentId for flexibility
+ */
+export interface MockRequestor {
+  id?: string;
+  name: string;
+  email?: string;
+  department?: string;
+  departmentId?: string;
+  departmentName?: string;
+}
+
+export interface MockPurchaseRequest extends Omit<PurchaseRequest, 'requestor' | 'currency'> {
   // Legacy fields from old data structure
   refNumber?: string;
   requestNumber?: string;
 
-  // UI-specific mock fields
-  requestor?: {
-    name: string;
-    email?: string;
-    department?: string;
-  };
+  // UI-specific mock fields - uses flexible MockRequestor type
+  requestor?: MockRequestor;
 
-  // Financial mock fields for prototyping
+  // Financial mock fields for prototyping - currency is optional in mock data
+  currency?: string;
   subTotalPrice?: number;
   baseSubTotalPrice?: number;
   discountAmount?: number;
@@ -48,7 +59,6 @@ export interface MockPurchaseRequest extends PurchaseRequest {
   baseTotalAmount?: number;
   taxAmount?: number;
   baseTaxAmount?: number;
-  currency?: string;
   baseCurrencyCode?: string;
   exchangeRate?: number;
 
@@ -159,9 +169,11 @@ export interface MockPurchaseRequestItem extends PurchaseRequestItem {
 }
 
 /**
- * Type guard to check if a PurchaseRequest is a MockPurchaseRequest
+ * Type guard to check if a value is a MockPurchaseRequest
+ * Works with both PurchaseRequest and MockPurchaseRequest inputs
  */
-export function isMockPurchaseRequest(pr: PurchaseRequest | MockPurchaseRequest): pr is MockPurchaseRequest {
+export function isMockPurchaseRequest(pr: unknown): pr is MockPurchaseRequest {
+  if (typeof pr !== 'object' || pr === null) return false;
   return 'refNumber' in pr || 'subTotalPrice' in pr || 'currency' in pr;
 }
 
@@ -190,7 +202,7 @@ export function asMockPurchaseRequestItem(item: PurchaseRequestItem): MockPurcha
  * Type assertion function for MockPurchaseRequest following Next.js validation pattern
  * Throws if the value is not a valid mock purchase request
  */
-export function assertMockPurchaseRequest(value: PurchaseRequest): asserts value is MockPurchaseRequest {
+export function assertMockPurchaseRequest(value: unknown): asserts value is MockPurchaseRequest {
   if (!isMockPurchaseRequest(value)) {
     throw new Error('Value is not a MockPurchaseRequest');
   }

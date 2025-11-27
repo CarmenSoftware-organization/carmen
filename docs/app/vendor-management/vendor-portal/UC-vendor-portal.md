@@ -1,1500 +1,687 @@
-# Vendor Entry Portal - Use Cases (UC)
+# Use Cases: Vendor Price Submission Portal
 
 ## Document Information
-- **Document Type**: Use Cases Document
-- **Module**: Vendor Management > Vendor Entry Portal
-- **Version**: 1.0
-- **Last Updated**: 2024-01-15
-- **Document Status**: Draft
+- **Document Type**: Use Cases Specification
+- **System**: Vendor Price Submission Portal
+- **Module**: Vendor Management > Vendor Portal
+- **Version**: 3.0.0
+- **Status**: Updated
+- **Created**: 2025-01-23
+- **Last Updated**: 2025-11-26
+- **Author**: Product Team
+- **Related Documents**:
+  - [Business Requirements](./BR-vendor-portal.md)
+  - [Technical Specification](./TS-vendor-portal.md)
+  - [Data Dictionary](./DD-vendor-portal.md)
+  - [Flow Diagrams](./FD-vendor-portal.md)
+  - [Validations](./VAL-vendor-portal.md)
+
+## Document History
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial version (INCORRECT - full vendor portal) |
+| 2.0 | 2025-01-23 | Product Team | Complete rewrite based on actual implementation - token-based price submission only |
+| 2.1.0 | 2025-11-26 | System | Removed approval workflow; Updated status to draft → submitted; Aligned with BR v2.1.0 |
+| 3.0.0 | 2025-11-26 | System | Complete refactor - removed staff-side use cases (UC-VPP-001 to UC-VPP-005). This document now focuses ONLY on vendor-facing portal. See related modules for staff-side functionality. |
+
+---
+
+## Scope Clarification
+
+### In Scope (This Document)
+- Vendor portal access via token (UC-VPP-006)
+- Online price submission (UC-VPP-007)
+- Excel upload submission (UC-VPP-008)
+- Excel template download (UC-VPP-009)
+- Submission review and confirmation (UC-VPP-010)
+- Submission history viewing (UC-VPP-011)
+
+### Out of Scope (See Related Modules)
+- **Pricelist Template Creation** (UC-VPP-001) → See [pricelist-templates](../pricelist-templates/) module
+- **Campaign Creation** (UC-VPP-002) → See [requests-for-pricing](../requests-for-pricing/) module
+- **Vendor Invitation** (UC-VPP-003) → See [requests-for-pricing](../requests-for-pricing/) module
+- **Campaign Launch** (UC-VPP-005) → See [requests-for-pricing](../requests-for-pricing/) module
+- **Submission Viewing by Staff** → See [price-lists](../price-lists/) module
+
+---
+
+## Table of Contents
+1. [Introduction](#1-introduction)
+2. [Actors](#2-actors)
+3. [Use Case Catalog](#3-use-case-catalog)
+4. [Primary Use Cases](#4-primary-use-cases)
+5. [Use Case Relationships](#5-use-case-relationships)
+6. [Appendices](#6-appendices)
 
 ---
 
 ## 1. Introduction
 
-This document provides detailed use case descriptions for the Vendor Entry Portal module. Each use case includes preconditions, main flows, alternate flows, exception flows, postconditions, business rules, and UI requirements.
+### 1.1 Purpose
+This document defines the use cases for the Vendor Price Submission Portal, focusing specifically on the vendor-facing functionality. This portal enables vendors to submit pricing information through token-based access without requiring traditional authentication.
 
-The Vendor Entry Portal enables vendors to self-register, manage their profiles, respond to pricing requests and RFQs, track purchase orders, submit invoices, and monitor their performance metrics through a secure, self-service web portal.
+### 1.2 Scope
+This document covers vendor-facing functionality ONLY:
+- Token-based portal access
+- Price submission via three methods (online, Excel upload, Excel download)
+- Draft management with auto-save
+- Submission confirmation
+
+**Note**: There is no approval workflow - pricelists go from draft → submitted (active) directly.
+
+This document does NOT cover:
+- Campaign creation and management (see [requests-for-pricing](../requests-for-pricing/))
+- Template creation (see [pricelist-templates](../pricelist-templates/))
+- Vendor invitation (see [requests-for-pricing](../requests-for-pricing/))
+- Pricelist viewing by staff (see [price-lists](../price-lists/))
+
+### 1.3 Document Conventions
+- **Use Case ID Format**: UC-VPP-XXX (UC = Use Case, VPP = Vendor Price Portal, XXX = sequence number)
+- **Actor Names**: Capitalized (e.g., Vendor)
+- **Business Rules**: Referenced as BR-VPP-Rule-XXX from BR document
+- **Priority Levels**: Critical, High, Medium, Low
+
+---
+
+## 2. Actors
+
+### 2.1 Primary Actors
+
+#### 2.1.1 Vendor
+**Description**: External supplier who submits pricing information through the vendor portal using token-based access.
+
+**Responsibilities**:
+- Access portal via unique token link
+- Review pricelist template requirements
+- Submit accurate pricing information
+- Meet campaign deadlines
+
+**Frequency**: Periodic (campaign-dependent)
+
+**Authentication**: Token-based only (no username/password)
+
+### 2.2 Secondary Actors
+
+#### 2.2.1 System (Automated Processes)
+**Description**: Automated system processes.
+
+**Responsibilities**:
+- Validate tokens on portal access
+- Auto-save vendor draft submissions
+- Calculate quality scores
+- Send submission confirmation emails
+- Expire tokens based on campaign end date
 
 ---
 
-## 2. Use Case Index
+## 3. Use Case Catalog
 
-| Use Case ID | Use Case Name | Actor(s) | Priority |
-|-------------|---------------|----------|----------|
-| UC-VP-001 | Vendor Registration | Prospective Vendor | High |
-| UC-VP-002 | Vendor Login and Authentication | Vendor User | High |
-| UC-VP-003 | Update Vendor Profile | Vendor Admin, Vendor User | High |
-| UC-VP-004 | Upload Documents | Vendor Admin, Vendor User | High |
-| UC-VP-005 | View Price List Templates | Vendor User | High |
-| UC-VP-006 | Submit Pricing | Vendor User | High |
-| UC-VP-007 | Respond to RFQ | Vendor User | High |
-| UC-VP-008 | View Purchase Orders | Vendor User | High |
-| UC-VP-009 | Submit Invoice | Vendor User | High |
-| UC-VP-010 | View Performance Metrics | Vendor Admin, Vendor User | Medium |
-| UC-VP-011 | Communicate with Buyer | Vendor User | Medium |
+### 3.1 Use Case Overview
+
+| ID | Use Case Name | Priority | Primary Actor | Frequency |
+|----|---------------|----------|---------------|-----------|
+| UC-VPP-006 | Access Vendor Portal via Token | Critical | Vendor | As invited |
+| UC-VPP-007 | Submit Prices Online | Critical | Vendor | As invited |
+| UC-VPP-008 | Upload Excel Pricelist | High | Vendor | As invited |
+| UC-VPP-009 | Download Excel Template | High | Vendor | As invited |
+| UC-VPP-010 | Review and Confirm Submission | High | Vendor | As invited |
+| UC-VPP-011 | View Submission History | Medium | Vendor | As needed |
 
 ---
 
-## 3. Detailed Use Cases
+## 4. Primary Use Cases
 
-### UC-VP-001: Vendor Registration
+### UC-VPP-006: Access Vendor Portal via Token
 
-**Primary Actor**: Prospective Vendor
+#### Basic Information
+- **Use Case ID**: UC-VPP-006
+- **Use Case Name**: Access Vendor Portal via Token
+- **Priority**: Critical
+- **Primary Actor**: Vendor
+- **Secondary Actors**: System
+- **Frequency**: Per invitation
+- **Related Requirements**: BR-VPP-010, BR-VPP-011
 
-**Stakeholders and Interests**:
-- Prospective Vendor: Wants to register quickly and easily to do business with organization
-- Procurement Staff: Needs to verify vendor legitimacy and approve qualified vendors
-- Finance Team: Wants accurate bank account information for payments
-- Compliance Officer: Needs to verify vendor meets regulatory and policy requirements
+#### Description
+Vendor accesses the price submission portal using a unique token link received via email invitation.
 
-**Preconditions**:
-- Vendor registration page is publicly accessible
-- Vendor has business information and documents ready
-- Vendor has valid email address
-
-**Trigger**: Vendor navigates to public registration page
-
----
+#### Preconditions
+1. Vendor received invitation email with token link
+2. Token is valid and not expired
+3. Campaign associated with token is active
 
 #### Main Flow
+1. Vendor receives invitation email with portal link: `https://portal.carmen.com/vendor-portal/{token}`
+2. Vendor clicks link in email
+3. Browser navigates to vendor portal with token in URL
+4. System receives request with token
+5. System validates token:
+   - Token exists in database
+   - Token format is valid UUID
+   - Token status is 'sent' or 'accessed'
+   - Associated campaign is active
+   - Current date is before token expiration date
+6. System retrieves campaign and pricelist data
+7. System creates portal session
+8. System updates invitation record (first access: status = 'accessed')
+9. System logs access activity
+10. System displays vendor portal interface
 
-**Step 1: Access Registration Page**
-1. Vendor navigates to vendor portal URL
-2. System displays landing page with "Register as Vendor" button
-3. Vendor clicks "Register as Vendor"
-4. System displays registration form wizard with 4 steps:
-   - Step 1: Company Information
-   - Step 2: Contact Information
-   - Step 3: Business Details
-   - Step 4: Documents & Terms
+#### Alternative Flows
 
-**Step 2: Enter Company Information**
-5. System displays Step 1: Company Information form
-6. Vendor enters:
-   - **Legal Company Name** (required, 5-200 characters)
-   - **Trade Name/DBA** (optional, 5-200 characters)
-   - **Business Type** (required, dropdown: Corporation, LLC, Partnership, Sole Proprietorship)
-   - **Business Registration Number** (required, alphanumeric)
-   - **Tax Identification Number (EIN)** (required, XX-XXXXXXX format)
-   - **State Tax ID** (optional, state-specific format)
-   - **Year Established** (required, 4-digit year)
-7. Vendor enters addresses:
-   - **Physical Address** (required):
-     - Street Address Line 1 (required)
-     - Street Address Line 2 (optional)
-     - City (required)
-     - State/Province (required, dropdown)
-     - ZIP/Postal Code (required)
-     - Country (required, dropdown, default USA)
-   - **Mailing Address** (required, checkbox "Same as Physical Address")
-   - **Billing Address** (required, checkbox "Same as Physical Address")
-8. System validates address formats and completeness
-9. Vendor clicks "Next" to proceed to Step 2
-10. System validates Step 1 data
-11. System checks for duplicate EIN or company name
-12. If duplicate found, system displays warning (EF-002)
-13. System saves progress and proceeds to Step 2
+**A1: Returning Vendor - Resume Draft**
+- At step 6, vendor has existing draft pricelist
+- System displays welcome back message with completion percentage
+- Vendor can continue draft or start over
 
-**Step 3: Enter Contact Information**
-14. System displays Step 2: Contact Information form
-15. Vendor enters Primary Contact:
-    - **First Name** (required, 2-50 characters)
-    - **Last Name** (required, 2-50 characters)
-    - **Title/Position** (required, 2-100 characters)
-    - **Email Address** (required, valid email format)
-    - **Phone Number** (required, +X (XXX) XXX-XXXX format)
-    - **Mobile Number** (optional, same format as phone)
-16. Vendor enters Secondary Contact (optional):
-    - Same fields as Primary Contact
-17. Vendor enters Accounts Payable Contact:
-    - **Name** (required)
-    - **Email** (required)
-    - **Phone** (required)
-18. System validates email addresses (unique, valid format)
-19. Vendor clicks "Next" to proceed to Step 3
-20. System validates Step 2 data
-21. System saves progress and proceeds to Step 3
-
-**Step 4: Enter Business Details**
-22. System displays Step 3: Business Details form
-23. Vendor enters:
-    - **Business Category** (required, multi-select): Food & Beverage, Equipment & Supplies, Services, etc.
-    - **Products/Services Offered** (required, textarea, min 100 characters)
-    - **Years in Business** (calculated from Year Established, display only)
-    - **Annual Revenue Range** (required, dropdown: <$100K, $100K-$500K, $500K-$1M, $1M-$5M, $5M+)
-    - **Number of Employees** (required, dropdown: 1-10, 11-50, 51-200, 201-1000, 1000+)
-    - **Certifications** (optional, multi-select checkboxes):
-      - ISO 9001, ISO 14001, HACCP, FDA Registered, Organic, Fair Trade, Kosher, Halal, etc.
-24. Vendor enters Bank Account Information for payments:
-    - **Bank Name** (required)
-    - **Account Holder Name** (required, must match legal company name)
-    - **Account Number** (required, 4-17 digits)
-    - **Routing Number** (required, 9 digits for US banks)
-    - **Account Type** (required, dropdown: Checking, Savings)
-    - **Bank Address** (optional)
-25. Vendor enters Website and Social Media (optional):
-    - **Website URL** (optional, valid URL format)
-    - **LinkedIn** (optional, URL)
-    - **Facebook** (optional, URL)
-26. System validates bank account information format
-27. Vendor clicks "Next" to proceed to Step 4
-28. System validates Step 3 data
-29. System saves progress and proceeds to Step 4
-
-**Step 5: Upload Documents and Accept Terms**
-30. System displays Step 4: Documents & Terms form
-31. System lists required documents:
-    - Business License (required, PDF, max 10MB)
-    - Tax Certificate (W-9 or equivalent) (required, PDF, max 10MB)
-    - Certificate of Insurance - General Liability (required, PDF, max 10MB)
-    - Certificate of Insurance - Workers' Compensation (required if employees >5, PDF, max 10MB)
-32. System allows vendor to upload each document:
-    - Drag-and-drop or file picker
-    - Preview uploaded file
-    - Remove and re-upload if needed
-33. Vendor uploads all required documents
-34. System validates each file (format, size, virus scan)
-35. System displays optional documents section:
-    - Quality Certifications (ISO, HACCP, etc.)
-    - Financial Statements
-    - Product Catalogs
-    - References
-36. Vendor uploads optional documents (if any)
-37. System displays Terms and Conditions:
-    - Vendor Agreement (scrollable text)
-    - Privacy Policy (scrollable text)
-    - Code of Conduct (scrollable text)
-38. Vendor reviews terms and conditions
-39. Vendor checks "I have read and agree to the Terms and Conditions" (required)
-40. Vendor checks "I confirm all information provided is accurate and complete" (required)
-41. Vendor enters electronic signature:
-    - **Full Name** (required, must match authorized representative)
-    - **Title** (required)
-    - **Date** (auto-filled with current date)
-42. Vendor clicks "Submit Registration"
-43. System validates all steps completed
-44. System performs final validation of all data
-45. System creates vendor record with status "Pending Approval"
-46. System generates unique registration ID (REG-YYYY-XXXX)
-47. System sends confirmation email to vendor with:
-    - Registration ID
-    - Confirmation that application received
-    - Expected review timeline (3-5 business days)
-    - Contact information for questions
-48. System creates notification for procurement staff:
-    - New vendor registration pending review
-    - Registration ID and company name
-    - Link to review application
-49. System displays success message with registration ID
-50. System provides option to "Track Application Status"
-
----
-
-#### Alternate Flows
-
-**AF-001: Save Progress and Resume Later**
-- At any step 1-4, vendor clicks "Save and Continue Later"
-- System validates current step data
-- System saves progress with unique resume token
-- System sends email to vendor with resume link
-- Vendor can click link to resume registration within 30 days
-- System loads saved progress and continues from last step
-
-**AF-002: Use Same Address for Multiple Purposes**
-- At step 7, vendor checks "Same as Physical Address" for mailing or billing
-- System copies physical address to selected address type
-- System disables mailing/billing address fields
-- If vendor unchecks later, system clears copied data and enables fields
-
-**AF-003: Add Additional Contacts**
-- At step 15-17, vendor clicks "Add Another Contact"
-- System displays additional contact form
-- Vendor enters additional contact information
-- Vendor can add up to 5 contacts total
-- System saves all contacts with roles (primary, secondary, AP, etc.)
-
-**AF-004: Upload Document via Camera (Mobile)**
-- At step 32, vendor using mobile device clicks "Take Photo"
-- System activates device camera
-- Vendor takes photo of document
-- System converts photo to PDF
-- System processes as normal upload
-
-**AF-005: Download Registration Summary**
-- After step 50, vendor clicks "Download Summary"
-- System generates PDF with all registration information
-- Vendor can save for records
-
----
+**A2: Token About to Expire Warning**
+- At step 5, token expires in <24 hours
+- System displays warning banner
 
 #### Exception Flows
 
-**EF-001: Validation Errors**
-- At any validation step, system detects errors
-- System displays error summary at top of form
-- System highlights fields with errors in red
-- System displays specific error message below each field
-- Vendor corrects errors
-- Vendor resubmits
-- Flow continues from failed validation step
+**E1: Invalid Token Format**
+- At step 5, token is not valid UUID format
+- System displays error page
+- Flow ends with error
 
-**EF-002: Duplicate Vendor Detected**
-- At step 12, system finds existing vendor with same EIN or company name
-- System displays warning: "A vendor with this information already exists. If you are already registered, please login. If this is an error, please contact support."
-- System offers options:
-  - "Go to Login Page"
-  - "Contact Support"
-  - "Continue Anyway" (with justification required)
-- If vendor continues, system flags for manual review
-- Flow continues from step 13 with duplicate warning flag
+**E2: Token Expired**
+- At step 5, current date > token expiration date
+- System displays "Invitation Expired" error
+- Flow ends with error
 
-**EF-003: Invalid Tax ID Format**
-- At step 10, system detects invalid EIN format
-- System displays error: "Invalid Tax ID format. Must be XX-XXXXXXX."
-- System shows format example: "12-3456789"
-- Vendor corrects format
-- Flow continues from step 10
-
-**EF-004: File Upload Failure**
-- At step 34, file upload fails (network error, file too large, virus detected)
-- System displays error: "File upload failed: {specific reason}"
-- System offers:
-  - "Retry Upload"
-  - "Choose Different File"
-  - "Continue Without This File" (if optional document)
-- If virus detected, system blocks upload and notifies security team
-- Vendor must resolve issue before proceeding
-
-**EF-005: Invalid Bank Account Information**
-- At step 26, system validates bank account
-- System detects invalid routing number or account number format
-- System displays error: "Invalid bank account information. Please verify your routing and account numbers."
-- System provides link to "How to Find Your Bank Account Information"
-- Vendor corrects information
-- Flow continues from step 26
-
-**EF-006: Terms Not Accepted**
-- At step 43, vendor has not checked required agreement checkboxes
-- System displays error: "You must accept the Terms and Conditions to proceed."
-- System scrolls to terms section
-- System highlights unchecked boxes
-- Vendor must check boxes to proceed
-- Flow continues from step 43
-
-**EF-007: Session Timeout**
-- During any step, vendor inactive for >30 minutes
-- System displays warning: "Your session will expire in 2 minutes. Click to continue."
-- If vendor does not respond:
-  - System saves current progress automatically
-  - System displays: "Session expired. Your progress has been saved. Check your email for a link to resume."
-  - System sends email with resume link
-  - Flow terminates
-- Vendor can resume later using email link
-
-**EF-008: Network Connection Lost**
-- During submission (step 44), network connection lost
-- System displays: "Connection lost. Your progress has been saved. Please retry when connection is restored."
-- System saves all data locally (browser storage)
-- When connection restored, system displays "Retry Submission" button
-- Vendor clicks retry
-- System resubmits saved data
-- Flow continues from step 44
-
----
+**E3: Campaign Not Active**
+- At step 5, campaign status is not 'active'
+- System displays "Campaign Closed" message
+- Flow ends with error
 
 #### Postconditions
-
 **Success**:
-- Vendor record created with status "Pending Approval"
-- Unique registration ID generated
-- All vendor information stored in database
-- All documents uploaded and virus-scanned
-- Confirmation email sent to vendor
-- Notification created for procurement staff
-- Audit log entry created with registration details
-- Vendor can track application status via public link
-- Procurement staff can review application in admin portal
+- Portal session created and active
+- Vendor authenticated via token
+- Invitation status updated
+- Access logged
+- Vendor portal interface displayed
 
 **Failure**:
-- No vendor record created
-- Partial data may be saved if vendor saved progress
-- Error logged in system logs
-- Vendor informed of failure reason
-- Vendor can retry registration
+- No portal session created
+- Error page displayed
+- Security event logged (if applicable)
+
+#### Business Rules
+- BR-VPP-Rule-011: One unique token per vendor per campaign
+- BR-VPP-Rule-012: Token expires with campaign end date
+- BR-VPP-Rule-024: Token is only authentication method
+- BR-VPP-Rule-025: Vendor can access portal unlimited times before expiration
 
 ---
 
-#### Business Rules Applied
+### UC-VPP-007: Submit Prices Online
 
-- **BR-VP-001**: Vendor registration requires approval before portal access (enforced at step 45)
-- **BR-VP-Rule-001**: All registrations reviewed and approved by procurement (status set at step 45)
-- **BR-VP-Rule-009**: File upload limit 50MB per file, virus scanning required (enforced at step 34)
-- **BR-VP-Rule-021**: All uploaded documents must pass virus scanning (enforced at step 34)
+#### Basic Information
+- **Use Case ID**: UC-VPP-007
+- **Use Case Name**: Submit Prices Online
+- **Priority**: Critical
+- **Primary Actor**: Vendor
+- **Secondary Actors**: System (Auto-save)
+- **Frequency**: Per campaign invitation
+- **Related Requirements**: BR-VPP-011, BR-VPP-012, BR-VPP-013
 
----
+#### Description
+Vendor submits pricing information using the online web form interface with inline editing and auto-save.
 
-#### UI Requirements
-
-**Registration Landing Page**:
-- **Hero Section**: Welcoming message and benefits of registration
-- **Call to Action**: Prominent "Register as Vendor" button
-- **Login Link**: "Already registered? Login here"
-- **Help Resources**: FAQ, Contact Support
-
-**Registration Wizard**:
-- **Layout**: Multi-step wizard with progress indicator (4 steps)
-- **Progress Bar**: Visual progress bar showing completion (25%, 50%, 75%, 100%)
-- **Navigation**: "Previous", "Next", "Save and Continue Later", "Cancel" buttons
-- **Auto-save**: Auto-save draft every 3 minutes
-- **Mobile-Responsive**: Full functionality on tablets and smartphones
-
-**Step Forms**:
-- **Field Labels**: Clear, descriptive labels with tooltips for complex fields
-- **Required Indicators**: Red asterisk (*) for required fields
-- **Validation**: Inline validation with immediate feedback
-- **Error Display**: Error messages in red below fields
-- **Character Counters**: Show remaining characters for text fields
-- **Format Helpers**: Placeholder text showing expected format (e.g., "XX-XXXXXXX" for EIN)
-
-**Document Upload Section**:
-- **Drag-and-Drop**: Large drop zone for file uploads
-- **File Picker**: "Browse" button for traditional file selection
-- **Upload Progress**: Progress bar during upload
-- **File Preview**: Thumbnail or preview of uploaded file
-- **File Info**: Display filename, size, upload date
-- **Remove Button**: X button to remove uploaded file
-
-**Terms and Conditions**:
-- **Scrollable Text Box**: Scrollable container with terms text
-- **Scroll Tracking**: "I Agree" checkbox disabled until vendor scrolls to bottom
-- **Checkboxes**: Large, clear checkboxes for required agreements
-- **Electronic Signature**: Simple text input fields for name and title
-
-**Confirmation Page**:
-- **Success Icon**: Green checkmark or success graphic
-- **Registration ID**: Large, prominent display of registration ID
-- **Next Steps**: Clear explanation of what happens next
-- **Action Buttons**: "Track Status", "Download Summary", "Go to Login"
-
----
-
-### UC-VP-002: Vendor Login and Authentication
-
-**Primary Actor**: Vendor User
-
-**Stakeholders and Interests**:
-- Vendor User: Wants secure, convenient access to portal
-- IT Security: Needs strong authentication to protect data
-- Procurement Staff: Wants vendors to have reliable access
-- Compliance Officer: Requires audit trail of access
-
-**Preconditions**:
-- Vendor registration approved
-- Portal credentials created and sent to vendor
-- Vendor has internet access and modern web browser
-
-**Trigger**: Vendor navigates to portal login page
-
----
+#### Preconditions
+1. Vendor has accessed portal via valid token (UC-VPP-006)
+2. Campaign is active
+3. Pricelist template is loaded
 
 #### Main Flow
+1. Vendor clicks "Submit Prices" tab
+2. System displays three submission method options
+3. Vendor selects "Online Entry"
+4. System displays online price entry interface
 
-**Step 1: Access Login Page**
-1. Vendor navigates to vendor portal login URL
-2. System displays login page
-3. System shows login form with:
-   - Username or Email field
-   - Password field
-   - "Remember Me" checkbox
-   - "Login" button
-   - "Forgot Password?" link
-   - "Need Help?" link
+**Header Section**:
+5. System displays pricelist header form:
+   - Currency (dropdown, required)
+   - Effective Start Date (required)
+   - Effective End Date (optional, null = open-ended)
+   - General Notes (optional)
 
-**Step 2: Enter Credentials**
-4. Vendor enters username or email address
-5. Vendor enters password
-6. Vendor optionally checks "Remember Me" checkbox
-7. Vendor clicks "Login" button
+**Product List Section**:
+6. System displays product list table with all products from template
 
-**Step 3: Validate Credentials**
-8. System validates username/email format
-9. System looks up user account
-10. System verifies password hash matches
-11. System checks account status (active, locked, disabled)
-12. If account locked, system displays error (EF-002)
-13. If account disabled, system displays error (EF-003)
-14. System logs successful login attempt
+7. Vendor enters pricing for each product:
 
-**Step 4: Two-Factor Authentication (if enabled)**
-15. If 2FA enabled for user, system prompts for verification code
-16. System sends 2FA code to:
-    - Email (always sent)
-    - SMS (if mobile number configured)
-    - Authenticator app (if configured)
-17. System displays code entry form
-18. Vendor enters 6-digit verification code
-19. Vendor clicks "Verify"
-20. System validates code (correct, not expired)
-21. If code invalid, system displays error (EF-004)
-22. If code expired, system offers to resend (AF-002)
+**Option A: Simple Single-Tier Pricing**:
+8. Vendor enters base price and lead time
+9. System validates and auto-saves
 
-**Step 5: Create Session**
-23. System creates new user session
-24. System generates session token
-25. System sets session timeout (30 minutes of inactivity)
-26. If "Remember Me" checked, system creates persistent login token (30 days)
-27. System records login details:
-    - User ID and name
-    - Vendor ID
-    - Login timestamp
-    - IP address
-    - Browser/device information
-28. System checks for forced password change
-29. If password expired (>90 days), system redirects to password change (AF-003)
+**Option B: Multi-Tier MOQ Pricing**:
+10. Vendor clicks "Add MOQ Tiers" button
+11. System displays tier form (up to 5 tiers)
+12. Vendor enters tier data (MOQ, Unit Price, Lead Time)
+13. System validates MOQ tiers (ascending order)
 
-**Step 6: Check Onboarding Status**
-30. System checks if vendor completed onboarding checklist
-31. If onboarding incomplete, system redirects to onboarding (AF-004)
-32. If onboarding complete, system proceeds to dashboard
+**Option C: Free of Charge (FOC) Quantity**:
+14. Vendor enters FOC quantity, unit, and notes
 
-**Step 7: Load Dashboard**
-33. System loads vendor dashboard
-34. System displays:
-    - Welcome message with vendor name
-    - Dashboard summary cards (active POs, pending invoices, open RFQs, etc.)
-    - Recent activity timeline
-    - Action items requiring attention
-    - Notifications badge
-35. System displays main navigation menu
-36. System displays user profile dropdown
-37. System displays "Logout" button
+**Auto-Save**:
+15. System auto-saves every 2 minutes
+16. System saves on field blur and tab navigation
 
----
+**Submit**:
+17. When vendor completes pricing, system enables "Submit" button
+18. Vendor clicks "Submit"
+19. System displays submission confirmation dialog with summary
+20. Vendor clicks "Confirm Submit"
+21. System performs final validation
+22. System updates pricelist status: 'draft' → 'submitted' (active immediately)
+23. System sends confirmation email to vendor
+24. System sends notification to campaign owner
+25. System displays success message
 
-#### Alternate Flows
+**Note**: There is no approval workflow - submitted pricelists become active immediately.
 
-**AF-001: First-Time Login**
-- After step 10, system detects user never logged in before
-- System displays welcome message
-- System forces password change from temporary password
-- User enters new password (must meet requirements)
-- System validates password strength
-- System saves new password
-- System displays 2FA setup wizard (optional but recommended)
-- User sets up 2FA or skips
-- Flow continues to step 23
+#### Alternative Flows
 
-**AF-002: Resend 2FA Code**
-- At step 21, vendor clicks "Resend Code"
-- System invalidates previous code
-- System generates new 6-digit code
-- System sends new code via selected method
-- System displays "Code resent successfully"
-- Vendor enters new code
-- Flow continues from step 18
+**A1: Resume Draft Submission**
+- System loads draft data from previous session
+- Vendor continues editing from where they left off
 
-**AF-003: Force Password Change**
-- At step 29, system detects password expired (>90 days)
-- System displays password change form
-- User enters current password
-- User enters new password (twice for confirmation)
-- System validates:
-  - Current password correct
-  - New password meets requirements
-  - New password different from last 5 passwords
-  - Both new password entries match
-- System saves new password
-- System displays success message
-- Flow continues to step 30
-
-**AF-004: Complete Onboarding**
-- At step 31, system detects incomplete onboarding
-- System redirects to onboarding checklist
-- System displays checklist with incomplete tasks highlighted
-- User completes mandatory tasks
-- System tracks completion
-- When all mandatory tasks complete, system redirects to dashboard
-- Flow continues to step 33
-
-**AF-005: Trusted Device - Skip 2FA**
-- At step 15, system checks if current device is trusted
-- Device is marked as trusted (user selected "Trust this device" on previous login)
-- System skips 2FA verification
-- Flow continues to step 23
-
-**AF-006: Single Sign-On (SSO)**
-- At step 2, user clicks "Login with SSO" button
-- System redirects to identity provider (IdP)
-- User authenticates with IdP
-- IdP sends authentication assertion to system
-- System validates assertion
-- System creates user session
-- Flow continues to step 27
-
----
+**A2: Save Draft and Exit**
+- Vendor clicks "Save Draft" or closes browser
+- System saves all current data
+- Vendor can return later to complete
 
 #### Exception Flows
 
-**EF-001: Invalid Credentials**
-- At step 10, username or password incorrect
-- System increments failed login counter
-- System displays error: "Invalid username or password. Please try again."
-- System does NOT indicate which field is wrong (security)
-- System logs failed login attempt with IP address
-- If failed attempts <5, system allows retry
-- Vendor re-enters credentials
-- Flow continues from step 4
-- If failed attempts ≥5, system locks account (EF-002)
+**E1: Validation Error - Invalid Base Price**
+- System displays inline error
+- Vendor corrects price
 
-**EF-002: Account Locked**
-- At step 12, account locked due to excessive failed attempts
-- System displays error: "Your account has been locked due to multiple failed login attempts. Please use 'Forgot Password' to reset, or contact support."
-- System shows:
-  - "Forgot Password" button
-  - "Contact Support" button
-- System sends email notification to vendor about lockout
-- Flow terminates
+**E2: Session Expired During Submission**
+- System displays session expired modal
+- System saves draft automatically
+- Vendor re-authenticates and resumes
 
-**EF-003: Account Disabled**
-- At step 13, account disabled by administrator
-- System displays error: "Your account has been disabled. Please contact support for assistance."
-- System shows "Contact Support" button
-- System logs attempted access to disabled account
-- Flow terminates
-
-**EF-004: Invalid 2FA Code**
-- At step 20, verification code incorrect
-- System displays error: "Invalid verification code. Please try again."
-- System allows 3 attempts
-- If 3 attempts fail, system displays: "Too many failed attempts. Please request a new code."
-- System offers "Resend Code" button
-- Flow continues from step 16
-
-**EF-005: 2FA Code Expired**
-- At step 20, verification code expired (>10 minutes old)
-- System displays error: "Verification code has expired. Please request a new code."
-- System offers "Resend Code" button
-- Vendor clicks "Resend Code"
-- Flow continues from step 16
-
-**EF-006: Session Already Active**
-- At step 23, system detects active session for same user
-- If "single session only" policy enabled:
-  - System displays warning: "You are already logged in on another device/browser. Would you like to logout the other session and continue here?"
-  - System offers:
-    - "Yes, logout other session"
-    - "No, go back"
-  - If vendor selects "Yes", system terminates other session
-  - Flow continues to step 27
-- If multiple sessions allowed:
-  - System allows new session
-  - System notifies vendor of concurrent sessions
-  - Flow continues to step 27
-
-**EF-007: Network Connection Lost During Login**
-- At any step, network connection lost
-- System displays: "Connection lost. Please check your internet and try again."
-- System clears sensitive data (password field)
-- When connection restored, vendor must re-enter credentials
-- Flow restarts from step 1
-
-**EF-008: Browser Not Supported**
-- At step 2, system detects outdated or unsupported browser
-- System displays warning: "Your browser is not supported. For best experience, please use Chrome, Firefox, Safari, or Edge (latest versions)."
-- System allows user to continue with warning
-- System logs browser information
-- Flow continues from step 4
-
----
+**E3: MOQ Tiers Not in Ascending Order**
+- At step 13, system detects invalid tier order
+- System displays error message
+- Vendor corrects tier values
 
 #### Postconditions
-
 **Success**:
-- User authenticated and session created
-- Session token generated and stored
-- Login activity logged (user, timestamp, IP, device)
-- User has access to portal based on role/permissions
-- Dashboard loaded with current data
-- User can perform permitted actions
-- Session expires after 30 minutes of inactivity
+- Pricelist status changed to 'submitted'
+- All product pricing data saved
+- Completion percentage and quality score calculated
+- Confirmation emails sent
+- Portal changes to read-only mode
 
-**Failure**:
-- User not authenticated
-- No session created
-- Failed login attempt logged
-- Account may be locked if excessive failures
-- User sees error message with guidance
-- User can retry or use password reset
+**Draft Saved**:
+- Pricelist remains 'draft'
+- Data saved
+- Vendor can return later
 
----
-
-#### Business Rules Applied
-
-- **BR-VP-Rule-007**: Single active session per user (configurable) (enforced at step 23 or EF-006)
-- **BR-VP-Rule-008**: Passwords expire every 90 days (checked at step 28)
-- **BR-VP-Rule-018**: Session timeout after 30 minutes of inactivity (set at step 25)
+#### Business Rules
+- BR-VPP-Rule-027: Auto-save every 2 minutes
+- BR-VPP-Rule-028: Maximum 5 MOQ tiers per product
+- BR-VPP-Rule-029: MOQ quantities must be in ascending order
+- BR-VPP-Rule-030: All prices must be positive numbers
 
 ---
 
-#### UI Requirements
+### UC-VPP-008: Upload Excel Pricelist
 
-**Login Page**:
-- **Clean Layout**: Minimal, professional design focused on login form
-- **Branding**: Organization logo and vendor portal name
-- **Centered Form**: Login form centered on page
-- **Field Design**: Large, clear input fields with icons (user icon, lock icon)
-- **Password Toggle**: Eye icon to show/hide password
-- **Remember Me**: Checkbox with clear label and tooltip explaining duration
-- **Error Display**: Error messages in red alert box above form
-- **Help Links**: Clearly visible "Forgot Password?" and "Need Help?" links
-- **Mobile-Responsive**: Full functionality on smartphones
+#### Basic Information
+- **Use Case ID**: UC-VPP-008
+- **Use Case Name**: Upload Excel Pricelist
+- **Priority**: High
+- **Primary Actor**: Vendor
+- **Secondary Actors**: System
+- **Frequency**: Per campaign invitation
+- **Related Requirements**: BR-VPP-012
 
-**2FA Verification Page**:
-- **Code Entry**: Large input field for 6-digit code
-- **Number Pad**: On-screen number pad for mobile devices
-- **Auto-Submit**: Automatically submit when 6 digits entered
-- **Resend Button**: Clear "Resend Code" button
-- **Timer**: Countdown timer showing code expiry (10 minutes)
-- **Method Indicator**: Show which method was used (email, SMS, app)
+#### Description
+Vendor uploads a completed Excel file containing pricing information instead of using online entry.
 
-**Dashboard (After Login)**:
-- **Welcome Banner**: Personalized greeting with vendor name
-- **Summary Cards**: Visual cards showing key metrics with icons
-- **Quick Actions**: Prominent buttons for common actions (Submit Invoice, Respond to RFQ)
-- **Activity Timeline**: Scrollable list of recent activities
-- **Notifications**: Bell icon with badge showing unread count
-- **Navigation Menu**: Sidebar or top menu with clear labels and icons
-- **User Menu**: Dropdown with profile, settings, logout options
-
----
-
-### UC-VP-003: Update Vendor Profile
-
-**Primary Actor**: Vendor Admin, Vendor User
-
-**Stakeholders and Interests**:
-- Vendor Admin: Wants to keep company information current and accurate
-- Procurement Staff: Needs accurate vendor information for communication and compliance
-- Finance Team: Requires current bank account information for payments
-- Compliance Officer: Needs up-to-date certifications and licenses
-
-**Preconditions**:
-- Vendor user is authenticated and logged into portal
-- User has "Edit Profile" permission (Vendor Admin or Vendor User role)
-- Vendor status is active
-
-**Trigger**: Vendor clicks "Profile" or "Edit Profile" in navigation menu
-
----
+#### Preconditions
+1. Vendor has accessed portal via valid token (UC-VPP-006)
+2. Campaign is active
+3. Vendor has completed Excel file (from downloaded template)
 
 #### Main Flow
+1. Vendor clicks "Submit Prices" tab
+2. System displays three submission method options
+3. Vendor selects "Upload Excel"
+4. System displays upload interface with drag-and-drop zone
+5. Vendor drags file or clicks to select file
+6. System validates file:
+   - File type: .xlsx or .csv
+   - File size: ≤ 10MB
+7. System uploads file
+8. System parses Excel content:
+   - Read header row
+   - Map columns to expected fields
+   - Extract product pricing data
+9. System validates parsed data:
+   - Required fields present
+   - Price values are valid numbers
+   - Product codes match template
+   - MOQ tiers in ascending order (if applicable)
+10. System displays parsed data preview:
+    - Shows all parsed items
+    - Highlights errors and warnings
+    - Shows validation summary
+11. Vendor reviews parsed data
+12. Vendor clicks "Confirm and Save"
+13. System saves pricing data to pricelist
+14. System displays success message
 
-**Step 1: Access Profile Page**
-1. Vendor user navigates to dashboard
-2. User clicks "Profile" link in navigation menu or user dropdown
-3. System displays vendor profile view page
-4. System shows profile sections:
-   - Company Information
-   - Contact Information
-   - Business Details
-   - Bank Account Information
-   - Certifications & Documents
-5. System displays "Edit Profile" button
-6. System shows document expiry warnings (if any)
+**Submit After Upload**:
+15. Vendor can then submit using same flow as UC-VPP-007 (steps 17-25)
 
-**Step 2: Initiate Profile Edit**
-7. User clicks "Edit Profile" button
-8. System checks user permissions
-9. System switches to edit mode
-10. System displays editable form fields
-11. System displays "Save Changes" and "Cancel" buttons
+#### Alternative Flows
 
-**Step 3: Update Company Information**
-12. User edits company information fields:
-    - **Trade Name/DBA** (editable, 5-200 characters)
-    - **Legal Company Name** (read-only, requires approval to change)
-    - **Physical Address** (editable):
-      - Street Address (required)
-      - City (required)
-      - State (required)
-      - ZIP Code (required)
-      - Country (required)
-    - **Mailing Address** (editable, checkbox "Same as Physical")
-    - **Billing Address** (editable, checkbox "Same as Physical")
-    - **Business Phone** (editable, phone format)
-    - **Website** (editable, URL format)
-13. System validates each field on blur
-14. System displays validation errors inline
+**A1: Validation Errors in Excel**
+- At step 9, system finds validation errors
+- System displays errors with row numbers
+- Vendor can: Fix errors offline and re-upload OR Edit inline
 
-**Step 4: Update Contact Information**
-15. User edits contact information:
-    - **Primary Contact**:
-      - Name (editable)
-      - Title (editable)
-      - Email (editable, requires email verification)
-      - Phone (editable)
-      - Mobile (editable)
-    - **Secondary Contact** (optional, same fields)
-    - **Accounts Payable Contact** (required, same fields)
-16. User can add additional contacts (up to 5 total)
-17. User can remove non-primary contacts
-18. If email changed, system flags for verification
-
-**Step 5: Update Business Details**
-19. User edits business details:
-    - **Business Categories** (multi-select, can add/remove)
-    - **Products/Services Description** (textarea, min 100 characters)
-    - **Annual Revenue Range** (dropdown)
-    - **Number of Employees** (dropdown)
-    - **Business Hours** (text or structured input)
-    - **Holiday Schedule** (optional calendar picker)
-    - **Shipping/Delivery Capabilities** (textarea)
-    - **Payment Terms Preferences** (dropdown or text)
-20. User updates certifications:
-    - Check/uncheck certification boxes
-    - Add custom certifications (text input)
-21. System validates all business detail fields
-
-**Step 6: Update Bank Account (Critical Change)**
-22. User clicks "Update Bank Account" button
-23. System displays security verification:
-    - "This is a critical change requiring additional verification"
-    - User must re-enter password
-24. User enters current password
-25. System validates password
-26. System displays bank account edit form:
-    - **Bank Name** (editable)
-    - **Account Holder Name** (editable, must match legal name)
-    - **Account Number** (editable, masked as ****5678)
-    - **Routing Number** (editable)
-    - **Account Type** (dropdown: Checking, Savings)
-27. User updates bank account information
-28. System validates format (routing number 9 digits, account number 4-17 digits)
-29. System flags change as "Pending Approval"
-
-**Step 7: Review and Save Changes**
-30. User reviews all changes made
-31. User clicks "Save Changes" button
-32. System performs final validation of all fields
-33. System checks for critical changes requiring approval:
-    - Legal name change
-    - Tax ID change
-    - Bank account change
-34. If critical changes detected:
-    - System displays confirmation dialog
-    - "The following changes require procurement approval: [list of changes]"
-    - "Changes will be pending until approved. Continue?"
-    - User confirms or cancels
-35. System saves changes:
-    - Non-critical changes saved immediately
-    - Critical changes saved with "Pending Approval" flag
-36. System creates change history record:
-    - User who made change
-    - Timestamp
-    - Fields changed (old value → new value)
-    - Approval status
-37. System sends notifications:
-    - To vendor: Confirmation of changes
-    - To procurement staff: If approval required
-38. System displays success message
-39. System shows updated profile in view mode
-40. If email changed, system sends verification email (AF-002)
-
----
-
-#### Alternate Flows
-
-**AF-001: Cancel Changes**
-- At any point during edit, user clicks "Cancel" button
-- System displays confirmation: "Discard unsaved changes?"
-- User confirms discard
-- System reverts to view mode without saving
-- System displays last saved profile data
-
-**AF-002: Email Change Verification**
-- At step 40, system detects email address changed
-- System sends verification email to NEW email address
-- Email contains:
-  - Verification link (expires in 24 hours)
-  - Security note about not sharing link
-- Vendor clicks verification link
-- System verifies token
-- System updates email status to "Verified"
-- System sends confirmation to both old and new email addresses
-- If not verified within 24 hours, system reverts to old email
-
-**AF-003: Add Additional Contact**
-- At step 16, user clicks "Add Another Contact"
-- System displays contact form
-- User fills contact information
-- User selects contact role (Secondary, AP, Technical, Emergency)
-- System validates fields
-- User clicks "Save Contact"
-- System adds contact to profile
-- Contact appears in contacts list
-
-**AF-004: Request Legal Name Change**
-- At step 12, user clicks "Request Legal Name Change" link
-- System displays special request form:
-  - Current legal name (read-only)
-  - Requested new legal name (text input)
-  - Reason for change (textarea, required)
-  - Supporting documents upload (required, e.g., amended articles)
-- User fills form and uploads documents
-- User submits request
-- System creates approval workflow
-- System notifies procurement and legal teams
-- Change pending until approved by authorized personnel
-
-**AF-005: Bulk Contact Update**
-- At step 15, user clicks "Import Contacts from File"
-- System displays file upload dialog
-- User uploads CSV file with contact information
-- System validates and imports contacts
-- System displays preview of imported contacts
-- User confirms import
-- System adds all valid contacts to profile
-
----
+**A2: Partial Data Upload**
+- Excel contains subset of products
+- System imports available data
+- Vendor completes remaining products online
 
 #### Exception Flows
 
-**EF-001: Validation Errors**
-- At step 32, system detects validation errors
-- System displays error summary at top of form
-- System highlights fields with errors
-- System scrolls to first error
-- User corrects errors
-- User resubmits
-- Flow continues from step 32
+**E1: Invalid File Type**
+- At step 6, file is not .xlsx or .csv
+- System displays error message
+- Vendor selects correct file type
 
-**EF-002: Insufficient Permissions**
-- At step 8, user lacks "Edit Profile" permission
-- System displays error: "You do not have permission to edit the vendor profile. Contact your Vendor Admin."
-- System shows profile in read-only mode
-- System hides "Edit" button
-- Flow terminates
+**E2: File Too Large**
+- At step 6, file exceeds 10MB
+- System displays error message
+- Vendor reduces file size
 
-**EF-003: Email Already in Use**
-- At step 32, system detects email address already used by another vendor
-- System displays error: "This email address is already registered to another vendor account."
-- System highlights email field
-- User must use different email
-- Flow continues from step 15
-
-**EF-004: Invalid Bank Account**
-- At step 28, system cannot validate bank account information
-- System displays error: "Unable to validate bank account information. Please verify routing and account numbers."
-- System provides help link: "How to find your bank account information"
-- User corrects information
-- User retries validation
-- Flow continues from step 26
-
-**EF-005: Password Verification Failed**
-- At step 25, entered password incorrect
-- System displays error: "Incorrect password. For security, please verify your password to update bank account."
-- System allows 3 attempts
-- If 3 attempts fail, system cancels bank account update
-- User must retry later or use password reset
-- Flow returns to step 22
-
-**EF-006: Session Timeout During Edit**
-- During edit (steps 12-31), user inactive >30 minutes
-- System displays warning: "Your session will expire soon. Save your changes."
-- If user continues, session expires
-- System saves draft automatically (if possible)
-- User redirected to login
-- After login, system offers to restore draft
-- User can continue editing from last saved state
-
-**EF-007: Concurrent Edit Conflict**
-- At step 32, system detects another user edited profile simultaneously
-- System displays error: "Profile was updated by another user. Please review changes."
-- System shows comparison:
-  - Your changes
-  - Other user's changes
-  - Current saved values
-- System offers:
-  - "Reload and Lose My Changes"
-  - "Merge Changes" (if no conflicts)
-  - "Contact Support" (if conflicts exist)
-- User selects option
-- System handles accordingly
-
----
+**E3: Template Mismatch**
+- At step 9, column structure doesn't match expected template
+- System displays mapping error
+- Vendor downloads correct template
 
 #### Postconditions
-
 **Success**:
-- Vendor profile updated with new information
-- Non-critical changes effective immediately
-- Critical changes marked "Pending Approval"
-- Change history record created
-- Notifications sent to relevant parties
-- If email changed, verification email sent
-- User sees updated profile in view mode
-- Procurement staff can review changes requiring approval
+- Excel file stored
+- Pricing data parsed and saved
+- Pricelist ready for submission
 
 **Failure**:
-- Profile not updated
-- Changes not saved (unless draft saved)
-- Error displayed to user
-- Error logged in system
-- User can retry after correcting issues
+- Upload rejected
+- Error message displayed
+- No data saved
+
+#### Business Rules
+- BR-VPP-Rule-031: Maximum file size 10MB
+- BR-VPP-Rule-032: Accepted file types: .xlsx, .csv
+- BR-VPP-Rule-033: Excel structure must match template
 
 ---
 
-#### Business Rules Applied
+### UC-VPP-009: Download Excel Template
 
-- **BR-VP-006**: Critical profile changes require approval (enforced at step 33-34)
-- **BR-VP-Rule-006**: Vendors can edit their own information (permission checked at step 8)
-- **BR-VP-Rule-019**: Vendors can only modify their own data (enforced by system design)
+#### Basic Information
+- **Use Case ID**: UC-VPP-009
+- **Use Case Name**: Download Excel Template
+- **Priority**: High
+- **Primary Actor**: Vendor
+- **Secondary Actors**: System
+- **Frequency**: Per campaign invitation
+- **Related Requirements**: BR-VPP-013
 
----
+#### Description
+Vendor downloads an Excel template pre-filled with required products to complete offline.
 
-#### UI Requirements
-
-**Profile View Page**:
-- **Section Layout**: Organized into collapsible sections with clear headers
-- **Read-Only Display**: Clean, professional presentation of profile data
-- **Edit Button**: Prominent "Edit Profile" button (top-right)
-- **Document Status**: Visual indicators for expired/expiring documents (red/yellow badges)
-- **Responsive**: Full functionality on tablets and smartphones
-
-**Profile Edit Mode**:
-- **Inline Editing**: Forms with editable fields in context
-- **Field Grouping**: Related fields grouped visually
-- **Required Indicators**: Red asterisk (*) for required fields
-- **Inline Validation**: Real-time validation with green checkmarks or red error messages
-- **Character Counters**: For text fields with limits
-- **Help Icons**: Tooltips explaining complex fields
-- **Save/Cancel Buttons**: Sticky buttons at top and bottom of form
-- **Unsaved Changes Warning**: Browser prompt if user attempts to navigate away
-
-**Bank Account Edit**:
-- **Security Banner**: Prominent security message about sensitive information
-- **Password Modal**: Modal dialog for password verification
-- **Masked Display**: Account numbers partially masked (****5678)
-- **Show/Hide Toggle**: Option to temporarily reveal full account number
-- **Approval Notice**: Clear message that changes require approval
-
-**Change Confirmation Dialog**:
-- **Modal Dialog**: Centered modal with dimmed background
-- **Change Summary**: Clear list of what will change
-- **Approval Warning**: Prominent notice about pending approval if applicable
-- **Action Buttons**: "Confirm Changes" (green) and "Cancel" (gray)
-
----
-
-### UC-VP-004: Upload Documents
-
-**Primary Actor**: Vendor Admin, Vendor User
-
-**Stakeholders and Interests**:
-- Vendor: Wants easy document upload to maintain compliance
-- Procurement Staff: Needs current, valid vendor documents for compliance and verification
-- Compliance Officer: Requires valid certifications to approve vendor transactions
-- Risk Management: Needs insurance certificates to assess vendor risk
-
-**Preconditions**:
-- Vendor user is authenticated and logged into portal
-- User has "Upload Documents" permission
-- Vendor status is active
-
-**Trigger**: Vendor clicks "Documents" in navigation menu or receives document expiry notification
-
----
+#### Preconditions
+1. Vendor has accessed portal via valid token (UC-VPP-006)
+2. Campaign is active
 
 #### Main Flow
+1. Vendor clicks "Submit Prices" tab
+2. System displays three submission method options
+3. Vendor selects "Download Template"
+4. System displays template information:
+   - Number of products
+   - Required fields
+   - Instructions summary
+5. Vendor clicks "Download Excel Template"
+6. System generates Excel file:
+   - Sheet 1: Pricing data sheet with product list
+   - Sheet 2: Instructions and field descriptions
+   - Pre-filled product codes and names
+   - Data validation rules in cells
+   - Column headers with field names
+7. Browser downloads file
+8. Vendor saves file to local computer
 
-**Step 1: Access Documents Page**
-1. Vendor user navigates to dashboard
-2. User clicks "Documents" link in navigation menu
-3. System displays documents management page
-4. System shows document categories:
-   - **Required Documents** (licenses, insurance, tax certificates)
-   - **Quality Certifications** (ISO, HACCP, etc.)
-   - **Optional Documents** (catalogs, references, financial statements)
-5. System displays document library with:
-   - Document name
-   - Document type
-   - Expiry date (if applicable)
-   - Upload date
-   - Status (Valid, Expiring Soon, Expired, Under Review)
-   - Actions (View, Replace, Delete)
-6. System highlights expired or expiring documents with warning badges
-7. System displays "Upload New Document" button
+**Fill Offline and Upload Later**:
+9. Vendor opens file in Excel
+10. Vendor fills in pricing data
+11. Vendor saves file
+12. Vendor uploads using UC-VPP-008
 
-**Step 2: Initiate Document Upload**
-8. User clicks "Upload New Document" button
-9. System displays upload modal dialog
-10. System shows:
-    - Document type dropdown
-    - Drag-and-drop upload area
-    - "Browse Files" button
-    - File requirements notice (formats, size limit)
+#### Alternative Flows
 
-**Step 3: Select Document Type**
-11. User selects document type from dropdown:
-    - Business License
-    - Tax Certificate (W-9/W-8)
-    - Certificate of Insurance - General Liability
-    - Certificate of Insurance - Workers' Compensation
-    - Certificate of Insurance - Professional Liability
-    - ISO 9001 Certificate
-    - ISO 14001 Certificate
-    - HACCP Certificate
-    - FDA Registration
-    - Organic Certification
-    - Fair Trade Certification
-    - Kosher Certification
-    - Halal Certification
-    - Product Catalog
-    - Safety Data Sheet (SDS)
-    - Financial Statement
-    - Reference Letter
-    - Other (with description field)
-12. If "Other" selected, system displays description field (required)
-
-**Step 4: Upload Document File**
-13. User drags file to upload area, or clicks "Browse Files"
-14. System displays file selection dialog
-15. User selects file from computer
-16. System validates file:
-    - Format (PDF, JPG, PNG, DOC, DOCX, XLS, XLSX)
-    - Size (max 50MB)
-    - Not infected with virus (virus scan)
-17. System displays upload progress bar
-18. System uploads file to secure storage
-19. System displays file preview (if PDF or image)
-20. System shows file information:
-    - Filename
-    - File size
-    - Upload date/time
-
-**Step 5: Enter Document Metadata**
-21. System displays metadata form fields:
-    - **Document Name** (required, pre-filled from filename, editable)
-    - **Issue Date** (required, date picker)
-    - **Expiry Date** (conditional based on document type, date picker)
-    - **Issuing Organization** (optional, text input)
-    - **Certificate/License Number** (optional, text input)
-    - **Version** (optional, for documents with versions)
-    - **Notes** (optional, textarea for additional information)
-22. User fills required metadata fields
-23. For documents with expiry dates, system validates:
-    - Issue date is not in future
-    - Expiry date is after issue date
-    - Expiry date is not in the past (warning if <30 days)
-24. System provides "Add Another Document" option
-
-**Step 6: Review and Submit**
-25. User reviews document information
-26. User can:
-    - Edit metadata
-    - Change file (upload different file)
-    - Remove document (cancel upload)
-27. User clicks "Upload Document" button
-28. System performs final validation
-29. System saves document record:
-    - Document metadata
-    - File path/reference
-    - Status: "Under Review" (for required documents)
-    - Uploaded by: user ID and name
-    - Upload timestamp
-30. System creates audit log entry
-31. System sends notification to procurement staff:
-    - New document uploaded
-    - Document type and vendor name
-    - Link to review document
-32. System displays success message
-33. System updates document library view
-34. New document appears in list with "Under Review" status
-
-**Step 7: Set Expiry Reminders (for time-sensitive documents)**
-35. If document has expiry date, system automatically:
-    - Calculates expiry reminders (60, 30, 7 days before)
-    - Schedules reminder notifications
-    - Displays confirmation: "Expiry reminders set for [date ranges]"
-
----
-
-#### Alternate Flows
-
-**AF-001: Replace Existing Document**
-- User starts from document library view
-- User clicks "Replace" action for existing document
-- System displays upload modal pre-filled with:
-  - Same document type
-  - Previous metadata (for reference)
-- User uploads new file
-- User updates metadata (especially issue/expiry dates)
-- System creates new version
-- System marks old document as "Superseded"
-- System retains old document for history
-- Flow continues from step 28
-
-**AF-002: Bulk Upload Multiple Documents**
-- At step 9, user clicks "Bulk Upload" option
-- System displays multi-file upload interface
-- User selects or drags multiple files
-- System processes each file:
-  - Attempts to detect document type from filename/content
-  - Displays list of files with suggested types
-- User reviews and corrects document types
-- User enters metadata for each (or bulk apply common metadata)
-- User clicks "Upload All"
-- System processes all documents
-- System displays summary of uploads (successful, failed)
-
-**AF-003: Scan Document with Mobile Camera**
-- User accessing portal from mobile device
-- At step 13, user clicks "Scan Document" button
-- System activates device camera
-- User positions document and captures photo
-- System applies image processing:
-  - Auto-crop
-  - Enhance contrast
-  - Correct perspective
-- User reviews captured image
-- User retakes or confirms
-- System converts image to PDF
-- Flow continues from step 20
-
-**AF-004: Add Multiple Expiry Dates**
-- At step 21, document has multiple expiry dates (e.g., multi-year certification with annual renewals)
-- User clicks "Add Expiry Date"
-- System displays additional expiry date field
-- User enters secondary expiry dates
-- System tracks all expiry dates
-- System sets reminders for each date
-
-**AF-005: Download Document Template**
-- At step 9, user clicks "Download Template" link
-- System displays available templates (e.g., W-9 form, insurance certificate template)
-- User selects template
-- System downloads template file
-- User fills template offline
-- User uploads completed template
-- Flow continues from step 13
-
----
+**A1: Download with Existing Draft Data**
+- At step 6, vendor has existing draft
+- System includes draft pricing in template
+- Vendor can see previously entered values
 
 #### Exception Flows
 
-**EF-001: File Type Not Supported**
-- At step 16, file format not supported
-- System displays error: "File type not supported. Please upload PDF, JPG, PNG, DOC, DOCX, XLS, or XLSX."
-- System shows accepted formats list
-- System rejects upload
-- User must select different file
-- Flow continues from step 13
-
-**EF-002: File Too Large**
-- At step 16, file size exceeds 50MB
-- System displays error: "File size exceeds maximum limit of 50MB. Please reduce file size or split into multiple files."
-- System provides tips:
-  - "Reduce PDF quality"
-  - "Compress images"
-  - "Upload multi-page documents as separate files"
-- System rejects upload
-- User must reduce file size or split file
-- Flow continues from step 13
-
-**EF-003: Virus Detected**
-- At step 16, virus scanner detects malware
-- System immediately blocks upload
-- System displays error: "File failed security scan and cannot be uploaded. Please scan your device for viruses."
-- System logs security incident:
-  - User ID
-  - Filename
-  - Timestamp
-  - Virus signature
-- System notifies security team
-- Flow terminates
-- User must clean file or device before retrying
-
-**EF-004: Upload Failed (Network Error)**
-- At step 18, network connection lost during upload
-- System displays error: "Upload failed due to network error. Please check your connection and retry."
-- System offers "Retry Upload" button
-- If file partially uploaded, system resumes from last successful chunk
-- User clicks retry
-- Flow continues from step 18
-
-**EF-005: Expired Document Uploaded**
-- At step 23, system detects expiry date is in the past
-- System displays warning: "This document has already expired. Are you sure you want to upload an expired document?"
-- System offers:
-  - "Yes, upload anyway" (document marked as Expired status)
-  - "No, change expiry date"
-  - "Cancel"
-- If user proceeds, document uploaded with Expired status
-- Flow continues from step 28 with Expired status
-
-**EF-006: Duplicate Document Detected**
-- At step 28, system detects duplicate document:
-  - Same document type
-  - Same issue date
-  - Similar filename
-- System displays warning: "A similar document already exists. Do you want to replace it or upload as a new version?"
-- System shows existing document details
-- System offers:
-  - "Replace Existing"
-  - "Upload as New Version"
-  - "Cancel"
-- User selects option
-- System processes accordingly
-- Flow continues based on selection
-
-**EF-007: Insufficient Storage Space**
-- At step 18, vendor has exceeded allocated storage quota
-- System displays error: "Your account has reached its storage limit. Please delete old documents or contact support to increase your storage quota."
-- System shows current storage usage
-- System offers "Manage Documents" button to delete old files
-- Flow terminates until storage freed
-
-**EF-008: Permission Denied**
-- At step 8, user lacks "Upload Documents" permission (Viewer role)
-- System displays error: "You do not have permission to upload documents. Contact your Vendor Admin."
-- System hides upload buttons
-- Documents page shown in read-only mode
-- Flow terminates
-
----
+**E1: Template Generation Error**
+- At step 6, system fails to generate template
+- System displays error message
+- Vendor can retry or contact support
 
 #### Postconditions
-
 **Success**:
-- Document uploaded and stored securely
-- Document record created with metadata
-- Document status set (Under Review for required docs, Valid for optional docs)
-- Expiry reminders scheduled (if applicable)
-- Audit log entry created
-- Procurement staff notified (for required documents)
-- Document appears in vendor's document library
-- Old document superseded (if replacement)
+- Excel template downloaded
+- Template contains all required products
+- Vendor can fill offline
 
 **Failure**:
-- Document not uploaded
-- No document record created
-- Error displayed to user
-- Error logged in system
-- User can retry upload
-- If security issue, incident logged and security notified
+- Download fails
+- Error message displayed
+
+#### Business Rules
+- BR-VPP-Rule-034: Template includes all products from campaign template
+- BR-VPP-Rule-035: Template includes data validation rules
+- BR-VPP-Rule-036: Template includes instructions sheet
 
 ---
 
-#### Business Rules Applied
+### UC-VPP-010: Review and Confirm Submission
 
-- **BR-VP-002**: Price/bid submissions require approved vendor status (documents support approval)
-- **BR-VP-004**: Document uploads limited to 50MB per file (enforced at step 16)
-- **BR-VP-Rule-009**: File size limit 50MB, virus scanning required (enforced at step 16)
-- **BR-VP-Rule-021**: All uploaded documents must pass virus scanning (enforced at step 16)
+#### Basic Information
+- **Use Case ID**: UC-VPP-010
+- **Use Case Name**: Review and Confirm Submission
+- **Priority**: High
+- **Primary Actor**: Vendor
+- **Secondary Actors**: System
+- **Frequency**: Per submission
+- **Related Requirements**: BR-VPP-014
 
----
+#### Description
+Vendor reviews entered pricing data before final submission.
 
-#### UI Requirements
+#### Preconditions
+1. Vendor has entered pricing data (via UC-VPP-007 or UC-VPP-008)
+2. Pricelist is in 'draft' status
 
-**Documents Management Page**:
-- **Page Layout**: Document library with table/card view toggle
-- **Document Categories**: Tabbed interface or sections for document categories
-- **Status Indicators**: Color-coded badges (green=Valid, yellow=Expiring, red=Expired, blue=Under Review)
-- **Actions Menu**: Dropdown menu with View, Replace, Delete options per document
-- **Search/Filter**: Search bar and filters (document type, status, date range)
-- **Upload Button**: Prominent "Upload New Document" button (primary CTA)
-- **Expiry Warnings**: Banner at top showing expired/expiring documents with counts
+#### Main Flow
+1. Vendor clicks "Review" tab
+2. System displays submission summary:
+   - Completion percentage
+   - Total items
+   - Completed items
+   - Missing items (if any)
+   - Header information (currency, dates)
+3. System displays item-by-item pricing review:
+   - Product code and name
+   - Unit price
+   - MOQ tiers (if applicable)
+   - FOC quantities (if applicable)
+   - Lead time
+4. Vendor reviews all entries
+5. If changes needed:
+   - Vendor clicks "Edit Prices"
+   - System navigates to Submit tab
+   - Vendor makes corrections
+   - Returns to Review tab
+6. When satisfied, vendor clicks "Submit"
+7. System displays final confirmation dialog
+8. Vendor clicks "Confirm Submit"
+9. System validates all data
+10. System updates status: 'draft' → 'submitted'
+11. System calculates quality score
+12. System sends confirmation email
+13. System displays success message
+14. Portal changes to read-only mode
 
-**Upload Modal Dialog**:
-- **Modal Layout**: Centered modal (600px wide) with dimmed background
-- **Document Type Dropdown**: Large, searchable dropdown at top
-- **Upload Area**: Large drag-and-drop zone with dashed border
-  - Icon: Cloud upload icon
-  - Text: "Drag and drop file here, or click to browse"
-  - Format notice: "Accepted formats: PDF, JPG, PNG, DOC, DOCX, XLS, XLSX (max 50MB)"
-- **File Preview**: Preview pane showing uploaded file (for images/PDFs)
-- **Progress Bar**: Linear progress bar during upload with percentage
-- **Metadata Form**: Clean form layout with labeled fields
-- **Date Pickers**: Calendar widgets for issue/expiry dates
-- **Character Counters**: For text fields with limits
-- **Action Buttons**: "Upload Document" (green), "Cancel" (gray)
+#### Alternative Flows
 
-**Mobile Camera Scan Interface** (mobile only):
-- **Camera View**: Full-screen camera view
-- **Capture Button**: Large circular button at bottom center
-- **Guidelines**: Overlay showing document boundaries
-- **Flash Toggle**: Toggle flash on/off
-- **Gallery Button**: Access previously captured images
-- **Review Screen**: After capture, show image with crop/enhance controls
-- **Retake/Confirm Buttons**: "Retake Photo" and "Use This Photo" buttons
+**A1: Return to Edit**
+- At step 4, vendor identifies errors
+- Vendor clicks "Edit Prices"
+- Returns to Submit tab for corrections
 
-**Document Library View**:
-- **Table View**:
-  - Columns: Document Name, Type, Issue Date, Expiry Date, Status, Actions
-  - Sortable columns
-  - Row hover effect
-- **Card View** (mobile-friendly):
-  - Document cards with thumbnail, key info, status badge
-  - Swipe actions for mobile
-- **Quick Actions**: Floating action button for quick upload on mobile
+#### Exception Flows
 
----
+**E1: Incomplete Data on Submit**
+- At step 9, validation fails due to missing required fields
+- System displays error with missing items
+- Vendor must complete missing data
 
-*(Due to length constraints, I'll provide a condensed version of the remaining use cases. The full document would contain the same level of detail for UC-VP-005 through UC-VP-011)*
+#### Postconditions
+**Success**:
+- Pricelist status is 'submitted'
+- Quality score calculated
+- Confirmation sent
+- Portal in read-only mode
 
----
-
-### UC-VP-005: View Price List Templates
-(Detailed main flow, alternate flows, exception flows, postconditions, business rules, UI requirements)
-
-### UC-VP-006: Submit Pricing
-(Detailed main flow with wizard steps, pricing table, validation, submission, alternate flows for bulk import, exception flows, postconditions, business rules, UI requirements)
-
-### UC-VP-007: Respond to RFQ
-(Detailed main flow with RFQ review, bid submission, Q&A, submission confirmation, alternate flows for clarifications, exception flows, postconditions, business rules, UI requirements)
-
-### UC-VP-008: View Purchase Orders
-(Detailed main flow with PO list, detail view, acknowledgment, delivery updates, alternate flows, exception flows, postconditions, business rules, UI requirements)
-
-### UC-VP-009: Submit Invoice
-(Detailed main flow with PO selection, invoice creation, document upload, submission, alternate flows, exception flows, postconditions, business rules, UI requirements)
-
-### UC-VP-010: View Performance Metrics
-(Detailed main flow with dashboard, metrics visualization, scorecards, alternate flows, exception flows, postconditions, business rules, UI requirements)
-
-### UC-VP-011: Communicate with Buyer
-(Detailed main flow with message center, compose message, reply, notifications, alternate flows, exception flows, postconditions, business rules, UI requirements)
+#### Business Rules
+- BR-VPP-Rule-037: All required fields must be completed before submission
+- BR-VPP-Rule-038: Submission is final (but vendor can create new version in future campaigns)
 
 ---
 
-## 4. User Roles and Permissions Matrix
+### UC-VPP-011: View Submission History
 
-| Function | Vendor Admin | Vendor User | Vendor Viewer |
-|----------|--------------|-------------|---------------|
-| Register Vendor | ✓ | ✓ | ✓ |
-| Login | ✓ | ✓ | ✓ |
-| View Profile | ✓ | ✓ | ✓ |
-| Edit Profile | ✓ | ✓ (limited) | ✗ |
-| Upload Documents | ✓ | ✓ | ✗ |
-| View Templates | ✓ | ✓ | ✓ |
-| Submit Pricing | ✓ | ✓ | ✗ |
-| View RFQs | ✓ | ✓ | ✓ |
-| Submit RFQ Bid | ✓ | ✓ | ✗ |
-| View POs | ✓ | ✓ | ✓ |
-| Acknowledge PO | ✓ | ✓ | ✗ |
-| Submit Invoice | ✓ | ✓ | ✗ |
-| View Performance | ✓ | ✓ | ✓ |
-| Send Messages | ✓ | ✓ | ✓ (limited) |
-| Manage Users | ✓ | ✗ | ✗ |
-| Configure Settings | ✓ | ✗ | ✗ |
+#### Basic Information
+- **Use Case ID**: UC-VPP-011
+- **Use Case Name**: View Submission History
+- **Priority**: Medium
+- **Primary Actor**: Vendor
+- **Secondary Actors**: System
+- **Frequency**: As needed
+- **Related Requirements**: BR-VPP-015
 
----
+#### Description
+Vendor views history of price submissions made through the portal.
 
-## 5. Integration Points
+#### Preconditions
+1. Vendor has accessed portal via valid token (UC-VPP-006)
 
-### 5.1 Vendor Directory Integration
-- **Registration**: Creates vendor record in directory
-- **Profile Updates**: Syncs changes to vendor directory
-- **Status Changes**: Portal access reflects vendor status
-- **Documents**: Links to vendor documents in directory
+#### Main Flow
+1. Vendor clicks "History" tab
+2. System displays submission history list:
+   - Current submission status
+   - Submission date
+   - Quality score
+   - Number of items
+3. For each submission, vendor can:
+   - View details
+   - Compare with previous versions
 
-### 5.2 Pricelist Templates Integration
-- **Template Assignment**: Templates assigned in main system appear in portal
-- **Price Submission**: Portal submissions create price lists in main system
-- **Status Updates**: Template submission status synced
-- **Deadline Notifications**: Portal notifies vendors of approaching deadlines
+#### Alternative Flows
 
-### 5.3 RFQ Module Integration
-- **RFQ Assignment**: RFQs assigned in main system appear in portal
-- **Bid Submission**: Portal bids recorded in RFQ system
-- **Clarifications**: Q&A posted to all vendors
-- **Award Notifications**: Awards communicated via portal
+**A1: First-Time Vendor**
+- At step 2, no history exists
+- System displays "No previous submissions" message
 
-### 5.4 Purchase Orders Integration
-- **PO Display**: POs issued in main system visible in portal
-- **Acknowledgment**: Portal acknowledgments recorded in main system
-- **Delivery Updates**: Portal updates synced to PO tracking
-- **Status Changes**: PO status changes reflected in portal
-
-### 5.5 Finance/Invoicing Integration
-- **Invoice Submission**: Portal invoices create records in finance system
-- **Status Updates**: Invoice approval status synced to portal
-- **Payment Notifications**: Payment confirmations sent to portal
-- **Aging Reports**: Portal displays invoice aging data
-
-### 5.6 Notifications Integration
-- **Email Notifications**: Portal events trigger email notifications
-- **SMS Notifications**: Portal supports SMS for 2FA and critical alerts
-- **In-Portal Notifications**: Notification badge and center
-- **Preferences Sync**: Notification preferences synced across systems
+#### Postconditions
+**Success**:
+- History displayed
+- Vendor informed of past submissions
 
 ---
 
-## 6. Accessibility Requirements
+## 5. Use Case Relationships
 
-- **WCAG 2.1 AA Compliance**: All portal pages meet WCAG 2.1 AA standards
-- **Keyboard Navigation**: Full functionality accessible via keyboard
-- **Screen Reader Support**: Proper ARIA labels and semantic HTML
-- **Color Contrast**: Minimum 4.5:1 contrast ratio for text
-- **Text Resize**: Support browser text resize up to 200%
-- **Focus Indicators**: Clear visual focus indicators for interactive elements
-- **Alternative Text**: All images have descriptive alt text
-- **Error Identification**: Clear, descriptive error messages
+### 5.1 Dependency Matrix
 
----
+| Use Case | Depends On | Depended On By |
+|----------|------------|----------------|
+| UC-VPP-006 | Campaign launched (see requests-for-pricing) | UC-VPP-007, UC-VPP-008, UC-VPP-009, UC-VPP-010, UC-VPP-011 |
+| UC-VPP-007 | UC-VPP-006 | UC-VPP-010 |
+| UC-VPP-008 | UC-VPP-006, UC-VPP-009 (optional) | UC-VPP-010 |
+| UC-VPP-009 | UC-VPP-006 | UC-VPP-008 |
+| UC-VPP-010 | UC-VPP-007 or UC-VPP-008 | - |
+| UC-VPP-011 | UC-VPP-006 | - |
 
-## 7. Performance Requirements
+### 5.2 Vendor Portal Workflow
 
-- **Page Load Time**: Portal pages load within 3 seconds on 3G connection
-- **Search Response**: Search results return within 2 seconds
-- **File Upload**: Support files up to 50MB with progress indication
-- **Dashboard Refresh**: Dashboard data refreshes within 2 seconds
-- **Concurrent Users**: Support 1,000 concurrent vendor users
-- **API Response Time**: API calls complete within 500ms (95th percentile)
+```
+1. Vendor receives invitation email (from requests-for-pricing module)
+2. UC-VPP-006: Vendor clicks link, accesses portal via token
+3. UC-VPP-009: (Optional) Download Excel template
+4. UC-VPP-007 OR UC-VPP-008: Submit prices (online OR upload)
+5. UC-VPP-010: Review and confirm submission
+6. Pricelist becomes active immediately (stored in price-lists module)
+7. UC-VPP-011: View submission history (optional)
+```
 
----
-
-## 8. Security Requirements
-
-- **Authentication**: Multi-factor authentication (2FA) support
-- **Authorization**: Role-based access control (RBAC)
-- **Data Encryption**: TLS 1.3 for data in transit, AES-256 for data at rest
-- **Session Management**: Secure session handling with 30-minute timeout
-- **Input Validation**: All user inputs validated and sanitized
-- **File Security**: Virus scanning for all uploaded files
-- **Audit Logging**: Comprehensive logging of all user actions
-- **Rate Limiting**: Protection against brute force and DDoS attacks
-- **Data Isolation**: Vendors can only access their own data
-- **Password Policy**: Strong password requirements and expiry
+**Note**: There is no approval workflow - pricelists become active immediately upon submission.
 
 ---
 
-## Document History
+## 6. Appendices
 
-| Version | Date       | Author | Changes                            |
-|---------|------------|--------|------------------------------------|
-| 1.0     | 2024-01-15 | System | Initial use cases document         |
+### Appendix A: Related Module Documentation
+
+| Module | Documentation Path | Related Use Cases |
+|--------|-------------------|-------------------|
+| Requests for Pricing | `../requests-for-pricing/` | Campaign creation, vendor invitation, campaign launch |
+| Pricelist Templates | `../pricelist-templates/` | Template creation and management |
+| Price Lists | `../price-lists/` | Staff viewing of submitted pricelists |
+| Vendor Directory | `../vendor-directory/` | Vendor profiles and master data |
+
+### Appendix B: Source Code References
+
+| Source File | Key Features Validated |
+|-------------|------------------------|
+| `/app/(main)/vendor-management/vendor-portal/sample/page.tsx` | UC-VPP-006, UC-VPP-007, UC-VPP-008, UC-VPP-009 |
+| `/app/(main)/vendor-management/templates/components/MOQPricingComponent.tsx` | UC-VPP-007 (MOQ tier pricing) |
+
+### Appendix C: Glossary
+
+| Term | Definition |
+|------|------------|
+| **Token** | Unique UUID identifier providing vendor portal access |
+| **MOQ** | Minimum Order Quantity |
+| **MOQ Tier** | Price tier based on order quantity (up to 5 tiers) |
+| **FOC** | Free of Charge promotional quantity |
+| **Open-Ended Pricelist** | Pricelist with null end date, valid until superseded |
+| **Quality Score** | Calculated score (0-100) based on completeness, accuracy, detail |
+| **Auto-Save** | System saves vendor draft every 2 minutes |
 
 ---
 
-## Appendices
+**Document End**
 
-### Appendix A: UI Wireframes
-(Reference to detailed wireframes for each major screen)
-
-### Appendix B: API Endpoints
-(Reference to technical specification document for API details)
-
-### Appendix C: Business Rules Cross-Reference
-(Complete mapping of business rules to use cases)
-
-### Appendix D: Related Documents
-- Vendor Entry Portal - Business Requirements (BR-vendor-portal.md)
-- Vendor Entry Portal - Technical Specification (TS-vendor-portal.md)
-- Vendor Entry Portal - Flow Diagrams (FD-vendor-portal.md)
-- Vendor Entry Portal - Validations (VAL-vendor-portal.md)
-- Vendor Management - Module Overview (VENDOR-MANAGEMENT-OVERVIEW.md)
-
----
-
-**End of Use Cases Document**
+**Implementation Notes**:
+- This document covers ONLY vendor-facing portal use cases
+- Staff-side use cases (campaign, template management) are in separate modules
+- No approval workflow - pricelists become active immediately upon submission
+- Token is the only authentication method for vendors

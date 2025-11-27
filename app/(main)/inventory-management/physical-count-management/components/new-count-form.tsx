@@ -4,7 +4,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { X } from 'lucide-react'
-import { users, departments, storeLocations } from '@/lib/mockData'
+import { users, departments, storeLocations } from '@/lib/mock-data/legacy-simple'
 
 interface NewCountFormProps {
   onClose: () => void;

@@ -16,6 +16,11 @@
 **Submodule Name**: Manage Vendors
 **Route**: `/vendor-management/manage-vendors`
 **Status**: ✅ Production
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Purpose**: Vendor profile management, contacts, addresses, certifications, and pricelist associations
 
 **Key Features**:

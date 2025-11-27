@@ -5,12 +5,17 @@
 - **Version**: 1.0
 - **Last Updated**: 2025-01-16
 - **Status**: Active
-- **Related Documents**: BR-workflow.md, UC-workflow.md, TS-workflow.md, DS-workflow.md
+- **Related Documents**: BR-workflow.md, UC-workflow.md, TS-workflow.md, DD-workflow.md
 
 ## Overview
 
 This document provides comprehensive flow diagrams for all major workflows in the Workflow Management module using Mermaid notation. Each diagram illustrates the complete user journey, decision points, validations, and system interactions.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Table of Contents

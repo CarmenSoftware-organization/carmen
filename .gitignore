@@ -158,5 +158,8 @@ tasks/*
 .serena/
 .playwright-mcp
 
+# MCP configuration (contains API tokens)
+mcp-setup.json
+
 # Documentation
 # docs/ - Commented out to track documentation files

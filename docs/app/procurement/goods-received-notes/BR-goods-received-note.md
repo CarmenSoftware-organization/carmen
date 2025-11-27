@@ -14,7 +14,6 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-01-11 | Documentation Team | Initial version from source code analysis |
 
----
 
 ## Overview
 

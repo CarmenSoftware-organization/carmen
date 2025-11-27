@@ -1,5 +1,11 @@
 # System Method: Inventory Transactions
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+
 ## Purpose
 
 The Inventory Transactions system manages all **physical inventory movements** across the organization, including receipts, issues, transfers, adjustments, and returns. It provides real-time inventory tracking and integrates with the centralized inventory valuation service for accurate costing.
@@ -454,7 +460,6 @@ interface GRNInventoryResponse {
 - Cost calculation failure → Reject with error
 - Inventory module returns detailed error for Procurement to display
 
----
 
 ### 2. Credit Note (CN) Integration with Vendor Returns
 

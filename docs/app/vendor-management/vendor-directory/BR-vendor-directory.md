@@ -3,11 +3,20 @@
 ## Document Information
 - **Document Type**: Business Requirements Document
 - **Module**: Vendor Management > Vendor Directory
-- **Version**: 1.0
-- **Last Updated**: 2024-01-15
-- **Document Status**: Draft
+- **Version**: 2.2.0
+- **Last Updated**: 2025-11-25
+- **Document Status**: Updated
+- **Route**: `/vendor-management/manage-vendors`
 
----
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.2.0 | 2025-11-25 | System | Added full certification management with status tracking; Updated address format to Asian international standard |
+| 2.1.0 | 2025-11-25 | System | Added multi-address and multi-contact management with primary designation |
+| 2.0.0 | 2025-11-25 | System | Updated to match actual code implementation |
+| 1.0 | 2024-01-15 | System | Initial creation |
+
 
 ## 1. Executive Summary
 
@@ -22,17 +31,29 @@ The Vendor Directory module serves as the central repository for managing all ve
 - Support procurement decision-making with vendor data
 
 ### 1.2 Scope
-**In Scope**:
-- Vendor profile management (creation, editing, archiving)
-- Multi-level vendor categorization and classification
-- Contact management (multiple contacts per vendor)
-- Document management (contracts, certifications, insurance)
+**In Scope (Implemented)**:
+- Vendor profile management (creation, editing)
+- Business type categorization
+- Multi-address management with primary designation (add, edit, delete)
+  - Asian international address format (Address Line 1, Address Line 2, Sub-District, District, City, Province, Postal Code, Country)
+- Multi-contact management with primary designation (add, edit, delete)
+- **Full certification management with status tracking**:
+  - CRUD operations via dialog modal
+  - 16 certification types (ISO, HACCP, GMP, Halal, Kosher, Organic, etc.)
+  - Auto-calculated status based on expiry dates (Active, Expired, Expiring Soon, Pending)
+  - Visual indicators for expired (red) and expiring soon (yellow) certifications
+  - Certificate metadata (issuer, certificate number, issue/expiry dates, document URL, notes)
+- Vendor status management (active/inactive)
+- Tax configuration (Tax ID, Tax Profile, Tax Rate)
+- Performance metrics (quality score)
+- Currency and payment terms management
+- Integration with Price Lists module
+
+**Planned (Not Yet Implemented)**:
+- Document upload/attachment for certifications and contracts
 - Vendor approval workflows
-- Performance tracking and ratings
-- Vendor segmentation (preferred, approved, blocked)
-- Location-based vendor assignments
-- Payment terms and currency management
-- Integration with procurement and finance modules
+- Advanced vendor segmentation (preferred, blocaked, blacklisted)
+- Bulk import/export functionality
 
 **Out of Scope**:
 - Vendor portal functionality (covered in separate module)
@@ -47,105 +68,218 @@ The Vendor Directory module serves as the central repository for managing all ve
 
 ### FR-VD-001: Vendor Profile Management
 **Priority**: Critical
-**Description**: System shall provide comprehensive vendor profile creation and management capabilities.
+**Implementation Status**: ✅ Implemented
+**Description**: System provides vendor profile creation and management capabilities.
 
-**Requirements**:
+**Implemented Requirements**:
 - Create new vendor profiles with required and optional fields
-- Edit existing vendor information
-- Archive/deactivate vendors (soft delete)
-- Restore archived vendors
-- Bulk import vendors from CSV/Excel
-- Export vendor list to CSV/Excel
-- Duplicate detection during creation
-- Version history tracking for profile changes
-- Audit trail for all modifications
+- Edit existing vendor information via inline editing
+- Activate/deactivate vendors (status toggle)
+- View vendor details with tabbed interface
+- Delete vendors with confirmation dialog
+
+**Vendor Form Fields (Create Page - 3 Tabs)**:
+
+**Tab 1 - Basic Info**:
+- Company Name * (required)
+- Business Type * (required, dropdown)
+- Website (optional)
+- Status (active/inactive, default: active)
+- **Addresses Section** (at least one required):
+  - Add/Edit/Delete addresses via dialog modal
+  - Asian international address format fields:
+    - Label (e.g., "Main Office", "Warehouse")
+    - Address Line 1 * (required)
+    - Address Line 2 (optional)
+    - Sub-District (optional)
+    - District (optional)
+    - City * (required)
+    - Province/State (optional)
+    - Postal Code (optional)
+    - Country * (required, dropdown with 15 countries)
+  - One address designated as Primary (star icon indicator)
+  - First address auto-becomes primary
+- **Contacts Section** (at least one required):
+  - Add/Edit/Delete contacts via dialog modal
+  - Contact fields: Name, Title, Email, Phone
+  - One contact designated as Primary (star icon indicator)
+  - First contact auto-becomes primary
+
+**Tab 2 - Business Details**:
+- Company Registration (optional)
+- Tax ID (optional)
+- Tax Profile (dropdown: None VAT, VAT 7%)
+- Preferred Currency (dropdown: BHT, USD, CNY, SGD) from Currency table.
+- Payment Terms (dropdown: Net 30, Net 60, Net 90, 2/10 Net 30, 1/15 Net 45, Due on Receipt, COD)
+
+**Tab 3 - Additional Info**:
+- **Certifications Section** (full management):
+  - Add/Edit/Delete certifications via dialog modal
+  - Certification fields:
+    - Certification Name * (required)
+    - Certification Type * (required, dropdown with 16 types)
+    - Issuer * (required)
+    - Certificate Number (optional)
+    - Issue Date * (required)
+    - Expiry Date * (required)
+    - Status (auto-calculated based on expiry date)
+    - Document URL (optional)
+    - Notes (optional)
+  - Available certification types:
+    - ISO 9001 - Quality Management
+    - ISO 14001 - Environmental Management
+    - ISO 22000 - Food Safety Management
+    - ISO 45001 - Occupational Health & Safety
+    - HACCP - Hazard Analysis Critical Control Points
+    - GMP - Good Manufacturing Practice
+    - Halal Certification
+    - Kosher Certification
+    - Organic Certification
+    - Fair Trade Certification
+    - FDA Approved
+    - CE Marking
+    - Business License
+    - Trade License
+    - Import/Export License
+    - Other
+  - Status auto-calculation:
+    - **Active** (green): Expiry date > 30 days in future
+    - **Expiring Soon** (yellow): Expiry date within 30 days
+    - **Expired** (red): Expiry date has passed
+    - **Pending** (gray): For new certifications being processed
+- Languages (multi-select/add: English, Spanish, Chinese, etc.)
+- Notes (textarea)
+
+**Business Types Available**:
+- Food & Beverage
+- Hospitality Supplies
+- Cleaning Services
+- Linen Services
+- Technology
+- Furniture & Fixtures
+- Security Services
+- Maintenance Services
+- Marketing & Advertising
+- Professional Services
+- Transportation
+- Other
 
 **Business Rules**:
-- Vendor code must be unique across the system
-- Company name must be unique within active vendors
-- At least one contact person is required
-- Payment terms must be defined before vendor can be used in POs
-- Tax registration number format validation based on country
+- Company name is required
+- Business type is required
+- At least one address is required
+- At least one contact is required
+- First address/contact automatically becomes primary when added
+- When deleting primary address/contact, first remaining item becomes primary
 
 **Acceptance Criteria**:
-- User can create vendor with all required fields in <2 minutes
-- System prevents duplicate vendor codes
-- All changes are logged with user and timestamp
-- Archived vendors do not appear in active vendor searches
-- Bulk import handles 1000+ vendors successfully
+- User can create vendor using 3-tab wizard
+- User can add multiple addresses and contacts via dialog modals
+- User can designate one address and one contact as primary
+- Form validation prevents submission with missing required fields
+- User redirected to vendor list on successful creation
 
 ---
 
 ### FR-VD-002: Vendor Categorization
 **Priority**: High
-**Description**: System shall support multi-dimensional vendor categorization and classification.
+**Implementation Status**: ✅ Partially Implemented
+**Description**: System supports basic vendor categorization by business type.
 
-**Requirements**:
-- Primary vendor type classification:
-  - Supplier (Food & Beverage, Equipment, Supplies)
-  - Service Provider (Maintenance, Professional Services)
-  - Contractor (Construction, Consulting)
-  - Distributor
-  - Manufacturer
-- Secondary category tags (multiple per vendor)
+**Implemented Requirements**:
+- Single business type classification via dropdown selection
+- Business type displayed in list and detail views
+- Filter vendors by status (all, active, inactive)
+
+
+**Not Yet Implemented**:
+- Secondary category tags
 - Industry classification
-- Product/service specialization tags
 - Preferred vendor designation
 - Strategic partner classification
-- Spend tier classification (Tier 1, 2, 3 based on annual spend)
+- Spend tier classification
 
 **Business Rules**:
-- Each vendor must have exactly one primary type
-- Vendors can have 0-20 secondary category tags
-- Preferred vendor status requires approval
-- Strategic partner designation requires executive approval
-- Spend tier calculated automatically based on 12-month rolling spend
+- Each vendor must have exactly one business type selected
 
 **Acceptance Criteria**:
-- User can filter vendors by any category dimension
-- Category changes require reason/justification
-- System tracks category change history
-- Preferred vendor badge displayed prominently
+- User can filter vendors by status
+- Business type displayed in table view column
 
 ---
 
 ### FR-VD-003: Contact Management
 **Priority**: Critical
-**Description**: System shall manage multiple contacts per vendor with roles and communication preferences.
+**Implementation Status**: ✅ Implemented
+**Description**: System manages multiple contacts and addresses per vendor with primary designation.
 
-**Requirements**:
-- Add unlimited contacts per vendor
-- Contact roles: Primary, Sales, Accounts Payable, Technical Support, Management, Other
-- Contact details: Name, title, email (multiple), phone (multiple), mobile
-- Communication preferences: Email, Phone, SMS, Portal
-- Preferred contact designation (one per role)
+**Implemented Requirements**:
+- Multiple contacts per vendor with:
+  - Name (displayed in list)
+  - Title (optional)
+  - Email (validated)
+  - Phone (optional)
+  - Primary designation (one per vendor)
+- Multiple addresses per vendor with:
+  - Label (e.g., "Main Office", "Warehouse")
+  - Street Address
+  - City
+  - State/Province (optional)
+  - Postal Code (optional)
+  - Country
+  - Primary designation (one per vendor)
+- CRUD operations via dialog modals:
+  - Add new contact/address
+  - Edit existing contact/address
+  - Delete contact/address with confirmation
+  - Set as Primary
+- Contact/address information displayed on:
+  - List page (Primary Contact name column)
+  - Detail page Summary Card (primary contact name)
+  - Detail page Contacts & Addresses tab (full list with CRUD)
+  - Create page Basic Info tab (inline list with CRUD)
+
+**Primary Designation Logic**:
+- One contact and one address marked as Primary (star icon)
+- First item auto-becomes primary when added to empty list
+- When primary is deleted, first remaining item becomes primary
+- Primary badge displayed with filled star, non-primary with outline star
+
+**UI Components**:
+- Address/Contact list cards with action buttons (Edit, Delete, Set Primary)
+- Dialog modals for add/edit forms
+- Delete confirmation dialog
+- Toast notifications for all operations
+
+**Not Yet Implemented**:
+- Contact roles (Sales, Accounts Payable, Technical Support, etc.)
 - Contact availability schedule
-- Language preference
-- Contact status (Active, Inactive, Left Company)
+- Language preference per contact
+- Contact status tracking
 - Contact notes and interaction history
 
 **Business Rules**:
-- At least one primary contact required
-- Primary contact must have valid email
-- Email addresses validated for format
-- Phone numbers validated for format based on country code
-- One preferred contact per role type
-- Cannot delete last primary contact
+- At least one contact required for vendor creation
+- At least one address required for vendor creation
+- Exactly one contact must be designated as primary
+- Exactly one address must be designated as primary
 
 **Acceptance Criteria**:
-- User can add/edit contacts in <1 minute
-- System sends test email to validate email addresses
-- Contact list sortable by role, name, status
-- Quick actions: Call, Email, Message from contact card
-- Contact changes logged in audit trail
+- User can add multiple contacts and addresses
+- User can edit existing contacts and addresses via dialog
+- User can delete contacts and addresses with confirmation
+- User can designate one contact and one address as primary
+- Primary contact name displayed in vendor list
+- Full contact/address management available on detail page
 
 ---
 
 ### FR-VD-004: Document Management
 **Priority**: High
-**Description**: System shall manage vendor-related documents with version control and expiration tracking.
+**Implementation Status**: ⏳ Not Yet Implemented
+**Description**: Document management functionality is planned but not yet implemented.
 
-**Requirements**:
+**Planned Requirements**:
 - Document types:
   - Contracts (Service agreements, Supply agreements)
   - Certifications (ISO, HACCP, Organic, Halal, etc.)
@@ -157,289 +291,356 @@ The Vendor Directory module serves as the central repository for managing all ve
 - Document metadata: Type, number, issue date, expiry date, status
 - Version control for document updates
 - Expiration alerts (30, 60, 90 days before expiry)
-- Document approval workflow for critical documents
-- Access control by document type
-- Bulk document upload
-- Document linking to purchase orders
 
-**Business Rules**:
-- Contracts require approval before vendor can receive POs >$10,000
-- Insurance certificates must be current (not expired)
-- Certifications with expiry dates must be renewed before expiry
-- Expired documents flagged with red indicator
-- Documents <30 days from expiry flagged with amber warning
-- Maximum file size: 50MB per document
-- Allowed formats: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG
-
-**Acceptance Criteria**:
-- User can upload documents via drag-and-drop
-- System displays document status indicators
-- Expiration alerts sent to assigned users
-- Document viewer supports PDF preview
-- Version history shows all document revisions
+**Current State**:
+- Certifications can be added as text tags only (no file upload)
+- No document upload or management functionality
 
 ---
 
 ### FR-VD-005: Vendor Approval Workflow
 **Priority**: Critical
-**Description**: System shall implement configurable approval workflows for vendor onboarding and changes.
+**Implementation Status**: ⏳ Not Yet Implemented
+**Description**: Vendor approval workflow is planned but not yet implemented.
 
-**Requirements**:
+**Planned Requirements**:
 - Multi-stage approval workflow
 - Approval stages:
   1. Compliance review (documents, certifications)
   2. Financial review (credit check, payment terms)
   3. Quality review (standards, certifications)
   4. Management approval (final authorization)
-- Parallel and sequential approval paths
-- Conditional approvals based on vendor type, spend tier
-- Email notifications at each stage
-- Approval delegation during absence
-- Approval history and audit trail
-- Rejection with required reasons
-- Re-submission after rejection
-- Approval SLA tracking
 
-**Business Rules**:
-- All new vendors require approval before activation
-- Major changes (payment terms, bank details) require re-approval
-- Approval required based on:
-  - New vendor: All stages
-  - Preferred vendor designation: Management approval
-  - Contract value >$100,000: Executive approval
-  - International vendor: Additional compliance review
-- Approvers cannot approve their own submissions
-- Minimum 2 approvers for critical vendors
-
-**Acceptance Criteria**:
-- Approval request sent within 5 minutes of submission
-- Approvers receive email with inline approval option
-- Average approval cycle <24 hours for standard vendors
-- Rejection includes clear reason and improvement suggestions
-- Dashboard shows pending approvals count
+**Current State**:
+- Vendors are created directly without approval workflow
+- No approval stages or notifications implemented
+- Vendors can be set as active/inactive immediately
 
 ---
 
 ### FR-VD-006: Vendor Rating and Performance Tracking
 **Priority**: High
-**Description**: System shall track vendor performance metrics and calculate overall ratings.
+**Implementation Status**: ✅ Partially Implemented
+**Description**: System displays basic vendor performance metrics.
 
-**Requirements**:
-- Performance metrics:
-  - Quality score (defect rate, reject rate)
-  - Delivery performance (on-time delivery %)
-  - Service level (responsiveness, issue resolution)
-  - Pricing competitiveness
-  - Compliance adherence
-  - Innovation and value-add
-- Weighted scoring model (configurable weights)
-- Overall vendor rating (5-star or 1-10 scale)
+**Implemented Requirements**:
+- Performance metrics structure:
+  - Quality Score (displayed as X/5 rating)
+  - Response Rate
+  - Average Response Time
+  - On-Time Delivery Rate
+  - Total Campaigns
+  - Completed Submissions
+  - Average Completion Time
+- Vendor rating displayed in detail page Summary Card
+- Rating badge with visual indicator
+
+**Display on Detail Page**:
+- Summary Card shows "Vendor Rating" with score out of 5
+- Rating calculated from qualityScore (qualityScore/20 = rating out of 5)
+- Award icon with blue background for rating display
+
+**Not Yet Implemented**:
+- Automatic rating calculation from transaction data
 - Rating history and trends
-- Performance reviews (quarterly, annual)
+- Performance reviews
 - Scorecard generation
-- Performance alerts for declining scores
-- Comparison against benchmarks
+- Performance alerts
 
-**Business Rules**:
-- Ratings updated monthly based on transaction data
-- Minimum 5 transactions required for meaningful rating
-- Quality score based on GRN inspection results
-- Delivery performance based on PO delivery dates vs. actual
-- Service level based on issue tickets and resolution time
-- Rating changes >1 point trigger notification
-- Vendors below threshold (rating <3) flagged for review
-
-**Acceptance Criteria**:
-- Performance dashboard shows current rating and trends
-- Rating calculation transparent and auditable
-- Historical ratings preserved for comparison
-- Automated rating calculation runs monthly
-- Manual adjustments allowed with justification
+**Current State**:
+- Performance metrics initialized with default values (0)
+- Metrics populated manually or through mock data
+- No automatic calculation from GRN or PO data
 
 ---
 
-### FR-VD-007: Vendor Segmentation
+### FR-VD-007: Vendor Status Management
 **Priority**: Medium
-**Description**: System shall support vendor segmentation for strategic management.
+**Implementation Status**: ✅ Partially Implemented
+**Description**: System supports basic vendor status management.
 
-**Requirements**:
+**Implemented Requirements**:
 - Vendor status types:
-  - **Approved**: Standard active vendors
-  - **Preferred**: High-performing, strategic vendors
-  - **Provisional**: New vendors on probation (first 90 days)
-  - **Blocked**: Temporarily suspended
-  - **Blacklisted**: Permanently banned
-  - **Inactive**: Archived, no longer used
-- Status change workflow with approval
-- Status change reasons (required for Blocked/Blacklisted)
-- Status change effective date
-- Automatic provisional → approved transition after 90 days with good performance
-- Block/blacklist impact on existing POs
-- Status badges and indicators
+  - **Active**: Vendor available for transactions
+  - **Inactive**: Vendor not available for new transactions
+- Status toggle switch on detail page header
+- Status badge displayed in list and detail views
+- Status filter on list page (All, Active, Inactive)
 
-**Business Rules**:
-- Preferred vendors get priority in vendor selection
-- Provisional vendors limited to PO value <$5,000
-- Blocked vendors cannot receive new POs (existing POs continue)
-- Blacklisted vendors completely excluded from system
-- Status change from Preferred requires justification
-- Blacklisting requires executive approval
+**Status Display**:
+- List page: Badge in Status column
+  - Active: Green badge (bg-green-100 text-green-700)
+  - Inactive: Gray badge (bg-gray-100 text-gray-600)
+- Detail page: Badge next to vendor name + toggle switch
+
+**Status Change**:
+- Toggle switch changes status immediately
+- Toast notification confirms status change
+- No approval workflow for status changes
+
+**Not Yet Implemented**:
+- Advanced segmentation (Preferred, Provisional, Blocked, Blacklisted)
+- Status change approval workflow
+- Status change history tracking
+- Automatic status transitions
+- PO restrictions based on status
 
 **Acceptance Criteria**:
-- Status badges prominently displayed
-- Status change triggers email to stakeholders
-- System prevents PO creation to blocked/blacklisted vendors
-- Status history tracked with reasons
-- Filters available by vendor status
+- Status badges displayed on list and detail pages
+- Toggle switch changes status immediately with toast notification
 
 ---
 
 ### FR-VD-008: Location and Assignment
 **Priority**: Medium
-**Description**: System shall manage vendor assignments to locations and departments.
+**Implementation Status**: ⏳ Not Yet Implemented
+**Description**: Location-based vendor assignments are planned but not yet implemented.
 
-**Requirements**:
+**Planned Requirements**:
 - Assign vendors to one or multiple locations
 - Assign vendors to specific departments
-- Location-specific pricing (if different)
-- Location-specific contacts
-- Location-specific delivery terms
-- Location availability schedule
+- Location-specific pricing
 - Primary location designation
-- Location restrictions (vendor only serves specific locations)
 
-**Business Rules**:
-- Vendors can serve all locations (default) or specific locations only
-- Location assignments required for location-specific pricing
-- Location restrictions enforced during PO creation
-- At least one location must be assigned if restrictions enabled
-
-**Acceptance Criteria**:
-- User can select multiple locations during vendor creation
-- Location-restricted vendors only appear in PO for assigned locations
-- Location-specific details (contact, pricing) override global settings
-- Location matrix view shows vendor coverage
+**Current State**:
+- No location assignment functionality implemented
+- Vendors are system-wide without location restrictions
 
 ---
 
 ### FR-VD-009: Payment Terms and Currency
 **Priority**: High
-**Description**: System shall manage vendor payment terms, currency, and banking details.
+**Implementation Status**: ✅ Implemented
+**Description**: System manages vendor payment terms, currency, and tax configuration.
 
-**Requirements**:
-- Payment terms:
-  - Net 7, 15, 30, 45, 60, 90 days
-  - Custom payment terms
-  - Early payment discounts (e.g., 2/10 Net 30)
-  - Prepayment requirements
-  - Credit limit
-- Multi-currency support
-- Default currency per vendor
-- Banking details:
-  - Bank name and branch
-  - Account number
-  - IBAN / SWIFT code
-  - Routing number
-  - Payment method preferences (Wire, Check, ACH, Card)
-- Tax settings:
-  - Tax registration number
-  - Tax exemption status
-  - Tax rates
+**Implemented Requirements**:
 
-**Business Rules**:
-- Payment terms default from vendor profile to PO
-- Currency must match vendor's default currency or be explicitly changed
-- Banking details required for electronic payments
-- Tax registration number validated based on country
-- Credit limit enforced during PO approval
+**Payment Terms** (Create Page - Business Details Tab):
+- Net 30
+- Net 60
+- Net 90
+- 2/10 Net 30
+- 1/15 Net 45
+- Due on Receipt
+- COD
+
+**Currency Support**:
+- Preferred Currency selection: BHT, USD, CNY, SGD
+- Default: BHT (Thai Baht)
+
+**Tax Configuration** (Detail Page - Overview Tab):
+- Tax ID field
+- Tax Profile dropdown:
+  - None VAT (0%)
+  - VAT Thailand (7%)
+  - GST Singapore/Australia (10%)
+  - Sales Tax USA (8.5%)
+  - Custom Rate
+- Tax Rate percentage field
+- Company Registration field
+
+**Tax Profile Auto-Rate Mapping**:
+- None VAT → 0%
+- VAT → 7%
+- GST → 10%
+- Sales Tax → 8.5%
+- Custom → User-defined
+
+**Not Yet Implemented**:
+- Banking details management
+- Credit limit tracking
+- Early payment discount calculations
 
 **Acceptance Criteria**:
-- Payment terms clearly displayed during PO creation
-- Multi-currency transactions handled correctly
-- Banking details encrypted and access-controlled
-- Early payment discount calculations automatic
+- Payment terms selectable during vendor creation
+- Tax configuration editable on detail page
+- Tax rate auto-populates based on tax profile selection
 
 ---
 
 ### FR-VD-010: Search and Filtering
 **Priority**: High
-**Description**: System shall provide powerful search and filtering capabilities.
+**Implementation Status**: ✅ Implemented
+**Description**: System provides search and filtering capabilities on vendor list page.
 
-**Requirements**:
-- Quick search by:
-  - Vendor code
+**Implemented Requirements**:
+
+**Quick Search**:
+- Search input with placeholder "Search vendors..."
+- Search icon (magnifying glass) indicator
+- Searches across:
   - Company name
+  - Business type name
+  - Address lines
   - Contact name
-  - Tax ID
-  - Email
-  - Phone
-- Advanced filters:
-  - Vendor type and categories
-  - Status (Approved, Preferred, Blocked, etc.)
-  - Location
-  - Rating (range)
-  - Spend tier
-  - Certification type
-  - Contract expiration
-  - Document expiration
-  - Creation date range
-  - Last transaction date
-- Saved filter presets
-- Sort by: Name, Code, Rating, Last Order Date, Total Spend
+  - Contact phone
+
+**Status Filter**:
+- Dropdown: All Status, Active, Inactive
+- Default: All Status
+
+**Advanced Filters** (UI placeholder only):
+- "Saved Filters" button → Toast: "will be available in future release"
+- "Add Filters" button → Toast: "will be available in future release"
+
+**View Toggle**:
+- Table view (List icon)
+- Card view (Grid icon)
+- Toggle buttons with visual state indicator
+
+**Not Yet Implemented**:
+- Saved filter presets (functional)
+- Advanced filter dialog (functional)
+- Sort functionality
 - Export filtered results
 
-**Business Rules**:
-- Search results return max 100 vendors per page
-- Search is case-insensitive
-- Partial matches supported
-- Results sorted by relevance score by default
-
 **Acceptance Criteria**:
-- Search results appear in <1 second for database <10,000 vendors
-- Filters can be combined (AND logic)
-- Saved filters accessible from dropdown
-- Search highlights matching terms
+- Search filters vendors in real-time
+- Status filter works with search
+- View toggle switches between table and card views
 
 ---
 
 ### FR-VD-011: Integration with Other Modules
 **Priority**: Critical
-**Description**: System shall integrate seamlessly with procurement and finance modules.
+**Implementation Status**: ✅ Partially Implemented
+**Description**: System integrates with other vendor management modules.
 
-**Requirements**:
+**Implemented Requirements**:
+- **Price Lists**: Link vendor to price lists (tab on detail page)
+- **Contacts & Addresses**: Separate tab for contact management (display only)
+- **Certifications**: Separate tab for certifications (display only)
+- **Navigation**: Links from vendor list/detail to other modules
+
+**Tab Integration on Detail Page**:
+1. Overview - Vendor details and tax configuration
+2. Price Lists - Link to vendor's price lists
+3. Contacts & Addresses - Contact and address information
+4. Certifications - Certification badges
+
+**Planned/Not Yet Implemented**:
 - **Purchase Request**: Vendor selection from directory
 - **Purchase Order**: Vendor details auto-populate
 - **GRN**: Quality ratings fed back to vendor performance
 - **Invoices**: Payment terms enforced
-- **Price Lists**: Link vendor to price lists
 - **RFQ**: Vendor contact details for RFQ distribution
 - **Finance**: Vendor as payable entity
 - **Reporting**: Vendor spend analysis
 
-**Business Rules**:
-- Vendor must be Approved or Preferred status to use in POs
-- Vendor blocking prevents new PO creation
-- Vendor archiving requires no active POs or outstanding invoices
-- Vendor data changes reflect immediately in all modules
+**Current State**:
+- Vendor detail page shows Price Lists tab with link to price list module
+- No automatic data flow between vendor and procurement modules
+- Performance metrics not auto-calculated from transaction data
 
 **Acceptance Criteria**:
-- Vendor selection dropdown in PO shows only eligible vendors
-- Vendor details auto-fill in PO (address, payment terms, currency)
-- Performance ratings update after each GRN
-- Spend data aggregates correctly in reporting
+- Price Lists tab displays on vendor detail page
+- Navigation between vendor and price list modules works
+
+---
+
+### FR-VD-012: Certification Management
+**Priority**: High
+**Implementation Status**: ✅ Implemented
+**Description**: System provides full certification management with CRUD operations, status tracking, and expiry alerts.
+
+**Implemented Requirements**:
+- Full CRUD operations for certifications via dialog modal:
+  - Add new certification
+  - Edit existing certification
+  - Delete certification with confirmation
+- Certification data fields:
+  - Certification Name (required)
+  - Certification Type (required, 16 predefined types)
+  - Issuer (required)
+  - Certificate Number (optional)
+  - Issue Date (required)
+  - Expiry Date (required)
+  - Status (auto-calculated)
+  - Document URL (optional)
+  - Notes (optional)
+
+**Available Certification Types** (16 types):
+1. ISO 9001 - Quality Management
+2. ISO 14001 - Environmental Management
+3. ISO 22000 - Food Safety Management
+4. ISO 45001 - Occupational Health & Safety
+5. HACCP - Hazard Analysis Critical Control Points
+6. GMP - Good Manufacturing Practice
+7. Halal Certification
+8. Kosher Certification
+9. Organic Certification
+10. Fair Trade Certification
+11. FDA Approved
+12. CE Marking
+13. Business License
+14. Trade License
+15. Import/Export License
+16. Other
+
+**Status Auto-Calculation**:
+- **Active** (green badge): Expiry date is more than 30 days in the future
+- **Expiring Soon** (yellow badge): Expiry date is within 30 days
+- **Expired** (red badge): Expiry date has passed
+- **Pending** (gray badge): Initial status for new certifications
+
+**UI Implementation**:
+- **Create Page** (Tab 3 - Additional Info):
+  - List view of certifications with cards
+  - Each card shows: Name, Type, Issuer, Status badge, Issue/Expiry dates
+  - Action buttons: Edit, Delete
+  - "Add Certification" button opens dialog modal
+- **Detail Page** (Certifications Tab):
+  - Grid display of certification cards
+  - Same card layout as create page
+  - Full CRUD operations available
+
+**Visual Indicators**:
+- Status badges with color coding:
+  - Active: `bg-green-100 text-green-800`
+  - Expiring Soon: `bg-yellow-100 text-yellow-800`
+  - Expired: `bg-red-100 text-red-800`
+  - Pending: `bg-gray-100 text-gray-800`
+- Certification type badge: `bg-blue-100 text-blue-800`
+
+**Not Yet Implemented**:
+- Document/file upload for certification copies
+- Automatic expiry email notifications
+- Certification renewal workflow
+- Bulk certification import
+
+**Business Rules**:
+- Certification name and type are required
+- Issuer name is required
+- Issue and expiry dates are required
+- Status is automatically calculated based on current date and expiry date
+- Certifications can be added, edited, and deleted at any time
+
+**Acceptance Criteria**:
+- User can add certifications via dialog modal on create and detail pages
+- User can edit existing certifications via dialog modal
+- User can delete certifications with confirmation dialog
+- Status automatically updates based on expiry date
+- Visual badges indicate certification status (Active, Expiring Soon, Expired, Pending)
+- Toast notifications confirm all CRUD operations
 
 ---
 
 ## 3. Non-Functional Requirements
 
+> **Note**: Non-functional requirements are goals for production deployment. Current implementation uses mock data and client-side state.
+
 ### NFR-VD-001: Performance
+**Implementation Status**: ⏳ Not Yet Measurable (using mock data)
 - Vendor list page loads in <2 seconds for 10,000 vendors
 - Search returns results in <1 second
 - Vendor profile loads in <1 second
 - Bulk operations (import/export) handle 5,000+ records
 - Concurrent user support: 100+ simultaneous users
 
+**Current State**: Client-side filtering with mock data performs well; backend not implemented.
+
 ### NFR-VD-002: Security
+**Implementation Status**: ⏳ Planned
 - Role-based access control (RBAC)
 - Sensitive data encrypted at rest (banking details, tax IDs)
 - Audit log for all vendor changes
@@ -447,91 +648,168 @@ The Vendor Directory module serves as the central repository for managing all ve
 - Document access controlled by role
 - SSO integration support
 
+**Current State**: No authentication or authorization implemented; all features visible to all users.
+
 ### NFR-VD-003: Reliability
+**Implementation Status**: ⏳ Planned
 - System uptime: 99.9%
 - Data backup: Daily automated backups
 - Disaster recovery: <4 hour RTO, <1 hour RPO
 - No data loss on system failures
 
+**Current State**: Using client-side state; data resets on page refresh.
+
 ### NFR-VD-004: Usability
-- Intuitive UI following established design patterns
-- Mobile-responsive design
-- Accessibility: WCAG 2.1 AA compliance
-- Multi-language support (English, Spanish, French default)
-- Context-sensitive help available
-- Keyboard shortcuts for power users
+**Implementation Status**: ✅ Partially Implemented
+- ✅ Intuitive UI following established design patterns
+- ✅ Mobile-responsive design (responsive breakpoints implemented)
+- ✅ Form validation with clear error messages
+- ⏳ Accessibility: WCAG 2.1 AA compliance (not verified)
+- ⏳ Multi-language support (English only)
+- ⏳ Context-sensitive help available
+- ⏳ Keyboard shortcuts for power users
+
+**Current State**: UI follows Shadcn/Tailwind design system; basic responsive design implemented.
 
 ### NFR-VD-005: Scalability
+**Implementation Status**: ⏳ Not Yet Applicable
 - Support 50,000+ vendor records
 - Support 500,000+ contact records
 - Support 1,000,000+ document records
 - Horizontal scaling capability
 
+**Current State**: Using mock data; scalability requirements apply to backend implementation.
+
 ### NFR-VD-006: Maintainability
-- Modular architecture
-- RESTful API for integrations
-- Comprehensive logging
-- Monitoring and alerting
-- Automated testing coverage >80%
+**Implementation Status**: ✅ Partially Implemented
+- ✅ Modular architecture (Next.js App Router with component-based structure)
+- ⏳ RESTful API for integrations (not implemented)
+- ⏳ Comprehensive logging
+- ⏳ Monitoring and alerting
+- ⏳ Automated testing coverage >80%
+
+**Current State**: Modular React component architecture; no backend API or tests.
 
 ---
 
 ## 4. Data Requirements
 
+> **Note**: Data structures below reflect actual implementation. Mock data interfaces are defined in component files.
+
 ### 4.1 Core Data Entities
 
-**Vendor**:
-- Vendor ID (primary key)
-- Vendor Code (unique, user-defined)
-- Company Name
-- Legal Name
-- DBA (Doing Business As)
-- Vendor Type
-- Category Tags
-- Status
-- Rating
-- Website
-- Description/Notes
+**Vendor** (Implemented):
+```typescript
+interface Vendor {
+  id: string
+  companyName: string
+  businessType: { id: string; name: string }
+  addresses: VendorAddress[]
+  contacts: VendorContact[]
+  isActive?: boolean
+  rating?: number
+  status?: 'active' | 'inactive'
+  website?: string
+  notes?: string
+  // Tax & Payment
+  taxId?: string
+  taxProfile?: string
+  taxRate?: number
+  companyRegistration?: string
+  preferredCurrency?: string
+  paymentTerms?: string
+  // Certifications
+  certifications?: VendorCertification[]  // Full certification objects
+  languages?: string[]
+}
+```
 
-**Vendor Address**:
-- Address Type (Billing, Shipping, Remittance)
-- Address Line 1, 2
-- City, State, Postal Code, Country
-- Is Primary
+**Vendor Address** (Implemented - Asian International Format):
+```typescript
+interface VendorAddress {
+  id: string
+  label: string           // e.g., "Main Office", "Warehouse"
+  addressLine1: string    // Street address line 1 (required)
+  addressLine2?: string   // Street address line 2 (optional)
+  subDistrict?: string    // Sub-district/Tambon (optional)
+  district?: string       // District/Amphoe (optional)
+  city: string            // City (required)
+  province?: string       // Province/State (optional)
+  postalCode?: string     // Postal/ZIP code (optional)
+  country: string         // Country (required)
+  isPrimary: boolean
+}
+```
 
-**Vendor Contact**:
-- Contact ID
-- Name, Title
-- Role
-- Email (primary, secondary)
-- Phone, Mobile
-- Preferred Contact
-- Status
+**Available Countries** (15 countries):
+- Thailand, Singapore, Malaysia, Indonesia, Vietnam
+- Philippines, Myanmar, Cambodia, Laos, Brunei
+- China, Japan, South Korea, India, United States
 
-**Vendor Document**:
-- Document ID
-- Document Type
-- Document Number
-- Issue Date
-- Expiry Date
-- File Path
-- Version Number
-- Status
+**Vendor Contact** (Implemented):
+```typescript
+interface VendorContact {
+  id: string
+  name: string
+  title: string           // e.g., "Sales Manager", "Account Executive"
+  email: string
+  phone: string
+  isPrimary: boolean
+}
+```
 
-**Vendor Payment Terms**:
-- Payment Terms ID
-- Terms Description
-- Days Net
-- Early Payment Discount %
-- Early Payment Days
-- Credit Limit
+**Vendor Certification** (Implemented):
+```typescript
+type CertificationStatus = 'active' | 'expired' | 'expiring_soon' | 'pending'
 
-**Vendor Location Assignment**:
-- Vendor ID
-- Location ID
-- Is Primary
-- Delivery Days
-- Minimum Order Value
+interface VendorCertification {
+  id: string
+  name: string                    // Certification name (required)
+  certificationType: string       // Type from 16 predefined types (required)
+  issuer: string                  // Issuing organization (required)
+  certificateNumber?: string      // Certificate/registration number (optional)
+  issueDate: Date                 // Date issued (required)
+  expiryDate: Date                // Expiration date (required)
+  status: CertificationStatus     // Auto-calculated based on expiryDate
+  documentUrl?: string            // URL to certification document (optional)
+  notes?: string                  // Additional notes (optional)
+}
+```
+
+**Certification Status Calculation Logic**:
+```typescript
+const calculateCertificationStatus = (expiryDate: Date): CertificationStatus => {
+  const now = new Date()
+  const expiry = new Date(expiryDate)
+  const daysUntilExpiry = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+
+  if (daysUntilExpiry < 0) return 'expired'
+  if (daysUntilExpiry <= 30) return 'expiring_soon'
+  return 'active'
+}
+```
+
+**Vendor Performance Metrics** (Partially Implemented - Display Only):
+```typescript
+interface VendorPerformanceMetrics {
+  qualityScore: number       // 0-100
+  responseRate: number       // Percentage
+  avgResponseTime: string    // e.g., "2.5 days"
+  onTimeDelivery: number     // Percentage
+  totalCampaigns: number
+  completedSubmissions: number
+  avgCompletionTime: string
+}
+```
+
+**Planned but Not Implemented**:
+- Vendor Code (unique identifier)
+- Legal Name / DBA
+- Multiple contact roles
+- Document management
+- Location assignments
+- Credit limits
+- Banking details
 
 ### 4.2 Data Volumes (Estimated)
 - Vendors: 5,000 - 50,000 records
@@ -539,58 +817,108 @@ The Vendor Directory module serves as the central repository for managing all ve
 - Documents: 50,000 - 500,000 records
 - Addresses: 15,000 - 150,000 records
 
+**Current State**: Mock data with ~10 sample vendors.
+
 ### 4.3 Data Retention
 - Active vendors: Indefinite
 - Archived vendors: 7 years
 - Audit logs: 10 years
 - Documents: Per legal requirements (typically 7-10 years)
 
+**Current State**: No persistence; data stored in client-side state only.
+
 ---
 
 ## 5. Business Rules Summary
 
-### BR-VD-001: Vendor Code Uniqueness
-All vendor codes must be unique across the system. System prevents creation of duplicate codes.
+> **Note**: Business rules below indicate implementation status. Many rules are planned but not yet enforced.
+
+### BR-VD-001: Vendor Name Required
+**Implementation Status**: ✅ Implemented
+Company name is required during vendor creation. Form validation prevents submission without name.
 
 ### BR-VD-002: Required Contact Information
-Every vendor must have at least one primary contact with a valid email address.
+**Implementation Status**: ✅ Implemented
+Contact email and phone are required during vendor creation. Form validation enforces this rule.
 
 ### BR-VD-003: Approval Requirements
-New vendors and significant changes require approval before use in transactions.
+**Implementation Status**: ⏳ Not Implemented
+*Planned*: New vendors and significant changes require approval before use in transactions.
+*Current*: Vendors are created directly without approval workflow.
 
 ### BR-VD-004: Document Expiration
-Vendors with expired critical documents (insurance, certifications) receive warnings, but are not blocked from transactions.
+**Implementation Status**: ⏳ Not Implemented
+*Planned*: Vendors with expired critical documents receive warnings.
+*Current*: No document management or expiration tracking.
 
-### BR-VD-005: Performance Rating Minimum
-Vendors require minimum 5 transactions over 30 days to calculate meaningful performance ratings.
+### BR-VD-005: Performance Rating Display
+**Implementation Status**: ✅ Partially Implemented
+*Implemented*: Rating displayed on detail page (qualityScore / 20 = rating out of 5).
+*Not Implemented*: Automatic calculation from transactions.
 
-### BR-VD-006: Status-Based Restrictions
-- **Provisional**: PO limit $5,000
-- **Blocked**: No new POs, existing POs continue
-- **Blacklisted**: Completely excluded, existing POs must be cancelled
+### BR-VD-006: Status-Based Behavior
+**Implementation Status**: ✅ Partially Implemented
+- **Active**: Vendor displayed normally
+- **Inactive**: Vendor displayed with inactive badge
+- *Not Implemented*: PO restrictions, blocking, blacklisting
 
-### BR-VD-007: Preferred Vendor Criteria
-Preferred vendor status requires:
-- Rating ≥ 4.0/5.0
-- Minimum 6 months relationship
-- Minimum 20 completed orders
-- No major issues in last 6 months
-- Management approval
+### BR-VD-007: Tax Rate Auto-Population
+**Implementation Status**: ✅ Implemented
+When tax profile is selected, tax rate auto-populates:
+- None VAT → 0%
+- VAT Thailand → 7%
+- GST → 10%
+- Sales Tax → 8.5%
+- Custom → User-defined
 
 ### BR-VD-008: Credit Limit Enforcement
-Purchase orders exceeding vendor credit limit require additional approval.
+**Implementation Status**: ⏳ Not Implemented
+*Planned*: Purchase orders exceeding vendor credit limit require additional approval.
 
-### BR-VD-009: Multi-Currency Rules
-Currency must be specified for each vendor. All POs default to vendor's currency unless explicitly changed.
+### BR-VD-009: Multi-Currency Selection
+**Implementation Status**: ✅ Implemented
+Preferred currency selectable during vendor creation (BHT, USD, CNY, SGD).
 
-### BR-VD-010: Document Retention
-Expired documents are retained in system for historical reference but flagged as expired.
+### BR-VD-010: Certification Management
+**Implementation Status**: ✅ Implemented
+Full certification management with:
+- CRUD operations via dialog modal
+- 16 predefined certification types
+- Auto-calculated status based on expiry dates
+- Visual status indicators (Active=green, Expiring Soon=yellow, Expired=red, Pending=gray)
+
+### BR-VD-011: Certification Status Auto-Calculation
+**Implementation Status**: ✅ Implemented
+Certification status is automatically calculated based on expiry date:
+- **Active**: Expiry date > 30 days in future
+- **Expiring Soon**: Expiry date within 30 days (warning state)
+- **Expired**: Expiry date has passed
+- **Pending**: Initial status for new certifications being processed
+Status recalculates on page load and when certification is edited.
+
+### BR-VD-012: Asian International Address Format
+**Implementation Status**: ✅ Implemented
+Addresses use Asian international format with fields:
+- Address Line 1 (required)
+- Address Line 2 (optional)
+- Sub-District (optional, for Thailand/Southeast Asia)
+- District (optional)
+- City (required)
+- Province/State (optional)
+- Postal Code (optional)
+- Country (required, 15 countries available)
 
 ---
 
 ## 6. User Roles and Permissions
 
-### 6.1 Vendor Manager
+> **Note**: Role-based access control is planned but not yet implemented. Currently, all users have full access to all features.
+
+**Implementation Status**: ⏳ Not Implemented
+
+### 6.1 Planned Roles (Not Yet Enforced)
+
+**Vendor Manager**:
 - Full access to vendor management
 - Create, edit, archive vendors
 - Manage contacts and documents
@@ -598,89 +926,131 @@ Expired documents are retained in system for historical reference but flagged as
 - View performance metrics
 - Configure vendor categories
 
-### 6.2 Procurement Staff
+**Procurement Staff**:
 - View vendor directory
 - View contact information
 - View documents (non-sensitive)
 - Create vendor requests (subject to approval)
 - View performance ratings
 
-### 6.3 Finance Manager
+**Finance Manager**:
 - View vendor financial information
 - Edit payment terms
 - Edit banking details
 - View credit limits
 - Approve credit limit changes
 
-### 6.4 Compliance Officer
+**Compliance Officer**:
 - View all vendor documents
 - Upload/approve certifications
 - Monitor document expiration
 - Approve/reject vendor applications
 - Audit vendor compliance
 
-### 6.5 Department Manager
+**Department Manager**:
 - View vendors assigned to department
 - View contact information
 - Request new vendor additions
 - View performance ratings
 
-### 6.6 System Administrator
+**System Administrator**:
 - Full system access
 - Configure workflows
 - Manage user permissions
 - System configuration
 - Bulk operations
 
+### 6.2 Current State
+- All users can view, create, edit, and delete vendors
+- No permission checks implemented
+- No role-based UI hiding
+- User context available in app but not used for vendor module
+
 ---
 
 ## 7. Workflow Specifications
 
-### 7.1 New Vendor Onboarding Workflow
-1. **Initiation**: User creates vendor request
-2. **Data Entry**: Complete vendor profile, contacts, documents
-3. **Compliance Review**: Verify certifications, insurance, tax documents
-4. **Financial Review**: Credit check, payment terms approval
-5. **Quality Review**: Review quality certifications and standards
-6. **Management Approval**: Final approval for activation
-7. **Activation**: Vendor status set to "Approved" or "Provisional"
-8. **Notification**: Vendor and requestor notified
+> **Note**: Approval workflows are planned but not yet implemented. Current implementation uses direct actions.
 
-### 7.2 Vendor Change Request Workflow
-1. **Change Request**: User submits change request
-2. **Impact Assessment**: System identifies impacted POs, contracts
-3. **Approval Routing**: Based on change type (financial, contract, etc.)
-4. **Approval/Rejection**: Approvers review and decide
-5. **Implementation**: Changes applied upon approval
-6. **Notification**: Stakeholders notified of changes
+### 7.1 Current Vendor Creation Workflow (Implemented)
+**Implementation Status**: ✅ Implemented (Simplified)
+1. **Navigate**: User clicks "Add Vendor" button on list page
+2. **Data Entry**: Complete 3-tab wizard form:
+   - Tab 1: Basic Information (name, business type, website, status, addresses, contacts)
+   - Tab 2: Business Details (registration, tax, currency, payment terms)
+   - Tab 3: Additional Info (certifications, languages, notes)
+3. **Address/Contact Management** (within Tab 1):
+   - Click "Add Address" or "Add Contact" to open dialog modal
+   - Fill in required fields and save
+   - First item automatically becomes primary
+   - Use action buttons to edit, delete, or set as primary
+4. **Submit**: Click "Create Vendor" button
+5. **Result**: Vendor created immediately with "active" status
+6. **Navigation**: Redirect to vendor list with success toast
 
-### 7.3 Vendor Block/Blacklist Workflow
-1. **Issue Reported**: Quality issue, fraud, non-compliance reported
-2. **Investigation**: Investigate issue and gather evidence
-3. **Recommendation**: Recommend block (temporary) or blacklist (permanent)
-4. **Management Review**: Review recommendation and evidence
-5. **Decision**: Approve or reject recommendation
-6. **Implementation**: Status changed, notifications sent
-7. **Impact Management**: Handle existing POs and contracts
+### 7.2 Current Vendor Edit Workflow (Implemented)
+**Implementation Status**: ✅ Partially Implemented
+1. **Navigate**: Click vendor row or "View" action on list page
+2. **View Details**: See vendor detail page with 4 tabs
+3. **Edit Tax Config**: Change tax profile/rate in Overview tab
+4. **Toggle Status**: Use switch to change active/inactive status
+5. **Result**: Changes applied immediately with toast notification
+
+### 7.3 Planned Workflows (Not Yet Implemented)
+
+**New Vendor Onboarding Workflow**:
+1. Initiation: User creates vendor request
+2. Data Entry: Complete vendor profile, contacts, documents
+3. Compliance Review: Verify certifications, insurance, tax documents
+4. Financial Review: Credit check, payment terms approval
+5. Quality Review: Review quality certifications and standards
+6. Management Approval: Final approval for activation
+7. Activation: Vendor status set to "Approved" or "Provisional"
+8. Notification: Vendor and requestor notified
+
+**Vendor Change Request Workflow**:
+1. Change Request: User submits change request
+2. Impact Assessment: System identifies impacted POs, contracts
+3. Approval Routing: Based on change type
+4. Approval/Rejection: Approvers review and decide
+5. Implementation: Changes applied upon approval
+6. Notification: Stakeholders notified
+
+**Vendor Block/Blacklist Workflow**:
+1. Issue Reported: Quality issue, fraud, non-compliance reported
+2. Investigation: Investigate issue and gather evidence
+3. Recommendation: Recommend block or blacklist
+4. Management Review: Review recommendation
+5. Decision: Approve or reject
+6. Implementation: Status changed, notifications sent
 
 ---
 
 ## 8. Integration Requirements
 
-### 8.1 Internal Integrations
+> **Note**: Integrations are planned for backend implementation. Current frontend is standalone.
+
+**Implementation Status**: ⏳ Not Implemented
+
+### 8.1 Current Integration State
+- **Price Lists**: Tab link to price list module (navigation only)
+- **UI Navigation**: Links between vendor management pages
+- **No Backend**: No API calls; all data is mock/client-side
+
+### 8.2 Planned Internal Integrations
 - **Procurement**: Vendor selection, PO creation
 - **Finance**: Accounts payable, payment processing
 - **Inventory**: Product-vendor relationships
 - **Reporting**: Vendor spend analysis, performance reports
 
-### 8.2 External Integrations
+### 8.3 Planned External Integrations
 - **Credit Check Services**: Dun & Bradstreet, Experian
 - **Tax Validation**: TIN verification services
 - **Email/SMS**: Notification services
 - **Document Storage**: Cloud storage (AWS S3, Azure Blob)
 - **ERP Systems**: SAP, Oracle, QuickBooks
 
-### 8.3 API Requirements
+### 8.4 API Requirements (Planned)
 - RESTful API for vendor CRUD operations
 - API for vendor search and filtering
 - Webhook support for status changes
@@ -690,21 +1060,34 @@ Expired documents are retained in system for historical reference but flagged as
 
 ## 9. Success Criteria
 
-### 9.1 Business Metrics
+> **Note**: Success criteria are goals for production deployment. Current state is UI prototype.
+
+### 9.1 Current Implementation Success Criteria
+**Implementation Status**: ✅ Achieved (UI Prototype)
+- ✅ Vendor list page displays with table/card views
+- ✅ Search filters vendors by multiple fields
+- ✅ Status filter works correctly
+- ✅ 4-tab create form captures all required fields
+- ✅ Detail page shows vendor information organized in tabs
+- ✅ Tax configuration with auto-rate population works
+- ✅ Status toggle changes vendor status with toast feedback
+- ✅ Responsive design works on mobile
+
+### 9.2 Planned Business Metrics
 - Vendor onboarding time reduced by 50%
 - 100% vendor compliance with required documents
 - 95%+ vendor contact information accuracy
 - Average vendor rating >4.0/5.0
 - <5% vendors blocked or blacklisted
 
-### 9.2 System Metrics
+### 9.3 Planned System Metrics
 - Page load time <2 seconds
 - Search response time <1 second
 - 99.9% system uptime
 - Zero data loss incidents
 - <10 support tickets per 1000 transactions
 
-### 9.3 User Adoption
+### 9.4 Planned User Adoption
 - 80%+ user satisfaction score
 - 90%+ users complete onboarding training
 - <5% duplicate vendor entries
@@ -714,14 +1097,26 @@ Expired documents are retained in system for historical reference but flagged as
 
 ## 10. Constraints and Assumptions
 
-### 10.1 Constraints
+### 10.1 Current Implementation Constraints
+- Frontend-only implementation (no backend API)
+- Mock data with no persistence
+- No authentication or authorization
+- Client-side state management only
+- No file upload capability
+
+### 10.2 Planned Production Constraints
 - Must integrate with existing ERP system
 - Must comply with data protection regulations (GDPR, CCPA)
 - Must support multi-tenancy for enterprise clients
 - Budget: $150,000 development + $25,000 annual maintenance
 - Timeline: 6 months development + 2 months testing
 
-### 10.2 Assumptions
+### 10.3 Current Assumptions
+- Users testing UI prototype in development environment
+- Mock data sufficient for demonstrating UI patterns
+- Backend API will be developed separately
+
+### 10.4 Planned Production Assumptions
 - Users have basic computer literacy
 - Stable internet connection available
 - Existing vendor data can be migrated
@@ -731,6 +1126,16 @@ Expired documents are retained in system for historical reference but flagged as
 ---
 
 ## 11. Risks and Mitigation
+
+### 11.1 Current Implementation Risks
+
+| Risk | Impact | Probability | Mitigation |
+|------|--------|-------------|------------|
+| UI prototype not matching final requirements | Medium | Medium | Regular stakeholder review, iterative updates |
+| Mock data not representing real scenarios | Medium | High | Work with business to create realistic test data |
+| Component patterns diverging from other modules | Low | Medium | Follow established component library patterns |
+
+### 11.2 Production Deployment Risks
 
 | Risk | Impact | Probability | Mitigation |
 |------|--------|-------------|------------|
@@ -743,11 +1148,38 @@ Expired documents are retained in system for historical reference but flagged as
 
 ---
 
-## Document History
+## 12. Implementation Summary
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial creation |
+### 12.1 Implemented Features
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Vendor List (Table View) | ✅ | Search, status filter, view toggle |
+| Vendor List (Card View) | ✅ | Alternative grid display |
+| Vendor Create (3-Tab Form) | ✅ | All basic fields captured |
+| Vendor Detail Page | ✅ | Summary card + 4 tabs |
+| Multi-Address Management | ✅ | Add, edit, delete via dialog with primary designation |
+| Asian International Address Format | ✅ | Address Line 1/2, Sub-District, District, City, Province, Postal Code, Country |
+| Multi-Contact Management | ✅ | Add, edit, delete via dialog with primary designation |
+| Full Certification Management | ✅ | CRUD via dialog, 16 types, auto-status calculation |
+| Certification Status Tracking | ✅ | Active, Expired, Expiring Soon (30 days), Pending |
+| Tax Configuration | ✅ | Tax profile with auto-rate |
+| Status Toggle | ✅ | Active/Inactive only |
+| Performance Metrics Display | ✅ | Display only, no calculation |
+
+### 12.2 Not Yet Implemented
+| Feature | Priority | Notes |
+|---------|----------|-------|
+| Backend API | Critical | Required for persistence |
+| Document Upload for Certifications | High | File attachment for certification copies |
+| Certification Expiry Notifications | High | Email alerts for expiring certifications |
+| Approval Workflows | High | Multi-stage approval |
+| Role-Based Access | High | Permission enforcement |
+| Contact Roles | Medium | Sales, Accounts Payable, etc. |
+| Advanced Segmentation | Medium | Preferred, Blocked, Blacklisted |
+| Location Assignments | Medium | Multi-location support |
+| Performance Calculation | Medium | Auto-calculate from transactions |
+| Banking Details | Medium | Payment processing |
+| Advanced Filters | Low | Saved filters, complex queries |
 
 ---
 

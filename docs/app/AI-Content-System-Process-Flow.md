@@ -532,8 +532,12 @@ Content-Type: application/json
 
 **Status**: Content ready for human editing
 
----
+## Document History
 
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+---
 ## Process 4: Human Editing in WordPress
 
 #### 4.1 Editor Makes Changes

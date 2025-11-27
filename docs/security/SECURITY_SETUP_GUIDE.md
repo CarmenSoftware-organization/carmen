@@ -1,5 +1,10 @@
 # Carmen ERP Security Setup Guide
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This guide provides comprehensive instructions for setting up and configuring the security features in Carmen ERP, including environment variables, authentication, authorization, and security monitoring.
 
 ## Table of Contents

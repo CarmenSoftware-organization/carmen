@@ -3,6 +3,11 @@
 **Module**: Store Operations
 **Route**: `/store-operations`
 **Status**: ✅ Production (Store Requisitions), 🚧 Prototype (Stock Replenishment, Wastage Reporting)
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Last Updated**: 2025-10-02
 
 ## Table of Contents

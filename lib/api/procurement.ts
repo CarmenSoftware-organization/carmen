@@ -15,7 +15,8 @@ import {
   type PurchaseOrderItem,
   PurchaseOrderStatus
 } from '@/lib/types/procurement'
-import { type Money, type DocumentStatus } from '@/lib/types/common'
+import { type Money } from '@/lib/types/common'
+import { PRStatus } from '@/lib/types/procurement'
 
 // API response types
 export interface PurchaseRequestListResponse {
@@ -86,7 +87,7 @@ export interface PriceHistoryResponse {
 
 // Filter types
 export interface PurchaseRequestFilters {
-  status?: DocumentStatus[]
+  status?: PRStatus[]
   requesterId?: string[]
   departmentId?: string[]
   priority?: string[]

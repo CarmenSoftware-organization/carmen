@@ -12,6 +12,11 @@
 
 Carmen ERP is a comprehensive hospitality-focused Enterprise Resource Planning system built with Next.js 14, providing integrated modules for inventory management, procurement, vendor management, financial operations, and operational planning. This PRD documents the core features currently implemented in the codebase.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. Authentication & User Management

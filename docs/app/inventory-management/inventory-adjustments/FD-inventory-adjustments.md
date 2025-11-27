@@ -8,6 +8,12 @@
 - **Last Updated**: 2025-01-10
 - **Status**: Active
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+---
 **IMPORTANT**: Inventory adjustments use the **shared costing methods infrastructure** for all stock transactions and lot tracking. This document references the shared transaction system defined in the Shared Methods documentation.
 
 ## Purpose
@@ -30,8 +36,6 @@ This document provides visual representations of Inventory Adjustments workflows
 - [Technical Specification](./TS-inventory-adjustments.md)
 - [Data Schema](./DS-inventory-adjustments.md)
 - [Validations](./VAL-inventory-adjustments.md)
-
----
 
 ## Diagram Index
 

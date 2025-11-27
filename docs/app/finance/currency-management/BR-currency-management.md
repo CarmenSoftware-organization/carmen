@@ -12,7 +12,6 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-11-12 | Carmen ERP Documentation Team | Initial version |
 
----
 
 ## Overview
 

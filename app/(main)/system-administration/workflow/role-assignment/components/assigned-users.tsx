@@ -4,20 +4,20 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MoreHorizontal, Filter, UserPlus } from 'lucide-react'
-import { users, roles } from "../data/mockData"
+import { mockUsers, mockRoles } from '@/lib/mock-data'
 import { User, Role } from "../types/approver"
 
 interface AssignedUsersProps {
-  selectedRoleId: number | null
+  selectedRoleId: string | null
 }
 
 // Map users to their roles (in a real app, this would come from the backend)
-const userRoleMap: Record<number, number[]> = {
-  1: [1, 2, 3, 4], // Requester role assigned to first 4 users
-  2: [5, 6], // Purchasing Staff role
-  3: [7, 8, 9, 10], // Department Head role
-  4: [11, 12], // Finance Manager role
-  5: [13], // General Manager role
+const userRoleMap: Record<string, string[]> = {
+  '1': ['1', '2', '3', '4'], // Requester role assigned to first 4 users
+  '2': ['5', '6'], // Purchasing Staff role
+  '3': ['7', '8', '9', '10'], // Department Head role
+  '4': ['11', '12'], // Finance Manager role
+  '5': ['13'], // General Manager role
 }
 
 export function AssignedUsers({ selectedRoleId }: AssignedUsersProps) {
@@ -34,11 +34,11 @@ export function AssignedUsers({ selectedRoleId }: AssignedUsersProps) {
     const assignedUserIds = userRoleMap[selectedRoleId] || []
     
     // Filter users based on role and search term
-    const roleUsers = users.filter(user => assignedUserIds.includes(user.id))
+    const roleUsers = mockUsers.filter(user => assignedUserIds.includes(user.id))
     const searchFiltered = roleUsers.filter(user =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.location.toLowerCase().includes(searchTerm.toLowerCase())
+      user.location?.toLowerCase().includes(searchTerm.toLowerCase())
     )
     
     setFilteredUsers(searchFiltered)
@@ -56,7 +56,7 @@ export function AssignedUsers({ selectedRoleId }: AssignedUsersProps) {
     console.log("Assign users functionality to be implemented")
   }
 
-  const selectedRole = selectedRoleId ? roles.find(role => role.id === selectedRoleId) : null
+  const selectedRole = selectedRoleId ? mockRoles.find(role => role.id === selectedRoleId) : null
 
   if (!selectedRoleId) {
     return <div className="text-center p-4">Please select a role to view assigned users</div>
@@ -107,7 +107,7 @@ export function AssignedUsers({ selectedRoleId }: AssignedUsersProps) {
                     </Avatar>
                     <div className="flex-grow">
                       <h4 className="font-semibold">{user.name}</h4>
-                      <p className="text-sm text-gray-500">{user.department} • {user.location}</p>
+                      <p className="text-sm text-gray-500">{user.department}{user.location ? ` • ${user.location}` : ''}</p>
                     </div>
                     <Button variant="ghost" size="icon">
                       <MoreHorizontal className="w-4 h-4" />

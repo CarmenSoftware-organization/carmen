@@ -13,6 +13,11 @@
 **Submodule Name**: Templates
 **Route**: `/vendor-management/templates`
 **Status**: 🚧 Prototype
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Purpose**: Pricelist template creation and management for standardized vendor pricing requests
 
 **Key Features**:

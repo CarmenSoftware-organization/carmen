@@ -2,6 +2,11 @@
 
 **Last Updated**: March 27, 2024
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Introduction
 
 This directory contains comprehensive documentation for the Recipe Management module within the Carmen F&B Management System. The documentation covers all aspects of the module, including business requirements, technical specifications, user interfaces, and API endpoints.

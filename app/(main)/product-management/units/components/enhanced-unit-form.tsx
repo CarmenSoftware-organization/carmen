@@ -42,41 +42,51 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { 
-  Loader2, 
-  Save, 
-  X, 
-  AlertTriangle, 
-  Info, 
+import {
+  Loader2,
+  Save,
+  X,
+  AlertTriangle,
+  Info,
   CheckCircle2,
   HelpCircle,
   Eye,
   EyeOff
 } from "lucide-react"
-import { Unit } from "./unit-list"
+import { Unit } from "@/lib/types"
 import { toast } from "sonner"
 
-// Enhanced validation schema with comprehensive rules
+// Enhanced validation schema with comprehensive rules (BR-UNIT aligned)
 const unitSchema = z.object({
   code: z.string()
     .min(1, "Unit code is required")
     .max(10, "Code must not exceed 10 characters")
-    .regex(/^[A-Z0-9_-]+$/, "Code must contain only uppercase letters, numbers, hyphens, and underscores")
-    .refine(val => val.trim() === val, "Code cannot have leading or trailing spaces")
-    .transform(val => val.toUpperCase()),
+    .regex(/^[A-Z0-9_]+$/, "Code must be uppercase letters, numbers, and underscores only")
+    .transform(val => val.trim().toUpperCase()),
   name: z.string()
     .min(1, "Unit name is required")
     .max(50, "Name must not exceed 50 characters")
     .refine(val => val.trim().length > 0, "Name cannot be only whitespace")
     .transform(val => val.trim()),
+  symbol: z.string()
+    .min(1, "Unit symbol is required")
+    .max(10, "Symbol must not exceed 10 characters")
+    .regex(/^[A-Za-z0-9_-]+$/, "Symbol must contain only letters, numbers, hyphens, and underscores")
+    .refine(val => val.trim() === val, "Symbol cannot have leading or trailing spaces")
+    .transform(val => val.trim()),
   description: z.string()
     .max(200, "Description must not exceed 200 characters")
-    .optional()
-    .transform(val => val?.trim() || undefined),
+    .optional(),
   type: z.enum(["INVENTORY", "ORDER", "RECIPE"], {
     required_error: "Please select a unit type",
     invalid_type_error: "Invalid unit type selected",
   }),
+  category: z.enum(["weight", "volume", "length", "count", "time", "temperature"], {
+    required_error: "Please select a unit category",
+    invalid_type_error: "Invalid unit category selected",
+  }),
+  baseUnit: z.string().optional(),
+  conversionFactor: z.number().positive().optional(),
   isActive: z.boolean().default(true),
 })
 
@@ -97,13 +107,12 @@ const CharacterCount = ({ current, max, className = "" }: { current: number, max
   const percentage = (current / max) * 100
   const isNearLimit = percentage >= 80
   const isOverLimit = percentage >= 100
-  
+
   return (
-    <span className={`text-xs ${
-      isOverLimit ? 'text-destructive' : 
-      isNearLimit ? 'text-amber-600' : 
-      'text-muted-foreground'
-    } ${className}`}>
+    <span className={`text-xs ${isOverLimit ? 'text-destructive' :
+        isNearLimit ? 'text-amber-600' :
+          'text-muted-foreground'
+      } ${className}`}>
       {current}/{max}
     </span>
   )
@@ -123,13 +132,13 @@ const FieldHelp = ({ content }: { content: string }) => (
   </TooltipProvider>
 )
 
-export function EnhancedUnitForm({ 
-  unit, 
-  onSuccess, 
-  onCancel, 
-  isLoading = false, 
+export function EnhancedUnitForm({
+  unit,
+  onSuccess,
+  onCancel,
+  isLoading = false,
   mode = 'create',
-  showAdvancedOptions = false 
+  showAdvancedOptions = false
 }: UnitFormProps) {
   // Form state management
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -138,10 +147,10 @@ export function EnhancedUnitForm({
   const [showAdvanced, setShowAdvanced] = useState(showAdvancedOptions)
   const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({})
   const [validationTouched, setValidationTouched] = useState<Record<string, boolean>>({})
-  
+
   const formRef = useRef<HTMLFormElement>(null)
   const codeInputRef = useRef<HTMLInputElement>(null)
-  
+
   // Enhanced form with proper defaults and validation
   const form = useForm<UnitFormValues>({
     resolver: zodResolver(unitSchema),
@@ -149,22 +158,26 @@ export function EnhancedUnitForm({
     defaultValues: {
       code: unit?.code || "",
       name: unit?.name || "",
+      symbol: unit?.symbol || "",
       description: unit?.description || "",
       type: unit?.type || "INVENTORY",
+      category: unit?.category || "weight",
+      baseUnit: unit?.baseUnit || "",
+      conversionFactor: unit?.conversionFactor || undefined,
       isActive: unit?.isActive ?? true,
     },
   })
-  
+
   // Watch form values for unsaved changes detection
   const watchedValues = form.watch()
-  
+
   // Auto-focus code input on mount for new units
   useEffect(() => {
     if (!unit && codeInputRef.current) {
       codeInputRef.current.focus()
     }
   }, [])
-  
+
   // Track unsaved changes
   useEffect(() => {
     if (!unit) {
@@ -172,6 +185,7 @@ export function EnhancedUnitForm({
       const hasChanges = Object.values(watchedValues).some(value => {
         if (typeof value === 'boolean') return value !== true // isActive defaults to true
         if (typeof value === 'string') return value.length > 0
+        if (typeof value === 'number') return true
         return false
       })
       setHasUnsavedChanges(hasChanges)
@@ -180,14 +194,18 @@ export function EnhancedUnitForm({
       const hasChanges = (
         watchedValues.code !== unit.code ||
         watchedValues.name !== unit.name ||
-        (watchedValues.description || '') !== (unit.description || '') ||
+        watchedValues.symbol !== unit.symbol ||
+        watchedValues.description !== (unit.description || "") ||
         watchedValues.type !== unit.type ||
+        watchedValues.category !== unit.category ||
+        watchedValues.baseUnit !== (unit.baseUnit || "") ||
+        watchedValues.conversionFactor !== unit.conversionFactor ||
         watchedValues.isActive !== unit.isActive
       )
       setHasUnsavedChanges(hasChanges)
     }
   }, [watchedValues, unit])
-  
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -203,24 +221,24 @@ export function EnhancedUnitForm({
         handleCancel()
       }
     }
-    
+
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [form.formState.isValid, isSubmitting])
-  
+
   // Enhanced submit handler with loading and error states
   const onSubmit = useCallback(async (data: UnitFormValues) => {
     if (isSubmitting) return
-    
+
     try {
       setIsSubmitting(true)
-      
+
       // Simulate API delay for demo
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       onSuccess(data)
       setHasUnsavedChanges(false)
-      
+
       toast.success(
         unit ? 'Unit updated successfully!' : 'Unit created successfully!',
         { duration: 3000 }
@@ -232,7 +250,7 @@ export function EnhancedUnitForm({
       setIsSubmitting(false)
     }
   }, [isSubmitting, onSuccess, unit])
-  
+
   // Enhanced cancel handler with unsaved changes protection
   const handleCancel = useCallback(() => {
     if (hasUnsavedChanges) {
@@ -241,22 +259,22 @@ export function EnhancedUnitForm({
       onCancel()
     }
   }, [hasUnsavedChanges, onCancel])
-  
+
   // Confirm discard changes
   const handleDiscardChanges = () => {
     setShowUnsavedDialog(false)
     setHasUnsavedChanges(false)
     onCancel()
   }
-  
+
   // Field validation on blur
   const handleFieldBlur = (fieldName: keyof UnitFormData) => {
     setValidationTouched(prev => ({ ...prev, [fieldName]: true }))
     form.trigger(fieldName)
   }
-  
+
   const isViewMode = mode === 'view'
-  
+
   // Get form state for UI feedback
   const { errors, isValid, isDirty } = form.formState
   const hasErrors = Object.keys(errors).length > 0
@@ -274,9 +292,9 @@ export function EnhancedUnitForm({
                 {unit && (
                   <div className="flex items-center gap-2 mt-2">
                     <Badge variant="outline" className="text-xs">
-                      {unit.type}
+                      {unit.category}
                     </Badge>
-                    <Badge 
+                    <Badge
                       variant={unit.isActive ? "default" : "secondary"}
                       className="text-xs"
                     >
@@ -285,7 +303,7 @@ export function EnhancedUnitForm({
                   </div>
                 )}
               </div>
-              
+
               {/* Form status indicator */}
               {!isViewMode && (
                 <div className="flex items-center gap-2 text-sm">
@@ -305,7 +323,7 @@ export function EnhancedUnitForm({
               )}
             </div>
           </CardHeader>
-          
+
           <CardContent>
             <Form {...form}>
               <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -314,9 +332,9 @@ export function EnhancedUnitForm({
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-medium">Basic Information</h3>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Unit Code Field */}
+                    {/* Unit Code Field (BR-UNIT-001) */}
                     <FormField
                       control={form.control}
                       name="code"
@@ -324,25 +342,56 @@ export function EnhancedUnitForm({
                         <FormItem>
                           <div className="flex items-center gap-2">
                             <FormLabel className="text-sm font-medium">Unit Code *</FormLabel>
-                            <FieldHelp content="A unique identifier for the unit (e.g., KG, L, PC). Only uppercase letters, numbers, hyphens, and underscores allowed." />
+                            <FieldHelp content="Unique, immutable code for the unit (e.g., KG, ML, BOX). Uppercase letters, numbers, and underscores only." />
                           </div>
                           <FormControl>
                             <div className="relative">
-                              <Input 
+                              <Input
                                 {...field}
                                 ref={codeInputRef}
-                                disabled={isViewMode || isLoading}
-                                placeholder="e.g., KG, L, PC"
-                                className={`
+                                disabled={isViewMode || isLoading || !!unit}
+                                placeholder="e.g., KG, ML, BOX"
+                                className={`uppercase font-mono
                                   ${errors.code ? 'border-destructive' : ''}
                                   ${validationTouched.code && !errors.code ? 'border-green-500' : ''}
                                 `}
                                 onBlur={() => handleFieldBlur('code')}
-                                onChange={(e) => {
-                                  // Auto-format to uppercase
-                                  const value = e.target.value.toUpperCase()
-                                  field.onChange(value)
-                                }}
+                                maxLength={10}
+                              />
+                              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                <CharacterCount current={field.value?.length || 0} max={10} />
+                              </div>
+                            </div>
+                          </FormControl>
+                          <FormDescription className="text-xs">
+                            {unit ? "Code cannot be changed after creation" : "Unique identifier for the unit (cannot be changed later)"}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Unit Symbol Field */}
+                    <FormField
+                      control={form.control}
+                      name="symbol"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormLabel className="text-sm font-medium">Display Symbol *</FormLabel>
+                            <FieldHelp content="A short symbol shown in UI (e.g., kg, L, pc). Letters, numbers, hyphens, and underscores allowed." />
+                          </div>
+                          <FormControl>
+                            <div className="relative">
+                              <Input
+                                {...field}
+                                disabled={isViewMode || isLoading}
+                                placeholder="e.g., kg, L, pc"
+                                className={`
+                                  ${errors.symbol ? 'border-destructive' : ''}
+                                  ${validationTouched.symbol && !errors.symbol ? 'border-green-500' : ''}
+                                `}
+                                onBlur={() => handleFieldBlur('symbol')}
                                 maxLength={10}
                               />
                               <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -357,57 +406,8 @@ export function EnhancedUnitForm({
                         </FormItem>
                       )}
                     />
-                    
-                    {/* Unit Type Field */}
-                    <FormField
-                      control={form.control}
-                      name="type"
-                      render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center gap-2">
-                            <FormLabel className="text-sm font-medium">Unit Type *</FormLabel>
-                            <FieldHelp content="Category that determines where this unit can be used: Inventory (stock tracking), Order (purchasing), Recipe (cooking measurements)." />
-                          </div>
-                          <Select 
-                            onValueChange={field.onChange} 
-                            defaultValue={field.value}
-                            disabled={isViewMode || isLoading}
-                          >
-                            <FormControl>
-                              <SelectTrigger className={errors.type ? 'border-destructive' : ''}>
-                                <SelectValue placeholder="Select unit category" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="INVENTORY">
-                                <div className="flex flex-col items-start">
-                                  <span>Inventory</span>
-                                  <span className="text-xs text-muted-foreground">Stock and warehouse tracking</span>
-                                </div>
-                              </SelectItem>
-                              <SelectItem value="ORDER">
-                                <div className="flex flex-col items-start">
-                                  <span>Order</span>
-                                  <span className="text-xs text-muted-foreground">Purchasing and procurement</span>
-                                </div>
-                              </SelectItem>
-                              <SelectItem value="RECIPE">
-                                <div className="flex flex-col items-start">
-                                  <span>Recipe</span>
-                                  <span className="text-xs text-muted-foreground">Cooking and food preparation</span>
-                                </div>
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormDescription className="text-xs">
-                            Determines system modules where unit appears
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                   </div>
-                  
+
                   {/* Unit Name Field */}
                   <FormField
                     control={form.control}
@@ -420,7 +420,7 @@ export function EnhancedUnitForm({
                         </div>
                         <FormControl>
                           <div className="relative">
-                            <Input 
+                            <Input
                               {...field}
                               disabled={isViewMode || isLoading}
                               placeholder="e.g., Kilogram, Liter, Piece"
@@ -443,8 +443,8 @@ export function EnhancedUnitForm({
                       </FormItem>
                     )}
                   />
-                  
-                  {/* Description Field */}
+
+                  {/* Description Field (BR-UNIT-007) */}
                   <FormField
                     control={form.control}
                     name="description"
@@ -452,40 +452,212 @@ export function EnhancedUnitForm({
                       <FormItem>
                         <div className="flex items-center gap-2">
                           <FormLabel className="text-sm font-medium">Description</FormLabel>
-                          <FieldHelp content="Optional detailed description, usage notes, or conversion information for this unit." />
+                          <FieldHelp content="Optional detailed description of the unit's purpose and usage." />
                         </div>
                         <FormControl>
                           <div className="relative">
-                            <Textarea 
+                            <Textarea
                               {...field}
                               disabled={isViewMode || isLoading}
-                              placeholder="Additional details about this unit..."
-                              className={`
-                                min-h-[80px] resize-none
+                              placeholder="Describe the unit's purpose and common usage..."
+                              className={`resize-none
                                 ${errors.description ? 'border-destructive' : ''}
-                                ${validationTouched.description && !errors.description ? 'border-green-500' : ''}
                               `}
-                              onBlur={() => handleFieldBlur('description')}
+                              rows={2}
                               maxLength={200}
                             />
-                            <div className="absolute right-3 bottom-3">
+                            <div className="absolute right-3 bottom-2">
                               <CharacterCount current={field.value?.length || 0} max={200} />
                             </div>
                           </div>
                         </FormControl>
-                        <FormDescription className="text-xs">
-                          Optional: conversion notes, usage guidelines, or special instructions
-                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
+                  {/* Type and Category Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Unit Type Field (BR-UNIT-006) */}
+                    <FormField
+                      control={form.control}
+                      name="type"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormLabel className="text-sm font-medium">Unit Type *</FormLabel>
+                            <FieldHelp content="Determines where this unit can be used: Inventory (stock tracking), Order (purchasing), or Recipe (food preparation)." />
+                          </div>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            disabled={isViewMode || isLoading}
+                          >
+                            <FormControl>
+                              <SelectTrigger className={errors.type ? 'border-destructive' : ''}>
+                                <SelectValue placeholder="Select unit type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="INVENTORY">
+                                <div className="flex flex-col items-start">
+                                  <span className="flex items-center gap-2">📦 Inventory</span>
+                                  <span className="text-xs text-muted-foreground">For stock tracking (KG, L, PC)</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="ORDER">
+                                <div className="flex flex-col items-start">
+                                  <span className="flex items-center gap-2">🛒 Order</span>
+                                  <span className="text-xs text-muted-foreground">For purchasing (BOX, CASE, CTN)</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="RECIPE">
+                                <div className="flex flex-col items-start">
+                                  <span className="flex items-center gap-2">👨‍🍳 Recipe</span>
+                                  <span className="text-xs text-muted-foreground">For food prep (TSP, TBSP, CUP)</span>
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription className="text-xs">
+                            Determines where this unit can be used in the system
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Unit Category Field */}
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormLabel className="text-sm font-medium">Measurement Category *</FormLabel>
+                            <FieldHelp content="Physical measurement category: Weight, Volume, Length, Count, Time, or Temperature." />
+                          </div>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            disabled={isViewMode || isLoading}
+                          >
+                            <FormControl>
+                              <SelectTrigger className={errors.category ? 'border-destructive' : ''}>
+                                <SelectValue placeholder="Select category" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="weight">
+                                <div className="flex flex-col items-start">
+                                  <span>Weight</span>
+                                  <span className="text-xs text-muted-foreground">Mass measurements</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="volume">
+                                <div className="flex flex-col items-start">
+                                  <span>Volume</span>
+                                  <span className="text-xs text-muted-foreground">Capacity measurements</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="length">
+                                <div className="flex flex-col items-start">
+                                  <span>Length</span>
+                                  <span className="text-xs text-muted-foreground">Distance measurements</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="count">
+                                <div className="flex flex-col items-start">
+                                  <span>Count</span>
+                                  <span className="text-xs text-muted-foreground">Discrete units</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="time">
+                                <div className="flex flex-col items-start">
+                                  <span>Time</span>
+                                  <span className="text-xs text-muted-foreground">Duration measurements</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="temperature">
+                                <div className="flex flex-col items-start">
+                                  <span>Temperature</span>
+                                  <span className="text-xs text-muted-foreground">Temperature measurements</span>
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription className="text-xs">
+                            Physical measurement type
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Conversion Fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Base Unit Field */}
+                    <FormField
+                      control={form.control}
+                      name="baseUnit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormLabel className="text-sm font-medium">Base Unit</FormLabel>
+                            <FieldHelp content="Reference unit for conversions. Leave empty if this is a base unit." />
+                          </div>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              disabled={isViewMode || isLoading}
+                              placeholder="e.g., KG, L (leave empty if base unit)"
+                              className="uppercase font-mono"
+                            />
+                          </FormControl>
+                          <FormDescription className="text-xs">
+                            Reference unit for conversion calculations
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Conversion Factor Field */}
+                    <FormField
+                      control={form.control}
+                      name="conversionFactor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormLabel className="text-sm font-medium">Conversion Factor</FormLabel>
+                            <FieldHelp content="Multiplier to convert this unit to the base unit. E.g., 1000 for g→kg." />
+                          </div>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              step="0.0001"
+                              disabled={isViewMode || isLoading}
+                              placeholder="e.g., 0.001 for g→kg"
+                              onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                              value={field.value || ''}
+                            />
+                          </FormControl>
+                          <FormDescription className="text-xs">
+                            Factor to convert to base unit
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-                
+
                 {/* Status Section */}
                 <div className="space-y-4 pt-4 border-t">
                   <h3 className="text-lg font-medium">Status & Settings</h3>
-                  
+
                   <FormField
                     control={form.control}
                     name="isActive"
@@ -498,8 +670,8 @@ export function EnhancedUnitForm({
                               <FieldHelp content="Active units can be used throughout the system. Inactive units are hidden from selection lists but preserved for historical data." />
                             </div>
                             <FormDescription className="text-sm">
-                              {field.value 
-                                ? "This unit is available for use in the system" 
+                              {field.value
+                                ? "This unit is available for use in the system"
                                 : "This unit is hidden from new transactions"}
                             </FormDescription>
                           </div>
@@ -516,7 +688,7 @@ export function EnhancedUnitForm({
                     )}
                   />
                 </div>
-                
+
                 {/* Form Actions */}
                 {!isViewMode && (
                   <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t">
@@ -528,11 +700,11 @@ export function EnhancedUnitForm({
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="flex gap-3">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
+                      <Button
+                        type="button"
+                        variant="outline"
                         onClick={handleCancel}
                         disabled={isSubmitting || isLoading}
                         className="flex-1 sm:flex-initial min-w-[100px]"
@@ -540,9 +712,9 @@ export function EnhancedUnitForm({
                         <X className="h-4 w-4 mr-2" />
                         Cancel
                       </Button>
-                      
-                      <Button 
-                        type="submit" 
+
+                      <Button
+                        type="submit"
                         disabled={isSubmitting || isLoading || !isValid || !isDirty}
                         className="flex-1 sm:flex-initial min-w-[120px]"
                       >
@@ -561,7 +733,7 @@ export function EnhancedUnitForm({
                     </div>
                   </div>
                 )}
-                
+
                 {/* Keyboard shortcuts help */}
                 {!isViewMode && (
                   <div className="text-xs text-muted-foreground text-center pt-2 border-t">
@@ -576,7 +748,7 @@ export function EnhancedUnitForm({
           </CardContent>
         </Card>
       </TooltipProvider>
-      
+
       {/* Unsaved Changes Dialog */}
       <AlertDialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
         <AlertDialogContent>
@@ -586,13 +758,13 @@ export function EnhancedUnitForm({
               Unsaved Changes
             </AlertDialogTitle>
             <AlertDialogDescription>
-              You have unsaved changes that will be lost if you continue. 
+              You have unsaved changes that will be lost if you continue.
               Are you sure you want to discard these changes?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Keep Editing</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleDiscardChanges}
               className="bg-destructive hover:bg-destructive/90"
             >

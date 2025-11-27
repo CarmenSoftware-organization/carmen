@@ -3,9 +3,10 @@
 ## Module Information
 - **Module**: Product Management
 - **Sub-Module**: Product Categories
+- **Route**: `/product-management/categories`
 - **Database**: CARMEN (PostgreSQL via Supabase)
 - **Schema Version**: 1.0.0
-- **Last Updated**: 2025-11-02
+- **Last Updated**: 2025-11-26
 - **Owner**: Product Management Team
 - **Status**: Approved
 
@@ -14,6 +15,7 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-11-02 | Documentation Team | Initial version |
 | 1.1.0 | 2025-11-15 | Documentation Team | Migrated from DS to DD format |
+| 1.2.0 | 2025-11-26 | Documentation Team | Added route reference, aligned with BR-categories.md |
 
 
 ---

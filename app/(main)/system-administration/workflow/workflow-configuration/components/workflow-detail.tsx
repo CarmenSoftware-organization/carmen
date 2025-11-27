@@ -5,7 +5,7 @@ import { WorkflowHeader } from "./workflow-header"
 import { WorkflowGeneral } from "./workflow-general"
 import { WorkflowStages } from "./workflow-stages"
 import { WorkflowRouting } from "./workflow-routing"
-import { sampleWorkflows } from "../data/mockData"
+import { sampleWorkflows } from '@/lib/mock-data'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle,ChevronLeft } from 'lucide-react'
 import { Button } from "@/components/ui/button"

@@ -1,5 +1,10 @@
 # Keycloak Integration Guide
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This guide covers the complete Keycloak integration for Carmen ERP, including setup, configuration, migration from JWT authentication, and production deployment.
 
 ## Table of Contents

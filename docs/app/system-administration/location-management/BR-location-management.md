@@ -2,9 +2,16 @@
 
 ## Document Information
 - **Module**: System Administration / Location Management
-- **Version**: 1.0
-- **Last Updated**: 2025-01-16
+- **Version**: 1.1
+- **Last Updated**: 2025-11-26
 - **Status**: Active
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+| 1.1.0 | 2025-11-26 | Documentation Team | Code compliance review - removed fictional features, added missing features |
 
 ## Overview
 
@@ -14,9 +21,11 @@ Location Management enables operations managers to define and manage physical an
 
 1. **Centralized Location Control**: Single source of truth for all operational locations
 2. **Inventory Segregation**: Enable separate inventory tracking per location
-3. **Access Control**: Restrict user access to specific locations
-4. **Delivery Management**: Link locations to delivery points for procurement
-5. **Stock Count Planning**: Configure physical count requirements per location
+3. **Access Control**: Assign users to specific locations with role-based permissions
+4. **Delivery Management**: Configure delivery points per location for procurement
+5. **Stock Management**: Configure physical count and inventory parameters per location
+
+---
 
 ## Functional Requirements
 
@@ -25,18 +34,19 @@ Location Management enables operations managers to define and manage physical an
 **User Story**: As an Operations Manager, I want to create new locations so that I can track inventory and operations at different sites.
 
 **Requirements**:
-- Create location with code, name, type, delivery point
-- Set location type (Inventory, Direct, Consignment)
-- Configure physical count type (yes/no)
-- Link to delivery point
-- Set active status
+- Create location with required fields: code (max 10 chars, uppercase alphanumeric with hyphens), name (max 100 chars)
+- Set location type: Inventory, Direct, or Consignment
+- Configure physical count enabled (yes/no)
+- Set status: active, inactive, closed, or pending_setup
+- Optional: description, department, cost center, address
+- For consignment locations: assign consignment vendor
 
 **Acceptance Criteria**:
-- Location name must be unique
+- Location code must match regex pattern `^[A-Z0-9-]+$`
 - Location code max 10 characters
-- Type must be one of: Inventory, Direct, Consignment
-- Active locations visible across system
-- Audit trail captures creation
+- Type must be one of: inventory, direct, consignment
+- Status must be one of: active, inactive, closed, pending_setup
+- Form validates required fields before submission
 
 ---
 
@@ -45,150 +55,284 @@ Location Management enables operations managers to define and manage physical an
 **User Story**: As a Store Manager, I want different location types so that inventory behaves correctly based on location purpose.
 
 **Location Types**:
-- **Inventory**: Standard warehouse/store locations with full inventory tracking
-- **Direct**: Direct consumption locations (kitchen, production areas)
-- **Consignment**: Consignment stock locations (owned by vendor until consumed)
+- **Inventory**: Standard warehouse/storage with full inventory tracking
+- **Direct**: Production areas with immediate expense on receipt
+- **Consignment**: Vendor-owned inventory until consumed (requires vendor assignment)
 
 **Acceptance Criteria**:
-- Type determines inventory behavior and costing
-- Inventory locations support all stock transactions
-- Direct locations bypass stock-in processes
-- Consignment locations track vendor ownership
+- Type selection shows label and description for each option
+- Consignment type displays additional vendor selection field
+- Type displayed with color-coded badge in list view
 
 ---
 
 ### FR-LOC-003: Physical Count Configuration
 **Priority**: Medium
-**User Story**: As an Inventory Manager, I want to specify which locations require physical counts so that I can plan count schedules efficiently.
+**User Story**: As an Inventory Manager, I want to specify which locations require physical counts so that I can plan count schedules.
 
 **Requirements**:
-- Set physical_count_type (yes/no) per location
-- Locations with "yes" appear in count schedules
-- Locations with "no" excluded from physical counts
+- Set physicalCountEnabled (true/false) per location
+- Filter locations by physical count status in list view
+- Display physical count status with check/x icon in location list
 
 **Acceptance Criteria**:
-- Physical count setting affects stock count workflows
-- Cannot perform stock count at "no" locations
-- Count schedules auto-populate "yes" locations
+- Physical count toggle available in location form
+- Filter dropdown with options: All, Count Enabled, Count Disabled
+- Visual indicator (CheckCircle/XCircle icon) in list view
 
 ---
 
-### FR-LOC-004: Delivery Point Assignment
+### FR-LOC-004: Delivery Points Management
 **Priority**: Medium
-**User Story**: As a Purchasing Manager, I want to assign delivery points to locations so that purchase orders route correctly.
+**User Story**: As a Purchasing Manager, I want to configure delivery points for locations so that vendors know where to deliver goods.
 
 **Requirements**:
-- Link location to delivery point (from tb_delivery_point)
-- Support multiple locations per delivery point
-- Display delivery point address on purchase orders
-- Update delivery point references when changed
+- Create multiple delivery points per location
+- Configure delivery point details: name, code, address, contact info
+- Set delivery instructions and access instructions
+- Configure logistics: max vehicle size, dock leveler availability, forklift availability
+- Set operating hours
+- Mark one delivery point as primary
 
 **Acceptance Criteria**:
-- Delivery point must be active
-- Purchase orders use location's delivery point
-- Delivery point changes reflect immediately
-- Historical POs retain original delivery point
+- Add/Edit/Delete delivery points from location detail page
+- Primary delivery point displayed with star badge
+- Active/Inactive status per delivery point
+- Full address with city, postal code, country
 
 ---
 
 ### FR-LOC-005: User Assignment
 **Priority**: High
-**User Story**: As a System Administrator, I want to assign users to locations so that they only access data from authorized sites.
+**User Story**: As a System Administrator, I want to assign users to locations with specific roles so that they can perform authorized operations.
 
 **Requirements**:
-- Assign multiple users to a location
-- Assign multiple locations to a user
+- Assign users to locations with role selection
+- Available roles: Location Manager, Inventory Controller, Receiver, Picker, Counter, Viewer
+- Configure granular permissions per assignment
+- Mark one assignment as primary location
 - Remove user assignments
-- Filter all data by user's assigned locations
+
+**Available Permissions**:
+- location:view, location:edit
+- inventory:view, inventory:receive, inventory:issue, inventory:adjust, inventory:transfer
+- count:view, count:participate, count:finalize
+- shelf:manage
 
 **Acceptance Criteria**:
-- Users see only assigned location data
-- Location change requires re-authentication
-- User without locations cannot access inventory
-- Audit log tracks assignments
+- User selection from available users list
+- Role dropdown with all location roles
+- Permission checkboxes with descriptions
+- Primary location indicator (star icon)
+- Edit and Remove actions per assignment
 
 ---
 
 ### FR-LOC-006: Product Assignment
 **Priority**: Medium
-**User Story**: As a Store Manager, I want to assign products to locations so that only relevant items appear in requisitions and counts.
+**User Story**: As a Store Manager, I want to assign products to locations with inventory parameters so that stock levels are properly managed.
 
 **Requirements**:
-- Assign products to specific locations
-- Define min/max stock levels per product-location
-- Set reorder points per location
-- Support bulk product assignment
+- Search and select products from centralized product catalog
+- Set inventory parameters: min quantity, max quantity, reorder point, PAR level
+- Assign default shelf for product storage
+- Create new shelves inline during product assignment
+- View current stock quantity and low stock alerts
 
 **Acceptance Criteria**:
-- Only assigned products visible at location
-- Stock levels tracked per product-location
-- Reorder alerts based on location thresholds
-- Product removal blocks if stock exists
+- Product search by name, code, or category
+- Only unassigned products shown in selection
+- Shelf selector with "Add New Shelf" option
+- Low stock indicator when current quantity <= reorder point
+- Edit parameters and remove product assignment
 
 ---
 
-### FR-LOC-007: Location Search & Filter
+### FR-LOC-007: Shelf Management
+**Priority**: Medium
+**User Story**: As a Warehouse Manager, I want to define storage shelves within a location so that products can be organized and located efficiently.
+
+**Requirements**:
+- Create shelves with code (max 20 chars) and name
+- Set active/inactive status per shelf
+- Edit and delete shelves
+- View shelves in table format
+
+**Acceptance Criteria**:
+- Add Shelf button opens dialog with code and name fields
+- Shelf code displays in monospace font
+- Active/Inactive badge per shelf
+- Edit/Delete actions in dropdown menu
+- Empty state with "Add First Shelf" prompt
+
+---
+
+### FR-LOC-008: Location Search & Filter
 **Priority**: Medium
 **User Story**: As an Operations Manager, I want to search and filter locations so that I can quickly find specific sites.
 
 **Requirements**:
-- Search by name, code, delivery point
-- Filter by type, active status, physical count setting
-- Sort by name, code, type, created date
+- Search by name, code, description, department name
+- Filter by type: All, Inventory, Direct, Consignment
+- Filter by status: All, Active, Inactive, Closed, Pending Setup
+- Filter by physical count: All, Count Enabled, Count Disabled
+- Sort by: code, name, type, status, shelves count, products count, users count
 
 **Acceptance Criteria**:
-- Search returns real-time results
+- Real-time search as user types
 - Multiple filters combine with AND logic
-- Results update as filters change
+- Results count displays "Showing X of Y locations"
+- Sortable column headers with up/down arrow indicator
 
 ---
 
-### FR-LOC-008: Location Activation/Deactivation
+### FR-LOC-009: Location Activation/Deactivation
 **Priority**: High
-**User Story**: As a System Administrator, I want to deactivate closed locations so that they don't appear in operational screens while preserving historical data.
+**User Story**: As a System Administrator, I want to change location status so that I can control operational availability.
 
 **Requirements**:
-- Set is_active flag to true/false
-- Inactive locations excluded from dropdowns
-- Historical transactions preserved
-- Reactivation restores visibility
+- Set status to: active, inactive, closed, pending_setup
+- Bulk activate/deactivate multiple selected locations
+- Cannot delete location with assigned products
 
 **Acceptance Criteria**:
-- Cannot deactivate location with stock
-- Inactive locations hidden in new transactions
-- Historical reports include inactive locations
-- User assignments auto-suspend on deactivation
+- Status dropdown in edit mode
+- Bulk action buttons appear when locations selected
+- Delete blocked with alert if assignedProductsCount > 0
+- Status displayed with color-coded badge
+
+---
+
+### FR-LOC-010: Location List & Bulk Actions
+**Priority**: Medium
+**User Story**: As an Operations Manager, I want to manage multiple locations at once so that I can efficiently handle bulk operations.
+
+**Requirements**:
+- Select individual or all locations via checkboxes
+- Bulk activate selected locations
+- Bulk deactivate selected locations
+- Bulk delete selected locations (with validation)
+- Export locations to CSV
+- Print location list
+
+**Acceptance Criteria**:
+- Checkbox column for selection
+- "X location(s) selected" indicator
+- Bulk action buttons: Activate, Deactivate, Delete, Clear Selection
+- Export generates CSV with all location fields
+- Print opens browser print dialog
+
+---
+
+### FR-LOC-011: Organization Assignment
+**Priority**: Medium
+**User Story**: As a Financial Controller, I want to assign locations to departments and cost centers so that expenses can be properly tracked.
+
+**Requirements**:
+- Assign department to location
+- Assign cost center to location
+- For consignment locations: assign consignment vendor
+
+**Acceptance Criteria**:
+- Department dropdown with available departments
+- Cost Center dropdown with available cost centers
+- Vendor dropdown appears only for consignment type locations
+- Department name displayed in location list
+
+---
+
+### FR-LOC-012: Location Address
+**Priority**: Low
+**User Story**: As a Logistics Coordinator, I want to record location addresses so that deliveries can be properly routed.
+
+**Requirements**:
+- Record address: line 1, line 2, city, postal code, country
+- Display formatted address in view mode
+- Edit address fields in edit mode
+
+**Acceptance Criteria**:
+- Address card section in General tab
+- All fields displayed as read-only text in view mode
+- Input fields in edit mode
+- Default country: Thailand
 
 ---
 
 ## Business Rules
 
-### BR-001: Unique Location Name
-Each location must have a unique name across the entire system.
+### BR-001: Location Code Format
+Location code must be uppercase alphanumeric with hyphens only, maximum 10 characters.
 
-### BR-002: Cannot Delete Location with Stock
-Locations with inventory balances cannot be deleted, only deactivated.
+### BR-002: Cannot Delete Location with Products
+Locations with assigned products (assignedProductsCount > 0) cannot be deleted. User must remove product assignments first.
 
-### BR-003: Location Type Immutable
-Location type cannot be changed after creation if transactions exist.
+### BR-003: Consignment Vendor Required
+Consignment type locations should have a vendor assigned for proper ownership tracking.
 
-### BR-004: Active Delivery Point Required
-Assigned delivery point must be active.
+### BR-004: Shelf Code Uniqueness
+Shelf codes should be unique within a location.
 
-### BR-005: Physical Count Location Requirement
-Stock counts can only be performed at locations with physical_count_type = yes.
+### BR-005: One Primary Delivery Point
+Each location should have at most one delivery point marked as primary.
+
+### BR-006: One Primary User Assignment
+Each user's assignments can have at most one location marked as primary.
+
+---
 
 ## Dependencies
 
-- **Inventory Management**: Provides stock transaction data
-- **User Management**: Provides user assignments
-- **Product Management**: Provides product catalog
-- **Procurement**: Uses delivery points for purchase orders
-- **Store Operations**: Uses locations for requisitions
+- **Product Management**: Provides product catalog for product assignments
+- **User Management**: Provides user list for user assignments
+- **Vendor Management**: Provides vendor list for consignment locations
+
+---
 
 ## Success Metrics
 
 1. **Location Setup Time**: < 2 minutes per location
 2. **Search Performance**: < 300ms for location searches
-3. **User Assignment Accuracy**: 100% correct access control
-4. **Data Integrity**: Zero stock misplacements between locations
+3. **Form Validation**: All required fields validated before submission
+4. **User Experience**: Intuitive tabbed interface for managing related data
+
+---
+
+## Appendix: Data Model Summary
+
+### InventoryLocation
+- id, code, name, description
+- type (inventory | direct | consignment)
+- status (active | inactive | closed | pending_setup)
+- physicalCountEnabled
+- departmentId, departmentName
+- costCenterId, costCenterName
+- consignmentVendorId, consignmentVendorName
+- shelvesCount, assignedUsersCount, assignedProductsCount
+- address (optional)
+- createdAt, createdBy, updatedAt, updatedBy
+
+### Shelf
+- id, locationId, code, name
+- zoneType, isActive
+- createdAt, createdBy
+
+### UserLocationAssignment
+- id, userId, userName, userEmail, locationId
+- roleAtLocation, permissions[]
+- isPrimary, isActive
+- assignedAt, assignedBy
+
+### ProductLocationAssignment
+- id, productId, productCode, productName, categoryName, baseUnit, locationId
+- shelfId, shelfName
+- minQuantity, maxQuantity, reorderPoint, parLevel
+- currentQuantity, isActive, isStocked
+- assignedAt, assignedBy
+
+### DeliveryPoint
+- id, locationId, name, code
+- address, contactName, contactPhone, contactEmail
+- deliveryInstructions, operatingHours
+- maxVehicleSize, hasDockLeveler, hasForklift
+- isPrimary, isActive
+- createdAt, createdBy

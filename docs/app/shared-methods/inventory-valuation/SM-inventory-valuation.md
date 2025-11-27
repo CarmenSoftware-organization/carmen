@@ -4,6 +4,12 @@
 **⚠️ Status**: Current schema documented with future enhancements marked
 **📋 Gap Analysis**: See [SCHEMA-ALIGNMENT.md](./SCHEMA-ALIGNMENT.md) for implementation roadmap
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+
 ## Purpose
 
 The Inventory Valuation shared method provides **centralized, application-wide inventory costing** using either **FIFO (First-In-First-Out)** or **AVG (Periodic Average)** costing methods. This ensures consistent inventory valuation across all modules and transactions.
@@ -888,8 +894,6 @@ const balance = await db.$queryRaw`
 **Last Updated**: 2025-11-03
 **Maintained By**: Architecture Team
 **Status**: Current Schema Documented + Future Enhancements Identified
-
----
 
 ## Document Revision Notes
 

@@ -888,6 +888,11 @@ Content-Type: application/json
 }
 ```
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 *Generated on: 2025-09-23*

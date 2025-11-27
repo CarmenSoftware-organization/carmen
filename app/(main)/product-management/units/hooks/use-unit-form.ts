@@ -5,28 +5,24 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { toast } from 'sonner'
-import { Unit } from '../components/unit-list'
+import { Unit } from '@/lib/types'
 
 // Enhanced validation schema
 export const unitFormSchema = z.object({
-  code: z.string()
-    .min(1, "Unit code is required")
-    .max(10, "Code must not exceed 10 characters")
-    .regex(/^[A-Z0-9_-]+$/, "Code must contain only uppercase letters, numbers, hyphens, and underscores")
-    .refine(val => val.trim() === val, "Code cannot have leading or trailing spaces")
-    .transform(val => val.toUpperCase()),
   name: z.string()
     .min(1, "Unit name is required")
     .max(50, "Name must not exceed 50 characters")
     .refine(val => val.trim().length > 0, "Name cannot be only whitespace")
     .transform(val => val.trim()),
-  description: z.string()
-    .max(200, "Description must not exceed 200 characters")
-    .optional()
-    .transform(val => val?.trim() || undefined),
-  type: z.enum(["INVENTORY", "ORDER", "RECIPE"], {
-    required_error: "Please select a unit type",
-    invalid_type_error: "Invalid unit type selected",
+  symbol: z.string()
+    .min(1, "Unit symbol is required")
+    .max(10, "Symbol must not exceed 10 characters")
+    .regex(/^[A-Za-z0-9_-]+$/, "Symbol must contain only letters, numbers, hyphens, and underscores")
+    .refine(val => val.trim() === val, "Symbol cannot have leading or trailing spaces")
+    .transform(val => val.trim()),
+  category: z.enum(["weight", "volume", "length", "count", "time", "temperature"], {
+    required_error: "Please select a unit category",
+    invalid_type_error: "Invalid unit category selected",
   }),
   isActive: z.boolean().default(true),
 })
@@ -82,10 +78,9 @@ export function useUnitForm(options: UseUnitFormOptions): UseUnitFormReturn {
     resolver: zodResolver(unitFormSchema),
     mode: validateOnBlur ? 'onBlur' : 'onChange',
     defaultValues: {
-      code: unit?.code || "",
       name: unit?.name || "",
-      description: unit?.description || "",
-      type: unit?.type || "INVENTORY",
+      symbol: unit?.symbol || "",
+      category: unit?.category || "weight",
       isActive: unit?.isActive ?? true,
     },
   })
@@ -106,10 +101,9 @@ export function useUnitForm(options: UseUnitFormOptions): UseUnitFormReturn {
     } else {
       // Existing unit - compare with original values
       const hasChanges = (
-        watchedValues.code !== unit.code ||
         watchedValues.name !== unit.name ||
-        (watchedValues.description || '') !== (unit.description || '') ||
-        watchedValues.type !== unit.type ||
+        watchedValues.symbol !== unit.symbol ||
+        watchedValues.category !== unit.category ||
         watchedValues.isActive !== unit.isActive
       )
       setHasUnsavedChanges(hasChanges)
@@ -137,11 +131,11 @@ export function useUnitForm(options: UseUnitFormOptions): UseUnitFormReturn {
       // Simulate API call with validation
       await new Promise(resolve => setTimeout(resolve, 1000))
 
-      // Check for duplicate codes (mock validation)
-      if (data.code === 'DUPLICATE') {
-        form.setError('code', {
+      // Check for duplicate symbols (mock validation)
+      if (data.symbol === 'DUPLICATE') {
+        form.setError('symbol', {
           type: 'manual',
-          message: 'This code already exists. Please choose a different code.'
+          message: 'This symbol already exists. Please choose a different symbol.'
         })
         return
       }
@@ -151,9 +145,9 @@ export function useUnitForm(options: UseUnitFormOptions): UseUnitFormReturn {
 
       toast.success(
         unit ? 'Unit updated successfully!' : 'Unit created successfully!',
-        { 
+        {
           duration: 3000,
-          description: `${data.code} - ${data.name} has been saved.`
+          description: `${data.symbol} - ${data.name} has been saved.`
         }
       )
     } catch (error) {
@@ -188,10 +182,9 @@ export function useUnitForm(options: UseUnitFormOptions): UseUnitFormReturn {
   // Reset form to initial state
   const resetForm = useCallback(() => {
     form.reset({
-      code: unit?.code || "",
       name: unit?.name || "",
-      description: unit?.description || "",
-      type: unit?.type || "INVENTORY",
+      symbol: unit?.symbol || "",
+      category: unit?.category || "weight",
       isActive: unit?.isActive ?? true,
     })
     setHasUnsavedChanges(false)
@@ -234,14 +227,14 @@ export function useUnitForm(options: UseUnitFormOptions): UseUnitFormReturn {
 
 // Validation utilities
 export const unitValidationUtils = {
-  // Check if code format is valid
-  isValidCode: (code: string): boolean => {
-    return /^[A-Z0-9_-]+$/.test(code) && code.trim() === code
+  // Check if symbol format is valid
+  isValidSymbol: (symbol: string): boolean => {
+    return /^[A-Za-z0-9_-]+$/.test(symbol) && symbol.trim() === symbol
   },
 
-  // Format code to uppercase
-  formatCode: (code: string): string => {
-    return code.toUpperCase().replace(/[^A-Z0-9_-]/g, '')
+  // Format symbol
+  formatSymbol: (symbol: string): string => {
+    return symbol.trim().replace(/[^A-Za-z0-9_-]/g, '')
   },
 
   // Check if name has valid length and content
@@ -249,33 +242,41 @@ export const unitValidationUtils = {
     return name.trim().length > 0 && name.length <= 50
   },
 
-  // Trim and validate description
-  formatDescription: (description?: string): string | undefined => {
-    if (!description) return undefined
-    const trimmed = description.trim()
-    return trimmed.length === 0 ? undefined : trimmed
-  },
-
-  // Get unit type display info
-  getUnitTypeInfo: (type: UnitFormData['type']) => {
-    const typeInfo = {
-      INVENTORY: {
-        label: 'Inventory',
-        description: 'Stock and warehouse tracking',
-        icon: '📦',
+  // Get unit category display info
+  getUnitCategoryInfo: (category: UnitFormData['category']) => {
+    const categoryInfo = {
+      weight: {
+        label: 'Weight',
+        description: 'Mass and weight measurements',
+        icon: '⚖️',
       },
-      ORDER: {
-        label: 'Order',
-        description: 'Purchasing and procurement',
-        icon: '🛒',
+      volume: {
+        label: 'Volume',
+        description: 'Volume and capacity measurements',
+        icon: '🧪',
       },
-      RECIPE: {
-        label: 'Recipe',
-        description: 'Cooking and food preparation',
-        icon: '👨‍🍳',
+      length: {
+        label: 'Length',
+        description: 'Distance and length measurements',
+        icon: '📏',
+      },
+      count: {
+        label: 'Count',
+        description: 'Discrete counting units',
+        icon: '🔢',
+      },
+      time: {
+        label: 'Time',
+        description: 'Time duration measurements',
+        icon: '⏱️',
+      },
+      temperature: {
+        label: 'Temperature',
+        description: 'Temperature measurements',
+        icon: '🌡️',
       },
     }
-    return typeInfo[type]
+    return categoryInfo[category]
   },
 
   // Character count helper
@@ -295,13 +296,6 @@ export const unitValidationUtils = {
 
 // Form field configurations
 export const unitFormFields = {
-  code: {
-    label: 'Unit Code',
-    placeholder: 'e.g., KG, L, PC',
-    helpText: 'A unique identifier for the unit (e.g., KG, L, PC). Only uppercase letters, numbers, hyphens, and underscores allowed.',
-    maxLength: 10,
-    required: true,
-  },
   name: {
     label: 'Unit Name',
     placeholder: 'e.g., Kilogram, Liter, Piece',
@@ -309,21 +303,24 @@ export const unitFormFields = {
     maxLength: 50,
     required: true,
   },
-  description: {
-    label: 'Description',
-    placeholder: 'Additional details about this unit...',
-    helpText: 'Optional detailed description, usage notes, or conversion information for this unit.',
-    maxLength: 200,
-    required: false,
+  symbol: {
+    label: 'Unit Symbol',
+    placeholder: 'e.g., kg, L, pc',
+    helpText: 'A short identifier for the unit (e.g., kg, L, pc). Letters, numbers, hyphens, and underscores allowed.',
+    maxLength: 10,
+    required: true,
   },
-  type: {
-    label: 'Unit Type',
-    helpText: 'Category that determines where this unit can be used: Inventory (stock tracking), Order (purchasing), Recipe (cooking measurements).',
+  category: {
+    label: 'Unit Category',
+    helpText: 'Category that determines the measurement type: Weight, Volume, Length, Count, Time, or Temperature.',
     required: true,
     options: [
-      { value: 'INVENTORY', label: 'Inventory', description: 'Stock and warehouse tracking' },
-      { value: 'ORDER', label: 'Order', description: 'Purchasing and procurement' },
-      { value: 'RECIPE', label: 'Recipe', description: 'Cooking and food preparation' },
+      { value: 'weight', label: 'Weight', description: 'Mass and weight measurements' },
+      { value: 'volume', label: 'Volume', description: 'Volume and capacity measurements' },
+      { value: 'length', label: 'Length', description: 'Distance and length measurements' },
+      { value: 'count', label: 'Count', description: 'Discrete counting units' },
+      { value: 'time', label: 'Time', description: 'Time duration measurements' },
+      { value: 'temperature', label: 'Temperature', description: 'Temperature measurements' },
     ],
   },
   isActive: {

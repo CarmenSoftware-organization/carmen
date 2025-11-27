@@ -4,7 +4,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { WorkflowList } from "./workflow-configuration/components/workflow-list"
 import RoleAssignmentLayout from "./role-assignment/components/layout"
-import { sampleWorkflows } from "./workflow-configuration/data/mockData"
+import { sampleWorkflows } from '@/lib/mock-data'
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 

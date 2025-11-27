@@ -4,6 +4,11 @@
 **Created**: January 2025  
 **Based on**: Purchase Request Production Implementation  
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This guide extracts proven UI design patterns, component structures, and implementation flows from the Purchase Request module to serve as a reference for implementing other modules in the Carmen ERP system.
 
 ## 1. Overview: Design System Foundation

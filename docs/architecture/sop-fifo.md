@@ -1,5 +1,10 @@
 ## Standard Operating Procedures: FIFO Inventory Management
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ### I. Purpose
 
 This document provides the official operational rules for all staff involved in handling, transacting, and managing physical inventory. Adherence to these rules is mandatory to ensure the accuracy of our inventory system, prevent financial discrepancies, and maintain a clear audit trail. This SOP is the operational counterpart to the system's "FIFO Inventory Calculation Business Logic".

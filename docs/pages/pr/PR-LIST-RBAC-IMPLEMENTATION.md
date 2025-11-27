@@ -1,5 +1,10 @@
 # Purchase Request List: RBAC Implementation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document summarizes the implementation of Role-Based Access Control (RBAC) for the Purchase Request List page.
 
 ## 1. RBAC Widget Access Control

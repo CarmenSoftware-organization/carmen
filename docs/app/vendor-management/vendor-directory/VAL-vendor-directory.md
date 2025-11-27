@@ -3,9 +3,18 @@
 ## Document Information
 - **Document Type**: Validations Document
 - **Module**: Vendor Management > Vendor Directory
-- **Version**: 1.0
-- **Last Updated**: 2024-01-15
-- **Document Status**: Draft
+- **Version**: 2.2.0
+- **Last Updated**: 2025-11-25
+- **Document Status**: Updated
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.2.0 | 2025-11-25 | System | Added certification management validations (16 types, status auto-calculation, 30-day threshold); Added Asian international address format validations (15 countries, subDistrict, district fields, country-specific postal codes) |
+| 2.1.0 | 2025-11-25 | System | Added multi-address and multi-contact management validations |
+| 2.0.0 | 2025-11-25 | System | Updated to match actual code implementation |
+| 1.0 | 2024-01-15 | System | Initial creation |
 
 ---
 
@@ -299,7 +308,7 @@ defaultCurrency: z.string()
   .default('USD')
 ```
 
-### 2.4 Address Information
+### 2.4 Address Information (Asian International Format)
 
 #### Address Line 1
 **Field**: `addressLine1` (stored in `tb_vendor_address.data['addressLine1']`)
@@ -308,14 +317,117 @@ defaultCurrency: z.string()
 |------|------------|---------------|
 | Required | Must not be empty | "Address line 1 is required" |
 | Length | 5-200 characters | "Address must be 5-200 characters" |
-| Format | Letters, numbers, spaces, common punctuation | "Address contains invalid characters" |
+| Format | Letters, numbers, spaces, common punctuation, Unicode | "Address contains invalid characters" |
 
 **Zod Schema**:
 ```typescript
 addressLine1: z.string()
   .min(5, 'Address must be at least 5 characters')
   .max(200, 'Address must not exceed 200 characters')
-  .regex(/^[a-zA-Z0-9\s\-\.\,\#]+$/, 'Address contains invalid characters')
+```
+
+#### Address Line 2
+**Field**: `addressLine2` (stored in `tb_vendor_address.data['addressLine2']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Optional | Can be empty | N/A |
+| Length | Max 200 characters | "Address line 2 must not exceed 200 characters" |
+
+**Zod Schema**:
+```typescript
+addressLine2: z.string()
+  .max(200, 'Address line 2 must not exceed 200 characters')
+  .optional()
+  .or(z.literal(''))
+```
+
+#### Sub-District (Asian Address Field)
+**Field**: `subDistrict` (stored in `tb_vendor_address.data['subDistrict']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Optional | Can be empty (recommended for Asian countries) | N/A |
+| Length | Max 100 characters | "Sub-district must not exceed 100 characters" |
+| Format | Letters, numbers, spaces, Unicode | "Sub-district contains invalid characters" |
+
+**Country-Specific Labels**:
+| Country | Label | Local Name |
+|---------|-------|------------|
+| Thailand | Sub-District | ตำบล (Tambon) |
+| Indonesia | Sub-District | Kelurahan |
+| Malaysia | Sub-District | Mukim |
+
+**Zod Schema**:
+```typescript
+subDistrict: z.string()
+  .max(100, 'Sub-district must not exceed 100 characters')
+  .optional()
+  .or(z.literal(''))
+```
+
+#### District (Asian Address Field)
+**Field**: `district` (stored in `tb_vendor_address.data['district']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Optional | Can be empty (recommended for Asian countries) | N/A |
+| Length | Max 100 characters | "District must not exceed 100 characters" |
+| Format | Letters, numbers, spaces, Unicode | "District contains invalid characters" |
+
+**Country-Specific Labels**:
+| Country | Label | Local Name |
+|---------|-------|------------|
+| Thailand | District | อำเภอ (Amphoe) |
+| Indonesia | District | Kecamatan / Kabupaten/Kota |
+| Vietnam | District | Quận/Huyện |
+
+**Zod Schema**:
+```typescript
+district: z.string()
+  .max(100, 'District must not exceed 100 characters')
+  .optional()
+  .or(z.literal(''))
+```
+
+#### City
+**Field**: `city` (stored in `tb_vendor_address.data['city']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Required | Must not be empty | "City is required" |
+| Length | 2-100 characters | "City must be 2-100 characters" |
+
+**Zod Schema**:
+```typescript
+city: z.string()
+  .min(2, 'City must be at least 2 characters')
+  .max(100, 'City must not exceed 100 characters')
+```
+
+#### Province/State
+**Field**: `province` (stored in `tb_vendor_address.data['province']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Required | Must not be empty | "Province/State is required" |
+| Length | 2-100 characters | "Province must be 2-100 characters" |
+
+**Country-Specific Labels**:
+| Country | Label |
+|---------|-------|
+| Thailand | Province (จังหวัด) |
+| Indonesia | Province (Provinsi) |
+| Malaysia | State (Negeri) |
+| Vietnam | Province (Tỉnh) |
+| United States | State |
+| Others | Province/State |
+
+**Zod Schema**:
+```typescript
+province: z.string()
+  .min(2, 'Province must be at least 2 characters')
+  .max(100, 'Province must not exceed 100 characters')
 ```
 
 #### Postal Code
@@ -327,21 +439,57 @@ addressLine1: z.string()
 | Format | Varies by country | "Invalid postal code format for selected country" |
 | Length | 3-10 characters | "Postal code must be 3-10 characters" |
 
+**Country-Specific Postal Code Formats (15 Countries)**:
+| Country | Code | Format | Pattern | Example |
+|---------|------|--------|---------|---------|
+| Thailand | TH | 5 digits | `^\d{5}$` | 10110 |
+| Singapore | SG | 6 digits | `^\d{6}$` | 123456 |
+| Malaysia | MY | 5 digits | `^\d{5}$` | 50450 |
+| Indonesia | ID | 5 digits | `^\d{5}$` | 12345 |
+| Vietnam | VN | 6 digits | `^\d{6}$` | 100000 |
+| Philippines | PH | 4 digits | `^\d{4}$` | 1234 |
+| Myanmar | MM | 5 digits | `^\d{5}$` | 11011 |
+| Cambodia | KH | 5 digits | `^\d{5}$` | 12000 |
+| Laos | LA | 5 digits | `^\d{5}$` | 01000 |
+| Brunei | BN | 6 alphanumeric | `^[A-Z]{2}\d{4}$` | KB1234 |
+| China | CN | 6 digits | `^\d{6}$` | 100000 |
+| Japan | JP | 7 digits with hyphen | `^\d{3}-\d{4}$` | 100-0001 |
+| South Korea | KR | 5 digits | `^\d{5}$` | 12345 |
+| India | IN | 6 digits | `^\d{6}$` | 110001 |
+| United States | US | 5 or 9 digits | `^\d{5}(-\d{4})?$` | 12345 or 12345-6789 |
+
 **Zod Schema**:
 ```typescript
 postalCode: z.string()
   .min(3, 'Postal code must be at least 3 characters')
   .max(10, 'Postal code must not exceed 10 characters')
-  .refine((code, ctx) => {
-    const country = ctx.parent.country; // Access parent context
-    const formats = {
+  .superRefine((code, ctx) => {
+    const country = ctx.path.includes('country') ? ctx.parent?.country : 'default';
+    const formats: Record<string, RegExp> = {
+      'TH': /^\d{5}$/,
+      'SG': /^\d{6}$/,
+      'MY': /^\d{5}$/,
+      'ID': /^\d{5}$/,
+      'VN': /^\d{6}$/,
+      'PH': /^\d{4}$/,
+      'MM': /^\d{5}$/,
+      'KH': /^\d{5}$/,
+      'LA': /^\d{5}$/,
+      'BN': /^[A-Z]{2}\d{4}$/,
+      'CN': /^\d{6}$/,
+      'JP': /^\d{3}-\d{4}$/,
+      'KR': /^\d{5}$/,
+      'IN': /^\d{6}$/,
       'US': /^\d{5}(-\d{4})?$/,
-      'CA': /^[A-Z]\d[A-Z] ?\d[A-Z]\d$/,
-      'GB': /^[A-Z]{1,2}\d{1,2} ?\d[A-Z]{2}$/,
     };
-    const pattern = formats[country] || /^[A-Z0-9\s\-]+$/;
-    return pattern.test(code);
-  }, 'Invalid postal code format for selected country')
+    const pattern = formats[country] || /^[A-Z0-9\s\-]+$/i;
+    if (!pattern.test(code)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Invalid postal code format for ${country}`,
+      });
+    }
+  })
 ```
 
 #### Country
@@ -351,14 +499,52 @@ postalCode: z.string()
 |------|------------|---------------|
 | Required | Must select country | "Country is required" |
 | Format | ISO 3166-1 alpha-2 code | "Invalid country code" |
-| Valid | Must exist in supported countries | "Country not supported" |
+| Valid | Must exist in 15 supported countries | "Country not supported" |
+
+**Supported Countries (15)**:
+| Code | Country Name |
+|------|--------------|
+| TH | Thailand |
+| SG | Singapore |
+| MY | Malaysia |
+| ID | Indonesia |
+| VN | Vietnam |
+| PH | Philippines |
+| MM | Myanmar |
+| KH | Cambodia |
+| LA | Laos |
+| BN | Brunei |
+| CN | China |
+| JP | Japan |
+| KR | South Korea |
+| IN | India |
+| US | United States |
 
 **Zod Schema**:
 ```typescript
-country: z.string()
-  .length(2, 'Country code must be exactly 2 characters')
-  .regex(/^[A-Z]{2}$/, 'Country code must be uppercase letters')
+country: z.enum([
+  'TH', 'SG', 'MY', 'ID', 'VN', 'PH', 'MM', 'KH', 'LA', 'BN', 'CN', 'JP', 'KR', 'IN', 'US'
+], {
+  errorMap: () => ({ message: 'Please select a supported country' }),
+})
 ```
+
+#### Primary Address Designation
+**Field**: `isPrimary` (stored in `tb_vendor_address.data['isPrimary']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Required | Boolean value | "Primary designation is required" |
+| Unique | Only one address can be primary per vendor | "Another address is already set as primary" |
+| Auto-set | First address automatically becomes primary | N/A |
+
+**Business Rule**: When setting a new primary address, the system must automatically update the previous primary address to non-primary.
+
+#### Address Limit
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Maximum | 10 addresses per vendor | "Maximum of 10 addresses allowed per vendor" |
+| Minimum | At least 1 address required | "At least one address is required" |
 
 ### 2.5 Document Information
 
@@ -486,6 +672,211 @@ const validateFile = (file: File): ValidationResult => {
   return { valid: true };
 };
 ```
+
+### 2.6 Certification Information
+
+#### Certification Type
+**Field**: `certificationType` (stored in `tb_vendor.info['certifications'][n]['certificationType']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Required | Must select a type | "Certification type is required" |
+| Valid | Must be one of 16 predefined types | "Invalid certification type selected" |
+| Unique | One active certification per type per vendor | "This certification type already exists for this vendor" |
+
+**Allowed Certification Types (16)**:
+| Code | Display Name |
+|------|--------------|
+| iso_9001 | ISO 9001 (Quality Management) |
+| iso_14001 | ISO 14001 (Environmental Management) |
+| iso_22000 | ISO 22000 (Food Safety) |
+| haccp | HACCP (Hazard Analysis Critical Control Points) |
+| gmp | GMP (Good Manufacturing Practice) |
+| halal | Halal Certification |
+| kosher | Kosher Certification |
+| organic | Organic Certification |
+| fda_registered | FDA Registered |
+| usda_certified | USDA Certified |
+| fair_trade | Fair Trade Certified |
+| business_license | Business License |
+| health_safety_license | Health & Safety License |
+| tax_registration | Tax Registration Certificate |
+| trade_license | Trade License |
+| other | Other Certification |
+
+**Zod Schema**:
+```typescript
+certificationType: z.enum([
+  'iso_9001',
+  'iso_14001',
+  'iso_22000',
+  'haccp',
+  'gmp',
+  'halal',
+  'kosher',
+  'organic',
+  'fda_registered',
+  'usda_certified',
+  'fair_trade',
+  'business_license',
+  'health_safety_license',
+  'tax_registration',
+  'trade_license',
+  'other',
+], {
+  errorMap: () => ({ message: 'Invalid certification type selected' }),
+})
+```
+
+#### Certificate Number
+**Field**: `certificateNumber` (stored in `tb_vendor.info['certifications'][n]['certificateNumber']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Required | Must not be empty | "Certificate number is required" |
+| Length | 1-100 characters | "Certificate number must be 1-100 characters" |
+| Format | Alphanumeric with common separators | "Certificate number contains invalid characters" |
+
+**Zod Schema**:
+```typescript
+certificateNumber: z.string()
+  .min(1, 'Certificate number is required')
+  .max(100, 'Certificate number must not exceed 100 characters')
+  .regex(/^[A-Z0-9\-\/\.]+$/i, 'Certificate number contains invalid characters')
+```
+
+#### Issuing Authority
+**Field**: `issuingAuthority` (stored in `tb_vendor.info['certifications'][n]['issuingAuthority']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Required | Must not be empty | "Issuing authority is required" |
+| Length | 2-200 characters | "Issuing authority must be 2-200 characters" |
+
+**Zod Schema**:
+```typescript
+issuingAuthority: z.string()
+  .min(2, 'Issuing authority must be at least 2 characters')
+  .max(200, 'Issuing authority must not exceed 200 characters')
+```
+
+#### Issue Date
+**Field**: `issueDate` (stored in `tb_vendor.info['certifications'][n]['issueDate']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Required | Must provide date | "Issue date is required" |
+| Format | ISO 8601 date string | "Invalid date format" |
+| Range | Cannot be future date | "Issue date cannot be in the future" |
+
+**Zod Schema**:
+```typescript
+issueDate: z.coerce.date()
+  .max(new Date(), 'Issue date cannot be in the future')
+```
+
+#### Expiry Date
+**Field**: `expiryDate` (stored in `tb_vendor.info['certifications'][n]['expiryDate']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Required | Must provide date | "Expiry date is required" |
+| Format | ISO 8601 date string | "Invalid date format" |
+| Consistency | Must be after issue date | "Expiry date must be after issue date" |
+
+**Zod Schema**:
+```typescript
+expiryDate: z.coerce.date()
+  .refine((expiryDate, ctx) => {
+    const issueDate = ctx.parent?.issueDate;
+    if (!issueDate) return true;
+    return expiryDate > issueDate;
+  }, 'Expiry date must be after issue date')
+```
+
+#### Certification Status (Auto-Calculated)
+**Field**: `status` (stored in `tb_vendor.info['certifications'][n]['status']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Auto-calculated | System determines based on expiry date | N/A |
+| Allowed Values | active, expiring_soon, expired, pending | "Invalid certification status" |
+
+**Status Calculation Logic (30-Day Threshold)**:
+| Status | Condition | Display |
+|--------|-----------|---------|
+| `active` | Expiry date > today + 30 days | Green badge |
+| `expiring_soon` | Today < expiry date ≤ today + 30 days | Yellow badge |
+| `expired` | Expiry date < today | Red badge |
+| `pending` | No expiry date or manual override | Gray badge |
+
+**Status Calculation Function**:
+```typescript
+const calculateCertificationStatus = (expiryDate: Date | null): CertificationStatus => {
+  if (!expiryDate) return 'pending';
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const expiry = new Date(expiryDate);
+  expiry.setHours(0, 0, 0, 0);
+
+  const thirtyDaysFromNow = new Date(today);
+  thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+  if (expiry < today) {
+    return 'expired';
+  } else if (expiry <= thirtyDaysFromNow) {
+    return 'expiring_soon';
+  } else {
+    return 'active';
+  }
+};
+```
+
+**Zod Schema**:
+```typescript
+status: z.enum(['active', 'expiring_soon', 'expired', 'pending'], {
+  errorMap: () => ({ message: 'Invalid certification status' }),
+}).default('pending')
+```
+
+#### Certificate Document
+**Field**: `documentUrl` (stored in `tb_vendor.info['certifications'][n]['documentUrl']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Optional | Can be empty | N/A |
+| File Type | PDF, JPG, PNG only | "Certificate document must be PDF, JPG, or PNG" |
+| File Size | Max 10MB | "Certificate document must not exceed 10MB" |
+
+**Zod Schema**:
+```typescript
+documentUrl: z.string()
+  .url('Invalid document URL')
+  .optional()
+  .or(z.literal(''))
+```
+
+#### Notes
+**Field**: `notes` (stored in `tb_vendor.info['certifications'][n]['notes']`)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Optional | Can be empty | N/A |
+| Length | Max 1000 characters | "Notes must not exceed 1000 characters" |
+
+**Zod Schema**:
+```typescript
+notes: z.string()
+  .max(1000, 'Notes must not exceed 1000 characters')
+  .optional()
+```
+
+#### Certification Limit
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Maximum | 20 certifications per vendor | "Maximum of 20 certifications allowed per vendor" |
 
 ---
 
@@ -662,6 +1053,266 @@ if (isPreferred && currentRating < 4.0) {
 ```
 
 **Warning Message**: "Warning: Vendor rating has fallen below 4.0. Preferred status may be revoked if performance does not improve."
+
+### 3.5 Certification Rules
+
+#### BR-VAL-010: Certification Expiry Warning
+**Rule**: System automatically calculates certification status based on expiry date. Certifications within 30 days of expiry are marked as "expiring_soon".
+
+**Status Calculation**:
+```typescript
+const calculateCertificationStatus = (expiryDate: Date | null): CertificationStatus => {
+  if (!expiryDate) return 'pending';
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const expiry = new Date(expiryDate);
+  expiry.setHours(0, 0, 0, 0);
+
+  const thirtyDaysFromNow = new Date(today);
+  thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+  if (expiry < today) {
+    return 'expired';
+  } else if (expiry <= thirtyDaysFromNow) {
+    return 'expiring_soon';
+  } else {
+    return 'active';
+  }
+};
+```
+
+**Status Definitions**:
+| Status | Condition | Display Badge |
+|--------|-----------|---------------|
+| `active` | Expiry date > 30 days from today | Green badge |
+| `expiring_soon` | Expiry date within 30 days | Yellow/warning badge |
+| `expired` | Expiry date has passed | Red badge |
+| `pending` | No expiry date set (awaiting certification) | Gray badge |
+
+**Warning Message**: "Warning: This certification will expire on [DATE]. Please initiate renewal process."
+
+#### BR-VAL-011: Duplicate Certification Type Prevention
+**Rule**: A vendor cannot have multiple certifications of the same type that are both active.
+
+**Validation**:
+```typescript
+const existingCertification = await prisma.tb_vendor_document.findFirst({
+  where: {
+    vendor_id: vendorId,
+    info: {
+      path: ['certificationType'],
+      equals: newCertification.certificationType,
+    },
+    deleted_at: null,
+  },
+});
+
+if (existingCertification) {
+  const existingStatus = calculateCertificationStatus(existingCertification.expiryDate);
+  if (existingStatus === 'active' || existingStatus === 'expiring_soon') {
+    throw new ValidationError(
+      `An active ${getCertificationDisplayName(newCertification.certificationType)} certification already exists. ` +
+      'Please update the existing certification or wait for it to expire.'
+    );
+  }
+}
+```
+
+**Error Message**: "An active [Certification Type] certification already exists for this vendor. Please update the existing certification instead."
+
+#### BR-VAL-012: Required Certifications by Vendor Type
+**Rule**: Certain vendor types may require specific certifications before approval.
+
+**Configuration**:
+```typescript
+const REQUIRED_CERTIFICATIONS: Record<string, string[]> = {
+  'food_supplier': ['halal', 'food_safety'],
+  'medical_supplier': ['medical_device'],
+  'construction': ['safety_compliance'],
+  'technology': ['iso_27001'],
+};
+
+const validateRequiredCertifications = async (
+  vendorId: string,
+  vendorType: string
+): Promise<ValidationResult> => {
+  const requiredTypes = REQUIRED_CERTIFICATIONS[vendorType] || [];
+  if (requiredTypes.length === 0) return { valid: true };
+
+  const activeCertifications = await prisma.tb_vendor_document.findMany({
+    where: {
+      vendor_id: vendorId,
+      info: {
+        path: ['certificationType'],
+        in: requiredTypes,
+      },
+      deleted_at: null,
+    },
+  });
+
+  const activeCertTypes = activeCertifications
+    .filter(cert => {
+      const status = calculateCertificationStatus(cert.expiryDate);
+      return status === 'active' || status === 'expiring_soon';
+    })
+    .map(cert => cert.info?.certificationType);
+
+  const missingCerts = requiredTypes.filter(type => !activeCertTypes.includes(type));
+
+  if (missingCerts.length > 0) {
+    return {
+      valid: false,
+      missingCertifications: missingCerts,
+      message: `The following certifications are required: ${missingCerts.map(getCertificationDisplayName).join(', ')}`,
+    };
+  }
+
+  return { valid: true };
+};
+```
+
+**Warning Message**: "Warning: This vendor type requires the following certifications: [List]. Please ensure all certifications are active before approval."
+
+#### BR-VAL-013: Certification Limit Per Vendor
+**Rule**: Each vendor can have a maximum of 20 certifications.
+
+**Validation**:
+```typescript
+const certificationCount = await prisma.tb_vendor_document.count({
+  where: {
+    vendor_id: vendorId,
+    info: {
+      path: ['isCertification'],
+      equals: true,
+    },
+    deleted_at: null,
+  },
+});
+
+if (certificationCount >= 20) {
+  throw new ValidationError(
+    'Maximum certification limit (20) reached. Please remove expired or obsolete certifications before adding new ones.'
+  );
+}
+```
+
+**Error Message**: "Maximum certification limit (20) reached. Please remove expired or obsolete certifications before adding new ones."
+
+### 3.6 Address Rules
+
+#### BR-VAL-014: Primary Address Requirement
+**Rule**: Each vendor must have exactly one primary address when addresses exist.
+
+**Validation**:
+```typescript
+const validatePrimaryAddress = async (vendorId: string): Promise<ValidationResult> => {
+  const addresses = await prisma.tb_vendor_address.findMany({
+    where: {
+      vendor_id: vendorId,
+      is_active: true,
+      deleted_at: null,
+    },
+  });
+
+  if (addresses.length === 0) {
+    return { valid: true }; // No addresses = no primary requirement
+  }
+
+  const primaryAddresses = addresses.filter(addr => addr.info?.isPrimary === true);
+
+  if (primaryAddresses.length === 0) {
+    return {
+      valid: false,
+      message: 'At least one address must be set as primary',
+    };
+  }
+
+  if (primaryAddresses.length > 1) {
+    return {
+      valid: false,
+      message: 'Only one address can be set as primary',
+    };
+  }
+
+  return { valid: true };
+};
+```
+
+**Error Message**: "At least one address must be designated as the primary address."
+
+#### BR-VAL-015: Address Limit Per Vendor
+**Rule**: Each vendor can have a maximum of 10 addresses.
+
+**Validation**:
+```typescript
+const addressCount = await prisma.tb_vendor_address.count({
+  where: {
+    vendor_id: vendorId,
+    deleted_at: null,
+  },
+});
+
+if (addressCount >= 10) {
+  throw new ValidationError(
+    'Maximum address limit (10) reached. Please remove unused addresses before adding new ones.'
+  );
+}
+```
+
+**Error Message**: "Maximum address limit (10) reached for this vendor."
+
+#### BR-VAL-016: Country-Specific Address Validation
+**Rule**: Address fields are validated based on the selected country's format requirements.
+
+**Country-Specific Requirements**:
+| Country | Sub-District Required | District Required | Province Required | Postal Code Format |
+|---------|----------------------|-------------------|-------------------|-------------------|
+| TH (Thailand) | Recommended | Required | Required | 5 digits |
+| SG (Singapore) | No | No | No | 6 digits |
+| MY (Malaysia) | No | No | Required (State) | 5 digits |
+| ID (Indonesia) | Required (Kelurahan) | Required (Kecamatan) | Required | 5 digits |
+| VN (Vietnam) | Required (Phường/Xã) | Required (Quận/Huyện) | Required | 6 digits |
+| PH (Philippines) | Required (Barangay) | No | Required | 4 digits |
+| JP (Japan) | No | No | Required (Prefecture) | 3-4 format (###-####) |
+| KR (South Korea) | No | Required (구/군) | Required (시/도) | 5 digits |
+| CN (China) | No | Required | Required | 6 digits |
+
+**Validation Example**:
+```typescript
+const countryRequirements: Record<string, CountryAddressRequirements> = {
+  'TH': { subDistrictRequired: false, districtRequired: true, provinceRequired: true },
+  'ID': { subDistrictRequired: true, districtRequired: true, provinceRequired: true },
+  'VN': { subDistrictRequired: true, districtRequired: true, provinceRequired: true },
+  'PH': { subDistrictRequired: true, districtRequired: false, provinceRequired: true },
+  'SG': { subDistrictRequired: false, districtRequired: false, provinceRequired: false },
+  // ... other countries
+};
+
+const validateAddressByCountry = (
+  address: VendorAddress,
+  country: string
+): ValidationResult => {
+  const requirements = countryRequirements[country];
+  if (!requirements) return { valid: true };
+
+  const errors: string[] = [];
+
+  if (requirements.subDistrictRequired && !address.subDistrict) {
+    errors.push('Sub-district is required for this country');
+  }
+  if (requirements.districtRequired && !address.district) {
+    errors.push('District is required for this country');
+  }
+  if (requirements.provinceRequired && !address.province) {
+    errors.push('Province/State is required for this country');
+  }
+
+  return errors.length > 0
+    ? { valid: false, errors }
+    : { valid: true };
+};
+```
 
 ---
 
@@ -898,52 +1549,364 @@ export const vendorDocumentSchema = z.object({
 export type VendorDocumentFormData = z.infer<typeof vendorDocumentSchema>;
 ```
 
-### 4.4 Address Schema
+### 4.4 Address Schema (Asian International Format)
 
 ```typescript
 // lib/schemas/address.schema.ts
 
 import { z } from 'zod';
 
+// Supported countries (ISO 3166-1 alpha-2)
+export const SUPPORTED_COUNTRIES = [
+  'TH', // Thailand
+  'SG', // Singapore
+  'MY', // Malaysia
+  'ID', // Indonesia
+  'VN', // Vietnam
+  'PH', // Philippines
+  'MM', // Myanmar
+  'KH', // Cambodia
+  'LA', // Laos
+  'BN', // Brunei
+  'CN', // China
+  'JP', // Japan
+  'KR', // South Korea
+  'IN', // India
+  'US', // United States
+] as const;
+
+export type SupportedCountry = typeof SUPPORTED_COUNTRIES[number];
+
+// Country-specific postal code patterns
+const postalCodePatterns: Record<SupportedCountry, RegExp> = {
+  TH: /^\d{5}$/,
+  SG: /^\d{6}$/,
+  MY: /^\d{5}$/,
+  ID: /^\d{5}$/,
+  VN: /^\d{6}$/,
+  PH: /^\d{4}$/,
+  MM: /^\d{5}$/,
+  KH: /^\d{5}$/,
+  LA: /^\d{5}$/,
+  BN: /^[A-Z]{2}\d{4}$/,
+  CN: /^\d{6}$/,
+  JP: /^\d{3}-\d{4}$/,
+  KR: /^\d{5}$/,
+  IN: /^\d{6}$/,
+  US: /^\d{5}(-\d{4})?$/,
+};
+
+// Country-specific field requirements
+interface CountryFieldRequirements {
+  subDistrictRequired: boolean;
+  districtRequired: boolean;
+  provinceRequired: boolean;
+  subDistrictLabel: string;
+  districtLabel: string;
+  provinceLabel: string;
+}
+
+const countryFieldRequirements: Record<SupportedCountry, CountryFieldRequirements> = {
+  TH: { subDistrictRequired: false, districtRequired: true, provinceRequired: true, subDistrictLabel: 'Tambon', districtLabel: 'Amphoe', provinceLabel: 'Province' },
+  SG: { subDistrictRequired: false, districtRequired: false, provinceRequired: false, subDistrictLabel: 'Sub-district', districtLabel: 'District', provinceLabel: 'Region' },
+  MY: { subDistrictRequired: false, districtRequired: false, provinceRequired: true, subDistrictLabel: 'Mukim', districtLabel: 'District', provinceLabel: 'State' },
+  ID: { subDistrictRequired: true, districtRequired: true, provinceRequired: true, subDistrictLabel: 'Kelurahan', districtLabel: 'Kecamatan', provinceLabel: 'Province' },
+  VN: { subDistrictRequired: true, districtRequired: true, provinceRequired: true, subDistrictLabel: 'Phường/Xã', districtLabel: 'Quận/Huyện', provinceLabel: 'Province/City' },
+  PH: { subDistrictRequired: true, districtRequired: false, provinceRequired: true, subDistrictLabel: 'Barangay', districtLabel: 'Municipality', provinceLabel: 'Province' },
+  MM: { subDistrictRequired: false, districtRequired: true, provinceRequired: true, subDistrictLabel: 'Ward', districtLabel: 'Township', provinceLabel: 'State/Region' },
+  KH: { subDistrictRequired: true, districtRequired: true, provinceRequired: true, subDistrictLabel: 'Sangkat', districtLabel: 'Khan/District', provinceLabel: 'Province' },
+  LA: { subDistrictRequired: false, districtRequired: true, provinceRequired: true, subDistrictLabel: 'Village', districtLabel: 'District', provinceLabel: 'Province' },
+  BN: { subDistrictRequired: false, districtRequired: true, provinceRequired: false, subDistrictLabel: 'Kampong', districtLabel: 'Mukim', provinceLabel: 'District' },
+  CN: { subDistrictRequired: false, districtRequired: true, provinceRequired: true, subDistrictLabel: 'Sub-district', districtLabel: 'District/County', provinceLabel: 'Province' },
+  JP: { subDistrictRequired: false, districtRequired: false, provinceRequired: true, subDistrictLabel: 'Chōme', districtLabel: 'Ward', provinceLabel: 'Prefecture' },
+  KR: { subDistrictRequired: false, districtRequired: true, provinceRequired: true, subDistrictLabel: 'Dong', districtLabel: 'Gu/Gun', provinceLabel: 'Province/City' },
+  IN: { subDistrictRequired: false, districtRequired: true, provinceRequired: true, subDistrictLabel: 'Locality', districtLabel: 'District', provinceLabel: 'State' },
+  US: { subDistrictRequired: false, districtRequired: false, provinceRequired: true, subDistrictLabel: 'Neighborhood', districtLabel: 'County', provinceLabel: 'State' },
+};
+
 export const vendorAddressSchema = z.object({
   addressType: z.enum(['contact_address', 'mailing_address', 'register_address']),
 
+  // Core address fields
   addressLine1: z.string()
     .min(5, 'Address must be at least 5 characters')
     .max(200, 'Address must not exceed 200 characters')
-    .regex(/^[a-zA-Z0-9\s\-\.\,\#]+$/, 'Address contains invalid characters'),
+    .regex(/^[a-zA-Z0-9\s\-\.\,\#\/\u0E00-\u0E7F\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]+$/,
+      'Address contains invalid characters'),
 
   addressLine2: z.string()
     .max(200, 'Address line 2 must not exceed 200 characters')
-    .regex(/^[a-zA-Z0-9\s\-\.\,\#]*$/, 'Address contains invalid characters')
-    .optional(),
+    .optional()
+    .or(z.literal('')),
+
+  // Asian International Format fields
+  subDistrict: z.string()
+    .max(100, 'Sub-district must not exceed 100 characters')
+    .optional()
+    .or(z.literal('')),
+
+  district: z.string()
+    .max(100, 'District must not exceed 100 characters')
+    .optional()
+    .or(z.literal('')),
 
   city: z.string()
     .min(2, 'City must be at least 2 characters')
-    .max(100, 'City must not exceed 100 characters')
-    .regex(/^[a-zA-Z\s\-\.]+$/, 'City contains invalid characters'),
+    .max(100, 'City must not exceed 100 characters'),
 
-  stateProvince: z.string()
-    .max(100, 'State/Province must not exceed 100 characters')
-    .optional(),
+  province: z.string()
+    .max(100, 'Province/State must not exceed 100 characters')
+    .optional()
+    .or(z.literal('')),
 
   postalCode: z.string()
     .min(3, 'Postal code must be at least 3 characters')
     .max(10, 'Postal code must not exceed 10 characters'),
 
-  country: z.string()
-    .length(2, 'Country code must be exactly 2 characters')
-    .regex(/^[A-Z]{2}$/, 'Country code must be uppercase letters'),
+  country: z.enum(SUPPORTED_COUNTRIES, {
+    errorMap: () => ({ message: 'Please select a supported country' }),
+  }),
 
+  // Primary/Active status
   isPrimary: z.boolean().default(false),
   isActive: z.boolean().default(true),
 
+  // Additional fields
   deliveryInstructions: z.string()
     .max(500, 'Delivery instructions must not exceed 500 characters')
     .optional(),
+
+}).superRefine((data, ctx) => {
+  // Country-specific postal code validation
+  const pattern = postalCodePatterns[data.country];
+  if (pattern && !pattern.test(data.postalCode)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Invalid postal code format for ${data.country}`,
+      path: ['postalCode'],
+    });
+  }
+
+  // Country-specific required field validation
+  const requirements = countryFieldRequirements[data.country];
+  if (requirements) {
+    if (requirements.subDistrictRequired && !data.subDistrict) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `${requirements.subDistrictLabel} is required for ${data.country}`,
+        path: ['subDistrict'],
+      });
+    }
+    if (requirements.districtRequired && !data.district) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `${requirements.districtLabel} is required for ${data.country}`,
+        path: ['district'],
+      });
+    }
+    if (requirements.provinceRequired && !data.province) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `${requirements.provinceLabel} is required for ${data.country}`,
+        path: ['province'],
+      });
+    }
+  }
 });
 
 export type VendorAddressFormData = z.infer<typeof vendorAddressSchema>;
+
+// Helper function to get field labels for a country
+export const getAddressFieldLabels = (country: SupportedCountry) => {
+  return countryFieldRequirements[country] || countryFieldRequirements.US;
+};
+```
+
+### 4.5 Certification Schema
+
+```typescript
+// lib/schemas/certification.schema.ts
+
+import { z } from 'zod';
+
+// 16 Certification Types
+export const CERTIFICATION_TYPES = [
+  'halal',
+  'iso_9001',
+  'iso_14001',
+  'iso_22000',
+  'iso_27001',
+  'haccp',
+  'gmp',
+  'organic',
+  'fair_trade',
+  'fda_approved',
+  'ce_marking',
+  'medical_device',
+  'food_safety',
+  'environmental',
+  'safety_compliance',
+  'other',
+] as const;
+
+export type CertificationType = typeof CERTIFICATION_TYPES[number];
+
+// Certification Status (auto-calculated)
+export const CERTIFICATION_STATUSES = [
+  'active',
+  'expiring_soon',
+  'expired',
+  'pending',
+] as const;
+
+export type CertificationStatus = typeof CERTIFICATION_STATUSES[number];
+
+// Certification type display names
+export const CERTIFICATION_TYPE_LABELS: Record<CertificationType, string> = {
+  halal: 'Halal Certification',
+  iso_9001: 'ISO 9001 (Quality Management)',
+  iso_14001: 'ISO 14001 (Environmental Management)',
+  iso_22000: 'ISO 22000 (Food Safety Management)',
+  iso_27001: 'ISO 27001 (Information Security)',
+  haccp: 'HACCP (Hazard Analysis)',
+  gmp: 'GMP (Good Manufacturing Practice)',
+  organic: 'Organic Certification',
+  fair_trade: 'Fair Trade Certification',
+  fda_approved: 'FDA Approved',
+  ce_marking: 'CE Marking',
+  medical_device: 'Medical Device Certification',
+  food_safety: 'Food Safety Certification',
+  environmental: 'Environmental Compliance',
+  safety_compliance: 'Safety Compliance',
+  other: 'Other Certification',
+};
+
+// Status calculation function
+export const calculateCertificationStatus = (expiryDate: Date | null): CertificationStatus => {
+  if (!expiryDate) return 'pending';
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const expiry = new Date(expiryDate);
+  expiry.setHours(0, 0, 0, 0);
+
+  const thirtyDaysFromNow = new Date(today);
+  thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+  if (expiry < today) {
+    return 'expired';
+  } else if (expiry <= thirtyDaysFromNow) {
+    return 'expiring_soon';
+  } else {
+    return 'active';
+  }
+};
+
+export const vendorCertificationSchema = z.object({
+  // Certification Type
+  certificationType: z.enum(CERTIFICATION_TYPES, {
+    errorMap: () => ({ message: 'Please select a certification type' }),
+  }),
+
+  // Certificate Details
+  certificateNumber: z.string()
+    .min(1, 'Certificate number is required')
+    .max(100, 'Certificate number must not exceed 100 characters')
+    .regex(/^[A-Z0-9\-\/\.]+$/i, 'Certificate number contains invalid characters'),
+
+  certificateName: z.string()
+    .min(1, 'Certificate name is required')
+    .max(200, 'Certificate name must not exceed 200 characters'),
+
+  issuingAuthority: z.string()
+    .min(1, 'Issuing authority is required')
+    .max(200, 'Issuing authority must not exceed 200 characters'),
+
+  // Dates
+  issueDate: z.coerce.date()
+    .max(new Date(), 'Issue date cannot be in the future')
+    .refine((date) => {
+      const fiftyYearsAgo = new Date();
+      fiftyYearsAgo.setFullYear(fiftyYearsAgo.getFullYear() - 50);
+      return date >= fiftyYearsAgo;
+    }, 'Issue date is too far in the past'),
+
+  expiryDate: z.coerce.date()
+    .optional()
+    .nullable(),
+
+  // Document Upload
+  documentFile: z.object({
+    fileName: z.string()
+      .min(1, 'Document file name is required')
+      .max(255, 'File name must not exceed 255 characters'),
+    fileSize: z.number()
+      .max(50 * 1024 * 1024, 'File size must not exceed 50MB'),
+    mimeType: z.enum([
+      'application/pdf',
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+    ], {
+      errorMap: () => ({ message: 'Only PDF, JPEG, PNG, and GIF files are allowed' }),
+    }),
+    url: z.string().url('Invalid document URL'),
+  }).optional(),
+
+  // Notes
+  notes: z.string()
+    .max(1000, 'Notes must not exceed 1000 characters')
+    .optional()
+    .or(z.literal('')),
+
+  // Flags
+  isActive: z.boolean().default(true),
+  autoNotifyBeforeExpiry: z.boolean().default(true),
+  notifyDaysBefore: z.number()
+    .int('Notification days must be a whole number')
+    .min(1, 'Notification must be at least 1 day before')
+    .max(90, 'Notification must not exceed 90 days before')
+    .default(30),
+
+}).superRefine((data, ctx) => {
+  // Expiry date must be after issue date
+  if (data.expiryDate && data.issueDate) {
+    if (data.expiryDate <= data.issueDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Expiry date must be after issue date',
+        path: ['expiryDate'],
+      });
+    }
+  }
+});
+
+export type VendorCertificationFormData = z.infer<typeof vendorCertificationSchema>;
+
+// Helper function to get certification display name
+export const getCertificationDisplayName = (type: CertificationType): string => {
+  return CERTIFICATION_TYPE_LABELS[type] || type;
+};
+
+// Helper function to get status badge styling
+export const getCertificationStatusStyle = (status: CertificationStatus): {
+  badge: string;
+  text: string;
+  icon: string;
+} => {
+  switch (status) {
+    case 'active':
+      return { badge: 'bg-green-100 text-green-800', text: 'Active', icon: 'CheckCircle' };
+    case 'expiring_soon':
+      return { badge: 'bg-yellow-100 text-yellow-800', text: 'Expiring Soon', icon: 'AlertTriangle' };
+    case 'expired':
+      return { badge: 'bg-red-100 text-red-800', text: 'Expired', icon: 'XCircle' };
+    case 'pending':
+      return { badge: 'bg-gray-100 text-gray-800', text: 'Pending', icon: 'Clock' };
+    default:
+      return { badge: 'bg-gray-100 text-gray-800', text: 'Unknown', icon: 'HelpCircle' };
+  }
+};
 ```
 
 ---
@@ -1049,6 +2012,20 @@ if (status === 'approved') {
 | VEN-013 | Invalid file type | Only PDF, DOC, DOCX, XLS, XLSX, JPG, and PNG files are allowed. |
 | VEN-014 | Expiry date before issue date | The expiry date must be after the issue date. |
 | VEN-015 | Credit limit exceeded | This purchase order exceeds the vendor's credit limit. Additional approval required. |
+| CERT-001 | Duplicate certification type | An active [Certification Type] certification already exists for this vendor. Please update the existing certification. |
+| CERT-002 | Certification limit exceeded | Maximum certification limit (20) reached. Please remove expired or obsolete certifications before adding new ones. |
+| CERT-003 | Missing required certifications | The following certifications are required for this vendor type: [List]. Please add them before approval. |
+| CERT-004 | Certificate number invalid | Certificate number contains invalid characters. Only letters, numbers, hyphens, slashes, and dots are allowed. |
+| CERT-005 | Certification expiring soon | Warning: This certification will expire on [DATE]. Please initiate renewal process. |
+| CERT-006 | Certification expired | This certification has expired on [DATE]. Please upload a renewed certificate or remove this certification. |
+| CERT-007 | Issuing authority required | Issuing authority is required for all certifications. |
+| ADDR-001 | Primary address required | At least one address must be designated as the primary address. |
+| ADDR-002 | Multiple primary addresses | Only one address can be set as primary. Please deselect other primary addresses first. |
+| ADDR-003 | Address limit exceeded | Maximum address limit (10) reached for this vendor. Please remove unused addresses first. |
+| ADDR-004 | Invalid postal code format | Invalid postal code format for [COUNTRY]. Expected format: [FORMAT]. |
+| ADDR-005 | Missing required address field | [FIELD_NAME] is required for addresses in [COUNTRY]. |
+| ADDR-006 | Unsupported country | The selected country is not currently supported. Supported countries: Thailand, Singapore, Malaysia, Indonesia, Vietnam, Philippines, Myanmar, Cambodia, Laos, Brunei, China, Japan, South Korea, India, United States. |
+| ADDR-007 | Cannot delete primary address | Cannot delete the primary address. Please set another address as primary first or delete all other addresses. |
 
 ### 6.2 Technical Error Logs
 
@@ -1094,6 +2071,28 @@ logger.error({
 | UT-VEN-008 | Payment days | 400 | Error: Must be ≤ 365 |
 | UT-VEN-009 | Expiry before issue | issue: 2024-01-15, expiry: 2024-01-10 | Error: Expiry must be after issue |
 | UT-VEN-010 | File size | 60MB | Error: Exceeds 50MB limit |
+| UT-CERT-001 | Certification type | "halal" | Success |
+| UT-CERT-002 | Certification type | "invalid_type" | Error: Invalid certification type |
+| UT-CERT-003 | Certificate number format | "CERT/2024-001" | Success |
+| UT-CERT-004 | Certificate number format | "CERT@#$%" | Error: Invalid characters |
+| UT-CERT-005 | Certificate number length | "A".repeat(101) | Error: Exceeds 100 characters |
+| UT-CERT-006 | Status calculation | expiryDate: 45 days from now | Status: active |
+| UT-CERT-007 | Status calculation | expiryDate: 20 days from now | Status: expiring_soon |
+| UT-CERT-008 | Status calculation | expiryDate: yesterday | Status: expired |
+| UT-CERT-009 | Status calculation | expiryDate: null | Status: pending |
+| UT-CERT-010 | Issuing authority | "" (empty) | Error: Issuing authority required |
+| UT-ADDR-001 | Country code | "TH" | Success |
+| UT-ADDR-002 | Country code | "XX" | Error: Unsupported country |
+| UT-ADDR-003 | Thai postal code | "10110" | Success |
+| UT-ADDR-004 | Thai postal code | "1234" | Error: Invalid format (5 digits required) |
+| UT-ADDR-005 | Singapore postal code | "123456" | Success |
+| UT-ADDR-006 | Singapore postal code | "12345" | Error: Invalid format (6 digits required) |
+| UT-ADDR-007 | Japan postal code | "123-4567" | Success |
+| UT-ADDR-008 | Japan postal code | "1234567" | Error: Invalid format (###-#### required) |
+| UT-ADDR-009 | Indonesia district | country: "ID", district: "" | Error: Kecamatan required |
+| UT-ADDR-010 | Vietnam sub-district | country: "VN", subDistrict: "" | Error: Phường/Xã required |
+| UT-ADDR-011 | Address line 1 (Thai chars) | "123 ถนนสุขุมวิท" | Success |
+| UT-ADDR-012 | Address line 1 (Chinese chars) | "北京市朝阳区" | Success |
 
 ### 7.2 Integration Test Cases
 
@@ -1104,23 +2103,27 @@ logger.error({
 | IT-VEN-003 | Block vendor with active PO | 1. Create vendor<br/>2. Create PO<br/>3. Try to block | Warning: Active PO exists |
 | IT-VEN-004 | Approve own submission | 1. User A creates vendor<br/>2. User A tries to approve | Error: Self-approval |
 | IT-VEN-005 | Upload invalid file type | 1. Select .exe file<br/>2. Try to upload | Error: Invalid file type |
-
----
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial creation |
+| IT-CERT-001 | Add duplicate certification type | 1. Add Halal certification<br/>2. Try to add another Halal certification | Error: Duplicate type |
+| IT-CERT-002 | Certification limit reached | 1. Add 20 certifications<br/>2. Try to add 21st certification | Error: Limit exceeded |
+| IT-CERT-003 | Status auto-calculation | 1. Add certification with expiry in 15 days<br/>2. View certification list | Status shows "Expiring Soon" |
+| IT-CERT-004 | Required certifications check | 1. Create food supplier vendor<br/>2. Try to approve without Halal/Food Safety cert | Warning: Required certifications missing |
+| IT-CERT-005 | Edit expired certification | 1. View expired certification<br/>2. Update expiry date to future | Status changes to "Active" |
+| IT-ADDR-001 | Add duplicate primary address | 1. Add address as primary<br/>2. Try to add another primary address | Existing primary auto-deselected |
+| IT-ADDR-002 | Address limit reached | 1. Add 10 addresses<br/>2. Try to add 11th address | Error: Limit exceeded |
+| IT-ADDR-003 | Delete primary address | 1. Have 2 addresses, one primary<br/>2. Delete primary address | Error: Set another as primary first |
+| IT-ADDR-004 | Country-specific validation (ID) | 1. Select Indonesia<br/>2. Leave district empty<br/>3. Try to save | Error: Kecamatan required |
+| IT-ADDR-005 | Country-specific postal code (TH) | 1. Select Thailand<br/>2. Enter 6-digit postal code<br/>3. Try to save | Error: Invalid format |
+| IT-ADDR-006 | Set primary address | 1. Have 3 addresses, none primary<br/>2. Set one as primary | Selected becomes primary, others unchanged |
+| IT-ADDR-007 | Address with Thai characters | 1. Select Thailand<br/>2. Enter address with Thai characters<br/>3. Save | Success |
 
 ---
 
 ## Related Documents
-- BR-vendor-directory.md - Business Requirements
-- UC-vendor-directory.md - Use Cases
-- TS-vendor-directory.md - Technical Specification
-- FD-vendor-directory.md - Flow Diagrams
-- data-structure-gaps.md - Data Structure Analysis
+- [BR-vendor-directory.md](BR-vendor-directory.md) - Business Requirements (v2.2.0)
+- [DD-vendor-directory.md](DD-vendor-directory.md) - Data Dictionary (v2.2.0)
+- [UC-vendor-directory.md](UC-vendor-directory.md) - Use Cases (v2.2.0)
+- [TS-vendor-directory.md](TS-vendor-directory.md) - Technical Specification (v2.2.0)
+- [FD-vendor-directory.md](FD-vendor-directory.md) - Flow Diagrams (v2.2.0)
 
 ---
 

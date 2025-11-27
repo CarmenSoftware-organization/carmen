@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useCallback, useMemo, memo } from 'react';
-import { Search, ChevronRight, ChevronDown, Plus, Edit, Trash2, Folder, Package2, Layers3, GripVertical, X, AlertTriangle } from 'lucide-react';
+import { Search, ChevronRight, ChevronDown, Plus, Edit, Trash2, Folder, Package2, Layers3, GripVertical, X, AlertTriangle, Home } from 'lucide-react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { 
@@ -19,6 +19,14 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
 
 // Import centralized types
@@ -32,6 +40,8 @@ interface TreeNodeProps extends CategoryTreeOperations {
   level: number;
   isSearching?: boolean;
   searchTerm?: string;
+  isSelected?: boolean;
+  onSelect?: (id: string) => void;
 }
 
 // Category level constants with better type safety
@@ -96,7 +106,7 @@ const initialCategories: CategoryItem[] = [
   }
 ];
 
-const TreeNode = memo<TreeNodeProps>(({ item, level, onMove, onDelete, onEdit, onAdd, isSearching, searchTerm }) => {
+const TreeNode = memo<TreeNodeProps>(({ item, level, onMove, onDelete, onEdit, onAdd, isSearching, searchTerm, isSelected, onSelect }) => {
   const [isExpanded, setIsExpanded] = useState(item.isExpanded ?? true);
   const [isEditing, setIsEditing] = useState(item.isEditing ?? false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -147,18 +157,19 @@ const TreeNode = memo<TreeNodeProps>(({ item, level, onMove, onDelete, onEdit, o
   // Memoized level-specific styling with enhanced visual hierarchy
   const levelStyles = useMemo(() => {
     const baseStyles = 'transition-all duration-200 ease-in-out';
-    
+    const selectedStyles = isSelected ? 'ring-2 ring-primary/50 ring-offset-1 bg-primary/10' : '';
+
     switch (item.type) {
       case 'CATEGORY':
-        return cn(baseStyles, 'bg-muted/50 hover:bg-muted/70 font-semibold border-l-4 border-l-primary/60 shadow-sm');
+        return cn(baseStyles, selectedStyles, 'bg-muted/50 hover:bg-muted/70 font-semibold border-l-4 border-l-primary/60 shadow-sm');
       case 'SUBCATEGORY':
-        return cn(baseStyles, 'bg-card hover:bg-muted/30 border-l-4 border-l-orange-400/60');
+        return cn(baseStyles, selectedStyles, 'bg-card hover:bg-muted/30 border-l-4 border-l-orange-400/60');
       case 'ITEM_GROUP':
-        return cn(baseStyles, 'bg-card hover:bg-muted/30 border-l-4 border-l-emerald-400/60');
+        return cn(baseStyles, selectedStyles, 'bg-card hover:bg-muted/30 border-l-4 border-l-emerald-400/60');
       default:
-        return baseStyles;
+        return cn(baseStyles, selectedStyles);
     }
-  }, [item.type]);
+  }, [item.type, isSelected]);
 
   // Memoized type icon component
   const TypeIcon = useMemo(() => {
@@ -217,7 +228,7 @@ const TreeNode = memo<TreeNodeProps>(({ item, level, onMove, onDelete, onEdit, o
           isOver && "ring-2 ring-primary/50 ring-offset-2"
         )}
       >
-      <div 
+      <div
         ref={dragDropRef}
         style={getIndentStyle}
         className={cn(
@@ -229,12 +240,14 @@ const TreeNode = memo<TreeNodeProps>(({ item, level, onMove, onDelete, onEdit, o
         )}
         role="treeitem"
         aria-expanded={item.children ? isExpanded : undefined}
-        aria-selected={false}
+        aria-selected={isSelected}
         aria-label={`${item.name} - ${CATEGORY_LEVELS[item.type]} with ${item.itemCount} items`}
         tabIndex={0}
+        onClick={() => onSelect?.(item.id)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
+            onSelect?.(item.id);
             if (item.children) setIsExpanded(!isExpanded);
           }
         }}
@@ -411,6 +424,7 @@ const TreeNode = memo<TreeNodeProps>(({ item, level, onMove, onDelete, onEdit, o
                 onAdd={onAdd}
                 isSearching={isSearching}
                 searchTerm={searchTerm}
+                onSelect={onSelect}
               />
             </div>
           ))}
@@ -469,12 +483,71 @@ const TreeNode = memo<TreeNodeProps>(({ item, level, onMove, onDelete, onEdit, o
 // Add display name for better debugging
 TreeNode.displayName = 'TreeNode';
 
+// Breadcrumb navigation component (FR-CAT-007)
+interface CategoryBreadcrumbProps {
+  path: CategoryItem[];
+  onNavigate: (categoryId: string | null) => void;
+}
+
+const CategoryBreadcrumb = memo<CategoryBreadcrumbProps>(({ path, onNavigate }) => {
+  if (path.length === 0) return null;
+
+  return (
+    <Breadcrumb className="mb-4">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink
+            className="cursor-pointer hover:text-primary flex items-center gap-1"
+            onClick={() => onNavigate(null)}
+          >
+            <Home className="h-3 w-3" />
+            <span className="text-xs">All Categories</span>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        {path.map((item, index) => {
+          const isLast = index === path.length - 1;
+          return (
+            <React.Fragment key={item.id}>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-3 w-3" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                {isLast ? (
+                  <BreadcrumbPage className="text-xs font-medium flex items-center gap-1">
+                    {item.type === 'CATEGORY' && <Folder className="h-3 w-3 text-primary/70" />}
+                    {item.type === 'SUBCATEGORY' && <Package2 className="h-3 w-3 text-orange-500/70" />}
+                    {item.type === 'ITEM_GROUP' && <Layers3 className="h-3 w-3 text-emerald-500/70" />}
+                    {item.name}
+                  </BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink
+                    className="cursor-pointer hover:text-primary text-xs flex items-center gap-1"
+                    onClick={() => onNavigate(item.id)}
+                  >
+                    {item.type === 'CATEGORY' && <Folder className="h-3 w-3 text-primary/70" />}
+                    {item.type === 'SUBCATEGORY' && <Package2 className="h-3 w-3 text-orange-500/70" />}
+                    {item.type === 'ITEM_GROUP' && <Layers3 className="h-3 w-3 text-emerald-500/70" />}
+                    {item.name}
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+            </React.Fragment>
+          );
+        })}
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+});
+
+CategoryBreadcrumb.displayName = 'CategoryBreadcrumb';
+
 // Main component with comprehensive optimizations
 export default function ProductCategoryTree() {
   const [categories, setCategories] = useState<CategoryItem[]>(initialCategories);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
   // Helper function to generate unique ID
   const generateId = () => {
@@ -511,6 +584,32 @@ export default function ProductCategoryTree() {
       }
     }
     return null;
+  }, []);
+
+  // Build breadcrumb path to a category (FR-CAT-007)
+  const buildBreadcrumbPath = useCallback((items: CategoryItem[], targetId: string, path: CategoryItem[] = []): CategoryItem[] | null => {
+    for (const item of items) {
+      const currentPath = [...path, item];
+      if (item.id === targetId) {
+        return currentPath;
+      }
+      if (item.children) {
+        const result = buildBreadcrumbPath(item.children, targetId, currentPath);
+        if (result) return result;
+      }
+    }
+    return null;
+  }, []);
+
+  // Compute breadcrumb path based on selected category
+  const breadcrumbPath = useMemo(() => {
+    if (!selectedCategoryId) return [];
+    return buildBreadcrumbPath(categories, selectedCategoryId) || [];
+  }, [categories, selectedCategoryId, buildBreadcrumbPath]);
+
+  // Handle breadcrumb navigation
+  const handleBreadcrumbNavigate = useCallback((categoryId: string | null) => {
+    setSelectedCategoryId(categoryId);
   }, []);
 
   // Add new category
@@ -669,6 +768,14 @@ export default function ProductCategoryTree() {
     <>
       <NetworkStatus />
       <DndProvider backend={HTML5Backend}>
+      {/* Breadcrumb Navigation (FR-CAT-007) */}
+      {breadcrumbPath.length > 0 && (
+        <CategoryBreadcrumb
+          path={breadcrumbPath}
+          onNavigate={handleBreadcrumbNavigate}
+        />
+      )}
+
       {/* Search and Filter Row */}
       <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mb-6">
         <div className="relative flex-1 sm:flex-initial sm:w-80">
@@ -770,7 +877,7 @@ export default function ProductCategoryTree() {
         ) : (
           <div className="divide-y divide-border">
             {filteredCategories.map((category, index) => (
-              <div 
+              <div
                 key={category.id}
                 style={{ animationDelay: `${index * 100}ms` }}
                 className="animate-in slide-in-from-left-5 fade-in-50 duration-300"
@@ -784,6 +891,8 @@ export default function ProductCategoryTree() {
                   onAdd={handleAdd}
                   isSearching={!!searchQuery}
                   searchTerm={searchQuery}
+                  isSelected={selectedCategoryId === category.id}
+                  onSelect={setSelectedCategoryId}
                 />
               </div>
             ))}

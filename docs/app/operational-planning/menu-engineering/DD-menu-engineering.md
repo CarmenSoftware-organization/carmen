@@ -6,6 +6,12 @@
 - **Version**: 1.0
 - **Last Updated**: 2024-01-15
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial data schema document created |
+
 ---
 
 ## 1. Database Schema (PostgreSQL)
@@ -14,7 +20,6 @@
 
 Stores calculated performance metrics for menu items over specific time periods.
 | 1.1.0 | 2025-11-15 | Documentation Team | Migrated from DS to DD format |
-
 
 ```sql
 CREATE TABLE menu_item_performance (
@@ -1542,9 +1547,3 @@ INSERT INTO competitor_items (
 ```
 
 ---
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial data schema document created |

@@ -32,7 +32,7 @@ import { CalendarIcon, Download, FileDown, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { BalanceReportParams } from "../types"
-import { MovementHistoryData, MovementRecord, generateMockMovementHistory } from "../mock-movement-data"
+import { MovementHistoryData, MovementRecord, generateMockMovementHistory } from "@/lib/mock-data"
 import { formatCurrency, formatNumber } from "../utils"
 
 interface MovementHistoryProps {

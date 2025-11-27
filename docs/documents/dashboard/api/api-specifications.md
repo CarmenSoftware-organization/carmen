@@ -1,5 +1,10 @@
 # Dashboard API Specifications
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 This document defines the API endpoints, data models, and integration specifications for the Dashboard module. Currently using mock data; this specification serves as the blueprint for backend implementation.

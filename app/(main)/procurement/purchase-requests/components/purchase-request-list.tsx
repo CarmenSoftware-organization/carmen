@@ -54,8 +54,8 @@ import ListPageTemplate from "@/components/templates/ListPageTemplate";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import { AdvancedFilter } from '@/components/ui/advanced-filter'
 import { FilterType } from '@/lib/utils/filter-storage'
-import { PurchaseRequest, PRType, DocumentStatus, WorkflowStatus, WorkflowStage, MockPurchaseRequest } from '@/lib/types'
-import { mockPRListData } from './mockPRListData'
+import { PurchaseRequest, PRType, PRStatus, WorkflowStatus, WorkflowStage, MockPurchaseRequest } from '@/lib/types'
+import { mockPurchaseRequests } from '@/lib/mock-data'
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -100,7 +100,7 @@ interface SortConfig {
 }
 
 // Use mockup data from our comprehensive PR list - Cast to ExtendedPurchaseRequest for compatibility
-const sampleData: ExtendedPurchaseRequest[] = mockPRListData as ExtendedPurchaseRequest[];
+const sampleData: ExtendedPurchaseRequest[] = mockPurchaseRequests as ExtendedPurchaseRequest[];
 
 const filterFields: { value: keyof ExtendedPurchaseRequest; label: string }[] = [
   { value: 'refNumber', label: 'PR Number' },
@@ -281,7 +281,7 @@ export function PurchaseRequestList() {
   const [selectedPRs, setSelectedPRs] = useState<string[]>([]);
   const [advancedFilters, setAdvancedFilters] = useState<FilterType<ExtendedPurchaseRequest>[]>([]);
   const [filteredData, setFilteredData] = useState<ExtendedPurchaseRequest[]>(sampleData);
-  const [filterStatus, setFilterStatus] = useState<DocumentStatus | 'All'>('All');
+  const [filterStatus, setFilterStatus] = useState<PRStatus | 'All'>('All');
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
   const [isMounted, setIsMounted] = React.useState(false);
   const [viewMode, setViewMode] = React.useState<'table' | 'card'>('table');
@@ -302,20 +302,21 @@ export function PurchaseRequestList() {
   // Load RBAC configuration and available widgets
   useEffect(() => {
     if (user) {
-      // Get role configuration from RBAC service
-      const config = PRRBACService.getRoleConfiguration(user.role);
+      // Get the actual role NAME from user context, not the role ID
+      const userRoleName = user.context?.currentRole?.name || '';
+
+      // Get role configuration from RBAC service using role NAME
+      const config = PRRBACService.getRoleConfiguration(userRoleName);
       setRoleConfig(config);
-      
+
       // Determine available widgets based on role configuration
       const widgets = [];
       // Always add myPending for all users
       widgets.push('myPending');
-      
+
       // Add allDocument for admins, managers, or users with elevated access
-      if (user.role === 'System Administrator' || 
-          user.role === 'Department Manager' || 
-          user.role === 'Purchasing Staff' ||
-          config.visibilitySetting === 'full') {
+      const elevatedRoles = ['System Administrator', 'Department Manager', 'Purchasing Staff', 'Financial Manager', 'General Manager'];
+      if (elevatedRoles.includes(userRoleName) || config.visibilitySetting === 'full') {
         widgets.push('allDocument');
       }
       
@@ -459,16 +460,16 @@ export function PurchaseRequestList() {
         const userAssignedStages = user?.assignedWorkflowStages || [];
         result = result.filter(pr => {
           // PRs created by user that are not completed yet
-          const myUncompletedPRs = pr.requestorId === currentUserId && 
-            pr.status !== DocumentStatus.Completed;
-          
+          const myUncompletedPRs = pr.requestorId === currentUserId &&
+            pr.status !== PRStatus.Completed;
+
           // PRs pending my approval (if user has assigned stages)
           const pendingMyApproval = userAssignedStages.length > 0 ?
             userAssignedStages.includes(pr.currentWorkflowStage || '') &&
-            [DocumentStatus.Draft, DocumentStatus.InProgress].includes(pr.status) : false;
+            [PRStatus.Draft, PRStatus.InProgress].includes(pr.status as PRStatus) : false;
 
           // For demo purposes: if no user context, show all non-completed items
-          const demoMode = !user?.id && [DocumentStatus.Draft, DocumentStatus.InProgress].includes(pr.status);
+          const demoMode = !user?.id && [PRStatus.Draft, PRStatus.InProgress].includes(pr.status as PRStatus);
           
           return myUncompletedPRs || pendingMyApproval || demoMode;
         });
@@ -555,11 +556,11 @@ export function PurchaseRequestList() {
         const userAssignedStages = user?.assignedWorkflowStages || [];
         baseData = baseData.filter(pr => {
           const myUncompletedPRs = pr.requestorId === currentUserId &&
-            pr.status !== DocumentStatus.Completed;
+            pr.status !== PRStatus.Completed;
           const pendingMyApproval = userAssignedStages.length > 0 ?
             userAssignedStages.includes(pr.currentWorkflowStage || '') &&
-            [DocumentStatus.Draft, DocumentStatus.InProgress].includes(pr.status) : false;
-          const demoMode = !user?.id && [DocumentStatus.Draft, DocumentStatus.InProgress].includes(pr.status);
+            [PRStatus.Draft, PRStatus.InProgress].includes(pr.status as PRStatus) : false;
+          const demoMode = !user?.id && [PRStatus.Draft, PRStatus.InProgress].includes(pr.status as PRStatus);
           return myUncompletedPRs || pendingMyApproval || demoMode;
         });
         break;
@@ -597,8 +598,8 @@ export function PurchaseRequestList() {
           { value: 'all', label: 'All Status' }
         ];
         
-        // Add all DocumentStatus enum values
-        Object.values(DocumentStatus).forEach(status => {
+        // Add all PRStatus enum values
+        Object.values(PRStatus).forEach(status => {
           statusFilters.push({
             value: status,
             label: status.replace(/([A-Z])/g, ' $1').trim()

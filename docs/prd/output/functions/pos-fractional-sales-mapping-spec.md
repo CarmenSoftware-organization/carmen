@@ -1,5 +1,10 @@
 # POS Fractional Sales Mapping Functional Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 The POS Fractional Sales Mapping system provides comprehensive integration between Point of Sale systems and the Carmen ERP's fractional sales management. This component enables seamless mapping of POS items to recipe variants, supporting complex scenarios where multiple POS items (pizza slice, half pizza, whole pizza) map to different yield variants of the same base recipe.
 

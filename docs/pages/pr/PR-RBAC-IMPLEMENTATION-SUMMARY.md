@@ -1,5 +1,10 @@
 # Purchase Request RBAC Implementation Summary
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document summarizes the implementation of Role-Based Access Control (RBAC) for the Purchase Request module, focusing on the PR details page and item actions.
 
 ## 1. RBAC Service Implementation

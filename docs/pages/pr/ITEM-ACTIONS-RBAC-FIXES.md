@@ -1,5 +1,10 @@
 # Purchase Request Item Actions: RBAC Fixes
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document summarizes the fixes made to correct the item action labels and RBAC inconsistencies in the Purchase Request details.
 
 ## 🚨 **Issues Identified**

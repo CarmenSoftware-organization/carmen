@@ -14,7 +14,6 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-01-11 | System | Initial version based on UI prototype and inventory transactions system |
 
----
 
 ## Overview
 
@@ -782,7 +781,6 @@ interface StockInActivity {
 |---------|------|--------|---------|
 | 1.0.0 | 2025-01-11 | System | Initial version based on UI prototype analysis and Inventory Transactions system documentation |
 
----
 
 ## References
 

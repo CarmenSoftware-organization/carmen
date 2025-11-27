@@ -16,6 +16,11 @@ This document defines comprehensive validation rules for inventory transactions 
 - [Business Requirements](./BR-inventory-transactions.md)
 - [Use Cases](./UC-inventory-transactions.md)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Validation Categories

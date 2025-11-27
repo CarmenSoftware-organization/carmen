@@ -49,7 +49,7 @@ export type {
   Requestor
 } from './procurement'
 
-export { GRNStatus, PurchaseOrderStatus, PRType, WorkflowStage } from './procurement'
+export { GRNStatus, PurchaseOrderStatus, PRType, PRStatus, WorkflowStage } from './procurement'
 
 // Vendor management types (PRIMARY SOURCE for VendorStatus)
 export type {
@@ -70,6 +70,7 @@ export type {
   ProductSpecification,
   ProductCategory,
   ProductStatus,
+  ProductUnit,
   CategoryType,
   CategoryItem,
   CategoryDragItem,
@@ -81,8 +82,12 @@ export type {
 export type {
   Recipe,
   RecipeCategory,
+  CuisineType,
   RecipeStatus,
-  RecipeCostBreakdown
+  RecipeCostBreakdown,
+  Ingredient,
+  PreparationStep,
+  RecipeYieldVariant
 } from './recipe'
 
 // Finance types (PRIMARY SOURCE for Currency, CostCenter)
@@ -139,6 +144,9 @@ export * from './mock'
 
 // Menu engineering types
 export * from './menu-engineering'
+
+// POS Recipe Mapping types
+export * from './pos-recipe-mapping'
 
 // POS Integration types
 // NOTE: Exclude FileAttachment (already exported from common.ts)
@@ -224,6 +232,9 @@ export type {
 // =============================================================================
 // TYPE UTILITIES
 // =============================================================================
+
+// Location management types
+export * from './location-management'
 
 // Type utilities and guards
 export * from './guards'

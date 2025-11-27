@@ -18,8 +18,7 @@ import {
   FractionalInventoryDeduction
 } from '@/lib/types/enhanced-consumption-tracking'
 
-import { Recipe, RecipeYieldVariant, Ingredient } from '@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes'
-import { RecipeMapping } from '@/app/(main)/system-administration/system-integrations/pos/mapping/recipes/types'
+import { Recipe, RecipeYieldVariant, Ingredient, RecipeMapping } from '@/lib/types'
 import { FractionalStockDeductionService, POSTransaction } from './fractional-stock-deduction-service'
 
 export class EnhancedConsumptionTrackingService {
@@ -119,7 +118,7 @@ export class EnhancedConsumptionTrackingService {
       const mapping = mappingLookup.get(transaction.posItemCode)
       if (!mapping) continue
 
-      const recipe = recipeLookup.get(mapping.recipeCode)
+      const recipe = recipeLookup.get(mapping.recipeId)
       if (!recipe) continue
 
       // Calculate cost using recipe data
@@ -127,13 +126,14 @@ export class EnhancedConsumptionTrackingService {
       if (!variant) continue
 
       // Enhance transaction with calculated data
+      const costPerUnitAmount = variant.costPerUnit.amount
       const enhancedTransaction: FractionalSalesTransaction = {
         ...transaction,
         baseRecipeId: recipe.id,
         baseRecipeName: recipe.name,
         conversionRate: variant.conversionRate,
-        costPrice: variant.costPerUnit * transaction.quantitySold,
-        grossProfit: transaction.salePrice - (variant.costPerUnit * transaction.quantitySold)
+        costPrice: costPerUnitAmount * transaction.quantitySold,
+        grossProfit: transaction.salePrice - (costPerUnitAmount * transaction.quantitySold)
       }
 
       processedTransactions.push(enhancedTransaction)
@@ -213,7 +213,7 @@ export class EnhancedConsumptionTrackingService {
     
     for (const [ingredientId, data] of ingredientConsumption) {
       const quantityVariance = data.actual - data.theoretical
-      const costVariance = quantityVariance * data.ingredient.costPerUnit
+      const costVariance = quantityVariance * data.ingredient.costPerUnit.amount
       const variancePercentage = data.theoretical > 0 ? 
         (quantityVariance / data.theoretical) * 100 : 0
 
@@ -223,9 +223,9 @@ export class EnhancedConsumptionTrackingService {
         ingredientName: data.ingredient.name,
         ingredientType: data.ingredient.type,
         theoreticalQuantity: data.theoretical,
-        theoreticalCost: data.theoretical * data.ingredient.costPerUnit,
+        theoreticalCost: data.theoretical * data.ingredient.costPerUnit.amount,
         actualQuantity: data.actual,
-        actualCost: data.actual * data.ingredient.costPerUnit,
+        actualCost: data.actual * data.ingredient.costPerUnit.amount,
         quantityVariance,
         costVariance,
         variancePercentage,
@@ -348,8 +348,8 @@ export class EnhancedConsumptionTrackingService {
         remainingInventory: 0, // Would need real inventory data
         variantSales,
         totalIngredientCost: recipeIngredientCost,
-        totalLaborCost: recipeIngredientCost * (data.recipe.laborCostPercentage / 100),
-        totalOverheadCost: recipeIngredientCost * (data.recipe.overheadPercentage / 100),
+        totalLaborCost: (data.recipe.laborCostPerPortion?.amount || 0) * totalSold,
+        totalOverheadCost: (data.recipe.overheadCostPerPortion?.amount || 0) * totalSold,
         totalCost,
         totalRevenue,
         grossProfit: totalRevenue - totalCost,
@@ -779,14 +779,14 @@ export class EnhancedConsumptionTrackingService {
     }
 
     const baseRecipeQuantityUsed = transaction.quantitySold * transaction.conversionRate
-    const baseRecipeCost = baseRecipeQuantityUsed * recipe.costPerPortion
+    const baseRecipeCost = baseRecipeQuantityUsed * recipe.costPerPortion.amount
 
     // Calculate ingredient deductions
     const ingredientDeductions = recipe.ingredients.map(ingredient => {
       const theoreticalQuantity = ingredient.quantity * baseRecipeQuantityUsed
       const wastageQuantity = theoreticalQuantity * ((ingredient.wastage || 0) / 100)
       const actualQuantityDeducted = theoreticalQuantity + wastageQuantity
-      const costImpact = actualQuantityDeducted * ingredient.costPerUnit
+      const costImpact = actualQuantityDeducted * ingredient.costPerUnit.amount
       
       const currentLevel = currentInventory.get(ingredient.id) || 0
       const newInventoryLevel = Math.max(0, currentLevel - actualQuantityDeducted)

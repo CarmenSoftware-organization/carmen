@@ -1,5 +1,10 @@
 # Carmen ERP Screenshots Index
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This directory contains comprehensive screenshots for all Carmen ERP screens, including base states, modal interactions, and responsive variants.
 
 ## Generated: 2025-08-14T11:29:56.211Z

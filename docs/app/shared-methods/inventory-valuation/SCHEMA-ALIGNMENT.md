@@ -1,6 +1,11 @@
 # Schema Alignment: Current vs. Desired Lot-Based System
 
 **Status**: Gap Analysis Document
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Created**: 2025-11-03
 **Last Updated**: 2025-01-04
 **Purpose**: Document the differences between current schema and desired lot-based costing system

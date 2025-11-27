@@ -1,5 +1,10 @@
 # Mermaid Diagram Test Page
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This page demonstrates the various types of Mermaid diagrams supported in the Carmen ERP documentation system.
 
 ## Flowchart Example

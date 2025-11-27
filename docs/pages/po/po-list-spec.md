@@ -1,5 +1,10 @@
 # Purchase Order List Page: Comprehensive Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## 1. Overview
 
 The Purchase Order List page serves as the central hub for managing all purchase orders within the system. It provides comprehensive functionality for viewing, filtering, creating, and managing POs with role-based access control and intelligent grouping capabilities.

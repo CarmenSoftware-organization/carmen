@@ -1,5 +1,10 @@
 # n8n Service Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 n8n is a workflow automation tool that has been integrated into the Carmen project. It allows you to create automated workflows that can integrate with various services and APIs.

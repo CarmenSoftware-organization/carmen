@@ -3,9 +3,31 @@
 **Module**: Procurement
 **Sub-Module**: Purchase Requests
 **Document Type**: Use Cases (UC)
-**Version**: 1.0.0
-**Last Updated**: 2025-01-30
+**Version**: 1.1.0
+**Last Updated**: 2025-11-26
 **Status**: Active
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+| 1.1.0 | 2025-11-26 | Documentation Team | Synchronized with BR - updated status values, added implementation status markers |
+
+## Implementation Status
+
+This document defines **target use cases** for Purchase Requests. Implementation status markers indicate current development state:
+
+| Status | Meaning |
+|--------|---------|
+| ✅ Implemented | Use case complete and functional |
+| 🔧 Partial | Frontend exists, backend development needed |
+| 🚧 Pending | Not yet implemented |
+| ⏳ Future | Post-MVP enhancement |
+
+**Current State**: Frontend prototype with mock data. Backend workflows pending development.
+
+**BR-Defined Status Values**: Draft, In-progress, Approved, Void, Completed, Cancelled
 
 ---
 
@@ -152,7 +174,7 @@ graph TB
 
 ### UC-PR-001: Create Purchase Request
 
-**Priority**: Critical
+**Priority**: Critical | **Status**: 🔧 Partial
 **Frequency**: Daily (50-100 per day)
 **Actors**: Requestor
 
@@ -375,7 +397,7 @@ Allows staff to create a new purchase request by entering header information and
 
 ### UC-PR-002: Edit Draft Purchase Request
 
-**Priority**: High
+**Priority**: High | **Status**: 🔧 Partial
 **Frequency**: Daily (30-50 per day)
 **Actors**: Requestor
 
@@ -407,12 +429,12 @@ graph LR
 ```
 
 #### Description
-Allows requestor to modify a purchase request that is in Draft or Rejected status.
+Allows requestor to modify a purchase request that is in Draft or Void status.
 
 #### Preconditions
 - User must be authenticated
 - PR must exist
-- PR status must be "Draft" or "Rejected"
+- PR status must be "Draft" or "Void"
 - User must be the creator of the PR
 
 #### Postconditions
@@ -470,7 +492,7 @@ Allows requestor to modify a purchase request that is in Draft or Rejected statu
 4. Use case ends
 
 #### Business Rules
-- BR-PR-005: Only Draft and Rejected PRs can be edited
+- BR-PR-005: Only Draft and Void PRs can be edited
 - BR-PR-006: Only creator can edit their PRs
 - BR-PR-015: Version control prevents concurrent edit conflicts
 
@@ -482,7 +504,7 @@ Allows requestor to modify a purchase request that is in Draft or Rejected statu
 
 ### UC-PR-003: Submit Purchase Request for Approval
 
-**Priority**: Critical
+**Priority**: Critical | **Status**: 🔧 Partial
 **Frequency**: Daily (40-80 per day)
 **Actors**: Requestor
 
@@ -528,7 +550,7 @@ Allows requestor to submit a draft PR for approval, triggering the approval work
 - Approval workflow must be configured
 
 #### Postconditions
-- **Success**: PR status changed to "Submitted", approval records created, notifications sent
+- **Success**: PR status changed to "In-progress", approval records created, notifications sent
 - **Failure**: Error message displayed, PR remains in Draft
 
 #### Main Flow
@@ -540,7 +562,7 @@ Allows requestor to submit a draft PR for approval, triggering the approval work
 6. User confirms submission
 7. System begins transaction
 8. System creates approval records for each stage
-9. System updates PR status to "Submitted"
+9. System updates PR status to "In-progress"
 10. System updates approval status to "Pending"
 11. System commits transaction
 12. System sends notification to first approver (see UC-PR-105)
@@ -581,7 +603,7 @@ Allows requestor to submit a draft PR for approval, triggering the approval work
 **E3: Notification Failure** (Step 12)
 1. System logs notification failure
 2. System queues notification for retry
-3. System still marks PR as Submitted
+3. System still marks PR as In-progress
 4. System displays warning: "PR submitted but notification may be delayed"
 5. Use case continues
 
@@ -602,7 +624,7 @@ Allows requestor to submit a draft PR for approval, triggering the approval work
 
 ### UC-PR-004: View Purchase Request Status
 
-**Priority**: High
+**Priority**: High | **Status**: ✅ Implemented
 **Frequency**: Continuous (monitoring)
 **Actors**: Requestor, Approvers, Purchasing Staff
 
@@ -654,12 +676,12 @@ Allows users to view the current status of a purchase request, including approva
 4. System retrieves PR data with related records
 5. System displays PR detail page showing:
    - Header information (type, dates, department, amounts)
-   - Status badge (Draft, Submitted, Approved, etc.)
+   - Status badge (Draft, In-progress, Approved, etc.)
    - Line items with quantities and prices
    - Approval progress:
      * List of approval stages
      * Current stage highlighted
-     * Status of each approval (Pending/Approved/Rejected)
+     * Status of each approval (Pending/Approved/Void)
      * Approver names and timestamps
      * Comments from approvers
    - Attachments list
@@ -712,7 +734,7 @@ Allows users to view the current status of a purchase request, including approva
 
 ### UC-PR-005: Approve Purchase Request
 
-**Priority**: Critical
+**Priority**: Critical | **Status**: 🔧 Partial
 **Frequency**: Daily (30-60 per day)
 **Actors**: Department Manager, Finance Manager, General Manager, Asset Manager
 
@@ -757,7 +779,7 @@ Allows designated approver to review and approve a purchase request at their app
 #### Preconditions
 - User must be authenticated
 - User must be the designated approver for current stage
-- PR must be in "Submitted" status
+- PR must be in "In-progress" status
 - Approval record must be in "Pending" status
 - User's turn in sequential approval chain (if applicable)
 
@@ -854,7 +876,7 @@ Allows designated approver to review and approve a purchase request at their app
 
 ### UC-PR-006: Reject Purchase Request
 
-**Priority**: High
+**Priority**: High | **Status**: 🔧 Partial
 **Frequency**: Weekly (5-15 per week)
 **Actors**: Department Manager, Finance Manager, General Manager, Asset Manager
 
@@ -897,7 +919,7 @@ Allows approver to reject a purchase request with required justification, return
 - Comments must be provided (minimum 10 characters)
 
 #### Postconditions
-- **Success**: PR status changed to "Rejected", requestor notified
+- **Success**: PR status changed to "Void", requestor notified
 - **Failure**: Error message displayed, approval unchanged
 
 #### Main Flow
@@ -911,10 +933,10 @@ Allows approver to reject a purchase request with required justification, return
 8. System validates comments length
 9. System begins transaction
 10. System updates approval record:
-    - Status = "Rejected"
+    - Status = "Void"
     - Timestamp = current time
     - Comments saved
-11. System updates PR status to "Rejected"
+11. System updates PR status to "Void"
 12. System cancels all other pending approvals
 13. System commits transaction
 14. System sends rejection notification to PR creator with comments
@@ -945,8 +967,8 @@ Allows approver to reject a purchase request with required justification, return
 
 #### Business Rules
 - BR-PR-010: Rejection comments required (min 10 chars)
-- BR-PR-020: Rejection returns PR to Draft or Rejected status
-- BR-PR-021: Rejected PR can be edited and resubmitted
+- BR-PR-020: Rejection returns PR to Draft or Void status
+- BR-PR-021: Void PR can be edited and resubmitted
 
 #### Related Requirements
 - FR-PR-005: Approval workflow
@@ -957,7 +979,7 @@ Allows approver to reject a purchase request with required justification, return
 
 ### UC-PR-007: Recall Purchase Request
 
-**Priority**: Medium
+**Priority**: Medium | **Status**: 🚧 Pending
 **Frequency**: Weekly (5-10 per week)
 **Actors**: Requestor
 
@@ -992,7 +1014,7 @@ Allows requestor to recall a submitted PR before it is fully approved, returning
 #### Preconditions
 - User must be authenticated
 - User must be the PR creator
-- PR status must be "Submitted"
+- PR status must be "In-progress"
 - PR must not be fully approved yet
 
 #### Postconditions
@@ -1020,7 +1042,7 @@ Allows requestor to recall a submitted PR before it is fully approved, returning
 **A1: Cancel Recall** (Step 6)
 6a. Requestor clicks "Cancel"
 7a. System closes dialog
-8a. PR remains Submitted
+8a. PR remains In-progress
 9a. Use case ends
 
 #### Exception Flows
@@ -1049,7 +1071,7 @@ Allows requestor to recall a submitted PR before it is fully approved, returning
 
 ### UC-PR-008: Cancel Purchase Request
 
-**Priority**: Medium
+**Priority**: Medium | **Status**: 🚧 Pending
 **Frequency**: Monthly (10-20 per month)
 **Actors**: Requestor, Department Manager
 
@@ -1081,12 +1103,12 @@ graph LR
 ```
 
 #### Description
-Allows authorized user to cancel a PR at any status except Converted.
+Allows authorized user to cancel a PR at any status except Completed.
 
 #### Preconditions
 - User must be authenticated
 - User must be PR creator OR have cancel permission
-- PR status must not be "Converted" or "Cancelled"
+- PR status must not be "Completed" or "Cancelled"
 
 #### Postconditions
 - **Success**: PR status changed to "Cancelled"
@@ -1121,7 +1143,7 @@ Allows authorized user to cancel a PR at any status except Converted.
 
 #### Exception Flows
 
-**E1: PR Already Converted** (Step 3)
+**E1: PR Already Completed** (Step 3)
 1. System detects PR has linked PO
 2. System displays "Cannot cancel. PR converted to PO. Please cancel PO instead."
 3. Use case ends
@@ -1138,7 +1160,7 @@ Allows authorized user to cancel a PR at any status except Converted.
 
 ### UC-PR-009: Add Attachment to PR
 
-**Priority**: Medium
+**Priority**: Medium | **Status**: 🚧 Pending
 **Frequency**: Weekly (20-40 per week)
 **Actors**: Requestor, Approvers
 
@@ -1240,7 +1262,7 @@ Allows authorized users to attach files (quotes, specifications, images) to a PR
 
 ### UC-PR-010: Add Comment to PR
 
-**Priority**: Medium
+**Priority**: Medium | **Status**: 🚧 Pending
 **Frequency**: Daily (30-50 per day)
 **Actors**: Requestor, Approvers, Purchasing Staff
 
@@ -1353,7 +1375,7 @@ Allows users to add comments and questions to a PR, supporting threaded discussi
 
 ### UC-PR-011: Convert Purchase Request to Purchase Order
 
-**Priority**: Critical
+**Priority**: Critical | **Status**: 🚧 Pending
 **Frequency**: Daily (30-50 per day)
 **Actors**: Purchasing Staff
 
@@ -1392,7 +1414,7 @@ Allows purchasing staff to convert an approved PR into a PO for sending to vendo
 - PR must not already be converted
 
 #### Postconditions
-- **Success**: PO created, PR status changed to "Converted", PR-PO link established
+- **Success**: PO created, PR status changed to "Completed", PR-PO link established
 - **Failure**: Error message displayed, no PO created
 
 #### Main Flow
@@ -1417,7 +1439,7 @@ Allows purchasing staff to convert an approved PR into a PO for sending to vendo
 8. System begins transaction
 9. System creates PO header and items
 10. System creates PR-PO link record
-11. System updates PR status to "Converted"
+11. System updates PR status to "Completed"
 12. System commits transaction
 13. System sends notification to PR creator
 14. System logs activity
@@ -1437,13 +1459,13 @@ Allows purchasing staff to convert an approved PR into a PO for sending to vendo
 **A2: Partial Conversion** (Step 6)
 6a. User selects only some items to convert
 7a. System creates PO with selected items
-8a. System marks PR as "Partially Converted"
+8a. System marks PR as "Partially Completed"
 9a. Remaining items can be converted later
 10a. Resume at step 11
 
 #### Exception Flows
 
-**E1: Already Converted** (Step 4b)
+**E1: Already Completed** (Step 4b)
 1. System detects existing PO link
 2. System displays "This PR was already converted to PO-XXXX"
 3. System provides link to existing PO
@@ -1467,7 +1489,7 @@ Allows purchasing staff to convert an approved PR into a PO for sending to vendo
 
 ### UC-PR-012: View On-Hand Inventory and Price During PR Creation
 
-**Priority**: High
+**Priority**: High | **Status**: 🚧 Pending
 **Frequency**: Continuous during PR creation/editing
 **Actors**: All PR creators (Staff, Department Managers, Purchasing Staff)
 
@@ -1794,7 +1816,7 @@ The system provides visual indicators based on inventory levels:
 
 ### UC-PR-013: Manage PR Templates
 
-**Priority**: Medium
+**Priority**: Medium | **Status**: 🚧 Pending
 **Frequency**: Weekly (5-10 template operations per week)
 **Actors**: Purchasing Staff, Department Managers
 
@@ -2168,7 +2190,7 @@ Allows authorized users to create, edit, view, and delete purchase request templ
 
 ### UC-PR-014: Create PR with Inventory Context and Price Visibility Control
 
-**Priority**: High
+**Priority**: High | **Status**: 🚧 Pending
 **Trigger**: Requestor initiates PR creation workflow
 **Frequency**: Daily (multiple times per day)
 **Duration**: 5-10 minutes
@@ -2315,7 +2337,7 @@ Requestor creates a new purchase request with real-time inventory visibility (on
 
 ### UC-PR-015: Create PR with Item-Specific Delivery Details
 
-**Priority**: Medium
+**Priority**: Medium | **Status**: 🚧 Pending
 **Trigger**: Requestor needs to specify delivery instructions, dates, or locations per item
 **Frequency**: Daily (for complex multi-item PRs)
 **Duration**: 5-12 minutes
@@ -2458,7 +2480,7 @@ Requestor creates a purchase request with item-specific delivery metadata includ
 
 ### UC-PR-016: Approve PR with FOC and Enhanced Pricing Visibility
 
-**Priority**: High
+**Priority**: High | **Status**: 🚧 Pending
 **Trigger**: Approver reviews PR for approval decision
 **Frequency**: Daily (multiple times per day)
 **Duration**: 3-7 minutes
@@ -2588,7 +2610,7 @@ Approver reviews purchase request with full visibility of FOC fields, complete p
 **A5: Reject PR (Step 9)**
 - Approver clicks "Reject" button
 - System requires comment (min 10 characters)
-- System changes PR status to "Rejected"
+- System changes PR status to "Void"
 - System notifies Requestor with rejection reason
 - Requestor can edit and resubmit
 
@@ -2639,7 +2661,7 @@ Approver reviews purchase request with full visibility of FOC fields, complete p
 
 ### UC-PR-101: Auto-generate Reference Number
 
-**Priority**: Critical
+**Priority**: Critical | **Status**: 🚧 Pending
 **Trigger**: PR creation (UC-PR-001 step 12)
 **Frequency**: Every PR creation
 
@@ -2721,7 +2743,7 @@ System automatically generates unique sequential reference numbers for new purch
 
 ### UC-PR-102: Calculate Purchase Request Totals
 
-**Priority**: Critical
+**Priority**: Critical | **Status**: 🔧 Partial
 **Trigger**: Line item added/modified/deleted
 **Frequency**: Continuous during PR editing
 
@@ -2810,7 +2832,7 @@ System automatically calculates line totals and PR totals based on quantities, p
 
 ### UC-PR-103: Determine Approval Chain
 
-**Priority**: Critical
+**Priority**: Critical | **Status**: 🚧 Pending
 **Trigger**: PR submission (UC-PR-003 step 4)
 **Frequency**: Every PR submission
 
@@ -2913,7 +2935,7 @@ System automatically determines the required approval chain based on PR type, am
 
 ### UC-PR-104: Check Budget Availability
 
-**Priority**: High
+**Priority**: High | **Status**: 🚧 Pending
 **Trigger**: PR submission with budget code (UC-PR-003 step 8)
 **Frequency**: When budget codes used (60% of PRs)
 
@@ -3011,7 +3033,7 @@ System checks if sufficient budget is available for items with budget codes befo
 
 ### UC-PR-105: Send Approval Notifications
 
-**Priority**: Critical
+**Priority**: Critical | **Status**: 🚧 Pending
 **Trigger**: PR submitted, approval completed (UC-PR-003, UC-PR-005)
 **Frequency**: Every status change requiring notification
 
@@ -3111,8 +3133,8 @@ System sends notifications to relevant users when PR status changes or action is
 
 ### UC-PR-201: Sync PR Data to ERP System
 
-**Priority**: Medium
-**Trigger**: PR status changes to Approved or Converted
+**Priority**: Medium | **Status**: 🚧 Pending
+**Trigger**: PR status changes to Approved or Completed
 **Frequency**: Daily (30-50 times)
 
 #### Use Case Diagram
@@ -3150,7 +3172,7 @@ System synchronizes approved PR data to external ERP system for financial tracki
 - **Failure**: Sync error logged, queued for retry
 
 #### Main Flow
-1. System detects PR status change to Approved/Converted
+1. System detects PR status change to Approved/Completed
 2. System checks if ERP sync is enabled
 3. System prepares PR data in ERP format:
    ```json
@@ -3208,7 +3230,7 @@ System synchronizes approved PR data to external ERP system for financial tracki
 
 ### UC-PR-202: Import PR Data from External System
 
-**Priority**: Low
+**Priority**: Low | **Status**: 🚧 Pending
 **Trigger**: Scheduled import job or manual trigger
 **Frequency**: Monthly (for bulk imports)
 
@@ -3310,7 +3332,7 @@ System imports purchase request data from external systems (e.g., legacy system 
 
 ### UC-PR-301: Send Approval Reminder Notifications
 
-**Priority**: Medium
+**Priority**: Medium | **Status**: 🚧 Pending
 **Trigger**: Scheduled job (daily at 9:00 AM)
 **Frequency**: Daily
 
@@ -3393,7 +3415,7 @@ System automatically sends reminder notifications to approvers who have pending 
 
 ### UC-PR-302: Escalate Overdue Approvals
 
-**Priority**: Medium
+**Priority**: Medium | **Status**: 🚧 Pending
 **Trigger**: Scheduled job (daily at 10:00 AM)
 **Frequency**: Daily
 
@@ -3473,7 +3495,7 @@ System escalates approvals that remain pending beyond critical threshold, notify
 
 ### UC-PR-303: Archive Old Purchase Requests
 
-**Priority**: Low
+**Priority**: Low | **Status**: 🚧 Pending
 **Trigger**: Scheduled job (monthly, first Sunday at 2:00 AM)
 **Frequency**: Monthly
 
@@ -3511,7 +3533,7 @@ System archives purchase requests older than retention period to maintain databa
    SELECT id
    FROM purchase_requests
    WHERE date < CURRENT_DATE - INTERVAL '2 years'
-     AND status IN ('Converted', 'Cancelled')
+     AND status IN ('Completed', 'Cancelled')
      AND deleted_at IS NULL
      AND archived_at IS NULL
    ```
@@ -3551,7 +3573,7 @@ System archives purchase requests older than retention period to maintain databa
 
 #### Business Rules
 - BR-PR-062: Archive after 2 years
-- BR-PR-063: Only Converted/Cancelled PRs archived
+- BR-PR-063: Only Completed/Cancelled PRs archived
 - BR-PR-064: Archived data can be restored
 
 #### Related Requirements
@@ -3606,7 +3628,24 @@ flowchart TD
 
 ---
 
-## 9. Related Documents
+## 9. Implementation Summary
+
+| Category | Total | ✅ | 🔧 | 🚧 | ⏳ |
+|----------|-------|----|----|----|-----|
+| User Use Cases (001-016) | 16 | 1 | 5 | 10 | 0 |
+| System Use Cases (101-105) | 5 | 0 | 1 | 4 | 0 |
+| Integration Use Cases (201-202) | 2 | 0 | 0 | 2 | 0 |
+| Background Jobs (301-303) | 3 | 0 | 0 | 3 | 0 |
+| **Total** | **26** | **1** | **6** | **19** | **0** |
+
+**Implementation Notes**:
+- ✅ **Implemented**: UC-PR-004 (View PR Status) - List and detail views functional
+- 🔧 **Partial**: Form creation, editing, approval display, rejection display, total calculations - frontend exists, backend APIs pending
+- 🚧 **Pending**: Workflow engine, notifications, templates, attachments, comments, conversions, integrations, background jobs
+
+---
+
+## 10. Related Documents
 
 - **Business Requirements**: [BR-purchase-requests.md](./BR-purchase-requests.md)
 - **Technical Specification**: [TS-purchase-requests.md](./TS-purchase-requests.md)

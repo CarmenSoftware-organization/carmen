@@ -3,13 +3,16 @@
 ## Module Information
 - **Module**: Vendor Management
 - **Sub-module**: Vendor Directory
-- **Version**: 1.0.0
+- **Version**: 2.2.0
 - **Status**: Active
-- **Last Updated**: 2025-11-15
+- **Last Updated**: 2025-11-25
 
 ## Document History
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2025-11-25 | System | Updated address format to Asian international standard; Full certification management with status tracking implemented |
+| 2.1.0 | 2025-11-25 | System | Added multi-address and multi-contact management with primary designation |
+| 2.0.0 | 2025-11-25 | System | Updated to match actual code implementation |
 | 1.0.0 | 2025-11-15 | Documentation Team | Initial DD document created from schema.prisma |
 
 **⚠️ IMPORTANT: This is a Data Definition Document - TEXT FORMAT ONLY**
@@ -18,10 +21,11 @@ This document describes data structures, entities, relationships, and constraint
 It does NOT contain executable SQL code, database scripts, or implementation code.
 For database implementation details, refer to the Technical Specification document.
 
-**⚠️ SCHEMA COVERAGE**: 57% - Partial coverage from `data-struc/schema.prisma`
+**⚠️ SCHEMA COVERAGE**: 70% - Partial coverage from `data-struc/schema.prisma`
 
 **Existing Tables** (4): `tb_vendor`, `tb_vendor_contact`, `tb_vendor_address`, `tb_vendor_business_type`
-**Missing Tables** (3): Certifications, Documents, Ratings - **Require Implementation**
+**Implemented in Frontend** (1): Certifications - Full CRUD with status tracking
+**Missing Tables** (2): Documents, Ratings - **Require Backend Implementation**
 
 ---
 
@@ -31,15 +35,16 @@ The Vendor Directory module manages comprehensive vendor information including c
 
 ### Key Features
 - Vendor profile management
-- Multiple contact persons per vendor
-- Multiple addresses (billing, shipping, etc.)
-- Business type classification
+- Multiple contact persons per vendor with primary designation
+- Multiple addresses with Asian international format and primary designation
+- Business type classification (12 types)
 - Tax profile integration
-- Certification tracking (⚠️ needs implementation)
-- Document management (⚠️ needs implementation)
-- Performance ratings (⚠️ needs implementation)
+- **Full certification management (✅ implemented)** - CRUD operations, 16 certification types, auto-status calculation
+- Document management (⚠️ needs backend implementation)
+- Performance ratings (⚠️ needs backend implementation)
 - Vendor activation/deactivation
 - Multi-dimensional attributes
+- 15 countries support
 
 ---
 
@@ -52,7 +57,7 @@ tb_vendor (1) ──── (N) tb_vendor_address
 tb_vendor (1) ──── (N) tb_pricelist
 tb_vendor (1) ──── (N) tb_purchase_order
 tb_vendor (1) ──── (N) tb_good_received_note
-tb_vendor (1) ──── (N) tb_vendor_certification    [PROPOSED]
+tb_vendor (1) ──── (N) tb_vendor_certification    [IMPLEMENTED - Frontend]
 tb_vendor (1) ──── (N) tb_vendor_document        [PROPOSED]
 tb_vendor (1) ──── (N) tb_vendor_rating          [PROPOSED]
 ```
@@ -315,23 +320,26 @@ INDEX vendoraddress_vendor_address_type_idx
 
 #### JSON Field Structures
 
-**data field** - Complete address:
+**data field** - Complete address (Asian International Format):
 ```json
 {
-  "street1": "123 Main Street",
-  "street2": "Building A, Floor 5",
-  "city": "New York",
-  "state": "NY",
-  "postal_code": "10001",
-  "country": "United States",
-  "country_code": "US",
-  "coordinates": {
-    "latitude": 40.7128,
-    "longitude": -74.0060
-  },
-  "is_default": true
+  "label": "Main Office",
+  "addressLine1": "123 Sukhumvit Road",
+  "addressLine2": "Building A, Floor 5",
+  "subDistrict": "Khlong Toei Nuea",
+  "district": "Watthana",
+  "city": "Bangkok",
+  "province": "Bangkok",
+  "postalCode": "10110",
+  "country": "Thailand",
+  "isPrimary": true
 }
 ```
+
+**Supported Countries** (15):
+- Thailand, Singapore, Malaysia, Indonesia, Vietnam
+- Philippines, Myanmar, Cambodia, Laos, Brunei
+- China, Japan, South Korea, India, United States
 
 **info field** - Address metadata:
 ```json
@@ -403,85 +411,94 @@ INDEX vendor_business_type_name_u ON tb_vendor_business_type(name)
 
 ---
 
-## ⚠️ Missing Tables (Not in Schema.prisma)
+## Frontend-Implemented Entities
 
-### 1. Vendor Certifications (PROPOSED)
+### 1. Vendor Certifications (IMPLEMENTED)
 
-**Status**: ❌ NOT IN SCHEMA - Requires Implementation
+**Status**: ✅ IMPLEMENTED IN FRONTEND - Full CRUD with status tracking
 
-**Purpose**: Track vendor certifications (ISO, HACCP, organic, etc.) with expiration dates and renewal tracking.
+**Purpose**: Track vendor certifications (ISO, HACCP, organic, Halal, etc.) with expiration dates and auto-calculated status.
 
-**Proposed Table Name**: `tb_vendor_certification`
+**Frontend Interface**: `VendorCertification`
 
-#### Proposed Fields
+#### Implemented Fields
 
-| Field Name | Data Type | Constraints | Description |
-|-----------|-----------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique identifier |
-| `vendor_id` | UUID | FOREIGN KEY → tb_vendor.id, NOT NULL | Parent vendor |
-| `certification_type` | VARCHAR | NOT NULL | Certification name/type |
-| `certification_number` | VARCHAR | | Certification number |
-| `issuing_authority` | VARCHAR | | Certifying body |
-| `issue_date` | DATE | | Certification issue date |
-| `expiry_date` | DATE | | Certification expiration date |
-| `renewal_date` | DATE | | Next renewal date |
-| `status` | ENUM | DEFAULT 'active' | active, expired, suspended, revoked |
-| `document_url` | VARCHAR | | Link to certification document |
-| `verified_by_id` | UUID | | User who verified certification |
-| `verified_date` | TIMESTAMPTZ | | Verification timestamp |
-| `description` | VARCHAR | | Certification description |
-| `note` | VARCHAR | | Internal notes |
-| `info` | JSON | | Additional certification details |
-| `dimension` | JSON | | Multi-dimensional attributes |
-| `created_at` | TIMESTAMPTZ | DEFAULT now() | Record creation timestamp |
-| `created_by_id` | UUID | | User who created |
-| `updated_at` | TIMESTAMPTZ | DEFAULT now() | Last update timestamp |
-| `updated_by_id` | UUID | | User who last updated |
-| `deleted_at` | TIMESTAMPTZ | | Soft delete timestamp |
-| `deleted_by_id` | UUID | | User who deleted |
+| Field Name | Data Type | Required | Description |
+|-----------|-----------|----------|-------------|
+| `id` | string | Auto | Unique identifier |
+| `name` | string | Yes | Certification name |
+| `certificationType` | string | Yes | Type from 16 predefined types |
+| `issuer` | string | Yes | Issuing organization |
+| `certificateNumber` | string | No | Certificate/registration number |
+| `issueDate` | Date | Yes | Date issued |
+| `expiryDate` | Date | Yes | Expiration date |
+| `status` | CertificationStatus | Auto | Auto-calculated based on expiryDate |
+| `documentUrl` | string | No | URL to certification document |
+| `notes` | string | No | Additional notes |
 
-#### Proposed Relationships
-- **tb_vendor**: Many-to-One (certifications belong to one vendor)
+#### Status Type
 
-#### Proposed Business Rules
-1. **Expiry Alert**: Alert when `expiry_date` is within 60 days
-2. **Auto-Status**: Status auto-updates to 'expired' when expiry_date < current_date
-3. **Required Certifications**: Some procurement categories require specific certifications
-4. **Verification**: Certifications should be verified before accepting
+**CertificationStatus**: `'active' | 'expired' | 'expiring_soon' | 'pending'`
 
-#### Proposed Indexes
+#### Available Certification Types (16)
+
+| # | Type | Description |
+|---|------|-------------|
+| 1 | ISO 9001 | Quality Management |
+| 2 | ISO 14001 | Environmental Management |
+| 3 | ISO 22000 | Food Safety Management |
+| 4 | ISO 45001 | Occupational Health & Safety |
+| 5 | HACCP | Hazard Analysis Critical Control Points |
+| 6 | GMP | Good Manufacturing Practice |
+| 7 | Halal Certification | Islamic food certification |
+| 8 | Kosher Certification | Jewish dietary certification |
+| 9 | Organic Certification | Organic food certification |
+| 10 | Fair Trade Certification | Ethical trade certification |
+| 11 | FDA Approved | US Food & Drug Administration |
+| 12 | CE Marking | European conformity |
+| 13 | Business License | General business license |
+| 14 | Trade License | Trade/commerce license |
+| 15 | Import/Export License | International trade license |
+| 16 | Other | Custom certification type |
+
+#### Status Auto-Calculation Logic
+
+The certification status is automatically calculated based on the expiry date:
+
+| Status | Condition | Visual Indicator |
+|--------|-----------|------------------|
+| **Active** | Expiry date > 30 days in future | Green badge (`bg-green-100 text-green-800`) |
+| **Expiring Soon** | Expiry date within 30 days | Yellow badge (`bg-yellow-100 text-yellow-800`) |
+| **Expired** | Expiry date has passed | Red badge (`bg-red-100 text-red-800`) |
+| **Pending** | Initial status for new certifications | Gray badge (`bg-gray-100 text-gray-800`) |
+
+**Calculation Formula**:
 ```
-CREATE INDEX idx_vendor_certification_vendor
-  ON tb_vendor_certification(vendor_id);
-
-CREATE INDEX idx_vendor_certification_expiry
-  ON tb_vendor_certification(expiry_date)
-  WHERE status = 'active' AND deleted_at IS NULL;
-```
-
-#### Proposed JSON Structure (info field)
-```json
-{
-  "scope": "Food production and distribution",
-  "audit_score": 95,
-  "audit_date": "2024-12-15",
-  "auditor_name": "John Auditor",
-  "non_conformities": 0,
-  "observations": 2,
-  "certificate_file": {
-    "filename": "ISO9001_Certificate.pdf",
-    "size_bytes": 245678,
-    "uploaded_date": "2024-12-20"
-  }
-}
+daysUntilExpiry = (expiryDate - currentDate) / (1000 * 60 * 60 * 24)
+if daysUntilExpiry < 0 → 'expired'
+if daysUntilExpiry ≤ 30 → 'expiring_soon'
+else → 'active'
 ```
 
-**Implementation Priority**: HIGH
-**Estimated Effort**: 3-4 hours
+#### Relationships
+- **Vendor**: Many-to-One (certifications belong to one vendor)
+
+#### Business Rules
+1. **Required Fields**: Certification name, type, issuer, issue date, and expiry date are required
+2. **Auto-Status**: Status recalculates on page load and when certification is edited
+3. **30-Day Threshold**: Certifications expiring within 30 days are flagged as "Expiring Soon"
+4. **CRUD Operations**: Full create, read, update, delete via dialog modal
+
+#### UI Implementation
+- **Create Page** (Tab 3 - Additional Info): List view with Add/Edit/Delete
+- **Detail Page** (Certifications Tab): Grid display with CRUD operations
+- **Toast Notifications**: Confirm all CRUD operations
 
 ---
 
-### 2. Vendor Documents (PROPOSED)
+## ⚠️ Missing Tables (Not in Schema.prisma)
+
+### 1. Vendor Documents (PROPOSED)
 
 **Status**: ❌ NOT IN SCHEMA - Requires Implementation
 
@@ -573,7 +590,7 @@ CREATE INDEX idx_vendor_document_expiry
 
 ---
 
-### 3. Vendor Ratings (PROPOSED)
+### 2. Vendor Ratings (PROPOSED)
 
 **Status**: ❌ NOT IN SCHEMA - Requires Implementation
 
@@ -695,25 +712,41 @@ CREATE UNIQUE INDEX idx_vendor_rating_vendor_period
    - Rule: Same email cannot appear twice for same vendor
    - Error: "Contact email already exists for this vendor"
 
-### Address Validation
+### Address Validation (Asian International Format)
 
 7. **VAL-VEN-201**: Required address fields
-   - Rule: `data` must include: street1, city, postal_code, country
+   - Rule: `data` must include: addressLine1, city, country
+   - Optional fields: addressLine2, subDistrict, district, province, postalCode
    - Error: "Required address fields missing"
 
-8. **VAL-VEN-202**: Default address requirement
-   - Rule: Each vendor must have at least one billing address
-   - Error: "Vendor must have a billing address"
+8. **VAL-VEN-202**: Primary address requirement
+   - Rule: Each vendor must have at least one address with isPrimary=true
+   - Error: "Vendor must have a primary address"
 
-### Certification Validation (PROPOSED)
+9. **VAL-VEN-203**: Country validation
+   - Rule: Country must be one of 15 supported countries
+   - Supported: Thailand, Singapore, Malaysia, Indonesia, Vietnam, Philippines, Myanmar, Cambodia, Laos, Brunei, China, Japan, South Korea, India, United States
+   - Error: "Unsupported country"
 
-9. **VAL-VEN-301**: Expiry date validation
-   - Rule: `expiry_date > issue_date`
-   - Error: "Expiry date must be after issue date"
+### Certification Validation (IMPLEMENTED)
 
-10. **VAL-VEN-302**: Required certifications
-    - Rule: Food vendors must have HACCP certification
-    - Error: "HACCP certification required for food vendors"
+10. **VAL-VEN-301**: Required certification fields
+    - Rule: `name`, `certificationType`, `issuer`, `issueDate`, `expiryDate` are required
+    - Error: "Required certification fields missing"
+
+11. **VAL-VEN-302**: Expiry date validation
+    - Rule: `expiryDate > issueDate`
+    - Error: "Expiry date must be after issue date"
+
+12. **VAL-VEN-303**: Certification type validation
+    - Rule: `certificationType` must be one of 16 predefined types
+    - Error: "Invalid certification type"
+
+13. **VAL-VEN-304**: Status auto-calculation
+    - Rule: Status automatically calculated based on expiryDate
+    - Active: expiryDate > 30 days from now
+    - Expiring Soon: expiryDate within 30 days
+    - Expired: expiryDate < current date
 
 ---
 
@@ -794,15 +827,20 @@ CREATE INDEX idx_vendor_active
 ## Migration Notes
 
 ### From DS to DD
-- **Date**: 2025-11-15
+- **Date**: 2025-11-25
 - **Schema Source**: `data-struc/schema.prisma` lines 1859-1942, 2664-2685
-- **Coverage**: ⚠️ 57% - Core vendor tables exist
+- **Coverage**: ⚠️ 70% - Core vendor tables exist, certifications implemented in frontend
 - **Existing**: tb_vendor, tb_vendor_contact, tb_vendor_address, tb_vendor_business_type
-- **Missing**: Certifications, documents, ratings tables
+- **Frontend Implemented**: VendorCertification with full CRUD and status tracking
+- **Missing**: Documents, ratings tables
 
 ### Implementation Roadmap
-1. **Phase 1** (Current): Use existing 4 tables, store certifications/ratings in `info` JSONB
-2. **Phase 2** (3-6 months): Implement tb_vendor_certification and tb_vendor_document
+1. **Phase 1** (Current):
+   - Use existing 4 tables
+   - Full certification management in frontend with 16 types and auto-status calculation
+   - Asian international address format (8 fields)
+   - 15 countries support
+2. **Phase 2** (3-6 months): Implement tb_vendor_certification backend and tb_vendor_document
 3. **Phase 3** (6-12 months): Implement tb_vendor_rating with full KPI tracking
 
 ---
@@ -810,10 +848,11 @@ CREATE INDEX idx_vendor_active
 ## Document Metadata
 
 **Created**: 2025-11-15
+**Updated**: 2025-11-25
 **Schema Version**: As of schema.prisma commit 9fbc771
-**Coverage**: 4 entities from schema.prisma + 3 proposed entities
-**Status**: Active - Core tables exist, enhancements proposed
-**Implementation Status**: 3 tables require implementation (High priority)
+**Coverage**: 4 entities from schema.prisma + 1 frontend-implemented + 2 proposed entities
+**Status**: Active - Core tables exist, certifications implemented in frontend
+**Implementation Status**: 2 tables require backend implementation (Documents, Ratings)
 
 ---
 

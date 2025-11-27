@@ -9,7 +9,7 @@ import { Building, List, Grid, X, Plus } from 'lucide-react'
 import { CountListItem } from "./components/count-list-item"
 import { CountDetailCard } from "./components/count-detail-card"
 import { CountDetailForm } from "./components/count-detail-form"
-import { users, departments, storeLocations } from '@/lib/mockData'
+import { users, departments, storeLocations } from '@/lib/mock-data/legacy-simple'
 import { useRouter } from "next/navigation"
 
 interface SpotCheckData {

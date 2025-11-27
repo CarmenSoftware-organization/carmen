@@ -67,6 +67,11 @@ This document provides comprehensive end-to-end (E2E) testing procedures for the
 - Invitation email sent
 - Audit log updated
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ### TC-02: Role Assignment

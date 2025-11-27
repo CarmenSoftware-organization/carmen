@@ -22,6 +22,11 @@ This document provides visual representations of inventory transaction processin
 - [Data Definition](./DD-inventory-transactions.md)
 - [Business Requirements](./BR-inventory-transactions.md)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Diagram Index

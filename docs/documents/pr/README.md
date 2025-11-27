@@ -209,5 +209,10 @@ This documentation should be updated when:
 ---
 
 **Last Updated**: Generated automatically from system analysis
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Version**: Carmen ERP v1.0
 **Maintained by**: Carmen Development Team

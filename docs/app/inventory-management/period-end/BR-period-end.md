@@ -14,7 +14,6 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-01-11 | System | Initial version based on UI prototype and SM-period-end-snapshots.md |
 
----
 
 ## Overview
 
@@ -686,7 +685,6 @@ interface PeriodActivity {
 |---------|------|--------|---------|
 | 1.0.0 | 2025-01-11 | System | Initial version based on UI prototype analysis and SM-period-end-snapshots.md reference |
 
----
 
 ## References
 

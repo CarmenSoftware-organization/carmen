@@ -3,6 +3,11 @@
 **Document Type**: Production Deployment & Operations Guide  
 **Version**: 1.0  
 **Last Updated**: August 22, 2025  
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Purpose**: Complete deployment and operations management for Carmen ERP
 
 ---

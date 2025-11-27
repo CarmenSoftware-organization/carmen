@@ -3,17 +3,20 @@
 ## Document Information
 - **Module**: Procurement
 - **Sub-Module**: Purchase Orders
-- **Document Type**: Data Schema (DS)
-- **Version**: 2.0.0
-- **Last Updated**: 2025-10-31
-- **Status**: Approved
+- **Document Type**: Data Definition (DD)
+- **Version**: 3.0.0
+- **Last Updated**: 2025-11-21
+- **Status**: In Progress
 
-**Document History**:
-- v1.0.0 (2025-10-30): Initial version with approval workflow tables
-- v2.0.0 (2025-10-31): Removed purchase_order_approvals table and all approval workflow references
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-10-30 | System | Initial creation with approval workflow tables |
+| 2.0.0 | 2025-10-31 | System | Removed purchase_order_approvals table, updated ERD, removed v_pending_po_approvals view, updated status constraints, clarified approved_by/approved_at fields are NOT multi-stage approval workflow |
+| 3.0.0 | 2025-11-21 | System | Major restructure: Converted from SQL-focused implementation document to proper Data Definition document with field definitions, business rules, and diagrams; moved all SQL code (DDL, triggers, functions, views) to Technical Specification document |
 
 ## Related Documents
-| 1.1.0 | 2025-11-15 | Documentation Team | Migrated from DS to DD format |
 
 - [Business Requirements](./BR-purchase-orders.md)
 - [Use Cases](./UC-purchase-orders.md)
@@ -25,22 +28,20 @@
 
 ## Overview
 
-This document defines the complete database schema for the Purchase Orders sub-module including:
+This document defines the data structures and relationships for the Purchase Orders sub-module including:
 - Entity Relationship Diagram (ERD)
-- Complete table definitions with SQL DDL
-- Indexes and constraints for performance and data integrity
-- Triggers and functions for automation
-- Views for common queries
+- Entity definitions and purposes
+- Field definitions with data types and business rules
+- Relationships between entities
+- Business constraints and validation rules
 
-**Database System**: PostgreSQL 14+  
-**Schema**: public  
-**Naming Convention**: snake_case
+**Note**: For technical implementation details (SQL DDL, triggers, functions), refer to the [Technical Specification](./TS-purchase-orders.md).
 
 ---
 
 ## Entity Relationship Diagram
 
-\`\`\`mermaid
+```mermaid
 erDiagram
     PURCHASE_ORDERS ||--o{ PURCHASE_ORDER_LINE_ITEMS : contains
     PURCHASE_ORDERS ||--o{ PURCHASE_ORDER_BUDGET_ALLOCATIONS : allocates
@@ -50,121 +51,96 @@ erDiagram
     PURCHASE_ORDERS }o--|| LOCATIONS : "delivered_to"
     PURCHASE_ORDERS }o--|| USERS : "created_by"
     PURCHASE_ORDERS }o--o| USERS : "sent_by"
-
     PURCHASE_ORDER_LINE_ITEMS }o--|| PRODUCTS : references
     PURCHASE_ORDER_LINE_ITEMS }o--o| PURCHASE_REQUEST_LINE_ITEMS : "converted_from"
     PURCHASE_ORDER_LINE_ITEMS ||--o{ GOODS_RECEIPT_NOTE_LINE_ITEMS : "received_as"
-
     PURCHASE_ORDER_BUDGET_ALLOCATIONS }o--|| BUDGET_ACCOUNTS : uses
     PURCHASE_ORDER_DOCUMENTS }o--|| USERS : "uploaded_by"
     PURCHASE_ORDER_HISTORY }o--|| USERS : "changed_by"
-\`\`\`
+```
 
 ---
 
-## Core Tables
+## Core Entities
 
-### 1. purchase_orders Table
+### 1. Purchase Orders
 
-**Purpose**: Main table storing purchase order header information.
+**Purpose**: Represents a purchase order document sent to vendors for procurement of goods or services.
 
-\`\`\`sql
-CREATE TABLE purchase_orders (
-  -- Primary Key
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
-  -- Business Identifier
-  po_number VARCHAR(50) NOT NULL UNIQUE,
-  
-  -- Vendor Information
-  vendor_id UUID NOT NULL REFERENCES vendors(id),
-  
-  -- Status and Workflow
-  status VARCHAR(20) NOT NULL DEFAULT 'Draft',
-  
-  -- Dates
-  order_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  expected_delivery_date DATE NOT NULL,
-  
-  -- Delivery Information
-  delivery_location_id UUID NOT NULL REFERENCES locations(id),
-  
-  -- Financial Information (Transaction Currency)
-  subtotal DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-  discount_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-  discount_percentage DECIMAL(5,2),
-  tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-  shipping_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-  grand_total DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-  currency VARCHAR(3) NOT NULL DEFAULT 'USD' REFERENCES currencies(code),
-  
-  -- Terms and Conditions
-  payment_terms VARCHAR(100) NOT NULL,
-  delivery_terms VARCHAR(100) NOT NULL,
-  
-  -- Notes
-  notes TEXT,
-  internal_notes TEXT,
-  
-  -- Workflow Tracking
-  created_by UUID NOT NULL REFERENCES users(id),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  approved_by UUID REFERENCES users(id), -- Single field: authorized purchasing staff who created/sent PO, NOT multi-stage approval
-  approved_at TIMESTAMPTZ, -- Timestamp when PO was authorized/sent by purchasing staff
-  sent_by UUID REFERENCES users(id),
-  sent_at TIMESTAMPTZ,
-  acknowledged_at TIMESTAMPTZ,
-  completed_at TIMESTAMPTZ,
-  cancelled_at TIMESTAMPTZ,
-  cancellation_reason TEXT,
-  
-  -- Audit Fields
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_by UUID NOT NULL REFERENCES users(id),
-  version INT NOT NULL DEFAULT 1,
-  
-  -- Soft Delete
-  deleted_at TIMESTAMPTZ,
-  deleted_by UUID REFERENCES users(id),
-  
-  -- Constraints
-  CONSTRAINT po_status_check CHECK (status IN (
-    'Draft', 'Sent', 'Acknowledged',
-    'Partially Received', 'Fully Received', 'Completed', 'Cancelled', 'On Hold'
-  )),
-  CONSTRAINT po_delivery_date_check CHECK (expected_delivery_date >= order_date),
-  CONSTRAINT po_amounts_check CHECK (
-    subtotal >= 0 AND
-    discount_amount >= 0 AND
-    tax_amount >= 0 AND
-    shipping_amount >= 0 AND
-    grand_total >= 0
-  ),
-  CONSTRAINT po_discount_check CHECK (
-    (discount_amount > 0 AND discount_percentage IS NULL) OR
-    (discount_percentage > 0 AND discount_amount >= 0) OR
-    (discount_amount = 0 AND discount_percentage IS NULL)
-  )
-);
+**Primary Key**: Unique identifier (UUID)
 
--- Indexes
-CREATE INDEX idx_po_number ON purchase_orders(po_number);
-CREATE INDEX idx_po_vendor_id ON purchase_orders(vendor_id);
-CREATE INDEX idx_po_status ON purchase_orders(status) WHERE deleted_at IS NULL;
-CREATE INDEX idx_po_order_date ON purchase_orders(order_date DESC);
-CREATE INDEX idx_po_expected_delivery_date ON purchase_orders(expected_delivery_date);
-CREATE INDEX idx_po_created_by ON purchase_orders(created_by);
-CREATE INDEX idx_po_created_at ON purchase_orders(created_at DESC);
-CREATE INDEX idx_po_status_order_date ON purchase_orders(status, order_date DESC) WHERE deleted_at IS NULL;
-CREATE INDEX idx_po_vendor_status ON purchase_orders(vendor_id, status) WHERE deleted_at IS NULL;
-CREATE INDEX idx_po_delivery_location ON purchase_orders(delivery_location_id);
+**Business Identifier**: PO Number (Format: PO-YYYY-NNNNNN, e.g., PO-2024-001234)
 
--- Comments
-COMMENT ON TABLE purchase_orders IS 'Main purchase order header information';
-COMMENT ON COLUMN purchase_orders.po_number IS 'Human-readable PO number (e.g., PO-2024-001234)';
-COMMENT ON COLUMN purchase_orders.status IS 'Current status in the PO lifecycle';
-COMMENT ON COLUMN purchase_orders.version IS 'Version number for change tracking';
-\`\`\`
+#### Field Definitions
+
+| Field Name | Data Type | Required | Description | Business Rules |
+|------------|-----------|----------|-------------|----------------|
+| **Identification** |
+| id | UUID | Yes | System-generated unique identifier | Auto-generated |
+| po_number | String(50) | Yes | Human-readable PO number | Unique, format: PO-YYYY-NNNNNN |
+| version | Integer | Yes | Document version for change tracking | Increments on each modification |
+| **Vendor Information** |
+| vendor_id | UUID | Yes | Reference to vendor entity | Must be active vendor |
+| **Status and Workflow** |
+| status | String(20) | Yes | Current lifecycle status | Values: Draft, Sent, Acknowledged, Partially Received, Fully Received, Completed, Cancelled, On Hold |
+| **Dates** |
+| order_date | Date | Yes | Date when PO was created | Defaults to current date |
+| expected_delivery_date | Date | Yes | Expected delivery date | Must be >= order_date |
+| **Delivery Information** |
+| delivery_location_id | UUID | Yes | Reference to delivery location | Must be valid location |
+| **Financial Information** |
+| subtotal | Decimal(15,2) | Yes | Sum of line item totals | Must be >= 0 |
+| discount_amount | Decimal(15,2) | Yes | Total discount applied | Must be >= 0 |
+| discount_percentage | Decimal(5,2) | No | Discount percentage if applicable | 0-100% |
+| tax_amount | Decimal(15,2) | Yes | Total tax amount | Must be >= 0 |
+| shipping_amount | Decimal(15,2) | Yes | Shipping/delivery charges | Must be >= 0 |
+| grand_total | Decimal(15,2) | Yes | Final total amount | Calculated: subtotal - discount + tax + shipping |
+| currency | String(3) | Yes | Currency code (ISO 4217) | Default: USD |
+| **Terms and Conditions** |
+| payment_terms | String(100) | Yes | Payment terms agreed with vendor | E.g., "Net 30", "COD" |
+| delivery_terms | String(100) | Yes | Delivery terms (Incoterms) | E.g., "FOB", "CIF" |
+| **Notes** |
+| notes | Text | No | Public notes visible to vendor | |
+| internal_notes | Text | No | Internal notes for staff only | Not shared with vendor |
+| **Workflow Tracking** |
+| created_by | UUID | Yes | User who created the PO | Reference to users |
+| created_at | Timestamp | Yes | Creation timestamp | Auto-generated |
+| approved_by | UUID | No | Purchasing staff who authorized PO | Single authorization, not multi-stage |
+| approved_at | Timestamp | No | Authorization timestamp | Set when PO is sent |
+| sent_by | UUID | No | User who sent PO to vendor | |
+| sent_at | Timestamp | No | Timestamp when sent to vendor | |
+| acknowledged_at | Timestamp | No | Vendor acknowledgment timestamp | |
+| completed_at | Timestamp | No | Completion timestamp | |
+| cancelled_at | Timestamp | No | Cancellation timestamp | |
+| cancellation_reason | Text | No | Reason for cancellation | Required if cancelled |
+| **Audit Fields** |
+| updated_at | Timestamp | Yes | Last update timestamp | Auto-updated |
+| updated_by | UUID | Yes | User who last updated | Reference to users |
+| **Soft Delete** |
+| deleted_at | Timestamp | No | Deletion timestamp | Null if not deleted |
+| deleted_by | UUID | No | User who deleted | |
+
+#### Business Constraints
+
+1. **Status Transitions**:
+   - Draft → Sent (when sent to vendor)
+   - Sent → Acknowledged (vendor confirms receipt)
+   - Acknowledged → Partially Received (some items received)
+   - Partially Received → Fully Received (all items received)
+   - Fully Received → Completed (all processes complete)
+   - Any status → Cancelled (with reason required)
+
+2. **Financial Validation**:
+   - All amounts must be non-negative
+   - Grand total must equal: subtotal - discount + tax + shipping
+   - Either discount_amount OR discount_percentage can be used, not both
+
+3. **Date Validation**:
+   - Expected delivery date must be >= order date
+
+4. **Authorization**:
+   - Only authorized purchasing staff can send POs to vendors
+   - approved_by and approved_at are set together when PO is sent
 
 ---
 
@@ -751,10 +727,3 @@ ON CONFLICT (year) DO NOTHING;
 - Soft delete allows recovery within 30 days
 
 ---
-
-**Document History**
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0.0 | 2025-10-30 | System | Initial creation with approval workflow tables |
-| 2.0.0 | 2025-10-31 | System | Removed purchase_order_approvals table (Table 3), updated ERD, removed v_pending_po_approvals view, updated status constraints, clarified approved_by/approved_at fields are NOT multi-stage approval workflow |

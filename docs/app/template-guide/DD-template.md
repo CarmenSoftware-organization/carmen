@@ -27,6 +27,41 @@
 - **DO include**: Entity descriptions, field definitions, relationship explanations, business rules
 - **Focus on**: WHAT data is stored, WHY it exists, HOW it relates - all in descriptive text
 
+---
+
+## Core Schema Reference
+
+**📋 CORE PATTERN**: All data definitions MUST align with the core Prisma schema located at:
+- **Primary Schema**: `docs/app/data-struc/schema.prisma`
+
+### Schema Alignment Rules
+
+1. **Existing Tables/Fields**: If a table or field exists in the core schema, use the exact naming and data types defined there
+2. **Proposed Additions**: Tables or fields NOT in the core schema must be marked as **🆕 PROPOSED**
+3. **Proposed Modifications**: Changes to existing schema structures must be marked as **✏️ PROPOSED CHANGE**
+
+### Proposed Entry Highlighting
+
+Use the following markers to indicate schema alignment status:
+
+| Marker | Meaning | Usage |
+|--------|---------|-------|
+| ✅ **CORE** | Exists in schema.prisma | Field/table already defined in core schema |
+| 🆕 **PROPOSED** | New addition | Field/table NOT in core schema - requires schema migration |
+| ✏️ **PROPOSED CHANGE** | Modification | Changes to existing core schema field/table |
+| ⚠️ **DEPRECATED** | Marked for removal | Field/table scheduled for deprecation |
+
+**Example Usage in Field Definitions**:
+
+| Field Name | Data Type | Status | Description |
+|-----------|-----------|--------|-------------|
+| id | UUID | ✅ CORE | Primary key |
+| name | VARCHAR(255) | ✅ CORE | Entity name |
+| priority_score | INTEGER | 🆕 PROPOSED | New field for ranking - requires migration |
+| status | VARCHAR(50) | ✏️ PROPOSED CHANGE | Adding new status value 'on_hold' |
+
+---
+
 **Related Documents**:
 - [Business Requirements](./BR-template.md) - Requirements in text format (no code)
 - [Technical Specification](./TS-template.md) - Implementation patterns in text format (no code)
@@ -69,6 +104,9 @@
 ## Data Entities
 
 ### Entity: {Entity Name}
+
+**Schema Status**: ✅ CORE | 🆕 PROPOSED | ✏️ PROPOSED CHANGE
+> If PROPOSED: Describe why this new entity is needed and its relationship to existing schema
 
 **Description**: {What business entity or concept this represents - e.g., "Represents purchase requests submitted by department staff"}
 
@@ -143,24 +181,27 @@
 
 #### Field Definitions Table
 
-| Field Name | Data Type | Required | Default | Description | Example Values | Constraints |
-|-----------|-----------|----------|---------|-------------|----------------|-------------|
-| id | UUID | Yes | Auto-generated | Primary key, unique identifier | 550e8400-... | Unique, Non-null |
-| {business_key} | VARCHAR(100) | Yes | - | Human-readable business identifier | PR-2024-001 | Unique within active records |
-| name | VARCHAR(255) | Yes | - | Display name or title | "Kitchen Equipment Request" | Non-empty string |
-| description | TEXT | No | NULL | Detailed description or notes | "Replacement for broken..." | - |
-| status | VARCHAR(50) | Yes | 'draft' | Current status in workflow | draft, submitted, approved | Must be from allowed values |
-| amount | DECIMAL(15,2) | Yes | 0.00 | Monetary value in transaction currency | 1250.50 | Must be ≥ 0 |
-| currency_code | VARCHAR(3) | Yes | 'USD' | ISO 4217 currency code | USD, EUR, GBP | Must be valid ISO code |
-| effective_date | DATE | Yes | - | Date when record becomes effective | 2024-01-15 | Cannot be in far past |
-| parent_id | UUID | No | NULL | Reference to parent entity | 550e8400-... | Must reference existing record |
-| department_id | UUID | Yes | - | Department that owns this record | 550e8400-... | Must reference existing dept |
-| metadata | JSONB | No | {} | Flexible additional data | {"priority": "high"} | Valid JSON object |
-| created_at | TIMESTAMPTZ | Yes | NOW() | Creation timestamp (UTC) | 2024-01-15T10:30:00Z | Immutable |
-| created_by | UUID | Yes | - | Creator user reference | 550e8400-... | Must reference existing user |
-| updated_at | TIMESTAMPTZ | Yes | NOW() | Last update timestamp (UTC) | 2024-01-15T14:20:00Z | Auto-updated |
-| updated_by | UUID | Yes | - | Last modifier user reference | 550e8400-... | Must reference existing user |
-| deleted_at | TIMESTAMPTZ | No | NULL | Soft delete timestamp | NULL or timestamp | NULL for active records |
+**Note**: The **Schema Status** column indicates alignment with `docs/app/data-struc/schema.prisma`
+
+| Field Name | Data Type | Schema Status | Required | Default | Description | Example Values | Constraints |
+|-----------|-----------|---------------|----------|---------|-------------|----------------|-------------|
+| id | UUID | ✅ CORE | Yes | Auto-generated | Primary key, unique identifier | 550e8400-... | Unique, Non-null |
+| {business_key} | VARCHAR(100) | ✅ CORE | Yes | - | Human-readable business identifier | PR-2024-001 | Unique within active records |
+| name | VARCHAR(255) | ✅ CORE | Yes | - | Display name or title | "Kitchen Equipment Request" | Non-empty string |
+| description | TEXT | ✅ CORE | No | NULL | Detailed description or notes | "Replacement for broken..." | - |
+| status | VARCHAR(50) | ✅ CORE | Yes | 'draft' | Current status in workflow | draft, submitted, approved | Must be from allowed values |
+| amount | DECIMAL(15,2) | ✅ CORE | Yes | 0.00 | Monetary value in transaction currency | 1250.50 | Must be ≥ 0 |
+| currency_code | VARCHAR(3) | ✅ CORE | Yes | 'USD' | ISO 4217 currency code | USD, EUR, GBP | Must be valid ISO code |
+| effective_date | DATE | ✅ CORE | Yes | - | Date when record becomes effective | 2024-01-15 | Cannot be in far past |
+| parent_id | UUID | ✅ CORE | No | NULL | Reference to parent entity | 550e8400-... | Must reference existing record |
+| department_id | UUID | ✅ CORE | Yes | - | Department that owns this record | 550e8400-... | Must reference existing dept |
+| metadata | JSONB | ✅ CORE | No | {} | Flexible additional data | {"priority": "high"} | Valid JSON object |
+| created_at | TIMESTAMPTZ | ✅ CORE | Yes | NOW() | Creation timestamp (UTC) | 2024-01-15T10:30:00Z | Immutable |
+| created_by | UUID | ✅ CORE | Yes | - | Creator user reference | 550e8400-... | Must reference existing user |
+| updated_at | TIMESTAMPTZ | ✅ CORE | Yes | NOW() | Last update timestamp (UTC) | 2024-01-15T14:20:00Z | Auto-updated |
+| updated_by | UUID | ✅ CORE | Yes | - | Last modifier user reference | 550e8400-... | Must reference existing user |
+| deleted_at | TIMESTAMPTZ | ✅ CORE | No | NULL | Soft delete timestamp | NULL or timestamp | NULL for active records |
+| {new_field} | {type} | 🆕 PROPOSED | {req} | {default} | {New field not in core schema} | {examples} | {constraints} |
 
 #### Data Constraints and Rules
 

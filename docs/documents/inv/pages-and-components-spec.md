@@ -12,6 +12,11 @@
 9. [Physical Count Management](#9-physical-count-management)
 10. [Common Components](#10-common-components)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. Dashboard

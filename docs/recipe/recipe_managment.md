@@ -1,3 +1,8 @@
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **I. Core Feature: Recipe Management**
 
 This encompasses all functionalities related to creating, viewing, editing, and managing individual recipes, including preparation instructions and associated media.

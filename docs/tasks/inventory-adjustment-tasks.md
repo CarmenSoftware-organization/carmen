@@ -1,5 +1,10 @@
 # Inventory Adjustment Module - Development Tasks
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 Based on: `docs/inventory-adjustment/INV-ADJ-PRD.md` and `docs/inventory-adjustment/INV-ADJ-API-Endpoints-Core.md`
 
 ## Frontend Tasks

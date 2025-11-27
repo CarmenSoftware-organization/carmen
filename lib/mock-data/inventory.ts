@@ -355,6 +355,22 @@ export const itemsToCount: CountItem[] = [
     description: "Refined Vegetable Oil - 20L container",
     expectedQuantity: 25,
     unit: "containers"
+  },
+  {
+    id: "9",
+    name: "Table Salt",
+    sku: "SP-ST-009",
+    description: "Fine Table Salt - 2kg pack",
+    expectedQuantity: 45,
+    unit: "packs"
+  },
+  {
+    id: "10",
+    name: "Sugar White",
+    sku: "SG-WH-010",
+    description: "Fine White Sugar - 10kg bag",
+    expectedQuantity: 30,
+    unit: "bags"
   }
 ];
 

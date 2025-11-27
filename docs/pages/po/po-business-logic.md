@@ -1,5 +1,10 @@
 # Purchase Order Module: Business Logic Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## 1. Overview
 
 This document defines the comprehensive business logic governing the Purchase Order (PO) module, including creation rules, approval workflows, financial calculations, status transitions, and integration requirements.

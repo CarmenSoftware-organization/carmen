@@ -28,7 +28,7 @@ The Units Management module supports three types of measurement units:
 - [Business Requirements](./BR-units.md)
 - [Use Cases](./UC-units.md)
 - [Technical Specification](./TS-units.md)
-- [Data Schema](./DS-units.md)
+- [Data Dictionary](./DD-units.md)
 - [Validation Rules](./VAL-units.md)
 
 ---
@@ -1542,7 +1542,7 @@ Diagrams should be updated when:
 - [Business Requirements](./BR-units.md) - Functional requirements and business rules
 - [Use Cases](./UC-units.md) - Detailed user scenarios and workflows
 - [Technical Specification](./TS-units.md) - Technical implementation details
-- [Data Schema](./DS-units.md) - Database structure and relationships
+- [Data Dictionary](./DD-units.md) - Database structure and relationships
 - [Validation Rules](./VAL-units.md) - Input validation and business rule enforcement
 
 ---

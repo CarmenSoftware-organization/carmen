@@ -1,5 +1,10 @@
 # Report Pages Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## 1. Gross Profit Report Page
 
 ### Header Section (64px height)

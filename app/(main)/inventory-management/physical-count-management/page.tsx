@@ -10,7 +10,7 @@ import { CountListItem } from "@/app/(main)/inventory-management/physical-count-
 import { CountDetailCard } from "@/app/(main)/inventory-management/physical-count-management/components/count-detail-card"
 import { NewCountForm, NewCountData } from "@/app/(main)/inventory-management/physical-count-management/components/new-count-form"
 import { CountDetailForm } from "@/app/(main)/inventory-management/physical-count-management/components/count-detail-form"
-import { users, departments, storeLocations, itemsToCount } from '@/lib/mockData'
+import { users, departments, storeLocations, itemsToCount } from '@/lib/mock-data/legacy-simple'
 
 interface CountData {
   storeName: string

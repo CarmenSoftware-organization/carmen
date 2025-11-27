@@ -2,6 +2,11 @@
 
 **Last Updated:** March 27, 2024
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Introduction
 
 This directory contains comprehensive documentation for the Inventory Adjustment module within the Carmen F&B Management System. The Inventory Adjustment module enables authorized users to make controlled corrections to inventory quantities and values, with proper tracking and financial integration.

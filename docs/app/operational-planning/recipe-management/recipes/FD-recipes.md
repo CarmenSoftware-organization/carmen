@@ -6,6 +6,12 @@
 - **Version**: 1.0
 - **Last Updated**: 2024-01-15
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial flow diagrams document created for Recipe Management |
+
 ---
 
 ## 1. Create Recipe Workflow
@@ -1182,9 +1188,3 @@ flowchart TD
 ```
 
 ---
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial flow diagrams document created for Recipe Management |

@@ -6,6 +6,11 @@
 **Date**: January 15, 2025  
 **Status**: Active  
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 This document defines business rules for managing fractional inventory within the Carmen ERP system, including dual-state tracking, conversion operations, stock movements, and inventory optimization for products sold in both whole and fractional forms.

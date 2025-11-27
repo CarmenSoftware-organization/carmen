@@ -1,5 +1,10 @@
 # GRN Footer Testing Guide
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 Testing scenarios for the updated GRN Detail footer patterns based on the form footer layout guide.
 
 ## Test Scenarios

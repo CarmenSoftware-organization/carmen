@@ -29,7 +29,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { Checkbox } from "@/components/ui/checkbox"
-import { DocumentStatus, MockPurchaseRequest } from "@/lib/types"
+import { PRStatus, MockPurchaseRequest } from "@/lib/types"
 import { mockPurchaseRequests } from "@/lib/mock-data"
 
 // Quick date filter options
@@ -49,12 +49,12 @@ const PR_TYPES = [
 ]
 
 // Status filter options
-const STATUS_OPTIONS: DocumentStatus[] = [
-  DocumentStatus.Draft,
-  DocumentStatus.InProgress,
-  DocumentStatus.Approved,
-  DocumentStatus.Rejected,
-  DocumentStatus.Void,
+const STATUS_OPTIONS: PRStatus[] = [
+  PRStatus.Draft,
+  PRStatus.InProgress,
+  PRStatus.Approved,
+  PRStatus.Cancelled,
+  PRStatus.Void,
 ]
 
 interface Filters {
@@ -62,7 +62,7 @@ interface Filters {
   dateTo: string
   deliveryDateFrom: string
   deliveryDateTo: string
-  statuses: DocumentStatus[]
+  statuses: PRStatus[]
   prType: string
   quickFilter: string
 }
@@ -120,11 +120,11 @@ export function PurchaseRequestListReport() {
       byStatus: filteredData.reduce((acc, pr) => {
         acc[pr.status] = (acc[pr.status] || 0) + 1
         return acc
-      }, {} as Record<DocumentStatus, number>),
+      }, {} as Record<PRStatus, number>),
     }
   }, [filteredData])
 
-  const handleStatusToggle = (status: DocumentStatus) => {
+  const handleStatusToggle = (status: PRStatus) => {
     setFilters(prev => ({
       ...prev,
       statuses: prev.statuses.includes(status)
@@ -154,26 +154,26 @@ export function PurchaseRequestListReport() {
     window.print()
   }
 
-  const getStatusBadgeVariant = (status: DocumentStatus) => {
-    const variants: Record<DocumentStatus, string> = {
-      [DocumentStatus.Draft]: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
-      [DocumentStatus.InProgress]: "bg-orange-100 text-orange-800 hover:bg-orange-100",
-      [DocumentStatus.Approved]: "bg-green-100 text-green-800 hover:bg-green-100",
-      [DocumentStatus.Rejected]: "bg-red-100 text-red-800 hover:bg-red-100",
-      [DocumentStatus.Void]: "bg-gray-100 text-gray-800 hover:bg-gray-100",
-      [DocumentStatus.Converted]: "bg-blue-100 text-blue-800 hover:bg-blue-100",
+  const getStatusBadgeVariant = (status: PRStatus) => {
+    const variants: Record<PRStatus, string> = {
+      [PRStatus.Draft]: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
+      [PRStatus.InProgress]: "bg-orange-100 text-orange-800 hover:bg-orange-100",
+      [PRStatus.Approved]: "bg-green-100 text-green-800 hover:bg-green-100",
+      [PRStatus.Cancelled]: "bg-red-100 text-red-800 hover:bg-red-100",
+      [PRStatus.Void]: "bg-gray-100 text-gray-800 hover:bg-gray-100",
+      [PRStatus.Completed]: "bg-blue-100 text-blue-800 hover:bg-blue-100",
     }
     return variants[status] || "bg-gray-100 text-gray-800"
   }
 
-  const getStatusLabel = (status: DocumentStatus) => {
-    const labels: Record<DocumentStatus, string> = {
-      [DocumentStatus.Draft]: "Draft",
-      [DocumentStatus.InProgress]: "In Progress",
-      [DocumentStatus.Approved]: "Approved",
-      [DocumentStatus.Rejected]: "Rejected",
-      [DocumentStatus.Void]: "Void",
-      [DocumentStatus.Converted]: "Converted",
+  const getStatusLabel = (status: PRStatus) => {
+    const labels: Record<PRStatus, string> = {
+      [PRStatus.Draft]: "Draft",
+      [PRStatus.InProgress]: "In Progress",
+      [PRStatus.Approved]: "Approved",
+      [PRStatus.Cancelled]: "Cancelled",
+      [PRStatus.Void]: "Void",
+      [PRStatus.Completed]: "Completed",
     }
     return labels[status] || status
   }
@@ -218,13 +218,13 @@ export function PurchaseRequestListReport() {
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>In Progress</CardDescription>
-            <CardTitle className="text-2xl">{summary.byStatus[DocumentStatus.InProgress] || 0}</CardTitle>
+            <CardTitle className="text-2xl">{summary.byStatus[PRStatus.InProgress] || 0}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Approved</CardDescription>
-            <CardTitle className="text-2xl">{summary.byStatus[DocumentStatus.Approved] || 0}</CardTitle>
+            <CardTitle className="text-2xl">{summary.byStatus[PRStatus.Approved] || 0}</CardTitle>
           </CardHeader>
         </Card>
       </div>

@@ -1,5 +1,10 @@
 # Vendor Pricelist Management Module - Requirements Document
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Introduction
 
 The Vendor Pricelist Management Module is a comprehensive system within the Carmen Supply Chain Management System that provides centralized vendor management, pricelist collection, price validity management, and intelligent price assignment capabilities. This feature streamlines all vendor-related pricing processes across the organization, reduces manual work, and improves procurement decision-making by integrating systematic vendor management with intelligent price assignment to Purchase Requests (PRs).

@@ -1,5 +1,10 @@
 # Help & Support Module PRD
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Executive Summary
 
 The Help & Support Module serves as the comprehensive knowledge management and user assistance center for the Carmen hospitality ERP system. This module provides multi-modal support through documentation, video tutorials, interactive guidance, and ticketing systems to ensure optimal user experience and system adoption across all organizational levels.

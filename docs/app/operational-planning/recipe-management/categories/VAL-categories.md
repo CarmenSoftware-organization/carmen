@@ -12,6 +12,12 @@
   - [DS-categories.md](./DS-categories.md) - Data Schema
   - [FD-categories.md](./FD-categories.md) - Flow Diagrams
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial validation specification created |
+
 ---
 
 ## 1. Overview
@@ -1986,9 +1992,3 @@ export async function validatePermissions(
 - **[FD-categories.md](./FD-categories.md)** - Flow Diagrams and Process Flows
 
 ---
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial validation specification created |

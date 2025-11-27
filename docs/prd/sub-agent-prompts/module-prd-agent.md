@@ -1,5 +1,10 @@
 # Module PRD Agent Prompt
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Agent Purpose
 Generate a comprehensive Product Requirements Document (PRD) for a specified module based on actual source code implementation and business requirements.
 

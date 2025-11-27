@@ -21,13 +21,21 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({
     const { name, value } = e.target;
     setFormData((prev) => {
       const mockPrev = asMockPurchaseRequest(prev);
+      const updatedRequestor = name.startsWith("requestor.")
+        ? { ...mockPrev.requestor, [name.split(".")[1]]: value }
+        : mockPrev.requestor;
+
       return {
         ...prev,
         [name]: value,
-        requestor: name.startsWith("requestor.")
-          ? { ...mockPrev.requestor, [name.split(".")[1]]: value }
-          : mockPrev.requestor,
-      };
+        requestor: updatedRequestor ? {
+          id: updatedRequestor.id || '',
+          name: updatedRequestor.name || '',
+          email: updatedRequestor.email,
+          departmentId: updatedRequestor.departmentId || '',
+          departmentName: updatedRequestor.departmentName,
+        } : prev.requestor,
+      } as PurchaseRequest;
     });
   };
 
@@ -59,8 +67,8 @@ export const DetailsTab: React.FC<DetailsTabProps> = ({
                   const parentKey = keys[0] as keyof typeof mockData;
                   const childKey = keys[1];
                   const parent = mockData[parentKey];
-                  if (parent && typeof parent === 'object' && childKey in parent) {
-                    return String((parent as Record<string, unknown>)[childKey] ?? '');
+                  if (parent && typeof parent === 'object' && !Array.isArray(parent) && childKey in parent) {
+                    return String((parent as unknown as Record<string, unknown>)[childKey] ?? '');
                   }
                 }
                 return '';

@@ -1,462 +1,529 @@
-# Vendor Entry Portal - Validations (VAL)
+# Vendor Price Submission Portal - Validation Specification (VAL)
 
 ## Document Information
-- **Document Type**: Validations Document
-- **Module**: Vendor Management > Vendor Entry Portal
-- **Version**: 1.0
-- **Last Updated**: 2024-01-15
-- **Document Status**: Draft
+- **Document Type**: Validation Specification
+- **System**: Vendor Price Submission Portal
+- **Module**: Vendor Management
+- **Version**: 2.1.0
+- **Status**: Updated
+- **Created**: 2025-01-23
+- **Last Updated**: 2025-11-26
+- **Author**: Product Team
+- **Related Documents**:
+  - [Business Requirements](./BR-vendor-portal.md)
+  - [Use Cases](./UC-vendor-portal.md)
+  - [Technical Specification](./TS-vendor-portal.md)
+  - [Data Dictionary](./DD-vendor-portal.md)
+  - [Flow Diagrams](./FD-vendor-portal.md)
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial version (INCORRECT - full vendor portal) |
+| 2.0 | 2025-01-23 | Product Team | Complete rewrite based on actual implementation - token-based price submission only |
+| 2.1.0 | 2025-11-26 | System | Removed approval workflow references; Updated status to draft → submitted; Aligned with BR v2.1.0 |
+
+---
+
+## Table of Contents
+
+1. [Introduction](#1-introduction)
+2. [Token Authentication Validation](#2-token-authentication-validation)
+3. [Field-Level Validations](#3-field-level-validations)
+4. [Business Rule Validations](#4-business-rule-validations)
+5. [Quality Score Calculation](#5-quality-score-calculation)
+6. [Excel Template Validation](#6-excel-template-validation)
+7. [Excel Upload Validation](#7-excel-upload-validation)
+8. [Draft Validation](#8-draft-validation)
+9. [Final Submission Validation](#9-final-submission-validation)
+10. [Security Validations](#10-security-validations)
+11. [Complete Zod Schemas](#11-complete-zod-schemas)
+12. [Error Messages Reference](#12-error-messages-reference)
+13. [Validation Testing Matrix](#13-validation-testing-matrix)
+14. [Performance Validation](#14-performance-validation)
+15. [Validation Best Practices](#15-validation-best-practices)
 
 ---
 
 ## 1. Introduction
 
-This document defines all validation rules, error messages, and data integrity constraints for the Vendor Entry Portal module. It includes field-level validations, business rule validations, Zod schemas, database constraints, and security validation specifications.
+### 1.1 Purpose
 
-The Vendor Entry Portal enables vendors to self-register, manage profiles, respond to pricing templates and RFQs, view purchase orders, submit invoices, and track performance metrics. Comprehensive validation ensures data integrity, security compliance, business rule enforcement, and proper approval workflows.
+This document defines all validation rules, error messages, and data integrity constraints for the **Vendor Price Submission Portal** module. It includes token authentication validation, field-level validations, business rule validations, quality scoring algorithms, Excel template/upload validations, and security validation specifications.
+
+### 1.2 Scope
+
+This document covers validations for:
+
+**Staff-side**:
+- Campaign creation and configuration validation
+- Vendor invitation validation
+- Pricelist viewing validation
+
+**Note**: There is no approval workflow - pricelists go from draft → submitted (active) directly.
+
+**Vendor-side**:
+- Token-based authentication validation
+- Price submission validation (online entry, Excel upload, Excel template download)
+- Draft pricelist validation
+- Final submission validation
+- Quality score calculation validation
+
+This document does **NOT** cover:
+- Vendor registration or onboarding validation
+- Vendor profile management validation
+- RFQ bidding or competitive quoting validation
+- Purchase order or invoice management validation
+- General vendor relationship management validation
+
+### 1.3 Validation Principles
+
+1. **Defense in Depth**: Multiple validation layers (client, server, database)
+2. **Fail Fast**: Detect and report errors immediately
+3. **User-Friendly Errors**: Clear, actionable error messages for vendors
+4. **Security First**: All user input is untrusted and validated
+5. **Data Integrity**: Ensure consistency and accuracy across all operations
+6. **Performance**: Validations must be fast (<100ms for field-level validations)
+
+### 1.4 Validation Strategy
+
+```mermaid
+graph TB
+    Start([User Input]) --> ClientVal[Client-Side Validation]
+    ClientVal -->|Pass| ServerVal[Server-Side Validation]
+    ClientVal -->|Fail| ClientError[Display Inline Error]
+    ServerVal -->|Pass| BizRules[Business Rule Validation]
+    ServerVal -->|Fail| ServerError[Return Error Response]
+    BizRules -->|Pass| DBVal[Database Constraint Validation]
+    BizRules -->|Fail| BizError[Return Business Rule Error]
+    DBVal -->|Pass| Success[Data Persisted]
+    DBVal -->|Fail| DBError[Return Constraint Error]
+
+    ClientError --> UserFix[User Corrects Input]
+    ServerError --> UserFix
+    BizError --> UserFix
+    DBError --> UserFix
+    UserFix --> ClientVal
+
+    Success --> End([Validation Complete])
+
+    style Success fill:#90EE90
+    style ClientError fill:#FFB6C1
+    style ServerError fill:#FFB6C1
+    style BizError fill:#FFB6C1
+    style DBError fill:#FFB6C1
+```
 
 ---
 
-## 2. Field-Level Validations
+## 2. Token Authentication Validation
 
-### 2.1 Vendor Registration - Company Information
+### 2.1 Token Format Validation
 
-#### Legal Company Name
-**Field**: `legalName` (stored in `tb_vendor_registration.legal_name`)
+#### Token UUID Format
+**Field**: `token` (URL parameter)
 
 | Rule | Validation | Error Message |
 |------|------------|---------------|
-| Required | Must not be empty | "Legal company name is required" |
-| Length | 3-200 characters | "Company name must be 3-200 characters" |
-| Format | Letters, numbers, spaces, and common punctuation | "Company name contains invalid characters" |
-| Unique | Must not duplicate active vendor | "A vendor with this name already exists" |
+| Required | Must be present in URL | "Invalid or missing access token" |
+| Format | Must be valid UUID v4 | "Invalid token format" |
+| Length | Exactly 36 characters (with hyphens) | "Invalid token length" |
+| Pattern | `^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$` | "Malformed token format" |
 
 **Zod Schema**:
 ```typescript
-legalName: z.string()
-  .min(3, 'Company name must be at least 3 characters')
-  .max(200, 'Company name must not exceed 200 characters')
-  .regex(/^[a-zA-Z0-9\s\-\.\,\&\'\(\)]+$/, 'Company name contains invalid characters')
-  .refine(async (name) => {
-    const existing = await prisma.vendor.findFirst({
-      where: {
-        legalName: { equals: name, mode: 'insensitive' },
-        status: { in: ['ACTIVE', 'PENDING_APPROVAL'] },
-        deletedAt: null
+token: z.string()
+  .uuid('Invalid token format')
+  .regex(
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    'Malformed UUID v4 token'
+  )
+```
+
+**Validation Logic**:
+```typescript
+async function validateTokenFormat(token: string): Promise<ValidationResult> {
+  // Check if token is present
+  if (!token || token.trim() === '') {
+    return {
+      valid: false,
+      code: 'TOKEN_001',
+      message: 'Invalid or missing access token',
+      severity: 'error',
+    };
+  }
+
+  // Check UUID v4 format
+  const uuidV4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidV4Regex.test(token)) {
+    return {
+      valid: false,
+      code: 'TOKEN_002',
+      message: 'Invalid token format',
+      severity: 'error',
+    };
+  }
+
+  return { valid: true };
+}
+```
+
+### 2.2 Token Existence Validation
+
+**Database Check**:
+```typescript
+async function validateTokenExists(token: string): Promise<ValidationResult> {
+  const invitation = await prisma.vendorInvitation.findUnique({
+    where: { token },
+    include: {
+      campaign: true,
+      vendor: true,
+    },
+  });
+
+  if (!invitation) {
+    // Log security event - potential token guessing attack
+    await createAuditLog({
+      action: 'TOKEN_NOT_FOUND',
+      actionCategory: 'SECURITY',
+      status: 'FAILURE',
+      severity: 'WARNING',
+      details: { token, ipAddress: req.ip },
+    });
+
+    return {
+      valid: false,
+      code: 'TOKEN_003',
+      message: 'Invalid or expired invitation link',
+      severity: 'error',
+    };
+  }
+
+  return { valid: true, data: invitation };
+}
+```
+
+### 2.3 Token Expiration Validation
+
+**Expiry Check**:
+```typescript
+async function validateTokenNotExpired(invitation: VendorInvitation): Promise<ValidationResult> {
+  const now = new Date();
+
+  if (invitation.expiresAt < now) {
+    return {
+      valid: false,
+      code: 'TOKEN_004',
+      message: 'This invitation has expired. Please contact procurement to request a new invitation.',
+      severity: 'error',
+      details: {
+        expiryDate: invitation.expiresAt,
+        daysExpired: Math.floor((now.getTime() - invitation.expiresAt.getTime()) / (24 * 60 * 60 * 1000)),
+      },
+    };
+  }
+
+  // Warning if expires within 24 hours
+  const twentyFourHoursFromNow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  if (invitation.expiresAt < twentyFourHoursFromNow) {
+    return {
+      valid: true,
+      code: 'TOKEN_005',
+      message: `This invitation expires in ${Math.ceil((invitation.expiresAt.getTime() - now.getTime()) / (60 * 60 * 1000))} hours. Please submit your pricelist soon.`,
+      severity: 'warning',
+    };
+  }
+
+  return { valid: true };
+}
+```
+
+### 2.4 Token Status Validation
+
+**Status Check**:
+```typescript
+async function validateTokenStatus(invitation: VendorInvitation): Promise<ValidationResult> {
+  // Valid statuses for portal access: 'sent', 'delivered', 'accessed'
+  const validStatuses = ['sent', 'delivered', 'accessed'];
+
+  if (!validStatuses.includes(invitation.status)) {
+    let message = 'This invitation is no longer valid.';
+
+    if (invitation.status === 'submitted') {
+      message = 'You have already submitted your pricelist for this campaign. Thank you!';
+    } else if (invitation.status === 'expired') {
+      message = 'This invitation has expired. Please contact procurement for assistance.';
+    } else if (invitation.status === 'cancelled') {
+      message = 'This invitation has been cancelled by the procurement team.';
+    }
+
+    return {
+      valid: false,
+      code: 'TOKEN_006',
+      message,
+      severity: 'error',
+      details: { status: invitation.status },
+    };
+  }
+
+  return { valid: true };
+}
+```
+
+### 2.5 Campaign Active Validation
+
+**Campaign Status Check**:
+```typescript
+async function validateCampaignActive(campaign: PriceCollectionCampaign): Promise<ValidationResult> {
+  if (campaign.status !== 'active') {
+    let message = 'This price collection campaign is not currently active.';
+
+    if (campaign.status === 'draft') {
+      message = 'This campaign has not been launched yet.';
+    } else if (campaign.status === 'completed') {
+      message = 'This campaign has been completed and is no longer accepting submissions.';
+    } else if (campaign.status === 'cancelled') {
+      message = 'This campaign has been cancelled.';
+    }
+
+    return {
+      valid: false,
+      code: 'CAMPAIGN_001',
+      message,
+      severity: 'error',
+      details: { campaignStatus: campaign.status },
+    };
+  }
+
+  // Check campaign dates
+  const now = new Date();
+
+  if (campaign.scheduledStart > now) {
+    return {
+      valid: false,
+      code: 'CAMPAIGN_002',
+      message: `This campaign has not started yet. It will begin on ${campaign.scheduledStart.toLocaleDateString()}.`,
+      severity: 'error',
+      details: { scheduledStart: campaign.scheduledStart },
+    };
+  }
+
+  if (campaign.scheduledEnd < now) {
+    return {
+      valid: false,
+      code: 'CAMPAIGN_003',
+      message: `This campaign ended on ${campaign.scheduledEnd.toLocaleDateString()} and is no longer accepting submissions.`,
+      severity: 'error',
+      details: { scheduledEnd: campaign.scheduledEnd },
+    };
+  }
+
+  return { valid: true };
+}
+```
+
+### 2.6 Complete Token Validation
+
+**Complete Validation Flow**:
+```typescript
+async function validateTokenAccess(token: string, req: Request): Promise<ValidationResult> {
+  // Step 1: Format validation
+  const formatCheck = await validateTokenFormat(token);
+  if (!formatCheck.valid) return formatCheck;
+
+  // Step 2: Existence validation
+  const existsCheck = await validateTokenExists(token);
+  if (!existsCheck.valid) return existsCheck;
+
+  const invitation = existsCheck.data!;
+
+  // Step 3: Expiration validation
+  const expiryCheck = await validateTokenNotExpired(invitation);
+  if (!expiryCheck.valid) return expiryCheck;
+
+  // Step 4: Status validation
+  const statusCheck = await validateTokenStatus(invitation);
+  if (!statusCheck.valid) return statusCheck;
+
+  // Step 5: Campaign active validation
+  const campaignCheck = await validateCampaignActive(invitation.campaign);
+  if (!campaignCheck.valid) return campaignCheck;
+
+  // Step 6: Update invitation status on first access
+  if (invitation.status === 'sent' || invitation.status === 'delivered') {
+    await prisma.vendorInvitation.update({
+      where: { id: invitation.id },
+      data: {
+        status: 'accessed',
+        accessedAt: new Date(),
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
       },
     });
-    return !existing;
-  }, 'A vendor with this name already exists')
+  }
+
+  // Step 7: Create portal session
+  const session = await createPortalSession(invitation, req);
+
+  return {
+    valid: true,
+    data: {
+      invitation,
+      campaign: invitation.campaign,
+      vendor: invitation.vendor,
+      pricelist: invitation.pricelist,
+      session,
+    },
+  };
+}
 ```
 
-#### Tax ID (EIN)
-**Field**: `taxId` (stored in `tb_vendor_registration.tax_id`)
+---
+
+## 3. Field-Level Validations
+
+### 3.1 Pricelist Header Validations
+
+#### Currency
+**Field**: `currency` (pricelist header)
 
 | Rule | Validation | Error Message |
 |------|------------|---------------|
-| Required | Must not be empty | "Tax ID (EIN) is required" |
-| Format | XX-XXXXXXX (9 digits with hyphen) | "Tax ID must be in format XX-XXXXXXX" |
-| Unique | Must not duplicate active vendor | "This Tax ID is already registered" |
-| Checksum | Valid EIN format | "Invalid Tax ID format" |
+| Required | Must not be empty | "Currency is required" |
+| Valid | Must be valid ISO 4217 currency code | "Invalid currency code" |
+| Allowed | Must be in supported currencies list | "Currency not supported for this campaign" |
 
 **Zod Schema**:
 ```typescript
-taxId: z.string()
-  .regex(/^\d{2}-\d{7}$/, 'Tax ID must be in format XX-XXXXXXX')
-  .refine(async (taxId) => {
-    const existing = await prisma.vendor.findFirst({
-      where: { taxId, status: { in: ['ACTIVE', 'PENDING_APPROVAL'] } },
-    });
-    return !existing;
-  }, 'This Tax ID is already registered')
-```
-
-#### Business Type
-**Field**: `businessType` (stored in `tb_vendor_registration.business_type`)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must select business type | "Business type is required" |
-| Valid | Must be valid enum value | "Invalid business type selected" |
-
-**Zod Schema**:
-```typescript
-businessType: z.enum([
-  'CORPORATION',
-  'LLC',
-  'PARTNERSHIP',
-  'SOLE_PROPRIETORSHIP',
-  'NON_PROFIT',
-  'GOVERNMENT',
-  'OTHER'
-], {
-  errorMap: () => ({ message: 'Invalid business type selected' }),
+currency: z.enum(['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CNY', 'MXN', 'THB'], {
+  errorMap: () => ({ message: 'Invalid currency code' }),
 })
 ```
 
-#### Physical Address
-**Field**: `physicalAddress` (stored in `tb_vendor_registration.physical_address JSONB`)
+**Validation Logic**:
+```typescript
+async function validateCurrency(currency: string, campaignId: string): Promise<ValidationResult> {
+  const campaign = await prisma.priceCollectionCampaign.findUnique({
+    where: { id: campaignId },
+    include: { template: true },
+  });
+
+  const supportedCurrencies = campaign.template.supportedCurrencies || ['USD'];
+
+  if (!supportedCurrencies.includes(currency)) {
+    return {
+      valid: false,
+      code: 'CURRENCY_001',
+      message: `Currency ${currency} is not supported for this campaign. Supported currencies: ${supportedCurrencies.join(', ')}`,
+      severity: 'error',
+      details: { supportedCurrencies },
+    };
+  }
+
+  return { valid: true };
+}
+```
+
+#### Effective Start Date
+**Field**: `effectiveStartDate` (pricelist header)
 
 | Rule | Validation | Error Message |
 |------|------------|---------------|
-| Required | All address fields required | "Complete physical address is required" |
-| Street Length | 5-200 characters | "Street address must be 5-200 characters" |
-| City Length | 2-100 characters | "City must be 2-100 characters" |
-| State | Valid US state code | "Invalid state code" |
-| Postal Code | Valid US ZIP (XXXXX or XXXXX-XXXX) | "Invalid ZIP code format" |
-| Country | ISO 3166-1 alpha-2 code | "Invalid country code" |
+| Required | Must not be empty | "Effective start date is required" |
+| Format | Must be valid ISO 8601 date | "Invalid date format" |
+| Range | Can be past or future date | None |
 
 **Zod Schema**:
 ```typescript
-physicalAddress: z.object({
-  street: z.string()
-    .min(5, 'Street address must be at least 5 characters')
-    .max(200, 'Street address must not exceed 200 characters'),
-  street2: z.string().max(200).optional(),
-  city: z.string()
-    .min(2, 'City must be at least 2 characters')
-    .max(100, 'City must not exceed 100 characters'),
-  state: z.string()
-    .length(2, 'State must be 2-letter code')
-    .regex(/^[A-Z]{2}$/, 'State must be uppercase letters'),
-  postalCode: z.string()
-    .regex(/^\d{5}(-\d{4})?$/, 'ZIP code must be XXXXX or XXXXX-XXXX'),
-  country: z.string()
-    .length(2, 'Country must be 2-letter ISO code')
-    .default('US'),
+effectiveStartDate: z.coerce.date({
+  required_error: 'Effective start date is required',
+  invalid_type_error: 'Invalid date format',
 })
 ```
 
-### 2.2 Vendor Registration - Contact Information
-
-#### Primary Contact Email
-**Field**: `primaryContact.email` (stored in `tb_vendor_registration.primary_contact JSONB`)
+#### Effective End Date
+**Field**: `effectiveEndDate` (pricelist header)
 
 | Rule | Validation | Error Message |
 |------|------------|---------------|
-| Required | Must not be empty | "Primary contact email is required" |
-| Format | Valid email format | "Invalid email address" |
-| Length | Max 255 characters | "Email must not exceed 255 characters" |
-| Unique | Must not be used by another vendor | "This email is already registered" |
-| Domain | Cannot be disposable email | "Disposable email addresses are not allowed" |
+| Optional | Can be null (open-ended pricelist) | None |
+| Format | Must be valid ISO 8601 date if provided | "Invalid date format" |
+| Range | Must be after or equal to start date | "End date must be on or after start date" |
 
 **Zod Schema**:
 ```typescript
-email: z.string()
-  .email('Invalid email address')
-  .max(255, 'Email must not exceed 255 characters')
-  .toLowerCase()
-  .refine((email) => {
-    const disposableDomains = ['tempmail.com', 'guerrillamail.com', '10minutemail.com'];
-    const domain = email.split('@')[1];
-    return !disposableDomains.includes(domain);
-  }, 'Disposable email addresses are not allowed')
-  .refine(async (email) => {
-    const existing = await prisma.vendorPortalUser.findFirst({
-      where: { email, deletedAt: null },
-    });
-    return !existing;
-  }, 'This email is already registered')
-```
-
-#### Phone Number
-**Field**: `primaryContact.phone` (stored in `tb_vendor_registration.primary_contact JSONB`)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must not be empty | "Phone number is required" |
-| Format | Valid US phone format | "Invalid phone number format" |
-| Length | 10-15 digits | "Phone number must be 10-15 digits" |
-
-**Zod Schema**:
-```typescript
-phone: z.string()
-  .regex(/^\+?1?\d{10,14}$/, 'Invalid phone number format')
-  .transform((val) => val.replace(/\D/g, '')) // Remove non-digits
-```
-
-### 2.3 Vendor Registration - Business Details
-
-#### Business Categories
-**Field**: `businessCategories` (stored in `tb_vendor_registration.business_categories JSONB`)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must select at least one category | "At least one business category is required" |
-| Max | Maximum 10 categories | "Maximum 10 business categories allowed" |
-| Valid | Each must be valid category ID | "Invalid business category selected" |
-
-**Zod Schema**:
-```typescript
-businessCategories: z.array(z.string().uuid())
-  .min(1, 'At least one business category is required')
-  .max(10, 'Maximum 10 business categories allowed')
-  .refine(async (categoryIds) => {
-    const categories = await prisma.businessCategory.findMany({
-      where: { id: { in: categoryIds }, isActive: true },
-    });
-    return categories.length === categoryIds.length;
-  }, 'One or more invalid business categories selected')
-```
-
-#### Bank Account Number
-**Field**: `bankAccount.accountNumber` (stored in `tb_vendor_registration.bank_account JSONB`)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must not be empty | "Bank account number is required" |
-| Format | 4-17 digits | "Account number must be 4-17 digits" |
-| Encryption | Encrypted with AES-256 before storage | N/A |
-
-**Zod Schema**:
-```typescript
-accountNumber: z.string()
-  .regex(/^\d{4,17}$/, 'Account number must be 4-17 digits')
-  .transform((val) => encryptData(val)) // Encrypt before storage
-```
-
-#### Routing Number
-**Field**: `bankAccount.routingNumber` (stored in `tb_vendor_registration.bank_account JSONB`)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must not be empty | "Routing number is required" |
-| Format | 9 digits | "Routing number must be 9 digits" |
-| Checksum | Valid routing number checksum | "Invalid routing number" |
-| Encryption | Encrypted with AES-256 before storage | N/A |
-
-**Zod Schema**:
-```typescript
-routingNumber: z.string()
-  .length(9, 'Routing number must be 9 digits')
-  .regex(/^\d{9}$/, 'Routing number must be numeric')
-  .refine((routing) => validateRoutingChecksum(routing), 'Invalid routing number')
-  .transform((val) => encryptData(val))
-```
-
-### 2.4 Vendor Registration - Document Upload
-
-#### Document Type
-**Field**: `documentType` (stored in `tb_vendor_document.document_type`)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must select document type | "Document type is required" |
-| Valid | Must be valid enum value | "Invalid document type selected" |
-| Mandatory | Required documents must be uploaded | "Business License, Tax Certificate, and Insurance are required" |
-
-**Zod Schema**:
-```typescript
-documentType: z.enum([
-  'BUSINESS_LICENSE',
-  'TAX_CERTIFICATE',
-  'INSURANCE_GENERAL',
-  'INSURANCE_LIABILITY',
-  'INSURANCE_WORKERS_COMP',
-  'CERTIFICATION_ISO',
-  'CERTIFICATION_ORGANIC',
-  'CERTIFICATION_HALAL',
-  'CERTIFICATION_KOSHER',
-  'CERTIFICATION_FAIR_TRADE',
-  'CERTIFICATION_OTHER',
-  'BANK_REFERENCE',
-  'TRADE_REFERENCE',
-  'W9_FORM',
-  'OTHER'
-], {
-  errorMap: () => ({ message: 'Invalid document type selected' }),
+effectiveEndDate: z.coerce.date({
+  invalid_type_error: 'Invalid date format',
 })
-```
-
-#### File Upload
-**Field**: `file` (uploaded to S3, reference in `tb_vendor_document`)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must upload file | "Document file is required" |
-| Size | Max 50MB per file | "File size must not exceed 50MB" |
-| Format | PDF, JPG, PNG, DOC, DOCX, XLS, XLSX | "Invalid file format. Allowed: PDF, JPG, PNG, DOC, DOCX, XLS, XLSX" |
-| Virus Scan | Must pass virus scan | "File failed virus scan" |
-| Name Length | Filename max 255 characters | "Filename must not exceed 255 characters" |
-
-**Zod Schema**:
-```typescript
-file: z.custom<File>()
-  .refine((file) => file.size <= 50 * 1024 * 1024, 'File size must not exceed 50MB')
-  .refine((file) => {
-    const allowedTypes = [
-      'application/pdf',
-      'image/jpeg',
-      'image/png',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    ];
-    return allowedTypes.includes(file.type);
-  }, 'Invalid file format')
-  .refine((file) => file.name.length <= 255, 'Filename must not exceed 255 characters')
-```
-
-#### Expiry Date
-**Field**: `expiryDate` (stored in `tb_vendor_document.expiry_date`)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required for certifications | Required for licenses/certifications | "Expiry date is required for this document type" |
-| Format | ISO 8601 date | "Invalid date format" |
-| Future Date | Must be in the future | "Expiry date must be in the future" |
-| Range | Max 10 years in future | "Expiry date cannot be more than 10 years in the future" |
-
-**Zod Schema**:
-```typescript
-expiryDate: z.coerce.date()
-  .refine((date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date > today;
-  }, 'Expiry date must be in the future')
-  .refine((date) => {
-    const tenYearsFromNow = new Date();
-    tenYearsFromNow.setFullYear(tenYearsFromNow.getFullYear() + 10);
-    return date <= tenYearsFromNow;
-  }, 'Expiry date cannot be more than 10 years in the future')
+  .nullable()
   .refine((date, ctx) => {
-    const requiresExpiry = [
-      'BUSINESS_LICENSE',
-      'TAX_CERTIFICATE',
-      'INSURANCE_GENERAL',
-      'INSURANCE_LIABILITY',
-      'INSURANCE_WORKERS_COMP',
-      'CERTIFICATION_ISO',
-      'CERTIFICATION_ORGANIC',
-      'CERTIFICATION_HALAL',
-      'CERTIFICATION_KOSHER',
-    ];
-    if (requiresExpiry.includes(ctx.parent.documentType)) {
-      return date !== undefined && date !== null;
-    }
-    return true;
-  }, 'Expiry date is required for this document type')
+    if (date === null) return true; // Open-ended pricelist
+    const startDate = ctx.parent.effectiveStartDate;
+    return date >= startDate;
+  }, 'End date must be on or after start date')
+```
+
+**Validation Logic**:
+```typescript
+async function validateEffectiveDates(
+  startDate: Date,
+  endDate: Date | null
+): Promise<ValidationResult> {
+  // Null end date = open-ended pricelist (valid)
+  if (endDate === null) {
+    return { valid: true };
+  }
+
+  // End date must be >= start date
+  if (endDate < startDate) {
+    return {
+      valid: false,
+      code: 'DATE_001',
+      message: 'Effective end date must be on or after the effective start date',
+      severity: 'error',
+      details: {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      },
+    };
+  }
+
+  return { valid: true };
+}
+```
+
+#### General Notes
+**Field**: `notes` (pricelist header)
+
+| Rule | Validation | Error Message |
+|------|------------|---------------|
+| Optional | Can be empty | None |
+| Length | Max 2000 characters | "Notes must not exceed 2000 characters" |
+| XSS Protection | No script tags | "Notes contain invalid content" |
+
+**Zod Schema**:
+```typescript
+notes: z.string()
+  .max(2000, 'Notes must not exceed 2000 characters')
+  .refine(
+    (text) => !/<script[^>]*>.*?<\/script>/i.test(text),
+    'Notes contain invalid content'
+  )
   .optional()
 ```
 
-### 2.5 Authentication Validations
-
-#### Email (Login)
-**Field**: `email` (login form)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must not be empty | "Email is required" |
-| Format | Valid email format | "Invalid email address" |
-| Exists | Must exist in system | "Invalid credentials" |
-
-**Zod Schema**:
-```typescript
-email: z.string()
-  .email('Invalid email address')
-  .toLowerCase()
-```
-
-#### Password (Login)
-**Field**: `password` (login form)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must not be empty | "Password is required" |
-| Length | Min 8 characters | "Password must be at least 8 characters" |
-
-**Zod Schema**:
-```typescript
-password: z.string()
-  .min(8, 'Password must be at least 8 characters')
-```
-
-#### Password (Registration/Change)
-**Field**: `password` (stored in `tb_vendor_portal_user.password_hash`)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must not be empty | "Password is required" |
-| Length | 12-128 characters | "Password must be 12-128 characters" |
-| Complexity | Must contain uppercase, lowercase, number, special char | "Password must contain uppercase, lowercase, number, and special character" |
-| Common Password | Not in common password list | "Password is too common. Please choose a stronger password" |
-| Username Match | Cannot contain username/email | "Password cannot contain your email address" |
-
-**Zod Schema**:
-```typescript
-password: z.string()
-  .min(12, 'Password must be at least 12 characters')
-  .max(128, 'Password must not exceed 128 characters')
-  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-  .regex(/[0-9]/, 'Password must contain at least one number')
-  .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character')
-  .refine((password) => {
-    const commonPasswords = ['Password123!', 'Welcome123!', 'Admin123!'];
-    return !commonPasswords.includes(password);
-  }, 'Password is too common')
-  .refine((password, ctx) => {
-    const email = ctx.parent.email?.toLowerCase();
-    if (!email) return true;
-    const username = email.split('@')[0];
-    return !password.toLowerCase().includes(username);
-  }, 'Password cannot contain your email address')
-```
-
-#### 2FA Code
-**Field**: `code` (2FA verification)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must not be empty | "Verification code is required" |
-| Format | 6 digits | "Verification code must be 6 digits" |
-| Expiry | Valid within 10 minutes | "Verification code has expired" |
-| Attempts | Max 3 attempts | "Too many failed attempts. Please request a new code" |
-
-**Zod Schema**:
-```typescript
-code: z.string()
-  .length(6, 'Verification code must be 6 digits')
-  .regex(/^\d{6}$/, 'Verification code must be numeric')
-```
-
-### 2.6 Profile Update Validations
-
-#### Company Information Update
-**Field**: Various fields in vendor profile
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Critical Change Detection | Changes to legal name, tax ID, bank account require approval | "This change requires approval" |
-| Change Reason | Required for critical changes (min 20 chars) | "Please provide a reason for this change (min 20 characters)" |
-| Approval Status | Cannot edit during pending approval | "Profile update is pending approval" |
-
-**Zod Schema**:
-```typescript
-changeReason: z.string()
-  .min(20, 'Change reason must be at least 20 characters')
-  .max(500, 'Change reason must not exceed 500 characters')
-  .refine((reason, ctx) => {
-    if (ctx.parent.isCriticalChange) {
-      return reason && reason.length >= 20;
-    }
-    return true;
-  }, 'Change reason is required for critical changes')
-  .optional()
-```
-
-### 2.7 Price Template Response Validations
+### 3.2 Product Pricing Validations
 
 #### Product ID
-**Field**: `productId` (price template item)
+**Field**: `productId` (pricelist item)
 
 | Rule | Validation | Error Message |
 |------|------------|---------------|
 | Required | Must be present | "Product ID is required" |
-| Valid | Must exist in template | "Invalid product for this template" |
-| Unique | No duplicate products in response | "Duplicate product in pricing response" |
+| Valid | Must be valid UUID | "Invalid product ID format" |
+| Exists | Must exist in template | "Product not found in campaign template" |
+| Unique | No duplicate products in pricelist | "Duplicate product in pricelist" |
 
 **Zod Schema**:
 ```typescript
@@ -470,34 +537,35 @@ productId: z.string()
       },
     });
     return templateItem !== null;
-  }, 'Invalid product for this template')
+  }, 'Product not found in campaign template')
 ```
 
-#### Unit Price
-**Field**: `unitPrice` (price template response)
+#### Base Unit Price (Simple Pricing)
+**Field**: `basePrice` (pricelist item)
 
 | Rule | Validation | Error Message |
 |------|------------|---------------|
-| Required | Must provide unit price | "Unit price is required" |
+| Required | Must provide price if no MOQ tiers | "Base unit price is required" |
 | Type | Must be positive number | "Unit price must be a positive number" |
 | Range | 0.0001 to 999,999,999.9999 | "Unit price must be between 0.0001 and 999,999,999.9999" |
 | Precision | Max 4 decimal places | "Unit price must have at most 4 decimal places" |
-| Market Range | Warning if >20% above market average | "Price is significantly higher than market average (warning)" |
 
 **Zod Schema**:
 ```typescript
-unitPrice: z.number()
+basePrice: z.number()
   .positive('Unit price must be a positive number')
   .min(0.0001, 'Unit price must be at least 0.0001')
   .max(999999999.9999, 'Unit price must not exceed 999,999,999.9999')
   .refine((val) => {
-    const decimalPlaces = (val.toFixed(10).split('.')[1].replace(/0+$/, '')).length;
-    return decimalPlaces <= 4;
+    const decimalStr = val.toFixed(10);
+    const decimalPart = decimalStr.split('.')[1].replace(/0+$/, '');
+    return decimalPart.length <= 4;
   }, 'Unit price must have at most 4 decimal places')
+  .optional() // Optional if MOQ tiers provided
 ```
 
-#### Lead Time Days
-**Field**: `leadTimeDays` (price template response)
+#### Lead Time
+**Field**: `leadTime` (pricelist item)
 
 | Rule | Validation | Error Message |
 |------|------------|---------------|
@@ -507,439 +575,400 @@ unitPrice: z.number()
 
 **Zod Schema**:
 ```typescript
-leadTimeDays: z.number()
+leadTime: z.number()
   .int('Lead time must be a whole number')
   .positive('Lead time must be a positive number')
   .min(1, 'Lead time must be at least 1 day')
   .max(365, 'Lead time must not exceed 365 days')
 ```
 
-### 2.8 RFQ Response Validations
+### 3.3 MOQ Tier Pricing Validations
 
-#### Bid Amount
-**Field**: `bidAmount` (RFQ line item bid)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must provide bid amount | "Bid amount is required" |
-| Type | Must be positive number | "Bid amount must be a positive number" |
-| Range | 0.01 to 999,999,999.99 | "Bid amount must be between 0.01 and 999,999,999.99" |
-| Precision | Max 2 decimal places for total bid | "Bid amount must have at most 2 decimal places" |
-| Budget | Warning if exceeds budget by >10% | "Bid exceeds budget by more than 10% (warning)" |
-
-**Zod Schema**:
-```typescript
-bidAmount: z.number()
-  .positive('Bid amount must be a positive number')
-  .min(0.01, 'Bid amount must be at least 0.01')
-  .max(999999999.99, 'Bid amount must not exceed 999,999,999.99')
-  .refine((val) => {
-    const decimalPlaces = (val.toFixed(10).split('.')[1].replace(/0+$/, '')).length;
-    return decimalPlaces <= 2;
-  }, 'Bid amount must have at most 2 decimal places')
-```
-
-#### Bid Validity Days
-**Field**: `bidValidityDays` (RFQ response)
+#### MOQ Tier Structure
+**Field**: `pricing` (array of MOQ tiers)
 
 | Rule | Validation | Error Message |
 |------|------------|---------------|
-| Required | Must provide bid validity | "Bid validity period is required" |
-| Type | Must be positive integer | "Bid validity must be a positive whole number" |
-| Range | 7 to 90 days | "Bid validity must be between 7 and 90 days" |
-| Minimum | Must meet RFQ minimum (if specified) | "Bid validity must be at least {min} days as specified in RFQ" |
+| Required | Must have at least 1 tier | "At least one pricing tier is required" |
+| Max Tiers | Maximum 5 tiers | "Maximum 5 MOQ pricing tiers allowed" |
+| Ascending MOQ | MOQ quantities must be in ascending order | "MOQ quantities must be in ascending order" |
+| Unique MOQ | No duplicate MOQ quantities | "Duplicate MOQ quantity detected" |
 
 **Zod Schema**:
 ```typescript
-bidValidityDays: z.number()
-  .int('Bid validity must be a whole number')
-  .positive('Bid validity must be a positive number')
-  .min(7, 'Bid validity must be at least 7 days')
-  .max(90, 'Bid validity must not exceed 90 days')
-  .refine((days, ctx) => {
-    const minRequired = ctx.parent.rfq?.minBidValidityDays;
-    if (minRequired) {
-      return days >= minRequired;
-    }
-    return true;
-  }, 'Bid validity does not meet RFQ requirements')
-```
-
-### 2.9 Invoice Submission Validations
-
-#### Invoice Number
-**Field**: `invoiceNumber` (vendor invoice submission)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must not be empty | "Invoice number is required" |
-| Length | 5-50 characters | "Invoice number must be 5-50 characters" |
-| Format | Alphanumeric with hyphens | "Invoice number must be alphanumeric (hyphens allowed)" |
-| Unique | Must be unique per vendor | "Invoice number already exists for your company" |
-
-**Zod Schema**:
-```typescript
-invoiceNumber: z.string()
-  .min(5, 'Invoice number must be at least 5 characters')
-  .max(50, 'Invoice number must not exceed 50 characters')
-  .regex(/^[A-Z0-9\-]+$/, 'Invoice number must be alphanumeric (hyphens allowed)')
-  .refine(async (invoiceNumber, ctx) => {
-    const existing = await prisma.invoice.findFirst({
-      where: {
-        vendorId: ctx.parent.vendorId,
-        invoiceNumber: invoiceNumber,
-      },
-    });
-    return !existing;
-  }, 'Invoice number already exists for your company')
-```
-
-#### Purchase Order Number
-**Field**: `purchaseOrderNumber` (invoice PO reference)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must select PO | "Purchase order is required" |
-| Valid | Must exist and belong to vendor | "Invalid purchase order selected" |
-| Status | PO must be confirmed or delivered | "Selected purchase order is not confirmed" |
-| Already Invoiced | Cannot invoice same PO twice | "This purchase order has already been invoiced" |
-
-**Zod Schema**:
-```typescript
-purchaseOrderNumber: z.string()
-  .refine(async (poNumber, ctx) => {
-    const po = await prisma.purchaseOrder.findFirst({
-      where: {
-        poNumber: poNumber,
-        vendorId: ctx.parent.vendorId,
-      },
-    });
-    return po !== null;
-  }, 'Invalid purchase order selected')
-  .refine(async (poNumber, ctx) => {
-    const po = await prisma.purchaseOrder.findFirst({
-      where: { poNumber: poNumber },
-    });
-    return po?.status === 'CONFIRMED' || po?.status === 'DELIVERED';
-  }, 'Selected purchase order is not confirmed')
-```
-
-#### Invoice Amount
-**Field**: `totalAmount` (invoice total)
-
-| Rule | Validation | Error Message |
-|------|------------|---------------|
-| Required | Must provide total amount | "Invoice total is required" |
-| Type | Must be positive number | "Invoice total must be a positive number" |
-| Range | 0.01 to 999,999,999.99 | "Invoice total must be between 0.01 and 999,999,999.99" |
-| Precision | Max 2 decimal places | "Invoice total must have at most 2 decimal places" |
-| PO Match | Must match PO total (±5% tolerance) | "Invoice total does not match purchase order (difference: {diff})" |
-
-**Zod Schema**:
-```typescript
-totalAmount: z.number()
-  .positive('Invoice total must be a positive number')
-  .min(0.01, 'Invoice total must be at least 0.01')
-  .max(999999999.99, 'Invoice total must not exceed 999,999,999.99')
-  .refine((val) => {
-    const decimalPlaces = (val.toFixed(2).split('.')[1] || '').length;
-    return decimalPlaces <= 2;
-  }, 'Invoice total must have at most 2 decimal places')
-  .refine(async (amount, ctx) => {
-    const po = await prisma.purchaseOrder.findFirst({
-      where: { poNumber: ctx.parent.purchaseOrderNumber },
-    });
-    if (!po) return true;
-
-    const diff = Math.abs(amount - po.totalAmount);
-    const tolerance = po.totalAmount * 0.05; // 5% tolerance
-
-    if (diff > tolerance) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Invoice total does not match purchase order (difference: $${diff.toFixed(2)})`,
-      });
-      return false;
-    }
-    return true;
+pricing: z.array(
+  z.object({
+    moq: z.number().int().positive().min(1),
+    unit: z.string().min(1).max(50),
+    unitPrice: z.number().positive().min(0.0001).max(999999999.9999),
+    leadTime: z.number().int().positive().min(1).max(365).optional(),
+    focQuantity: z.number().int().min(0).optional(),
+    focUnit: z.string().max(50).optional(),
+    notes: z.string().max(500).optional(),
   })
+)
+  .min(1, 'At least one pricing tier is required')
+  .max(5, 'Maximum 5 MOQ pricing tiers allowed')
+  .refine((tiers) => {
+    // Check ascending MOQ order
+    for (let i = 1; i < tiers.length; i++) {
+      if (tiers[i].moq <= tiers[i - 1].moq) {
+        return false;
+      }
+    }
+    return true;
+  }, 'MOQ quantities must be in ascending order')
+  .refine((tiers) => {
+    // Check for duplicate MOQ quantities
+    const moqSet = new Set(tiers.map(t => t.moq));
+    return moqSet.size === tiers.length;
+  }, 'Duplicate MOQ quantity detected')
 ```
 
-### 2.10 Message/Communication Validations
+**Validation Logic**:
+```typescript
+async function validateMOQTiers(tiers: MOQPricing[]): Promise<ValidationResult> {
+  // Check minimum 1 tier
+  if (tiers.length === 0) {
+    return {
+      valid: false,
+      code: 'MOQ_001',
+      message: 'At least one pricing tier is required',
+      severity: 'error',
+    };
+  }
 
-#### Message Subject
-**Field**: `subject` (vendor message)
+  // Check maximum 5 tiers
+  if (tiers.length > 5) {
+    return {
+      valid: false,
+      code: 'MOQ_002',
+      message: 'Maximum 5 MOQ pricing tiers allowed',
+      severity: 'error',
+    };
+  }
+
+  // Check ascending MOQ order
+  for (let i = 1; i < tiers.length; i++) {
+    if (tiers[i].moq <= tiers[i - 1].moq) {
+      return {
+        valid: false,
+        code: 'MOQ_003',
+        message: `MOQ quantities must be in ascending order. Tier ${i + 1} (MOQ: ${tiers[i].moq}) must be greater than Tier ${i} (MOQ: ${tiers[i - 1].moq})`,
+        severity: 'error',
+        details: {
+          tier: i + 1,
+          currentMOQ: tiers[i].moq,
+          previousMOQ: tiers[i - 1].moq,
+        },
+      };
+    }
+  }
+
+  // Check for duplicate MOQ quantities
+  const moqSet = new Set(tiers.map(t => t.moq));
+  if (moqSet.size !== tiers.length) {
+    return {
+      valid: false,
+      code: 'MOQ_004',
+      message: 'Duplicate MOQ quantity detected',
+      severity: 'error',
+    };
+  }
+
+  // Validate each tier
+  for (let i = 0; i < tiers.length; i++) {
+    const tier = tiers[i];
+
+    // MOQ validation
+    if (tier.moq < 1) {
+      return {
+        valid: false,
+        code: 'MOQ_005',
+        message: `Tier ${i + 1}: MOQ must be at least 1`,
+        severity: 'error',
+      };
+    }
+
+    // Unit price validation
+    if (tier.unitPrice <= 0) {
+      return {
+        valid: false,
+        code: 'MOQ_006',
+        message: `Tier ${i + 1}: Unit price must be a positive number`,
+        severity: 'error',
+      };
+    }
+
+    if (tier.unitPrice > 999999999.9999) {
+      return {
+        valid: false,
+        code: 'MOQ_007',
+        message: `Tier ${i + 1}: Unit price exceeds maximum value`,
+        severity: 'error',
+      };
+    }
+
+    // Check decimal precision (max 4 decimal places)
+    const decimalStr = tier.unitPrice.toFixed(10);
+    const decimalPart = decimalStr.split('.')[1].replace(/0+$/, '');
+    if (decimalPart.length > 4) {
+      return {
+        valid: false,
+        code: 'MOQ_008',
+        message: `Tier ${i + 1}: Unit price must have at most 4 decimal places`,
+        severity: 'error',
+      };
+    }
+
+    // Lead time validation (optional)
+    if (tier.leadTime !== undefined) {
+      if (tier.leadTime < 1 || tier.leadTime > 365) {
+        return {
+          valid: false,
+          code: 'MOQ_009',
+          message: `Tier ${i + 1}: Lead time must be between 1 and 365 days`,
+          severity: 'error',
+        };
+      }
+    }
+
+    // FOC validation (optional)
+    if (tier.focQuantity !== undefined && tier.focQuantity < 0) {
+      return {
+        valid: false,
+        code: 'MOQ_010',
+        message: `Tier ${i + 1}: FOC quantity cannot be negative`,
+        severity: 'error',
+      };
+    }
+  }
+
+  return { valid: true };
+}
+```
+
+### 3.4 FOC (Free of Charge) Validations
+
+#### FOC Quantity
+**Field**: `focQuantity` (MOQ tier)
 
 | Rule | Validation | Error Message |
 |------|------------|---------------|
-| Required | Must not be empty | "Message subject is required" |
-| Length | 5-200 characters | "Subject must be 5-200 characters" |
-| Format | Plain text | "Subject contains invalid characters" |
+| Optional | Can be omitted | None |
+| Type | Must be non-negative integer | "FOC quantity must be a non-negative whole number" |
+| Range | 0 to 999,999 | "FOC quantity must be between 0 and 999,999" |
+| Unit Required | FOC unit required if FOC quantity > 0 | "FOC unit is required when FOC quantity is specified" |
 
 **Zod Schema**:
 ```typescript
-subject: z.string()
-  .min(5, 'Subject must be at least 5 characters')
-  .max(200, 'Subject must not exceed 200 characters')
-  .regex(/^[a-zA-Z0-9\s\-\.\,\:\;\?\!\'\"\(\)]+$/, 'Subject contains invalid characters')
+focQuantity: z.number()
+  .int('FOC quantity must be a whole number')
+  .min(0, 'FOC quantity must be non-negative')
+  .max(999999, 'FOC quantity must not exceed 999,999')
+  .optional()
 ```
 
-#### Message Body
-**Field**: `body` (vendor message)
+#### FOC Unit
+**Field**: `focUnit` (MOQ tier)
 
 | Rule | Validation | Error Message |
 |------|------------|---------------|
-| Required | Must not be empty | "Message body is required" |
-| Length | 10-5000 characters | "Message must be 10-5000 characters" |
-| Format | Plain text or basic HTML | "Message contains unsafe content" |
-| XSS Protection | No script tags or malicious code | "Message contains invalid content" |
+| Required if FOC > 0 | Required when FOC quantity > 0 | "FOC unit is required when FOC quantity is specified" |
+| Length | Max 50 characters | "FOC unit must not exceed 50 characters" |
+| Format | Alphanumeric with spaces | "FOC unit contains invalid characters" |
 
 **Zod Schema**:
 ```typescript
-body: z.string()
-  .min(10, 'Message must be at least 10 characters')
-  .max(5000, 'Message must not exceed 5000 characters')
-  .refine((text) => !/<script[^>]*>.*?<\/script>/i.test(text), 'Message contains invalid content')
-  .refine((text) => !/<iframe[^>]*>.*?<\/iframe>/i.test(text), 'Message contains invalid content')
+focUnit: z.string()
+  .min(1, 'FOC unit is required when FOC quantity is specified')
+  .max(50, 'FOC unit must not exceed 50 characters')
+  .regex(/^[a-zA-Z0-9\s\-\/]+$/, 'FOC unit contains invalid characters')
+  .optional()
+  .refine((unit, ctx) => {
+    const focQty = ctx.parent.focQuantity;
+    if (focQty && focQty > 0) {
+      return unit !== undefined && unit.length > 0;
+    }
+    return true;
+  }, 'FOC unit is required when FOC quantity is specified')
+```
+
+**Validation Logic**:
+```typescript
+async function validateFOC(focQuantity?: number, focUnit?: string): Promise<ValidationResult> {
+  // If no FOC specified, validation passes
+  if (focQuantity === undefined || focQuantity === 0) {
+    return { valid: true };
+  }
+
+  // FOC quantity specified but no unit
+  if (!focUnit || focUnit.trim() === '') {
+    return {
+      valid: false,
+      code: 'FOC_001',
+      message: 'FOC unit is required when FOC quantity is specified',
+      severity: 'error',
+    };
+  }
+
+  // FOC quantity validation
+  if (focQuantity < 0) {
+    return {
+      valid: false,
+      code: 'FOC_002',
+      message: 'FOC quantity cannot be negative',
+      severity: 'error',
+    };
+  }
+
+  if (focQuantity > 999999) {
+    return {
+      valid: false,
+      code: 'FOC_003',
+      message: 'FOC quantity must not exceed 999,999',
+      severity: 'error',
+    };
+  }
+
+  // FOC unit validation
+  if (focUnit.length > 50) {
+    return {
+      valid: false,
+      code: 'FOC_004',
+      message: 'FOC unit must not exceed 50 characters',
+      severity: 'error',
+    };
+  }
+
+  return { valid: true };
+}
 ```
 
 ---
 
-## 3. Business Rule Validations
+## 4. Business Rule Validations
 
-### BR-VP-001: Registration Approval Required
+### BR-VPP-001: One Pricelist Per Campaign Per Vendor
 
-**Rule**: Vendor registration must be approved before portal access is granted.
+**Rule**: Each vendor can submit only one pricelist per campaign.
 
-**Enforcement**: Application-level validation + workflow routing
-
-**Implementation**:
-```typescript
-async function checkRegistrationApproval(vendorId: string): Promise<ValidationResult> {
-  const vendor = await prisma.vendor.findUnique({
-    where: { id: vendorId },
-    include: { registration: true },
-  });
-
-  if (!vendor || vendor.status !== 'ACTIVE') {
-    return {
-      valid: false,
-      code: 'BR_VP_001',
-      message: 'Vendor registration is not approved',
-      severity: 'error',
-    };
-  }
-
-  if (!vendor.registration || vendor.registration.status !== 'APPROVED') {
-    return {
-      valid: false,
-      code: 'BR_VP_001',
-      message: 'Registration is pending approval',
-      severity: 'error',
-    };
-  }
-
-  return { valid: true };
-}
-```
-
-### BR-VP-002: Document Expiry Blocks Submissions
-
-**Rule**: Vendors with expired documents cannot submit pricing, bids, or invoices.
-
-**Enforcement**: Application-level validation (pre-submission check)
+**Enforcement**: Application-level validation
 
 **Implementation**:
 ```typescript
-async function checkDocumentCompliance(vendorId: string): Promise<ValidationResult> {
-  const requiredDocs = ['BUSINESS_LICENSE', 'TAX_CERTIFICATE', 'INSURANCE_GENERAL'];
-
-  const documents = await prisma.vendorDocument.findMany({
+async function validateOnepricelistPerCampaign(
+  vendorId: string,
+  campaignId: string
+): Promise<ValidationResult> {
+  const existingPricelist = await prisma.vendorPricelist.findFirst({
     where: {
       vendorId,
-      documentType: { in: requiredDocs },
-      status: 'APPROVED',
+      campaignId,
+      status: 'submitted',  // No approval workflow - submitted pricelists are immediately active
     },
   });
 
-  // Check if all required documents exist
-  const existingTypes = documents.map(d => d.documentType);
-  const missingDocs = requiredDocs.filter(type => !existingTypes.includes(type));
-
-  if (missingDocs.length > 0) {
+  if (existingPricelist) {
     return {
       valid: false,
-      code: 'BR_VP_002',
-      message: `Missing required documents: ${missingDocs.join(', ')}`,
+      code: 'BR_VPP_001',
+      message: 'You have already submitted a pricelist for this campaign',
       severity: 'error',
-      details: { missingDocuments: missingDocs },
+      details: {
+        pricelistId: existingPricelist.id,
+        submittedAt: existingPricelist.submittedAt,
+        status: existingPricelist.status,
+      },
     };
   }
 
-  // Check for expired documents
+  return { valid: true };
+}
+```
+
+### BR-VPP-002: All Template Products Required
+
+**Rule**: Vendor must provide pricing for ALL products in the template (no partial submissions).
+
+**Enforcement**: Application-level validation (final submission)
+
+**Implementation**:
+```typescript
+async function validateAllProductsPriced(
+  templateId: string,
+  pricelistItems: PricelistItem[]
+): Promise<ValidationResult> {
+  // Get all required products from template
+  const templateItems = await prisma.priceListTemplateItem.findMany({
+    where: { templateId },
+    select: { productId: true },
+  });
+
+  const requiredProductIds = new Set(templateItems.map(item => item.productId));
+  const providedProductIds = new Set(pricelistItems.map(item => item.productId));
+
+  // Find missing products
+  const missingProductIds = Array.from(requiredProductIds).filter(
+    id => !providedProductIds.has(id)
+  );
+
+  if (missingProductIds.length > 0) {
+    // Get product names for user-friendly error
+    const missingProducts = await prisma.product.findMany({
+      where: { id: { in: missingProductIds } },
+      select: { id: true, name: true },
+    });
+
+    return {
+      valid: false,
+      code: 'BR_VPP_002',
+      message: `Pricing is missing for ${missingProductIds.length} product(s). All products in the template must have pricing before submission.`,
+      severity: 'error',
+      details: {
+        missingCount: missingProductIds.length,
+        totalRequired: requiredProductIds.size,
+        missingProducts: missingProducts.map(p => ({ id: p.id, name: p.name })),
+      },
+    };
+  }
+
+  return { valid: true };
+}
+```
+
+### BR-VPP-003: Submission Before Campaign Deadline
+
+**Rule**: Pricelist must be submitted before campaign end date.
+
+**Enforcement**: Application-level validation (submission check)
+
+**Implementation**:
+```typescript
+async function validateSubmissionDeadline(campaign: PriceCollectionCampaign): Promise<ValidationResult> {
   const now = new Date();
-  const expiredDocs = documents.filter(d => d.expiryDate && d.expiryDate < now);
 
-  if (expiredDocs.length > 0) {
+  if (campaign.scheduledEnd < now) {
     return {
       valid: false,
-      code: 'BR_VP_002',
-      message: `Expired documents: ${expiredDocs.map(d => d.documentType).join(', ')}. Please upload updated documents.`,
-      severity: 'error',
-      details: { expiredDocuments: expiredDocs.map(d => ({ type: d.documentType, expiryDate: d.expiryDate })) },
-    };
-  }
-
-  return { valid: true };
-}
-```
-
-### BR-VP-003: PO Acknowledgment Deadline
-
-**Rule**: Purchase orders must be acknowledged within 48 hours of receipt.
-
-**Enforcement**: Application-level validation + scheduled job
-
-**Implementation**:
-```typescript
-async function checkPOAcknowledgmentDeadline(): Promise<void> {
-  const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
-
-  const overduePOs = await prisma.purchaseOrder.findMany({
-    where: {
-      status: 'CONFIRMED',
-      vendorAcknowledgedAt: null,
-      createdAt: { lt: fortyEightHoursAgo },
-    },
-    include: { vendor: true },
-  });
-
-  for (const po of overduePOs) {
-    // Send reminder notification
-    await createNotification({
-      vendorId: po.vendorId,
-      type: 'PO_ACKNOWLEDGMENT_OVERDUE',
-      title: 'Purchase Order Acknowledgment Overdue',
-      message: `Purchase Order ${po.poNumber} requires acknowledgment. Please review and acknowledge within 24 hours to avoid delays.`,
-      priority: 'HIGH',
-      relatedEntityType: 'PURCHASE_ORDER',
-      relatedEntityId: po.id,
-    });
-
-    // Send email reminder
-    await sendEmail({
-      to: po.vendor.primaryEmail,
-      subject: 'URGENT: Purchase Order Acknowledgment Required',
-      template: 'po-acknowledgment-reminder',
-      data: {
-        poNumber: po.poNumber,
-        issueDate: po.createdAt,
-        daysOverdue: Math.floor((Date.now() - po.createdAt.getTime()) / (24 * 60 * 60 * 1000)) - 2,
-      },
-    });
-  }
-}
-```
-
-### BR-VP-004: Single Active Session
-
-**Rule**: Each vendor user can have only one active session at a time (configurable).
-
-**Enforcement**: Application-level validation (authentication middleware)
-
-**Implementation**:
-```typescript
-async function enforceSessionPolicy(userId: string): Promise<ValidationResult> {
-  const config = await getPortalConfig();
-
-  if (!config.enforceSingleSession) {
-    return { valid: true };
-  }
-
-  // Find existing active sessions
-  const activeSessions = await prisma.vendorPortalSession.findMany({
-    where: {
-      userId,
-      expiresAt: { gt: new Date() },
-      deletedAt: null,
-    },
-  });
-
-  if (activeSessions.length > 0) {
-    // Invalidate all existing sessions
-    await prisma.vendorPortalSession.updateMany({
-      where: {
-        userId,
-        id: { in: activeSessions.map(s => s.id) },
-      },
-      data: {
-        deletedAt: new Date(),
-        deletedBy: 'system',
-      },
-    });
-
-    // Create audit log
-    await createAuditLog({
-      userId,
-      action: 'SESSION_TERMINATED',
-      actionCategory: 'AUTHENTICATION',
-      status: 'SUCCESS',
-      details: {
-        reason: 'New login from different location',
-        terminatedSessions: activeSessions.length,
-      },
-    });
-  }
-
-  return { valid: true };
-}
-```
-
-### BR-VP-005: Password Expiry
-
-**Rule**: Passwords must be changed every 90 days.
-
-**Enforcement**: Application-level validation (login check)
-
-**Implementation**:
-```typescript
-async function checkPasswordExpiry(userId: string): Promise<ValidationResult> {
-  const user = await prisma.vendorPortalUser.findUnique({
-    where: { id: userId },
-  });
-
-  if (!user) {
-    return {
-      valid: false,
-      code: 'BR_VP_005',
-      message: 'User not found',
-      severity: 'error',
-    };
-  }
-
-  const passwordAge = Date.now() - (user.passwordChangedAt?.getTime() || user.createdAt.getTime());
-  const ninetyDays = 90 * 24 * 60 * 60 * 1000;
-
-  if (passwordAge > ninetyDays) {
-    return {
-      valid: false,
-      code: 'BR_VP_005',
-      message: 'Your password has expired. Please change your password to continue.',
+      code: 'BR_VPP_003',
+      message: `The submission deadline for this campaign was ${campaign.scheduledEnd.toLocaleDateString()}. Submissions are no longer accepted.`,
       severity: 'error',
       details: {
-        passwordAge: Math.floor(passwordAge / (24 * 60 * 60 * 1000)),
-        mustChangePassword: true,
+        deadline: campaign.scheduledEnd,
+        daysLate: Math.floor((now.getTime() - campaign.scheduledEnd.getTime()) / (24 * 60 * 60 * 1000)),
       },
     };
   }
 
-  // Warning if password expires within 7 days
-  if (passwordAge > (ninetyDays - 7 * 24 * 60 * 60 * 1000)) {
-    const daysRemaining = 90 - Math.floor(passwordAge / (24 * 60 * 60 * 1000));
+  // Warning if deadline is within 24 hours
+  const twentyFourHoursFromNow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  if (campaign.scheduledEnd < twentyFourHoursFromNow) {
+    const hoursRemaining = Math.ceil((campaign.scheduledEnd.getTime() - now.getTime()) / (60 * 60 * 1000));
     return {
       valid: true,
-      code: 'BR_VP_005',
-      message: `Your password will expire in ${daysRemaining} days. Please change it soon.`,
+      code: 'BR_VPP_003_WARNING',
+      message: `Submission deadline is in ${hoursRemaining} hours (${campaign.scheduledEnd.toLocaleString()}). Please submit soon to avoid missing the deadline.`,
       severity: 'warning',
     };
   }
@@ -948,56 +977,28 @@ async function checkPasswordExpiry(userId: string): Promise<ValidationResult> {
 }
 ```
 
-### BR-VP-006: File Upload Limits
+### BR-VPP-004: Quality Score Minimum Threshold
 
-**Rule**: Maximum file size is 50MB. All files must pass virus scanning.
+**Rule**: Submitted pricelist must meet minimum quality score of 60/100 to be accepted.
 
-**Enforcement**: Application-level validation + infrastructure
+**Enforcement**: Application-level validation (calculated after submission)
 
 **Implementation**:
 ```typescript
-async function validateFileUpload(file: File): Promise<ValidationResult> {
-  // Check file size
-  const maxSize = 50 * 1024 * 1024; // 50MB
-  if (file.size > maxSize) {
+async function validateQualityScore(qualityScore: number): Promise<ValidationResult> {
+  const minimumScore = 60;
+
+  if (qualityScore < minimumScore) {
     return {
       valid: false,
-      code: 'BR_VP_006',
-      message: 'File size exceeds 50MB limit',
+      code: 'BR_VPP_004',
+      message: `Pricelist quality score (${qualityScore}/100) is below the minimum threshold (${minimumScore}/100). Please improve completeness, accuracy, and detail before resubmitting.`,
       severity: 'error',
       details: {
-        fileSize: file.size,
-        maxSize: maxSize,
+        qualityScore,
+        minimumScore,
+        shortfall: minimumScore - qualityScore,
       },
-    };
-  }
-
-  // Convert File to Buffer for virus scanning
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-
-  // Virus scan
-  const scanResult = await scanFileForVirus(buffer);
-
-  if (!scanResult.clean) {
-    // Log security event
-    await createAuditLog({
-      action: 'FILE_VIRUS_DETECTED',
-      actionCategory: 'SECURITY',
-      status: 'FAILURE',
-      severity: 'CRITICAL',
-      details: {
-        fileName: file.name,
-        fileSize: file.size,
-        virusSignature: scanResult.signature,
-      },
-    });
-
-    return {
-      valid: false,
-      code: 'BR_VP_006',
-      message: 'File failed security scan',
-      severity: 'error',
     };
   }
 
@@ -1005,292 +1006,1215 @@ async function validateFileUpload(file: File): Promise<ValidationResult> {
 }
 ```
 
-### BR-VP-007: Session Timeout
+### BR-VPP-005: Auto-Save Conflict Detection
 
-**Rule**: Inactive sessions expire after 30 minutes.
+**Rule**: Only one auto-save operation can occur at a time per pricelist (prevent conflicts).
 
-**Enforcement**: Application-level validation (middleware) + scheduled job
+**Enforcement**: Application-level validation with Redis locking
 
 **Implementation**:
 ```typescript
-// Middleware check on each request
-async function checkSessionValidity(sessionToken: string): Promise<ValidationResult> {
-  const session = await prisma.vendorPortalSession.findFirst({
-    where: {
-      sessionToken,
-      deletedAt: null,
-    },
-  });
+import Redis from 'ioredis';
 
-  if (!session) {
-    return {
-      valid: false,
-      code: 'BR_VP_007',
-      message: 'Session not found',
-      severity: 'error',
-    };
-  }
+const redis = new Redis(process.env.REDIS_URL);
 
-  const now = new Date();
+async function acquireAutoSaveLock(pricelistId: string): Promise<boolean> {
+  const lockKey = `autosave:lock:${pricelistId}`;
+  const lockValue = Date.now().toString();
+  const lockTTL = 30; // 30 seconds
 
-  // Check if session expired
-  if (session.expiresAt < now) {
-    await prisma.vendorPortalSession.update({
-      where: { id: session.id },
-      data: { deletedAt: now },
-    });
+  // Try to acquire lock (NX = set if not exists, EX = expiry in seconds)
+  const acquired = await redis.set(lockKey, lockValue, 'NX', 'EX', lockTTL);
 
-    return {
-      valid: false,
-      code: 'BR_VP_007',
-      message: 'Session expired due to inactivity',
-      severity: 'error',
-    };
-  }
-
-  // Update last activity
-  await prisma.vendorPortalSession.update({
-    where: { id: session.id },
-    data: {
-      lastActivityAt: now,
-      expiresAt: new Date(now.getTime() + 30 * 60 * 1000), // Extend by 30 minutes
-    },
-  });
-
-  return { valid: true };
+  return acquired === 'OK';
 }
 
-// Scheduled cleanup job (runs hourly)
-async function cleanupExpiredSessions(): Promise<void> {
-  const now = new Date();
+async function releaseAutoSaveLock(pricelistId: string): Promise<void> {
+  const lockKey = `autosave:lock:${pricelistId}`;
+  await redis.del(lockKey);
+}
 
-  await prisma.vendorPortalSession.updateMany({
-    where: {
-      expiresAt: { lt: now },
-      deletedAt: null,
-    },
-    data: {
-      deletedAt: now,
-      deletedBy: 'system',
-    },
-  });
+async function performAutoSave(pricelistId: string, data: any): Promise<ValidationResult> {
+  // Attempt to acquire lock
+  const lockAcquired = await acquireAutoSaveLock(pricelistId);
+
+  if (!lockAcquired) {
+    return {
+      valid: false,
+      code: 'BR_VPP_005',
+      message: 'Another auto-save operation is in progress. Please try again in a moment.',
+      severity: 'warning',
+    };
+  }
+
+  try {
+    // Perform auto-save
+    await prisma.vendorPricelist.update({
+      where: { id: pricelistId },
+      data: {
+        items: data.items,
+        currency: data.currency,
+        effectiveStartDate: data.effectiveStartDate,
+        effectiveEndDate: data.effectiveEndDate,
+        notes: data.notes,
+        lastAutoSave: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+
+    return { valid: true };
+  } finally {
+    // Always release lock
+    await releaseAutoSaveLock(pricelistId);
+  }
 }
 ```
 
-### BR-VP-008: Critical Change Approval
+### BR-VPP-006: Token Single-Use for Submission
 
-**Rule**: Changes to legal name, tax ID, or bank account require approval.
+**Rule**: Once pricelist is submitted, token cannot be used to submit again (read-only access).
 
-**Enforcement**: Application-level validation + workflow routing
+**Enforcement**: Application-level validation
 
 **Implementation**:
 ```typescript
-async function detectCriticalChanges(
-  vendorId: string,
-  updates: Partial<Vendor>
-): Promise<{ isCritical: boolean; changes: string[] }> {
-  const criticalFields = ['legalName', 'taxId', 'bankAccount'];
-  const current = await prisma.vendor.findUnique({ where: { id: vendorId } });
-
-  if (!current) {
-    throw new Error('Vendor not found');
+async function validateTokenNotSubmitted(invitation: VendorInvitation): Promise<ValidationResult> {
+  if (invitation.status === 'submitted') {
+    return {
+      valid: false,
+      code: 'BR_VPP_006',
+      message: 'You have already submitted your pricelist. You can view your submission, but you cannot submit again.',
+      severity: 'error',
+      details: {
+        submittedAt: invitation.submittedAt,
+        allowReadOnly: true,
+      },
+    };
   }
 
-  const changes: string[] = [];
+  return { valid: true };
+}
+```
 
-  // Check legal name
-  if (updates.legalName && updates.legalName !== current.legalName) {
-    changes.push('Legal Name');
-  }
+---
 
-  // Check tax ID
-  if (updates.taxId && updates.taxId !== current.taxId) {
-    changes.push('Tax ID');
-  }
+## 5. Quality Score Calculation
 
-  // Check bank account (compare encrypted values)
-  if (updates.bankAccount) {
-    const currentAccount = current.bankAccount as any;
-    const newAccount = updates.bankAccount as any;
+### 5.1 Quality Score Algorithm
 
-    if (
-      newAccount.accountNumber !== currentAccount.accountNumber ||
-      newAccount.routingNumber !== currentAccount.routingNumber
-    ) {
-      changes.push('Bank Account Information');
+**Formula**: Quality Score = (Completeness × 0.4) + (Accuracy × 0.3) + (Detail × 0.2) + (Timeliness × 0.1)
+
+**Score Range**: 0-100
+
+**Components**:
+1. **Completeness (40%)**: Percentage of products with complete pricing data
+2. **Accuracy (30%)**: Pricing data validation (realistic prices, proper formats)
+3. **Detail (20%)**: Richness of information (MOQ tiers, FOC, notes)
+4. **Timeliness (10%)**: Submission timing relative to campaign duration
+
+### 5.2 Completeness Score (40%)
+
+**Calculation**:
+```typescript
+function calculateCompletenessScore(
+  templateItemCount: number,
+  pricelistItemCount: number
+): number {
+  if (templateItemCount === 0) return 100;
+
+  const completeness = (pricelistItemCount / templateItemCount) * 100;
+  return Math.min(completeness, 100);
+}
+```
+
+**Validation**:
+- All template products priced = 100 points
+- 90% of template products priced = 90 points
+- 50% of template products priced = 50 points
+- 0% of template products priced = 0 points
+
+### 5.3 Accuracy Score (30%)
+
+**Calculation**:
+```typescript
+function calculateAccuracyScore(pricelistItems: PricelistItem[]): number {
+  if (pricelistItems.length === 0) return 0;
+
+  let totalScore = 0;
+  const maxPointsPerItem = 100;
+
+  for (const item of pricelistItems) {
+    let itemScore = maxPointsPerItem;
+
+    // Check for valid unit price (deduct 30 points if invalid)
+    if (!item.pricing || item.pricing.length === 0) {
+      itemScore -= 30;
+    } else {
+      for (const tier of item.pricing) {
+        // Price too low (deduct 10 points)
+        if (tier.unitPrice < 0.01) {
+          itemScore -= 10;
+        }
+
+        // Price unrealistically high (deduct 10 points)
+        if (tier.unitPrice > 100000) {
+          itemScore -= 10;
+        }
+
+        // Invalid decimal precision (deduct 5 points)
+        const decimalStr = tier.unitPrice.toFixed(10);
+        const decimalPart = decimalStr.split('.')[1].replace(/0+$/, '');
+        if (decimalPart.length > 4) {
+          itemScore -= 5;
+        }
+      }
     }
+
+    // Check for valid lead time (deduct 10 points if missing or invalid)
+    if (!item.leadTime || item.leadTime < 1 || item.leadTime > 365) {
+      itemScore -= 10;
+    }
+
+    // Check MOQ tier order (deduct 20 points if not ascending)
+    if (item.pricing && item.pricing.length > 1) {
+      for (let i = 1; i < item.pricing.length; i++) {
+        if (item.pricing[i].moq <= item.pricing[i - 1].moq) {
+          itemScore -= 20;
+          break;
+        }
+      }
+    }
+
+    totalScore += Math.max(itemScore, 0);
+  }
+
+  const averageScore = totalScore / (pricelistItems.length * maxPointsPerItem);
+  return averageScore * 100;
+}
+```
+
+**Deductions**:
+- Missing unit price: -30 points
+- Price < $0.01: -10 points
+- Price > $100,000: -10 points (warning, may be valid)
+- Invalid decimal precision: -5 points
+- Missing/invalid lead time: -10 points
+- MOQ tiers not in ascending order: -20 points
+
+### 5.4 Detail Score (20%)
+
+**Calculation**:
+```typescript
+function calculateDetailScore(pricelistItems: PricelistItem[]): number {
+  if (pricelistItems.length === 0) return 0;
+
+  let totalScore = 0;
+  const maxPointsPerItem = 100;
+
+  for (const item of pricelistItems) {
+    let itemScore = 0;
+
+    // MOQ tiers provided (up to 50 points)
+    if (item.pricing) {
+      const tierCount = item.pricing.length;
+      if (tierCount === 1) {
+        itemScore += 10; // Basic single-tier pricing
+      } else if (tierCount === 2) {
+        itemScore += 25; // Two tiers
+      } else if (tierCount === 3) {
+        itemScore += 35; // Three tiers
+      } else if (tierCount >= 4) {
+        itemScore += 50; // Four or more tiers (max)
+      }
+    }
+
+    // FOC information provided (15 points)
+    const hasFOC = item.pricing?.some(tier => tier.focQuantity && tier.focQuantity > 0);
+    if (hasFOC) {
+      itemScore += 15;
+    }
+
+    // Tier-level notes provided (15 points)
+    const hasNotes = item.pricing?.some(tier => tier.notes && tier.notes.length > 0);
+    if (hasNotes) {
+      itemScore += 15;
+    }
+
+    // Item-level notes provided (10 points)
+    if (item.notes && item.notes.length > 0) {
+      itemScore += 10;
+    }
+
+    // Certifications provided (10 points)
+    if (item.certifications && item.certifications.length > 0) {
+      itemScore += 10;
+    }
+
+    totalScore += itemScore;
+  }
+
+  const averageScore = totalScore / (pricelistItems.length * maxPointsPerItem);
+  return averageScore * 100;
+}
+```
+
+**Points**:
+- 1 MOQ tier: +10 points
+- 2 MOQ tiers: +25 points
+- 3 MOQ tiers: +35 points
+- 4+ MOQ tiers: +50 points (max)
+- FOC information: +15 points
+- Tier-level notes: +15 points
+- Item-level notes: +10 points
+- Certifications: +10 points
+
+### 5.5 Timeliness Score (10%)
+
+**Calculation**:
+```typescript
+function calculateTimelinessScore(
+  submittedAt: Date,
+  campaignStart: Date,
+  campaignEnd: Date
+): number {
+  const totalDuration = campaignEnd.getTime() - campaignStart.getTime();
+  const timeElapsed = submittedAt.getTime() - campaignStart.getTime();
+
+  const percentageElapsed = (timeElapsed / totalDuration) * 100;
+
+  // Scoring:
+  // 0-25% of campaign: 100 points (very early)
+  // 25-50% of campaign: 80 points (early)
+  // 50-75% of campaign: 60 points (on time)
+  // 75-90% of campaign: 40 points (late)
+  // 90-100% of campaign: 20 points (very late)
+  // After 100%: 0 points (overdue)
+
+  if (percentageElapsed <= 25) return 100;
+  if (percentageElapsed <= 50) return 80;
+  if (percentageElapsed <= 75) return 60;
+  if (percentageElapsed <= 90) return 40;
+  if (percentageElapsed <= 100) return 20;
+  return 0; // Submitted after deadline
+}
+```
+
+**Scoring**:
+- Submitted in first 25% of campaign: 100 points
+- Submitted in 25-50% of campaign: 80 points
+- Submitted in 50-75% of campaign: 60 points
+- Submitted in 75-90% of campaign: 40 points
+- Submitted in 90-100% of campaign: 20 points
+- Submitted after deadline: 0 points
+
+### 5.6 Complete Quality Score Calculation
+
+**Implementation**:
+```typescript
+async function calculateQualityScore(
+  pricelist: VendorPricelist,
+  campaign: PriceCollectionCampaign,
+  templateItemCount: number
+): Promise<number> {
+  // 1. Completeness (40%)
+  const completenessScore = calculateCompletenessScore(
+    templateItemCount,
+    pricelist.items.length
+  );
+
+  // 2. Accuracy (30%)
+  const accuracyScore = calculateAccuracyScore(pricelist.items);
+
+  // 3. Detail (20%)
+  const detailScore = calculateDetailScore(pricelist.items);
+
+  // 4. Timeliness (10%)
+  const timelinessScore = calculateTimelinessScore(
+    pricelist.submittedAt || new Date(),
+    campaign.scheduledStart,
+    campaign.scheduledEnd
+  );
+
+  // Weighted average
+  const qualityScore =
+    completenessScore * 0.4 +
+    accuracyScore * 0.3 +
+    detailScore * 0.2 +
+    timelinessScore * 0.1;
+
+  return Math.round(qualityScore);
+}
+```
+
+**Validation**:
+```typescript
+async function validateAndCalculateQualityScore(
+  pricelist: VendorPricelist,
+  campaign: PriceCollectionCampaign
+): Promise<ValidationResult> {
+  const template = await prisma.priceListTemplate.findUnique({
+    where: { id: campaign.templateId },
+    include: { items: true },
+  });
+
+  if (!template) {
+    return {
+      valid: false,
+      code: 'QUALITY_001',
+      message: 'Template not found',
+      severity: 'error',
+    };
+  }
+
+  const qualityScore = await calculateQualityScore(
+    pricelist,
+    campaign,
+    template.items.length
+  );
+
+  // Store quality score
+  await prisma.vendorPricelist.update({
+    where: { id: pricelist.id },
+    data: { qualityScore },
+  });
+
+  // Validate against minimum threshold
+  const minimumScore = 60;
+  if (qualityScore < minimumScore) {
+    return {
+      valid: false,
+      code: 'QUALITY_002',
+      message: `Quality score (${qualityScore}/100) is below minimum threshold (${minimumScore}/100)`,
+      severity: 'error',
+      details: { qualityScore, minimumScore },
+    };
   }
 
   return {
-    isCritical: changes.length > 0,
-    changes,
+    valid: true,
+    data: { qualityScore },
   };
 }
+```
 
-async function routeToApproval(vendorId: string, changes: any): Promise<void> {
-  // Create approval request
-  const approvalRequest = await prisma.approvalRequest.create({
-    data: {
-      entityType: 'VENDOR_PROFILE',
-      entityId: vendorId,
-      requestType: 'CRITICAL_CHANGE',
-      requestedBy: changes.userId,
-      status: 'PENDING',
-      changes: changes,
-      requiredApprovers: ['PROCUREMENT_MANAGER', 'FINANCIAL_MANAGER'],
+---
+
+## 6. Excel Template Validation
+
+### 6.1 Template Generation Validation
+
+**Excel Structure Requirements**:
+```typescript
+interface ExcelTemplateStructure {
+  worksheets: {
+    'Product Pricing': {
+      headers: [
+        'Product ID',
+        'Product Code',
+        'Product Name',
+        'Category',
+        'Order Unit',
+        'Base Price',
+        'Lead Time (Days)',
+        'MOQ Tier 1',
+        'MOQ Tier 1 Price',
+        'MOQ Tier 2',
+        'MOQ Tier 2 Price',
+        'MOQ Tier 3',
+        'MOQ Tier 3 Price',
+        'MOQ Tier 4',
+        'MOQ Tier 4 Price',
+        'MOQ Tier 5',
+        'MOQ Tier 5 Price',
+        'FOC Quantity',
+        'FOC Unit',
+        'Notes'
+      ];
+      protectedColumns: ['Product ID', 'Product Code', 'Product Name', 'Category', 'Order Unit'];
+      editableColumns: ['Base Price', 'Lead Time (Days)', 'MOQ Tier *', 'FOC *', 'Notes'];
+    };
+    'Instructions': {
+      content: string; // Markdown instructions
+      readOnly: true;
+    };
+  };
+  fileFormat: 'xlsx';
+  fileNaming: `{Campaign Name}_Pricelist_Template_{YYYYMMDD}.xlsx`;
+}
+```
+
+**Generation Validation**:
+```typescript
+async function validateExcelTemplateGeneration(
+  template: PriceListTemplate,
+  campaign: PriceCollectionCampaign
+): Promise<ValidationResult> {
+  // Validate template has products
+  if (!template.items || template.items.length === 0) {
+    return {
+      valid: false,
+      code: 'EXCEL_GEN_001',
+      message: 'Template has no products. Cannot generate Excel template.',
+      severity: 'error',
+    };
+  }
+
+  // Validate product data completeness
+  for (const item of template.items) {
+    if (!item.product) {
+      return {
+        valid: false,
+        code: 'EXCEL_GEN_002',
+        message: `Product data missing for template item ${item.id}`,
+        severity: 'error',
+      };
+    }
+
+    if (!item.product.code || !item.product.name) {
+      return {
+        valid: false,
+        code: 'EXCEL_GEN_003',
+        message: `Incomplete product data for ${item.productId}`,
+        severity: 'error',
+      };
+    }
+  }
+
+  return { valid: true };
+}
+```
+
+### 6.2 Template File Validation
+
+**File Properties Validation**:
+```typescript
+async function validateExcelTemplateFile(file: File): Promise<ValidationResult> {
+  // File size check (max 10MB for template download)
+  if (file.size > 10 * 1024 * 1024) {
+    return {
+      valid: false,
+      code: 'EXCEL_FILE_001',
+      message: 'Excel template file size exceeds 10MB limit',
+      severity: 'error',
+    };
+  }
+
+  // File format check
+  const allowedMimeTypes = [
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+    'application/vnd.ms-excel', // .xls (legacy)
+  ];
+
+  if (!allowedMimeTypes.includes(file.type)) {
+    return {
+      valid: false,
+      code: 'EXCEL_FILE_002',
+      message: 'Invalid file format. Only .xlsx and .xls files are supported.',
+      severity: 'error',
+    };
+  }
+
+  return { valid: true };
+}
+```
+
+---
+
+## 7. Excel Upload Validation
+
+### 7.1 Upload File Validation
+
+**File Upload Validation**:
+```typescript
+async function validateExcelUpload(file: File): Promise<ValidationResult> {
+  // File size check (max 50MB)
+  if (file.size > 50 * 1024 * 1024) {
+    return {
+      valid: false,
+      code: 'EXCEL_UPLOAD_001',
+      message: 'File size exceeds 50MB limit',
+      severity: 'error',
+    };
+  }
+
+  // File format check
+  const allowedMimeTypes = [
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+    'application/vnd.ms-excel', // .xls
+  ];
+
+  if (!allowedMimeTypes.includes(file.type)) {
+    return {
+      valid: false,
+      code: 'EXCEL_UPLOAD_002',
+      message: 'Invalid file format. Please upload a .xlsx or .xls file.',
+      severity: 'error',
+    };
+  }
+
+  // File name length check
+  if (file.name.length > 255) {
+    return {
+      valid: false,
+      code: 'EXCEL_UPLOAD_003',
+      message: 'File name exceeds 255 characters',
+      severity: 'error',
+    };
+  }
+
+  return { valid: true };
+}
+```
+
+### 7.2 Excel Structure Validation
+
+**Worksheet Validation**:
+```typescript
+import * as XLSX from 'xlsx';
+
+async function validateExcelStructure(workbook: XLSX.WorkBook): Promise<ValidationResult> {
+  // Check for required worksheet
+  const requiredSheetName = 'Product Pricing';
+
+  if (!workbook.Sheets[requiredSheetName]) {
+    return {
+      valid: false,
+      code: 'EXCEL_STRUCT_001',
+      message: `Required worksheet "${requiredSheetName}" not found`,
+      severity: 'error',
+    };
+  }
+
+  const worksheet = workbook.Sheets[requiredSheetName];
+  const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+
+  // Check for header row
+  if (data.length === 0) {
+    return {
+      valid: false,
+      code: 'EXCEL_STRUCT_002',
+      message: 'Worksheet is empty',
+      severity: 'error',
+    };
+  }
+
+  // Validate headers
+  const expectedHeaders = [
+    'Product ID',
+    'Product Code',
+    'Product Name',
+    'Category',
+    'Order Unit',
+    'Base Price',
+    'Lead Time (Days)',
+  ];
+
+  const actualHeaders = data[0];
+
+  for (const expectedHeader of expectedHeaders) {
+    if (!actualHeaders.includes(expectedHeader)) {
+      return {
+        valid: false,
+        code: 'EXCEL_STRUCT_003',
+        message: `Missing required column: "${expectedHeader}"`,
+        severity: 'error',
+      };
+    }
+  }
+
+  // Check for data rows
+  if (data.length < 2) {
+    return {
+      valid: false,
+      code: 'EXCEL_STRUCT_004',
+      message: 'No product data found in worksheet',
+      severity: 'error',
+    };
+  }
+
+  return { valid: true };
+}
+```
+
+### 7.3 Excel Data Validation
+
+**Row-Level Validation**:
+```typescript
+async function validateExcelData(
+  data: any[][],
+  template: PriceListTemplate
+): Promise<ValidationResult> {
+  const headers = data[0];
+  const rows = data.slice(1);
+
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  // Get column indices
+  const productIdIdx = headers.indexOf('Product ID');
+  const productCodeIdx = headers.indexOf('Product Code');
+  const basePriceIdx = headers.indexOf('Base Price');
+  const leadTimeIdx = headers.indexOf('Lead Time (Days)');
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const rowNum = i + 2; // Excel row number (1-indexed + header)
+
+    // Skip empty rows
+    if (!row || row.every((cell: any) => !cell)) continue;
+
+    // Validate Product ID
+    const productId = row[productIdIdx];
+    if (!productId) {
+      errors.push(`Row ${rowNum}: Product ID is missing`);
+      continue;
+    }
+
+    // Validate Product ID exists in template
+    const templateItem = template.items.find(item => item.productId === productId);
+    if (!templateItem) {
+      errors.push(`Row ${rowNum}: Product ID "${productId}" not found in template`);
+      continue;
+    }
+
+    // Validate Base Price
+    const basePrice = row[basePriceIdx];
+    if (basePrice === undefined || basePrice === null || basePrice === '') {
+      errors.push(`Row ${rowNum}: Base Price is required`);
+    } else {
+      const price = parseFloat(basePrice);
+      if (isNaN(price)) {
+        errors.push(`Row ${rowNum}: Base Price must be a number`);
+      } else if (price <= 0) {
+        errors.push(`Row ${rowNum}: Base Price must be positive`);
+      } else if (price > 999999999.9999) {
+        errors.push(`Row ${rowNum}: Base Price exceeds maximum value`);
+      }
+    }
+
+    // Validate Lead Time
+    const leadTime = row[leadTimeIdx];
+    if (leadTime === undefined || leadTime === null || leadTime === '') {
+      errors.push(`Row ${rowNum}: Lead Time is required`);
+    } else {
+      const days = parseInt(leadTime);
+      if (isNaN(days)) {
+        errors.push(`Row ${rowNum}: Lead Time must be a number`);
+      } else if (days < 1 || days > 365) {
+        errors.push(`Row ${rowNum}: Lead Time must be between 1 and 365 days`);
+      }
+    }
+
+    // Validate MOQ tiers (if provided)
+    const moqTiers: any[] = [];
+    for (let tier = 1; tier <= 5; tier++) {
+      const moqIdx = headers.indexOf(`MOQ Tier ${tier}`);
+      const priceIdx = headers.indexOf(`MOQ Tier ${tier} Price`);
+
+      if (moqIdx === -1 || priceIdx === -1) continue;
+
+      const moq = row[moqIdx];
+      const tierPrice = row[priceIdx];
+
+      if (moq || tierPrice) {
+        if (!moq) {
+          errors.push(`Row ${rowNum}: MOQ Tier ${tier} quantity is required when price is provided`);
+        }
+        if (!tierPrice) {
+          errors.push(`Row ${rowNum}: MOQ Tier ${tier} price is required when quantity is provided`);
+        }
+
+        if (moq && tierPrice) {
+          const moqQty = parseInt(moq);
+          const tierPriceNum = parseFloat(tierPrice);
+
+          if (isNaN(moqQty) || moqQty < 1) {
+            errors.push(`Row ${rowNum}: MOQ Tier ${tier} quantity must be a positive integer`);
+          }
+          if (isNaN(tierPriceNum) || tierPriceNum <= 0) {
+            errors.push(`Row ${rowNum}: MOQ Tier ${tier} price must be a positive number`);
+          }
+
+          moqTiers.push({ tier, moq: moqQty, price: tierPriceNum });
+        }
+      }
+    }
+
+    // Validate MOQ tier ascending order
+    if (moqTiers.length > 1) {
+      for (let j = 1; j < moqTiers.length; j++) {
+        if (moqTiers[j].moq <= moqTiers[j - 1].moq) {
+          errors.push(`Row ${rowNum}: MOQ Tier ${moqTiers[j].tier} quantity must be greater than Tier ${moqTiers[j - 1].tier}`);
+        }
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    return {
+      valid: false,
+      code: 'EXCEL_DATA_001',
+      message: `Found ${errors.length} error(s) in uploaded Excel file`,
+      severity: 'error',
+      details: { errors, warnings },
+    };
+  }
+
+  if (warnings.length > 0) {
+    return {
+      valid: true,
+      code: 'EXCEL_DATA_002',
+      message: `Uploaded successfully with ${warnings.length} warning(s)`,
+      severity: 'warning',
+      details: { warnings },
+    };
+  }
+
+  return { valid: true };
+}
+```
+
+### 7.4 Complete Excel Upload Validation
+
+**End-to-End Validation**:
+```typescript
+async function validateCompleteExcelUpload(
+  file: File,
+  template: PriceListTemplate
+): Promise<ValidationResult> {
+  // Step 1: File validation
+  const fileCheck = await validateExcelUpload(file);
+  if (!fileCheck.valid) return fileCheck;
+
+  // Step 2: Parse Excel file
+  let workbook: XLSX.WorkBook;
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    workbook = XLSX.read(arrayBuffer, { type: 'array' });
+  } catch (error) {
+    return {
+      valid: false,
+      code: 'EXCEL_PARSE_001',
+      message: 'Failed to parse Excel file. Please ensure the file is not corrupted.',
+      severity: 'error',
+    };
+  }
+
+  // Step 3: Structure validation
+  const structCheck = await validateExcelStructure(workbook);
+  if (!structCheck.valid) return structCheck;
+
+  // Step 4: Data validation
+  const worksheet = workbook.Sheets['Product Pricing'];
+  const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+
+  const dataCheck = await validateExcelData(data, template);
+  if (!dataCheck.valid) return dataCheck;
+
+  return {
+    valid: true,
+    data: { workbook, data },
+  };
+}
+```
+
+---
+
+## 8. Draft Validation
+
+### 8.1 Draft Save Validation
+
+**Draft State Validation**:
+```typescript
+async function validateDraftSave(pricelist: Partial<VendorPricelist>): Promise<ValidationResult> {
+  // Drafts have minimal validation - allow incomplete data
+
+  // Check pricelist ID exists
+  if (!pricelist.id) {
+    return {
+      valid: false,
+      code: 'DRAFT_001',
+      message: 'Pricelist ID is required',
+      severity: 'error',
+    };
+  }
+
+  // Check pricelist status is draft
+  if (pricelist.status && pricelist.status !== 'draft') {
+    return {
+      valid: false,
+      code: 'DRAFT_002',
+      message: `Cannot save draft for pricelist with status "${pricelist.status}"`,
+      severity: 'error',
+    };
+  }
+
+  // Currency validation (if provided)
+  if (pricelist.currency) {
+    const validCurrencies = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CNY', 'MXN', 'THB'];
+    if (!validCurrencies.includes(pricelist.currency)) {
+      return {
+        valid: false,
+        code: 'DRAFT_003',
+        message: 'Invalid currency code',
+        severity: 'error',
+      };
+    }
+  }
+
+  // Date validation (if provided)
+  if (pricelist.effectiveStartDate && pricelist.effectiveEndDate) {
+    if (pricelist.effectiveEndDate < pricelist.effectiveStartDate) {
+      return {
+        valid: false,
+        code: 'DRAFT_004',
+        message: 'Effective end date must be on or after start date',
+        severity: 'error',
+      };
+    }
+  }
+
+  // Items validation (basic)
+  if (pricelist.items && pricelist.items.length > 0) {
+    for (const item of pricelist.items) {
+      // Check product ID format
+      if (item.productId && !isValidUUID(item.productId)) {
+        return {
+          valid: false,
+          code: 'DRAFT_005',
+          message: `Invalid product ID format: ${item.productId}`,
+          severity: 'error',
+        };
+      }
+
+      // Check pricing data (if provided)
+      if (item.pricing) {
+        for (const tier of item.pricing) {
+          // Basic price validation
+          if (tier.unitPrice !== undefined && tier.unitPrice <= 0) {
+            return {
+              valid: false,
+              code: 'DRAFT_006',
+              message: `Invalid unit price for product ${item.productId}`,
+              severity: 'error',
+            };
+          }
+
+          // Basic MOQ validation
+          if (tier.moq !== undefined && tier.moq < 1) {
+            return {
+              valid: false,
+              code: 'DRAFT_007',
+              message: `Invalid MOQ for product ${item.productId}`,
+              severity: 'error',
+            };
+          }
+        }
+      }
+    }
+  }
+
+  return { valid: true };
+}
+
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+```
+
+### 8.2 Draft Completion Percentage
+
+**Calculation**:
+```typescript
+function calculateDraftCompletion(
+  pricelist: VendorPricelist,
+  templateItemCount: number
+): number {
+  let completionScore = 0;
+  const maxScore = 100;
+
+  // Currency selected (10 points)
+  if (pricelist.currency) {
+    completionScore += 10;
+  }
+
+  // Effective start date (5 points)
+  if (pricelist.effectiveStartDate) {
+    completionScore += 5;
+  }
+
+  // Effective end date or open-ended (5 points)
+  if (pricelist.effectiveEndDate !== undefined) {
+    completionScore += 5;
+  }
+
+  // Products with pricing (70 points)
+  const itemsWithPricing = pricelist.items.filter(item =>
+    item.pricing && item.pricing.length > 0 && item.pricing[0].unitPrice > 0
+  );
+
+  const productCompletionPercentage = (itemsWithPricing.length / templateItemCount) * 70;
+  completionScore += productCompletionPercentage;
+
+  // Lead times provided (10 points)
+  const itemsWithLeadTime = pricelist.items.filter(item => item.leadTime && item.leadTime > 0);
+  const leadTimePercentage = (itemsWithLeadTime.length / templateItemCount) * 10;
+  completionScore += leadTimePercentage;
+
+  return Math.round(completionScore);
+}
+```
+
+**Validation**:
+```typescript
+async function validateDraftCompletion(
+  pricelist: VendorPricelist,
+  template: PriceListTemplate
+): Promise<ValidationResult> {
+  const completionPercentage = calculateDraftCompletion(pricelist, template.items.length);
+
+  // Store completion percentage
+  await prisma.vendorPricelist.update({
+    where: { id: pricelist.id },
+    data: { completionPercentage },
+  });
+
+  return {
+    valid: true,
+    data: { completionPercentage },
+  };
+}
+```
+
+---
+
+## 9. Final Submission Validation
+
+### 9.1 Pre-Submission Validation
+
+**Complete Submission Validation**:
+```typescript
+async function validateFinalSubmission(
+  pricelist: VendorPricelist,
+  campaign: PriceCollectionCampaign,
+  template: PriceListTemplate,
+  invitation: VendorInvitation
+): Promise<ValidationResult> {
+  const validationErrors: string[] = [];
+
+  // 1. Token validation
+  const tokenCheck = await validateTokenNotSubmitted(invitation);
+  if (!tokenCheck.valid) return tokenCheck;
+
+  // 2. Campaign deadline validation
+  const deadlineCheck = await validateSubmissionDeadline(campaign);
+  if (!deadlineCheck.valid) return deadlineCheck;
+
+  // 3. Header validation
+  if (!pricelist.currency) {
+    validationErrors.push('Currency is required');
+  }
+
+  if (!pricelist.effectiveStartDate) {
+    validationErrors.push('Effective start date is required');
+  }
+
+  if (pricelist.effectiveEndDate && pricelist.effectiveEndDate < pricelist.effectiveStartDate) {
+    validationErrors.push('Effective end date must be on or after start date');
+  }
+
+  // 4. All products validation
+  const allProductsCheck = await validateAllProductsPriced(template.id, pricelist.items);
+  if (!allProductsCheck.valid) {
+    validationErrors.push(allProductsCheck.message);
+  }
+
+  // 5. Item-level validation
+  for (const item of pricelist.items) {
+    // Product ID validation
+    if (!item.productId || !isValidUUID(item.productId)) {
+      validationErrors.push(`Invalid product ID: ${item.productId}`);
+      continue;
+    }
+
+    // Pricing validation
+    if (!item.pricing || item.pricing.length === 0) {
+      validationErrors.push(`Missing pricing for product ${item.productCode}`);
+      continue;
+    }
+
+    // MOQ tier validation
+    const moqCheck = await validateMOQTiers(item.pricing);
+    if (!moqCheck.valid) {
+      validationErrors.push(`${item.productCode}: ${moqCheck.message}`);
+    }
+
+    // Lead time validation
+    if (!item.leadTime || item.leadTime < 1 || item.leadTime > 365) {
+      validationErrors.push(`Invalid lead time for product ${item.productCode}`);
+    }
+
+    // FOC validation (if provided)
+    for (const tier of item.pricing) {
+      if (tier.focQuantity !== undefined && tier.focQuantity > 0) {
+        const focCheck = await validateFOC(tier.focQuantity, tier.focUnit);
+        if (!focCheck.valid) {
+          validationErrors.push(`${item.productCode}: ${focCheck.message}`);
+        }
+      }
+    }
+  }
+
+  // 6. Quality score calculation and validation
+  const qualityCheck = await validateAndCalculateQualityScore(pricelist, campaign);
+  if (!qualityCheck.valid) {
+    validationErrors.push(qualityCheck.message);
+  }
+
+  if (validationErrors.length > 0) {
+    return {
+      valid: false,
+      code: 'SUBMIT_001',
+      message: `Cannot submit pricelist: ${validationErrors.length} validation error(s)`,
+      severity: 'error',
+      details: { errors: validationErrors },
+    };
+  }
+
+  return {
+    valid: true,
+    data: { qualityScore: qualityCheck.data?.qualityScore },
+  };
+}
+```
+
+### 9.2 Submission State Transition
+
+**State Change Validation**:
+```typescript
+async function submitPricelist(
+  pricelistId: string,
+  invitationId: string
+): Promise<ValidationResult> {
+  const pricelist = await prisma.vendorPricelist.findUnique({
+    where: { id: pricelistId },
+    include: {
+      campaign: true,
+      invitation: true,
     },
   });
 
-  // Notify approvers
-  await notifyApprovers(approvalRequest);
+  if (!pricelist) {
+    return {
+      valid: false,
+      code: 'SUBMIT_002',
+      message: 'Pricelist not found',
+      severity: 'error',
+    };
+  }
+
+  // Check current status
+  if (pricelist.status !== 'draft') {
+    return {
+      valid: false,
+      code: 'SUBMIT_003',
+      message: `Cannot submit pricelist with status "${pricelist.status}"`,
+      severity: 'error',
+    };
+  }
+
+  // Get template
+  const template = await prisma.priceListTemplate.findUnique({
+    where: { id: pricelist.templateId },
+    include: { items: true },
+  });
+
+  if (!template) {
+    return {
+      valid: false,
+      code: 'SUBMIT_004',
+      message: 'Template not found',
+      severity: 'error',
+    };
+  }
+
+  // Final validation
+  const validationCheck = await validateFinalSubmission(
+    pricelist,
+    pricelist.campaign,
+    template,
+    pricelist.invitation
+  );
+
+  if (!validationCheck.valid) {
+    return validationCheck;
+  }
+
+  // Update pricelist status
+  const now = new Date();
+
+  await prisma.$transaction([
+    // Update pricelist
+    prisma.vendorPricelist.update({
+      where: { id: pricelistId },
+      data: {
+        status: 'submitted',
+        submittedAt: now,
+        qualityScore: validationCheck.data.qualityScore,
+        updatedAt: now,
+      },
+    }),
+
+    // Update invitation
+    prisma.vendorInvitation.update({
+      where: { id: invitationId },
+      data: {
+        status: 'submitted',
+        submittedAt: now,
+      },
+    }),
+
+    // Create audit log
+    prisma.auditLog.create({
+      data: {
+        action: 'PRICELIST_SUBMITTED',
+        entityType: 'PRICELIST',
+        entityId: pricelistId,
+        userId: pricelist.vendorId,
+        details: {
+          pricelistId,
+          campaignId: pricelist.campaignId,
+          qualityScore: validationCheck.data.qualityScore,
+        },
+        timestamp: now,
+      },
+    }),
+  ]);
+
+  // Send confirmation email to vendor
+  await sendSubmissionConfirmationEmail(pricelist);
+
+  // Notify procurement staff
+  await notifyProcurementStaff(pricelist);
+
+  return {
+    valid: true,
+    data: {
+      pricelistId,
+      status: 'submitted',
+      submittedAt: now,
+      qualityScore: validationCheck.data.qualityScore,
+    },
+  };
 }
 ```
 
 ---
 
-## 4. Database Constraints
+## 10. Security Validations
 
-### 4.1 Unique Constraints
-
-```sql
--- Vendor Registration
-ALTER TABLE tb_vendor_registration
-  ADD CONSTRAINT uq_vendor_registration_tax_id UNIQUE (tax_id);
-
-ALTER TABLE tb_vendor_registration
-  ADD CONSTRAINT uq_vendor_registration_email UNIQUE (primary_contact->>'email');
-
--- Vendor Portal User
-ALTER TABLE tb_vendor_portal_user
-  ADD CONSTRAINT uq_vendor_portal_user_email UNIQUE (email);
-
--- Vendor Portal Session
-ALTER TABLE tb_vendor_portal_session
-  ADD CONSTRAINT uq_vendor_portal_session_token UNIQUE (session_token);
-
--- Vendor Document
-ALTER TABLE tb_vendor_document
-  ADD CONSTRAINT uq_vendor_document_storage_path UNIQUE (storage_path);
-```
-
-### 4.2 Foreign Key Constraints
-
-```sql
--- Vendor Portal User → Vendor
-ALTER TABLE tb_vendor_portal_user
-  ADD CONSTRAINT fk_vendor_portal_user_vendor
-  FOREIGN KEY (vendor_id) REFERENCES tb_vendor(id) ON DELETE CASCADE;
-
--- Vendor Portal Session → User
-ALTER TABLE tb_vendor_portal_session
-  ADD CONSTRAINT fk_vendor_portal_session_user
-  FOREIGN KEY (user_id) REFERENCES tb_vendor_portal_user(id) ON DELETE CASCADE;
-
--- Vendor Registration → Vendor (nullable, set after approval)
-ALTER TABLE tb_vendor_registration
-  ADD CONSTRAINT fk_vendor_registration_vendor
-  FOREIGN KEY (vendor_id) REFERENCES tb_vendor(id) ON DELETE SET NULL;
-
--- Vendor Document → Vendor
-ALTER TABLE tb_vendor_document
-  ADD CONSTRAINT fk_vendor_document_vendor
-  FOREIGN KEY (vendor_id) REFERENCES tb_vendor(id) ON DELETE CASCADE;
-
--- Vendor Document → Uploaded By
-ALTER TABLE tb_vendor_document
-  ADD CONSTRAINT fk_vendor_document_uploaded_by
-  FOREIGN KEY (uploaded_by) REFERENCES tb_vendor_portal_user(id) ON DELETE SET NULL;
-
--- Vendor Notification → User
-ALTER TABLE tb_vendor_notification
-  ADD CONSTRAINT fk_vendor_notification_user
-  FOREIGN KEY (user_id) REFERENCES tb_vendor_portal_user(id) ON DELETE CASCADE;
-
--- Vendor Message → User
-ALTER TABLE tb_vendor_message
-  ADD CONSTRAINT fk_vendor_message_user
-  FOREIGN KEY (user_id) REFERENCES tb_vendor_portal_user(id) ON DELETE CASCADE;
-
--- Vendor Audit Log → User
-ALTER TABLE tb_vendor_audit_log
-  ADD CONSTRAINT fk_vendor_audit_log_user
-  FOREIGN KEY (user_id) REFERENCES tb_vendor_portal_user(id) ON DELETE SET NULL;
-```
-
-### 4.3 Check Constraints
-
-```sql
--- Vendor Portal User
-ALTER TABLE tb_vendor_portal_user
-  ADD CONSTRAINT chk_vendor_portal_user_email_format
-  CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
-
-ALTER TABLE tb_vendor_portal_user
-  ADD CONSTRAINT chk_vendor_portal_user_failed_attempts
-  CHECK (failed_login_attempts >= 0 AND failed_login_attempts <= 10);
-
--- Vendor Portal Session
-ALTER TABLE tb_vendor_portal_session
-  ADD CONSTRAINT chk_vendor_portal_session_expiry
-  CHECK (expires_at > created_at);
-
-ALTER TABLE tb_vendor_portal_session
-  ADD CONSTRAINT chk_vendor_portal_session_activity
-  CHECK (last_activity_at >= created_at);
-
--- Vendor Document
-ALTER TABLE tb_vendor_document
-  ADD CONSTRAINT chk_vendor_document_file_size
-  CHECK (file_size > 0 AND file_size <= 52428800); -- 50MB in bytes
-
-ALTER TABLE tb_vendor_document
-  ADD CONSTRAINT chk_vendor_document_expiry
-  CHECK (expiry_date IS NULL OR expiry_date > issue_date);
-```
-
-### 4.4 NOT NULL Constraints
-
-```sql
--- Vendor Portal User (essential fields)
-ALTER TABLE tb_vendor_portal_user
-  ALTER COLUMN vendor_id SET NOT NULL,
-  ALTER COLUMN email SET NOT NULL,
-  ALTER COLUMN password_hash SET NOT NULL,
-  ALTER COLUMN first_name SET NOT NULL,
-  ALTER COLUMN last_name SET NOT NULL,
-  ALTER COLUMN role SET NOT NULL,
-  ALTER COLUMN status SET NOT NULL;
-
--- Vendor Portal Session
-ALTER TABLE tb_vendor_portal_session
-  ALTER COLUMN user_id SET NOT NULL,
-  ALTER COLUMN session_token SET NOT NULL,
-  ALTER COLUMN expires_at SET NOT NULL;
-
--- Vendor Registration
-ALTER TABLE tb_vendor_registration
-  ALTER COLUMN registration_number SET NOT NULL,
-  ALTER COLUMN legal_name SET NOT NULL,
-  ALTER COLUMN tax_id SET NOT NULL,
-  ALTER COLUMN business_type SET NOT NULL,
-  ALTER COLUMN status SET NOT NULL;
-
--- Vendor Document
-ALTER TABLE tb_vendor_document
-  ALTER COLUMN vendor_id SET NOT NULL,
-  ALTER COLUMN document_type SET NOT NULL,
-  ALTER COLUMN document_name SET NOT NULL,
-  ALTER COLUMN file_name SET NOT NULL,
-  ALTER COLUMN file_size SET NOT NULL,
-  ALTER COLUMN storage_path SET NOT NULL,
-  ALTER COLUMN uploaded_by SET NOT NULL;
-```
-
----
-
-## 5. Security Validations
-
-### 5.1 Rate Limiting
+### 10.1 Rate Limiting
 
 **Implementation**:
 ```typescript
@@ -1299,46 +2223,47 @@ import { Redis } from '@upstash/redis';
 
 const redis = Redis.fromEnv();
 
-// Global rate limit: 100 requests per minute per IP
-const globalRateLimit = new Ratelimit({
+// Portal access rate limit: 100 requests per minute per IP
+const portalAccessLimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(100, '1 m'),
   analytics: true,
 });
 
-// Login rate limit: 5 attempts per minute per IP
-const loginRateLimit = new Ratelimit({
+// Auto-save rate limit: 30 saves per minute per pricelist
+const autoSaveLimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(5, '1 m'),
+  limiter: Ratelimit.slidingWindow(30, '1 m'),
   analytics: true,
 });
 
-// Document upload rate limit: 10 uploads per hour per user
-const uploadRateLimit = new Ratelimit({
+// Submission rate limit: 5 attempts per hour per vendor
+const submissionLimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(10, '1 h'),
+  limiter: Ratelimit.slidingWindow(5, '1 h'),
   analytics: true,
 });
 
 export async function checkRateLimit(
   identifier: string,
-  type: 'global' | 'login' | 'upload'
+  type: 'portal_access' | 'auto_save' | 'submission'
 ): Promise<ValidationResult> {
   let ratelimit: Ratelimit;
   let action: string;
 
   switch (type) {
-    case 'login':
-      ratelimit = loginRateLimit;
-      action = 'login';
+    case 'portal_access':
+      ratelimit = portalAccessLimit;
+      action = 'portal access';
       break;
-    case 'upload':
-      ratelimit = uploadRateLimit;
-      action = 'upload';
+    case 'auto_save':
+      ratelimit = autoSaveLimit;
+      action = 'auto-save';
       break;
-    default:
-      ratelimit = globalRateLimit;
-      action = 'request';
+    case 'submission':
+      ratelimit = submissionLimit;
+      action = 'submission';
+      break;
   }
 
   const { success, limit, reset, remaining } = await ratelimit.limit(identifier);
@@ -1346,7 +2271,7 @@ export async function checkRateLimit(
   if (!success) {
     return {
       valid: false,
-      code: 'RATE_LIMIT_EXCEEDED',
+      code: 'RATE_LIMIT_001',
       message: `Too many ${action} attempts. Please try again in ${Math.ceil((reset - Date.now()) / 1000)} seconds.`,
       severity: 'error',
       details: {
@@ -1361,103 +2286,38 @@ export async function checkRateLimit(
 }
 ```
 
-### 5.2 Account Lockout
+### 10.2 XSS Protection
 
-**Implementation**:
-```typescript
-async function handleFailedLogin(userId: string): Promise<void> {
-  const user = await prisma.vendorPortalUser.findUnique({
-    where: { id: userId },
-  });
-
-  if (!user) return;
-
-  const failedAttempts = user.failedLoginAttempts + 1;
-  const shouldLock = failedAttempts >= 5;
-
-  await prisma.vendorPortalUser.update({
-    where: { id: userId },
-    data: {
-      failedLoginAttempts: failedAttempts,
-      lockedUntil: shouldLock ? new Date(Date.now() + 15 * 60 * 1000) : null, // 15 minutes
-    },
-  });
-
-  // Create audit log
-  await createAuditLog({
-    userId,
-    action: shouldLock ? 'ACCOUNT_LOCKED' : 'LOGIN_FAILED',
-    actionCategory: 'AUTHENTICATION',
-    status: 'FAILURE',
-    details: {
-      failedAttempts,
-      lockedUntil: shouldLock ? new Date(Date.now() + 15 * 60 * 1000) : null,
-    },
-  });
-
-  // Send security alert if locked
-  if (shouldLock) {
-    await sendEmail({
-      to: user.email,
-      subject: 'Account Locked - Security Alert',
-      template: 'account-locked',
-      data: {
-        userName: `${user.firstName} ${user.lastName}`,
-        lockDuration: 15,
-        unlockTime: new Date(Date.now() + 15 * 60 * 1000),
-      },
-    });
-  }
-}
-```
-
-### 5.3 XSS Protection
-
-**Implementation**:
+**Input Sanitization**:
 ```typescript
 import DOMPurify from 'isomorphic-dompurify';
 
-function sanitizeHtml(html: string): string {
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['b', 'i', 'u', 'strong', 'em', 'p', 'br', 'ul', 'ol', 'li'],
+function sanitizeInput(input: string): string {
+  return DOMPurify.sanitize(input, {
+    ALLOWED_TAGS: [], // No HTML tags allowed
     ALLOWED_ATTR: [],
   });
 }
 
-function sanitizeInput(input: string): string {
-  return input
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;');
-}
-```
-
-### 5.4 SQL Injection Protection
-
-**Implementation**: Prisma ORM provides built-in SQL injection protection through parameterized queries. All database queries use Prisma's type-safe query builder.
-
-### 5.5 CSRF Protection
-
-**Implementation**:
-```typescript
-import { getCsrfToken } from 'next-auth/react';
-
-// Generate CSRF token for forms
-export async function generateCsrfToken(): Promise<string> {
-  return await getCsrfToken();
+function sanitizeNotes(notes: string): string {
+  return DOMPurify.sanitize(notes, {
+    ALLOWED_TAGS: ['b', 'i', 'u', 'strong', 'em', 'p', 'br'],
+    ALLOWED_ATTR: [],
+  });
 }
 
-// Validate CSRF token on submission
-export async function validateCsrfToken(token: string): Promise<ValidationResult> {
-  const expectedToken = await getCsrfToken();
+async function validateInputSecurity(data: any): Promise<ValidationResult> {
+  // Check for script tags
+  const scriptPattern = /<script[^>]*>.*?<\/script>/gi;
+  const iframePattern = /<iframe[^>]*>.*?<\/iframe>/gi;
 
-  if (token !== expectedToken) {
+  const jsonStr = JSON.stringify(data);
+
+  if (scriptPattern.test(jsonStr) || iframePattern.test(jsonStr)) {
     return {
       valid: false,
-      code: 'INVALID_CSRF_TOKEN',
-      message: 'Invalid or expired security token. Please refresh the page.',
+      code: 'XSS_001',
+      message: 'Invalid content detected. Please remove any HTML or script tags.',
       severity: 'error',
     };
   }
@@ -1466,637 +2326,767 @@ export async function validateCsrfToken(token: string): Promise<ValidationResult
 }
 ```
 
+### 10.3 CSRF Protection
+
+**Implementation**:
+```typescript
+import { getCsrfToken } from 'next-auth/react';
+
+// Generate CSRF token
+export async function generateCsrfToken(): Promise<string> {
+  return await getCsrfToken();
+}
+
+// Validate CSRF token
+export async function validateCsrfToken(token: string): Promise<ValidationResult> {
+  const expectedToken = await getCsrfToken();
+
+  if (token !== expectedToken) {
+    return {
+      valid: false,
+      code: 'CSRF_001',
+      message: 'Invalid security token. Please refresh the page and try again.',
+      severity: 'error',
+    };
+  }
+
+  return { valid: true };
+}
+```
+
+### 10.4 SQL Injection Protection
+
+**Implementation**: Prisma ORM provides built-in SQL injection protection through parameterized queries. All database queries use Prisma's type-safe query builder.
+
+**Example**:
+```typescript
+// Safe: Prisma parameterized query
+const pricelist = await prisma.vendorPricelist.findUnique({
+  where: { id: pricelistId },
+});
+
+// NEVER do this (raw SQL with interpolation)
+// UNSAFE: await prisma.$queryRaw(`SELECT * FROM pricelist WHERE id = '${pricelistId}'`);
+```
+
 ---
 
-## 6. Complete Zod Schemas
+## 11. Complete Zod Schemas
 
-### 6.1 Vendor Registration Schema
+### 11.1 Pricelist Header Schema
 
 ```typescript
 import { z } from 'zod';
 
-export const vendorRegistrationSchema = z.object({
-  // Company Information
-  legalName: z.string()
-    .min(3, 'Company name must be at least 3 characters')
-    .max(200, 'Company name must not exceed 200 characters')
-    .regex(/^[a-zA-Z0-9\s\-\.\,\&\'\(\)]+$/, 'Company name contains invalid characters'),
-
-  tradeName: z.string()
-    .max(200, 'Trade name must not exceed 200 characters')
-    .optional(),
-
-  taxId: z.string()
-    .regex(/^\d{2}-\d{7}$/, 'Tax ID must be in format XX-XXXXXXX'),
-
-  businessType: z.enum([
-    'CORPORATION',
-    'LLC',
-    'PARTNERSHIP',
-    'SOLE_PROPRIETORSHIP',
-    'NON_PROFIT',
-    'GOVERNMENT',
-    'OTHER'
-  ]),
-
-  yearEstablished: z.number()
-    .int('Year must be a whole number')
-    .min(1800, 'Year must be after 1800')
-    .max(new Date().getFullYear(), 'Year cannot be in the future')
-    .optional(),
-
-  website: z.string()
-    .url('Invalid website URL')
-    .optional(),
-
-  // Addresses
-  physicalAddress: z.object({
-    street: z.string().min(5).max(200),
-    street2: z.string().max(200).optional(),
-    city: z.string().min(2).max(100),
-    state: z.string().length(2).regex(/^[A-Z]{2}$/),
-    postalCode: z.string().regex(/^\d{5}(-\d{4})?$/),
-    country: z.string().length(2).default('US'),
+export const pricelistHeaderSchema = z.object({
+  currency: z.enum(['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CNY', 'MXN', 'THB'], {
+    required_error: 'Currency is required',
+    invalid_type_error: 'Invalid currency code',
   }),
 
-  mailingAddress: z.object({
-    street: z.string().min(5).max(200),
-    street2: z.string().max(200).optional(),
-    city: z.string().min(2).max(100),
-    state: z.string().length(2).regex(/^[A-Z]{2}$/),
-    postalCode: z.string().regex(/^\d{5}(-\d{4})?$/),
-    country: z.string().length(2).default('US'),
-  }).optional(),
-
-  billingAddress: z.object({
-    street: z.string().min(5).max(200),
-    street2: z.string().max(200).optional(),
-    city: z.string().min(2).max(100),
-    state: z.string().length(2).regex(/^[A-Z]{2}$/),
-    postalCode: z.string().regex(/^\d{5}(-\d{4})?$/),
-    country: z.string().length(2).default('US'),
-  }).optional(),
-
-  // Contact Information
-  primaryContact: z.object({
-    firstName: z.string().min(2).max(100),
-    lastName: z.string().min(2).max(100),
-    title: z.string().max(100).optional(),
-    email: z.string().email().max(255).toLowerCase(),
-    phone: z.string().regex(/^\+?1?\d{10,14}$/),
-    mobile: z.string().regex(/^\+?1?\d{10,14}$/).optional(),
+  effectiveStartDate: z.coerce.date({
+    required_error: 'Effective start date is required',
+    invalid_type_error: 'Invalid date format',
   }),
 
-  secondaryContact: z.object({
-    firstName: z.string().min(2).max(100),
-    lastName: z.string().min(2).max(100),
-    title: z.string().max(100).optional(),
-    email: z.string().email().max(255).toLowerCase(),
-    phone: z.string().regex(/^\+?1?\d{10,14}$/),
-  }).optional(),
+  effectiveEndDate: z.coerce.date({
+    invalid_type_error: 'Invalid date format',
+  })
+    .nullable()
+    .refine((date, ctx) => {
+      if (date === null) return true; // Open-ended pricelist
+      const startDate = ctx.parent.effectiveStartDate;
+      return date >= startDate;
+    }, 'End date must be on or after start date'),
 
-  apContact: z.object({
-    firstName: z.string().min(2).max(100),
-    lastName: z.string().min(2).max(100),
-    email: z.string().email().max(255).toLowerCase(),
-    phone: z.string().regex(/^\+?1?\d{10,14}$/),
-  }).optional(),
-
-  // Business Details
-  businessCategories: z.array(z.string().uuid())
-    .min(1, 'At least one business category is required')
-    .max(10, 'Maximum 10 business categories allowed'),
-
-  productsServices: z.array(z.string())
-    .min(1, 'At least one product/service is required')
-    .max(50, 'Maximum 50 products/services allowed'),
-
-  bankAccount: z.object({
-    bankName: z.string().min(2).max(200),
-    accountName: z.string().min(2).max(200),
-    accountNumber: z.string()
-      .regex(/^\d{4,17}$/, 'Account number must be 4-17 digits')
-      .transform((val) => encryptData(val)),
-    routingNumber: z.string()
-      .length(9, 'Routing number must be 9 digits')
-      .regex(/^\d{9}$/, 'Routing number must be numeric')
-      .refine((routing) => validateRoutingChecksum(routing), 'Invalid routing number')
-      .transform((val) => encryptData(val)),
-    accountType: z.enum(['CHECKING', 'SAVINGS']),
-  }),
-
-  certifications: z.array(z.object({
-    name: z.string().min(2).max(200),
-    issuingOrganization: z.string().min(2).max(200),
-    certificateNumber: z.string().max(100).optional(),
-    issueDate: z.coerce.date().optional(),
-    expiryDate: z.coerce.date().optional(),
-  })).optional(),
-
-  // Terms Acceptance
-  acceptedTerms: z.boolean()
-    .refine((val) => val === true, 'You must accept the terms and conditions'),
-
-  electronicSignature: z.string()
-    .min(3, 'Electronic signature must be at least 3 characters')
-    .max(200, 'Electronic signature must not exceed 200 characters'),
-
-  signatureDate: z.coerce.date(),
-
-  // Metadata
-  ipAddress: z.string().ip().optional(),
-  userAgent: z.string().optional(),
+  notes: z.string()
+    .max(2000, 'Notes must not exceed 2000 characters')
+    .refine(
+      (text) => !/<script[^>]*>.*?<\/script>/i.test(text),
+      'Notes contain invalid content'
+    )
+    .optional(),
 });
 
-export type VendorRegistrationFormData = z.infer<typeof vendorRegistrationSchema>;
+export type PricelistHeaderData = z.infer<typeof pricelistHeaderSchema>;
 ```
 
-### 6.2 Login Schema
+### 11.2 MOQ Tier Schema
 
 ```typescript
-export const loginSchema = z.object({
-  email: z.string()
-    .email('Invalid email address')
-    .toLowerCase(),
+export const moqTierSchema = z.object({
+  moq: z.number()
+    .int('MOQ must be a whole number')
+    .positive('MOQ must be a positive number')
+    .min(1, 'MOQ must be at least 1'),
 
-  password: z.string()
-    .min(8, 'Password must be at least 8 characters'),
+  unit: z.string()
+    .min(1, 'Unit is required')
+    .max(50, 'Unit must not exceed 50 characters')
+    .regex(/^[a-zA-Z0-9\s\-\/]+$/, 'Unit contains invalid characters'),
 
-  rememberMe: z.boolean().default(false),
-});
+  unitPrice: z.number()
+    .positive('Unit price must be a positive number')
+    .min(0.0001, 'Unit price must be at least 0.0001')
+    .max(999999999.9999, 'Unit price must not exceed 999,999,999.9999')
+    .refine((val) => {
+      const decimalStr = val.toFixed(10);
+      const decimalPart = decimalStr.split('.')[1].replace(/0+$/, '');
+      return decimalPart.length <= 4;
+    }, 'Unit price must have at most 4 decimal places'),
 
-export type LoginFormData = z.infer<typeof loginSchema>;
-```
-
-### 6.3 Password Change Schema
-
-```typescript
-export const passwordChangeSchema = z.object({
-  currentPassword: z.string()
-    .min(8, 'Current password is required'),
-
-  newPassword: z.string()
-    .min(12, 'Password must be at least 12 characters')
-    .max(128, 'Password must not exceed 128 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
-
-  confirmPassword: z.string(),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-}).refine((data) => data.currentPassword !== data.newPassword, {
-  message: 'New password must be different from current password',
-  path: ['newPassword'],
-});
-
-export type PasswordChangeFormData = z.infer<typeof passwordChangeSchema>;
-```
-
-### 6.4 Profile Update Schema
-
-```typescript
-export const profileUpdateSchema = z.object({
-  // Contact Information
-  primaryContact: z.object({
-    firstName: z.string().min(2).max(100),
-    lastName: z.string().min(2).max(100),
-    title: z.string().max(100).optional(),
-    phone: z.string().regex(/^\+?1?\d{10,14}$/),
-    mobile: z.string().regex(/^\+?1?\d{10,14}$/).optional(),
-  }).optional(),
-
-  // Addresses (non-critical)
-  mailingAddress: z.object({
-    street: z.string().min(5).max(200),
-    street2: z.string().max(200).optional(),
-    city: z.string().min(2).max(100),
-    state: z.string().length(2),
-    postalCode: z.string().regex(/^\d{5}(-\d{4})?$/),
-    country: z.string().length(2).default('US'),
-  }).optional(),
-
-  // Critical Changes (require approval)
-  legalName: z.string()
-    .min(3).max(200)
+  leadTime: z.number()
+    .int('Lead time must be a whole number')
+    .positive('Lead time must be a positive number')
+    .min(1, 'Lead time must be at least 1 day')
+    .max(365, 'Lead time must not exceed 365 days')
     .optional(),
 
-  taxId: z.string()
-    .regex(/^\d{2}-\d{7}$/)
+  focQuantity: z.number()
+    .int('FOC quantity must be a whole number')
+    .min(0, 'FOC quantity must be non-negative')
+    .max(999999, 'FOC quantity must not exceed 999,999')
     .optional(),
 
-  bankAccount: z.object({
-    bankName: z.string().min(2).max(200),
-    accountName: z.string().min(2).max(200),
-    accountNumber: z.string().regex(/^\d{4,17}$/),
-    routingNumber: z.string().length(9).regex(/^\d{9}$/),
-    accountType: z.enum(['CHECKING', 'SAVINGS']),
-  }).optional(),
+  focUnit: z.string()
+    .max(50, 'FOC unit must not exceed 50 characters')
+    .regex(/^[a-zA-Z0-9\s\-\/]+$/, 'FOC unit contains invalid characters')
+    .optional()
+    .refine((unit, ctx) => {
+      const focQty = ctx.parent.focQuantity;
+      if (focQty && focQty > 0) {
+        return unit !== undefined && unit.length > 0;
+      }
+      return true;
+    }, 'FOC unit is required when FOC quantity is specified'),
 
-  changeReason: z.string()
-    .min(20, 'Change reason must be at least 20 characters')
-    .max(500, 'Change reason must not exceed 500 characters')
+  notes: z.string()
+    .max(500, 'Notes must not exceed 500 characters')
+    .optional(),
+});
+
+export type MOQTierData = z.infer<typeof moqTierSchema>;
+```
+
+### 11.3 Pricelist Item Schema
+
+```typescript
+export const pricelistItemSchema = z.object({
+  productId: z.string()
+    .uuid('Invalid product ID format'),
+
+  productCode: z.string()
+    .min(1, 'Product code is required')
+    .max(50, 'Product code must not exceed 50 characters'),
+
+  productName: z.string()
+    .min(1, 'Product name is required')
+    .max(200, 'Product name must not exceed 200 characters'),
+
+  category: z.string()
+    .min(1, 'Category is required')
+    .max(100, 'Category must not exceed 100 characters'),
+
+  pricing: z.array(moqTierSchema)
+    .min(1, 'At least one pricing tier is required')
+    .max(5, 'Maximum 5 MOQ pricing tiers allowed')
+    .refine((tiers) => {
+      // Check ascending MOQ order
+      for (let i = 1; i < tiers.length; i++) {
+        if (tiers[i].moq <= tiers[i - 1].moq) {
+          return false;
+        }
+      }
+      return true;
+    }, 'MOQ quantities must be in ascending order')
+    .refine((tiers) => {
+      // Check for duplicate MOQ quantities
+      const moqSet = new Set(tiers.map(t => t.moq));
+      return moqSet.size === tiers.length;
+    }, 'Duplicate MOQ quantity detected'),
+
+  leadTime: z.number()
+    .int('Lead time must be a whole number')
+    .positive('Lead time must be a positive number')
+    .min(1, 'Lead time must be at least 1 day')
+    .max(365, 'Lead time must not exceed 365 days')
     .optional(),
 
-  currentPassword: z.string()
-    .min(8)
-    .optional(), // Required when changing bank account
+  taxRate: z.number()
+    .min(0, 'Tax rate must be non-negative')
+    .max(100, 'Tax rate must not exceed 100%')
+    .optional(),
+
+  notes: z.string()
+    .max(1000, 'Notes must not exceed 1000 characters')
+    .optional(),
+
+  certifications: z.array(z.string())
+    .max(20, 'Maximum 20 certifications allowed')
+    .optional(),
 });
 
-export type ProfileUpdateFormData = z.infer<typeof profileUpdateSchema>;
+export type PricelistItemData = z.infer<typeof pricelistItemSchema>;
 ```
 
-### 6.5 Price Template Response Schema
+### 11.4 Complete Pricelist Schema
 
 ```typescript
-export const priceTemplateResponseSchema = z.object({
-  templateId: z.string().uuid('Invalid template ID'),
+export const vendorPricelistSchema = z.object({
+  // Header
+  currency: pricelistHeaderSchema.shape.currency,
+  effectiveStartDate: pricelistHeaderSchema.shape.effectiveStartDate,
+  effectiveEndDate: pricelistHeaderSchema.shape.effectiveEndDate,
+  notes: pricelistHeaderSchema.shape.notes,
 
-  items: z.array(z.object({
-    productId: z.string().uuid('Invalid product ID'),
-    unitPrice: z.number()
-      .positive('Unit price must be a positive number')
-      .min(0.0001).max(999999999.9999)
-      .refine((val) => {
-        const decimalPlaces = (val.toFixed(10).split('.')[1].replace(/0+$/, '')).length;
-        return decimalPlaces <= 4;
-      }, 'Unit price must have at most 4 decimal places'),
-    casePrice: z.number()
-      .positive().min(0.0001).max(999999999.9999).optional(),
-    leadTimeDays: z.number()
-      .int().positive().min(1).max(365),
-    moq: z.number()
-      .int().positive().min(1).max(999999).optional(),
-    packSize: z.number()
-      .int().positive().min(1).max(999999).optional(),
-    notes: z.string().max(500).optional(),
-  })).min(1, 'At least one item is required'),
-
-  notes: z.string().max(1000).optional(),
+  // Items
+  items: z.array(pricelistItemSchema)
+    .min(1, 'At least one product is required'),
 });
 
-export type PriceTemplateResponseFormData = z.infer<typeof priceTemplateResponseSchema>;
+export type VendorPricelistData = z.infer<typeof vendorPricelistSchema>;
 ```
 
-### 6.6 RFQ Response Schema
+### 11.5 Draft Pricelist Schema
 
 ```typescript
-export const rfqResponseSchema = z.object({
-  rfqId: z.string().uuid('Invalid RFQ ID'),
-
-  items: z.array(z.object({
-    rfqItemId: z.string().uuid('Invalid RFQ item ID'),
-    unitPrice: z.number()
-      .positive().min(0.01).max(999999999.99),
-    totalPrice: z.number()
-      .positive().min(0.01).max(999999999.99),
-    leadTimeDays: z.number()
-      .int().positive().min(1).max(365),
-    notes: z.string().max(500).optional(),
-  })).min(1, 'At least one item is required'),
-
-  totalBidAmount: z.number()
-    .positive().min(0.01).max(999999999.99),
-
-  bidValidityDays: z.number()
-    .int().positive().min(7).max(90),
-
-  paymentTerms: z.object({
-    netDays: z.number().int().min(0).max(365),
-    earlyPaymentDiscount: z.number().min(0).max(100).optional(),
-    discountDays: z.number().int().min(0).max(365).optional(),
-  }),
-
-  deliveryTerms: z.object({
-    incoterm: z.enum(['EXW', 'FOB', 'CIF', 'DDP', 'DAP']),
-    shippingMethod: z.string().max(100),
-    estimatedDeliveryDays: z.number().int().positive().min(1).max(365),
-  }),
-
+export const draftPricelistSchema = z.object({
+  // Header (all optional for drafts)
+  currency: z.enum(['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CNY', 'MXN', 'THB']).optional(),
+  effectiveStartDate: z.coerce.date().optional(),
+  effectiveEndDate: z.coerce.date().nullable().optional(),
   notes: z.string().max(2000).optional(),
 
-  attachments: z.array(z.object({
-    fileName: z.string().max(255),
-    fileSize: z.number().positive().max(50 * 1024 * 1024),
-    fileType: z.string().max(100),
-    storageKey: z.string(),
-  })).max(10).optional(),
+  // Items (minimal validation for drafts)
+  items: z.array(
+    z.object({
+      productId: z.string().uuid(),
+      pricing: z.array(
+        z.object({
+          moq: z.number().int().positive().optional(),
+          unit: z.string().max(50).optional(),
+          unitPrice: z.number().positive().optional(),
+          leadTime: z.number().int().positive().max(365).optional(),
+          focQuantity: z.number().int().min(0).optional(),
+          focUnit: z.string().max(50).optional(),
+          notes: z.string().max(500).optional(),
+        })
+      ).optional(),
+      leadTime: z.number().int().positive().max(365).optional(),
+      notes: z.string().max(1000).optional(),
+    })
+  ).optional(),
 });
 
-export type RfqResponseFormData = z.infer<typeof rfqResponseSchema>;
-```
-
-### 6.7 Invoice Submission Schema
-
-```typescript
-export const invoiceSubmissionSchema = z.object({
-  purchaseOrderNumber: z.string()
-    .min(5, 'Purchase order number is required')
-    .max(50),
-
-  invoiceNumber: z.string()
-    .min(5, 'Invoice number must be at least 5 characters')
-    .max(50, 'Invoice number must not exceed 50 characters')
-    .regex(/^[A-Z0-9\-]+$/, 'Invoice number must be alphanumeric'),
-
-  invoiceDate: z.coerce.date()
-    .refine((date) => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      return date <= today;
-    }, 'Invoice date cannot be in the future'),
-
-  dueDate: z.coerce.date()
-    .refine((date, ctx) => {
-      const invoiceDate = ctx.parent.invoiceDate;
-      return date >= invoiceDate;
-    }, 'Due date must be on or after invoice date'),
-
-  items: z.array(z.object({
-    description: z.string().min(3).max(500),
-    quantity: z.number().int().positive().min(1),
-    unitPrice: z.number().positive().min(0.01).max(999999999.99),
-    totalPrice: z.number().positive().min(0.01).max(999999999.99),
-  })).min(1, 'At least one item is required'),
-
-  subtotal: z.number().positive().min(0.01).max(999999999.99),
-  taxAmount: z.number().min(0).max(999999999.99),
-  totalAmount: z.number().positive().min(0.01).max(999999999.99),
-
-  notes: z.string().max(1000).optional(),
-
-  invoiceDocument: z.custom<File>()
-    .refine((file) => file.size <= 50 * 1024 * 1024, 'File size must not exceed 50MB')
-    .refine((file) => {
-      return ['application/pdf', 'image/jpeg', 'image/png'].includes(file.type);
-    }, 'Invoice must be PDF, JPG, or PNG'),
-});
-
-export type InvoiceSubmissionFormData = z.infer<typeof invoiceSubmissionSchema>;
+export type DraftPricelistData = z.infer<typeof draftPricelistSchema>;
 ```
 
 ---
 
-## 7. Error Messages Reference
+## 12. Error Messages Reference
 
-### 7.1 Authentication Errors
-
-| Code | User Message | Technical Message | Severity |
-|------|--------------|-------------------|----------|
-| AUTH_001 | Invalid email or password | Authentication failed | error |
-| AUTH_002 | Account is locked. Please try again in 15 minutes. | Account locked due to failed attempts | error |
-| AUTH_003 | Your account is not active. Please contact support. | Account status is not ACTIVE | error |
-| AUTH_004 | Invalid verification code | 2FA code verification failed | error |
-| AUTH_005 | Verification code has expired. Please request a new one. | 2FA code expired | error |
-| AUTH_006 | Your session has expired. Please log in again. | Session expired | error |
-| AUTH_007 | Your password has expired. Please change your password. | Password older than 90 days | error |
-
-### 7.2 Registration Errors
+### 12.1 Token Authentication Errors
 
 | Code | User Message | Technical Message | Severity |
 |------|--------------|-------------------|----------|
-| REG_001 | This email is already registered | Duplicate email in registration | error |
-| REG_002 | This Tax ID is already registered | Duplicate Tax ID | error |
-| REG_003 | Invalid Tax ID format | Tax ID format validation failed | error |
-| REG_004 | Business License is required | Missing mandatory document | error |
-| REG_005 | File size exceeds 50MB limit | File size validation failed | error |
-| REG_006 | File failed security scan | Virus scan failed | error |
-| REG_007 | Invalid routing number | Bank routing checksum failed | error |
+| TOKEN_001 | Invalid or missing access token | Token parameter missing from URL | error |
+| TOKEN_002 | Invalid token format | Token does not match UUID v4 format | error |
+| TOKEN_003 | Invalid or expired invitation link | Token not found in database | error |
+| TOKEN_004 | This invitation has expired. Please contact procurement to request a new invitation. | Token expiration date in past | error |
+| TOKEN_005 | This invitation expires in {hours} hours. Please submit your pricelist soon. | Token expiring within 24 hours | warning |
+| TOKEN_006 | This invitation is no longer valid. | Token status is not valid for access | error |
+| CAMPAIGN_001 | This price collection campaign is not currently active. | Campaign status is not 'active' | error |
+| CAMPAIGN_002 | This campaign has not started yet. It will begin on {date}. | Current date before campaign start | error |
+| CAMPAIGN_003 | This campaign ended on {date} and is no longer accepting submissions. | Current date after campaign end | error |
 
-### 7.3 Document Upload Errors
-
-| Code | User Message | Technical Message | Severity |
-|------|--------------|-------------------|----------|
-| DOC_001 | Document type is required | Missing document type | error |
-| DOC_002 | File size must not exceed 50MB | File size exceeds limit | error |
-| DOC_003 | Invalid file format. Allowed: PDF, JPG, PNG, DOC, DOCX | File type not allowed | error |
-| DOC_004 | File failed virus scan | Malware detected | error |
-| DOC_005 | Expiry date is required for this document type | Missing expiry date for certification | error |
-| DOC_006 | Document is expired. Please upload a current version. | Document expiry date in past | error |
-
-### 7.4 Price Template Errors
+### 12.2 Field Validation Errors
 
 | Code | User Message | Technical Message | Severity |
 |------|--------------|-------------------|----------|
-| PT_001 | Template not found or no longer available | Invalid template ID | error |
-| PT_002 | Deadline for this template has passed | Template deadline exceeded | error |
-| PT_003 | Unit price is required | Missing unit price | error |
-| PT_004 | Unit price must be a positive number | Invalid unit price | error |
-| PT_005 | Price is significantly higher than market average | Price exceeds market by >20% | warning |
+| CURRENCY_001 | Currency {code} is not supported for this campaign. Supported currencies: {list} | Currency not in template's supported list | error |
+| DATE_001 | Effective end date must be on or after the effective start date | End date < start date | error |
+| MOQ_001 | At least one pricing tier is required | Pricing array is empty | error |
+| MOQ_002 | Maximum 5 MOQ pricing tiers allowed | Pricing array has > 5 tiers | error |
+| MOQ_003 | MOQ quantities must be in ascending order | MOQ tier {n} <= tier {n-1} | error |
+| MOQ_004 | Duplicate MOQ quantity detected | Same MOQ appears multiple times | error |
+| MOQ_005 | Tier {n}: MOQ must be at least 1 | MOQ < 1 | error |
+| MOQ_006 | Tier {n}: Unit price must be a positive number | Unit price <= 0 | error |
+| MOQ_007 | Tier {n}: Unit price exceeds maximum value | Unit price > 999,999,999.9999 | error |
+| MOQ_008 | Tier {n}: Unit price must have at most 4 decimal places | Decimal precision > 4 | error |
+| MOQ_009 | Tier {n}: Lead time must be between 1 and 365 days | Lead time out of range | error |
+| MOQ_010 | Tier {n}: FOC quantity cannot be negative | FOC quantity < 0 | error |
+| FOC_001 | FOC unit is required when FOC quantity is specified | FOC quantity > 0 but no unit | error |
+| FOC_002 | FOC quantity cannot be negative | FOC quantity < 0 | error |
+| FOC_003 | FOC quantity must not exceed 999,999 | FOC quantity > 999,999 | error |
+| FOC_004 | FOC unit must not exceed 50 characters | FOC unit length > 50 | error |
 
-### 7.5 RFQ Response Errors
-
-| Code | User Message | Technical Message | Severity |
-|------|--------------|-------------------|----------|
-| RFQ_001 | RFQ not found or no longer available | Invalid RFQ ID | error |
-| RFQ_002 | Deadline for this RFQ has passed | RFQ deadline exceeded | error |
-| RFQ_003 | Bid validity must be at least {min} days | Bid validity below RFQ minimum | error |
-| RFQ_004 | Bid exceeds budget by more than 10% | Bid amount validation warning | warning |
-| RFQ_005 | You have already submitted a response to this RFQ | Duplicate RFQ response | error |
-
-### 7.6 Invoice Errors
-
-| Code | User Message | Technical Message | Severity |
-|------|--------------|-------------------|----------|
-| INV_001 | Purchase order not found | Invalid PO number | error |
-| INV_002 | This purchase order has already been invoiced | Duplicate invoice for PO | error |
-| INV_003 | Invoice number already exists | Duplicate invoice number | error |
-| INV_004 | Invoice total does not match purchase order | Invoice-PO amount mismatch | error |
-| INV_005 | Invoice document is required | Missing invoice file | error |
-
-### 7.7 Security Errors
+### 12.3 Business Rule Errors
 
 | Code | User Message | Technical Message | Severity |
 |------|--------------|-------------------|----------|
-| SEC_001 | Too many login attempts. Please try again later. | Rate limit exceeded | error |
-| SEC_002 | Your session has been terminated due to suspicious activity | Security violation detected | error |
-| SEC_003 | Invalid security token. Please refresh the page. | CSRF token validation failed | error |
-| SEC_004 | You have been logged out due to inactivity | Session timeout | warning |
+| BR_VPP_001 | You have already submitted a pricelist for this campaign | Duplicate pricelist submission | error |
+| BR_VPP_002 | Pricing is missing for {count} product(s). All products in the template must have pricing before submission. | Incomplete product coverage | error |
+| BR_VPP_003 | The submission deadline for this campaign was {date}. Submissions are no longer accepted. | Submission after deadline | error |
+| BR_VPP_003_WARNING | Submission deadline is in {hours} hours. Please submit soon to avoid missing the deadline. | Deadline within 24 hours | warning |
+| BR_VPP_004 | Pricelist quality score ({score}/100) is below the minimum threshold ({min}/100). | Quality score < 60 | error |
+| BR_VPP_005 | Another auto-save operation is in progress. Please try again in a moment. | Redis lock conflict | warning |
+| BR_VPP_006 | You have already submitted your pricelist. You can view your submission, but you cannot submit again. | Token already used for submission | error |
+
+### 12.4 Excel Validation Errors
+
+| Code | User Message | Technical Message | Severity |
+|------|--------------|-------------------|----------|
+| EXCEL_GEN_001 | Template has no products. Cannot generate Excel template. | Template items array empty | error |
+| EXCEL_GEN_002 | Product data missing for template item {id} | Template item has no product data | error |
+| EXCEL_GEN_003 | Incomplete product data for {productId} | Product missing code or name | error |
+| EXCEL_FILE_001 | Excel template file size exceeds 10MB limit | Template file > 10MB | error |
+| EXCEL_FILE_002 | Invalid file format. Only .xlsx and .xls files are supported. | File MIME type not Excel | error |
+| EXCEL_UPLOAD_001 | File size exceeds 50MB limit | Upload file > 50MB | error |
+| EXCEL_UPLOAD_002 | Invalid file format. Please upload a .xlsx or .xls file. | File MIME type not Excel | error |
+| EXCEL_UPLOAD_003 | File name exceeds 255 characters | Filename length > 255 | error |
+| EXCEL_STRUCT_001 | Required worksheet "Product Pricing" not found | Missing worksheet | error |
+| EXCEL_STRUCT_002 | Worksheet is empty | No rows in worksheet | error |
+| EXCEL_STRUCT_003 | Missing required column: "{columnName}" | Expected header not found | error |
+| EXCEL_STRUCT_004 | No product data found in worksheet | No data rows after header | error |
+| EXCEL_DATA_001 | Found {count} error(s) in uploaded Excel file | Row-level validation failures | error |
+| EXCEL_DATA_002 | Uploaded successfully with {count} warning(s) | Non-blocking validation warnings | warning |
+| EXCEL_PARSE_001 | Failed to parse Excel file. Please ensure the file is not corrupted. | ExcelJS parsing error | error |
+
+### 12.5 Draft Errors
+
+| Code | User Message | Technical Message | Severity |
+|------|--------------|-------------------|----------|
+| DRAFT_001 | Pricelist ID is required | Pricelist ID missing | error |
+| DRAFT_002 | Cannot save draft for pricelist with status "{status}" | Pricelist status not 'draft' | error |
+| DRAFT_003 | Invalid currency code | Currency not in valid list | error |
+| DRAFT_004 | Effective end date must be on or after start date | End date < start date | error |
+| DRAFT_005 | Invalid product ID format: {productId} | Product ID not UUID | error |
+| DRAFT_006 | Invalid unit price for product {productId} | Unit price <= 0 | error |
+| DRAFT_007 | Invalid MOQ for product {productId} | MOQ < 1 | error |
+
+### 12.6 Submission Errors
+
+| Code | User Message | Technical Message | Severity |
+|------|--------------|-------------------|----------|
+| SUBMIT_001 | Cannot submit pricelist: {count} validation error(s) | Pre-submission validation failed | error |
+| SUBMIT_002 | Pricelist not found | Pricelist ID invalid | error |
+| SUBMIT_003 | Cannot submit pricelist with status "{status}" | Pricelist status not 'draft' | error |
+| SUBMIT_004 | Template not found | Template ID invalid | error |
+
+### 12.7 Quality Score Errors
+
+| Code | User Message | Technical Message | Severity |
+|------|--------------|-------------------|----------|
+| QUALITY_001 | Template not found | Template ID invalid | error |
+| QUALITY_002 | Quality score ({score}/100) is below minimum threshold ({min}/100) | Quality score < 60 | error |
+
+### 12.8 Security Errors
+
+| Code | User Message | Technical Message | Severity |
+|------|--------------|-------------------|----------|
+| RATE_LIMIT_001 | Too many {action} attempts. Please try again in {seconds} seconds. | Rate limit exceeded | error |
+| XSS_001 | Invalid content detected. Please remove any HTML or script tags. | XSS pattern detected | error |
+| CSRF_001 | Invalid security token. Please refresh the page and try again. | CSRF token mismatch | error |
 
 ---
 
-## 8. Validation Testing Matrix
+## 13. Validation Testing Matrix
 
-### 8.1 Registration Flow Tests
-
-| Test Case | Input | Expected Outcome | Validation Rule |
-|-----------|-------|------------------|-----------------|
-| Valid registration | Complete valid data | Registration created with PENDING status | All validations pass |
-| Duplicate email | Existing email | Error: "This email is already registered" | Email uniqueness check |
-| Invalid Tax ID format | "123456789" | Error: "Tax ID must be in format XX-XXXXXXX" | Tax ID regex validation |
-| Missing mandatory document | No business license | Error: "Business License is required" | Document requirement check |
-| File too large | 60MB file | Error: "File size exceeds 50MB limit" | File size validation |
-| Weak password | "password" | Error: "Password must contain..." | Password complexity check |
-
-### 8.2 Authentication Tests
+### 13.1 Token Authentication Tests
 
 | Test Case | Input | Expected Outcome | Validation Rule |
 |-----------|-------|------------------|-----------------|
-| Valid login | Correct credentials | Login successful, redirect to dashboard | Authentication successful |
-| Invalid password | Wrong password | Error: "Invalid email or password" | Password verification |
-| Account locked | 6th failed attempt | Error: "Account is locked..." | Account lockout rule |
-| Expired password | Password > 90 days old | Force password change | Password expiry rule |
-| Invalid 2FA code | Wrong code | Error: "Invalid verification code" | TOTP verification |
+| Valid token | Valid UUID token | Portal access granted | All token validations pass |
+| Invalid format | "invalid-token" | Error: "Invalid token format" | UUID format validation |
+| Expired token | Token with expiresAt < now | Error: "This invitation has expired" | Token expiration check |
+| Non-existent token | Random UUID | Error: "Invalid or expired invitation link" | Token existence check |
+| Already submitted | Token with status 'submitted' | Read-only access, no submit button | Token status check |
+| Campaign not started | Token for future campaign | Error: "This campaign has not started yet" | Campaign date validation |
+| Campaign ended | Token for past campaign | Error: "This campaign ended on {date}" | Campaign date validation |
 
-### 8.3 Profile Update Tests
-
-| Test Case | Input | Expected Outcome | Validation Rule |
-|-----------|-------|------------------|-----------------|
-| Update contact info | New phone number | Update successful | Non-critical change |
-| Change legal name | New company name | Approval request created | Critical change detection |
-| Change bank account without password | New account number | Error: "Password required" | Bank account security |
-| Invalid routing number | "123456789" | Error: "Invalid routing number" | Routing checksum validation |
-
-### 8.4 Price Template Response Tests
+### 13.2 Pricing Data Tests
 
 | Test Case | Input | Expected Outcome | Validation Rule |
 |-----------|-------|------------------|-----------------|
-| Valid pricing submission | All items with prices | Submission successful | All validations pass |
-| Price too high | 50% above market | Warning displayed | Market price comparison |
-| Missing lead time | No lead time | Error: "Lead time is required" | Required field validation |
-| Invalid unit price | Negative price | Error: "Unit price must be positive" | Price range validation |
+| Valid simple pricing | Base price: $10.50, Lead time: 7 days | Validation passes | Price and lead time validations |
+| Invalid unit price | Unit price: -5.00 | Error: "Unit price must be positive" | Price range validation |
+| Excessive decimal places | Unit price: 10.123456 | Error: "Unit price must have at most 4 decimal places" | Precision validation |
+| Valid MOQ tiers | 3 tiers with ascending MOQ (10, 50, 100) | Validation passes | MOQ tier order validation |
+| Non-ascending MOQ | Tier 1: MOQ 50, Tier 2: MOQ 10 | Error: "MOQ quantities must be in ascending order" | MOQ tier order validation |
+| Too many tiers | 6 MOQ tiers | Error: "Maximum 5 MOQ pricing tiers allowed" | MOQ tier count validation |
+| Duplicate MOQ | Tier 1: MOQ 10, Tier 2: MOQ 10 | Error: "Duplicate MOQ quantity detected" | MOQ uniqueness validation |
 
-### 8.5 RFQ Response Tests
-
-| Test Case | Input | Expected Outcome | Validation Rule |
-|-----------|-------|------------------|-----------------|
-| Valid bid submission | Complete bid data | Submission successful | All validations pass |
-| Bid validity too short | 5 days | Error: "Bid validity must be at least 7 days" | Minimum validity check |
-| Bid exceeds budget | 15% over budget | Warning displayed | Budget comparison |
-| Missing attachments | No supporting docs | Submission allowed (optional) | Optional field |
-
-### 8.6 Invoice Submission Tests
+### 13.3 FOC Tests
 
 | Test Case | Input | Expected Outcome | Validation Rule |
 |-----------|-------|------------------|-----------------|
-| Valid invoice | Complete invoice data | Submission successful | All validations pass |
-| Duplicate invoice number | Existing invoice # | Error: "Invoice number already exists" | Invoice number uniqueness |
-| Amount mismatch | Different from PO | Error: "Invoice total does not match PO" | PO amount validation |
-| Missing invoice document | No PDF uploaded | Error: "Invoice document is required" | Required file validation |
+| Valid FOC | FOC Qty: 5, FOC Unit: "bottles" | Validation passes | FOC validation |
+| FOC without unit | FOC Qty: 5, FOC Unit: empty | Error: "FOC unit is required when FOC quantity is specified" | FOC unit requirement |
+| Negative FOC | FOC Qty: -10 | Error: "FOC quantity cannot be negative" | FOC range validation |
+| No FOC | FOC Qty: null | Validation passes | FOC is optional |
 
-### 8.7 Document Upload Tests
+### 13.4 Draft Tests
 
 | Test Case | Input | Expected Outcome | Validation Rule |
 |-----------|-------|------------------|-----------------|
-| Valid document | PDF < 50MB | Upload successful | All validations pass |
-| File too large | 60MB PDF | Error: "File size exceeds 50MB" | File size limit |
-| Infected file | File with virus | Error: "File failed security scan" | Virus scan |
-| Invalid file type | .exe file | Error: "Invalid file format" | File type validation |
+| Save draft with partial data | Only 50% of products priced | Save successful, completion: 50% | Draft allows incomplete data |
+| Save draft with invalid price | One product has negative price | Error: "Invalid unit price for product {id}" | Basic price validation |
+| Save draft with no data | Empty pricelist | Save successful, completion: 0% | Draft allows empty state |
+| Auto-save conflict | Two simultaneous auto-save requests | One succeeds, one gets warning | Redis lock conflict detection |
+
+### 13.5 Submission Tests
+
+| Test Case | Input | Expected Outcome | Validation Rule |
+|-----------|-------|------------------|-----------------|
+| Submit complete pricelist | All products priced, quality score 85 | Submission successful | All validations pass |
+| Submit incomplete pricelist | Missing 20% of products | Error: "Pricing is missing for {count} products" | All products required |
+| Submit after deadline | Submission date > campaign end | Error: "The submission deadline was {date}" | Deadline validation |
+| Submit with low quality score | Quality score 45 | Error: "Quality score below minimum threshold" | Quality score >= 60 required |
+| Double submission | Submit twice with same token | Second attempt blocked | Token single-use validation |
+
+### 13.6 Excel Upload Tests
+
+| Test Case | Input | Expected Outcome | Validation Rule |
+|-----------|-------|------------------|-----------------|
+| Valid Excel upload | Properly formatted .xlsx file | Upload successful, data parsed | All Excel validations pass |
+| File too large | 60MB Excel file | Error: "File size exceeds 50MB limit" | File size validation |
+| Invalid file format | .pdf file | Error: "Invalid file format" | File type validation |
+| Missing worksheet | Excel without "Product Pricing" sheet | Error: "Required worksheet not found" | Worksheet validation |
+| Missing columns | Excel without "Base Price" column | Error: "Missing required column" | Column validation |
+| Invalid data | Row with negative price | Error: "Row {n}: Base Price must be positive" | Row-level validation |
+| Non-ascending MOQ tiers | Tier 2 MOQ < Tier 1 MOQ | Error: "Row {n}: MOQ Tier {n} must be greater than Tier {n-1}" | MOQ tier order validation |
+
+### 13.7 Quality Score Tests
+
+| Test Case | Input | Expected Outcome | Quality Score |
+|-----------|-------|------------------|---------------|
+| Perfect submission | All products, all details, submitted early | Quality score: 95-100 | High quality |
+| Good submission | All products, some details, submitted on time | Quality score: 75-85 | Good quality |
+| Acceptable submission | All products, minimal details, submitted late | Quality score: 60-70 | Acceptable |
+| Poor submission | 80% products, no details, submitted very late | Quality score: 40-55 | Below threshold |
 
 ---
 
-## 9. Performance Validation
+## 14. Performance Validation
 
-### 9.1 Response Time Requirements
+### 14.1 Response Time Requirements
 
-| Operation | Target | Maximum |
-|-----------|--------|---------|
-| Login | < 1 second | 2 seconds |
-| Registration submission | < 2 seconds | 5 seconds |
-| Profile update | < 1 second | 3 seconds |
-| Document upload (10MB) | < 5 seconds | 10 seconds |
-| Price template response | < 2 seconds | 5 seconds |
-| RFQ response submission | < 2 seconds | 5 seconds |
-| Invoice submission | < 3 seconds | 7 seconds |
-| Dashboard load | < 2 seconds | 4 seconds |
+| Operation | Target | Maximum | Notes |
+|-----------|--------|---------|-------|
+| Token validation | < 100ms | 200ms | Cached after first access |
+| Draft auto-save | < 500ms | 1 second | Redis locking overhead |
+| Field validation | < 50ms | 100ms | Client-side only |
+| Pricelist submission | < 2 seconds | 5 seconds | Includes quality score calculation |
+| Excel upload (10MB) | < 5 seconds | 10 seconds | Parsing + validation |
+| Excel template download | < 2 seconds | 5 seconds | Generation + download |
+| Quality score calculation | < 1 second | 3 seconds | For 100 products |
 
-### 9.2 Concurrent User Support
+### 14.2 Concurrent Operations
 
-| Scenario | Target Concurrent Users |
-|----------|------------------------|
-| Normal operation | 1,000 users |
-| Peak period | 2,000 users |
-| RFQ deadline rush | 5,000 users |
+| Scenario | Target Concurrent Operations |
+|----------|----------------------------|
+| Portal access | 1,000 simultaneous vendors |
+| Auto-save operations | 500 simultaneous saves |
+| Submissions | 100 simultaneous submissions |
+| Excel uploads | 50 simultaneous uploads |
+
+### 14.3 Data Volume Limits
+
+| Resource | Limit | Notes |
+|----------|-------|-------|
+| Products per pricelist | 1,000 | Performance tested up to 500 |
+| MOQ tiers per product | 5 | Hard limit |
+| Pricelist notes | 2,000 characters | Header notes |
+| Item notes | 1,000 characters | Per product |
+| Tier notes | 500 characters | Per MOQ tier |
+| Excel file size | 50MB | Upload limit |
+| Excel template size | 10MB | Download limit |
 
 ---
 
-## 10. Validation Best Practices
+## 15. Validation Best Practices
 
-### 10.1 Client-Side Validation
+### 15.1 Client-Side Validation
 
 **Purpose**: Improve UX with immediate feedback
 
 **Implementation Guidelines**:
-- Use Zod schemas with React Hook Form
-- Display inline error messages
-- Provide real-time validation feedback
-- Disable submit button until form is valid
+1. Use Zod schemas with React Hook Form
+2. Display inline error messages immediately
+3. Provide real-time validation feedback on blur
+4. Disable submit button until form is valid
+5. Show field-level validation status (checkmark, error icon)
+6. Use debouncing for expensive validations (e.g., uniqueness checks)
 
-### 10.2 Server-Side Validation
+**Example**:
+```typescript
+const form = useForm<VendorPricelistData>({
+  resolver: zodResolver(vendorPricelistSchema),
+  mode: 'onBlur', // Validate on blur
+});
+
+// Field-level validation feedback
+<Input
+  {...form.register('currency')}
+  error={form.formState.errors.currency?.message}
+  status={form.formState.errors.currency ? 'error' : 'valid'}
+/>
+```
+
+### 15.2 Server-Side Validation
 
 **Purpose**: Ensure data integrity and security
 
 **Implementation Guidelines**:
-- Always validate on server, even if client validates
-- Use same Zod schemas on server
-- Return detailed error messages
-- Log validation failures for security monitoring
+1. **Always validate on server**, even if client validates
+2. Use same Zod schemas on server as client
+3. Return detailed error messages with field-level context
+4. Log validation failures for security monitoring
+5. Never trust client-side validation alone
+6. Validate all input, including hidden fields and IDs
 
-### 10.3 Database-Level Validation
+**Example**:
+```typescript
+export async function submitPricelistAction(data: unknown) {
+  // Parse and validate with Zod
+  const parsed = vendorPricelistSchema.safeParse(data);
+
+  if (!parsed.success) {
+    // Return field-level errors
+    return {
+      success: false,
+      errors: parsed.error.flatten().fieldErrors,
+    };
+  }
+
+  // Business rule validation
+  const businessRulesCheck = await validateBusinessRules(parsed.data);
+
+  if (!businessRulesCheck.valid) {
+    return {
+      success: false,
+      error: businessRulesCheck.message,
+    };
+  }
+
+  // Proceed with data persistence
+  // ...
+}
+```
+
+### 15.3 Database-Level Validation
 
 **Purpose**: Enforce data integrity constraints
 
 **Implementation Guidelines**:
-- Use constraints (UNIQUE, CHECK, NOT NULL)
-- Define foreign key relationships
-- Implement triggers for complex validations
-- Maintain referential integrity
+1. Use constraints (UNIQUE, CHECK, NOT NULL)
+2. Define foreign key relationships with ON DELETE/UPDATE actions
+3. Implement triggers for complex validations
+4. Maintain referential integrity
+5. Use database-level validations as last line of defense
+
+**Example Prisma Schema Constraints**:
+```prisma
+model VendorPricelist {
+  id                   String    @id @default(uuid())
+  pricelistNumber      String    @unique // Unique constraint
+  vendorId             String
+  campaignId           String
+  currency             String    @db.VarChar(3) // Length constraint
+  effectiveStartDate   DateTime
+  effectiveEndDate     DateTime? // Nullable
+  qualityScore         Int       @default(0) // Default value
+  completionPercentage Int       @default(0) @db.SmallInt // Range: 0-100
+
+  // Foreign keys with cascading
+  vendor               Vendor    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  campaign             PriceCollectionCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  // Constraints
+  @@unique([vendorId, campaignId]) // One pricelist per vendor per campaign
+  @@index([campaignId, status]) // Performance index
+}
+```
+
+### 15.4 Progressive Validation
+
+**Strategy**: Validate in stages from least to most expensive
+
+**Validation Stages**:
+1. **Stage 1: Format Validation** (Client + Server)
+   - Data types, formats, lengths
+   - Fastest validation (<10ms)
+
+2. **Stage 2: Business Rule Validation** (Server)
+   - Required fields, ranges, patterns
+   - Fast validation (<100ms)
+
+3. **Stage 3: Relational Validation** (Server)
+   - Foreign key existence, uniqueness
+   - Moderate validation (<500ms)
+
+4. **Stage 4: Complex Validation** (Server)
+   - Quality score calculation, cross-field validation
+   - Expensive validation (<3 seconds)
+
+**Example**:
+```typescript
+async function validatePricelistProgressive(data: any): Promise<ValidationResult> {
+  // Stage 1: Format validation
+  const formatCheck = vendorPricelistSchema.safeParse(data);
+  if (!formatCheck.success) {
+    return { valid: false, errors: formatCheck.error.errors };
+  }
+
+  // Stage 2: Business rule validation
+  const businessCheck = await validateBusinessRules(formatCheck.data);
+  if (!businessCheck.valid) {
+    return businessCheck;
+  }
+
+  // Stage 3: Relational validation
+  const relationalCheck = await validateRelations(formatCheck.data);
+  if (!relationalCheck.valid) {
+    return relationalCheck;
+  }
+
+  // Stage 4: Complex validation (quality score)
+  const qualityCheck = await calculateQualityScore(formatCheck.data);
+
+  return qualityCheck;
+}
+```
+
+### 15.5 Error Message Best Practices
+
+**Guidelines**:
+1. **Be Specific**: "Unit price must be between 0.0001 and 999,999,999.9999" (not "Invalid price")
+2. **Be Actionable**: Tell users how to fix the error
+3. **Be Contextual**: Include field name and row number for multi-row data
+4. **Be User-Friendly**: Avoid technical jargon
+5. **Be Consistent**: Use same message format across all validations
+
+**Good Example**:
+```
+❌ Row 5: MOQ Tier 2 quantity (25) must be greater than Tier 1 quantity (50).
+   Please ensure MOQ quantities are in ascending order.
+```
+
+**Bad Example**:
+```
+❌ Invalid MOQ tier order
+```
 
 ---
 
-## Appendix: Validation Test Data
+## Appendix A: Validation Test Data
 
-### A. Valid Test Data
+### A.1 Valid Pricelist Data
 
-**Valid Registration**:
 ```typescript
-{
-  legalName: "Acme Food Distributors LLC",
-  taxId: "12-3456789",
-  businessType: "LLC",
-  physicalAddress: {
-    street: "123 Main Street",
-    city: "Boston",
-    state: "MA",
-    postalCode: "02101",
-    country: "US"
-  },
-  primaryContact: {
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@acmefood.com",
-    phone: "6175551234"
-  },
-  // ... complete data
-}
+const validPricelistData: VendorPricelistData = {
+  currency: 'USD',
+  effectiveStartDate: new Date('2025-02-01'),
+  effectiveEndDate: new Date('2025-05-31'),
+  notes: 'Q1 2025 pricing with volume discounts',
+  items: [
+    {
+      productId: '123e4567-e89b-12d3-a456-426614174000',
+      productCode: 'BEEF-001',
+      productName: 'Beef Ribeye Steak',
+      category: 'Meat & Poultry',
+      pricing: [
+        {
+          moq: 10,
+          unit: 'kg',
+          unitPrice: 25.50,
+          leadTime: 3,
+          focQuantity: 2,
+          focUnit: 'kg',
+          notes: 'Premium quality',
+        },
+        {
+          moq: 50,
+          unit: 'kg',
+          unitPrice: 22.00,
+          leadTime: 3,
+        },
+        {
+          moq: 100,
+          unit: 'kg',
+          unitPrice: 19.50,
+          leadTime: 5,
+        },
+      ],
+      leadTime: 3,
+      notes: 'USDA Prime grade',
+      certifications: ['USDA Prime', 'Organic'],
+    },
+  ],
+};
 ```
 
-### B. Invalid Test Data
+### A.2 Invalid Pricelist Data Examples
 
-**Invalid Tax ID**:
+**Example 1: Invalid MOQ Order**
 ```typescript
-{
-  taxId: "123456789", // Missing hyphen
-}
+const invalidMOQOrder = {
+  pricing: [
+    { moq: 50, unit: 'kg', unitPrice: 25.00 },
+    { moq: 10, unit: 'kg', unitPrice: 22.00 }, // ERROR: MOQ not ascending
+  ],
+};
+// Error: "MOQ quantities must be in ascending order"
 ```
 
-**Weak Password**:
+**Example 2: Missing FOC Unit**
 ```typescript
-{
-  password: "password123", // No uppercase, no special char
-}
+const missingFOCUnit = {
+  pricing: [
+    {
+      moq: 10,
+      unit: 'kg',
+      unitPrice: 25.00,
+      focQuantity: 5, // FOC quantity specified
+      // ERROR: focUnit missing
+    },
+  ],
+};
+// Error: "FOC unit is required when FOC quantity is specified"
 ```
 
-**Expired Document**:
+**Example 3: Invalid Price Precision**
 ```typescript
-{
-  documentType: "BUSINESS_LICENSE",
-  expiryDate: "2023-01-01", // In the past
-}
+const invalidPrecision = {
+  pricing: [
+    {
+      moq: 10,
+      unit: 'kg',
+      unitPrice: 25.123456, // ERROR: > 4 decimal places
+    },
+  ],
+};
+// Error: "Unit price must have at most 4 decimal places"
 ```
 
 ---
 
 **Document End**
+
+**Summary**: This Validation Specification (VAL) v2.0 document provides comprehensive validation rules for the **token-based Vendor Price Submission Portal** only, covering:
+
+1. **Token authentication validation** - UUID format, expiration, status, campaign active
+2. **Field-level validations** - Currency, dates, pricing, MOQ tiers, FOC
+3. **Business rule validations** - One pricelist per campaign, all products required, deadline, quality score
+4. **Quality score calculation** - Completeness (40%), Accuracy (30%), Detail (20%), Timeliness (10%)
+5. **Excel template/upload validation** - File format, structure, data validation
+6. **Draft validation** - Minimal validation, completion percentage tracking
+7. **Final submission validation** - Complete validation before status change
+8. **Security validations** - Rate limiting, XSS, CSRF, SQL injection protection
+9. **Complete Zod schemas** - Type-safe validation schemas for all data
+10. **Error messages reference** - User-friendly error messages for all validation failures
+11. **Validation testing matrix** - Comprehensive test cases for all validation rules
+12. **Performance validation** - Response time targets and data volume limits
+13. **Validation best practices** - Client/server/database validation strategies
+
+All validations align with the corrected scope: **token-based price submission portal only** (no vendor registration, RFQ, invoicing, or profile management).

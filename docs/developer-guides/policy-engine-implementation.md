@@ -13,6 +13,11 @@
 9. [Best Practices](#best-practices)
 10. [API Reference](#api-reference)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Overview

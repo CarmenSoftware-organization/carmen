@@ -1,5 +1,10 @@
 # Store Requisitions List Screen Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ```yaml
 Title: Store Requisitions List Screen Specification
 Module: Store Operations

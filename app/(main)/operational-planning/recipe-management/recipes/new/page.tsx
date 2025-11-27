@@ -2,7 +2,7 @@
 
 import { RecipeForm } from "../components/recipe-form"
 import { useRouter } from "next/navigation"
-import { Recipe } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
+import { Recipe } from '@/lib/types'
 
 export default function CreateRecipePage() {
   const router = useRouter()
@@ -19,53 +19,8 @@ export default function CreateRecipePage() {
 
   return (
     <div className="container mx-auto py-6">
-      <RecipeForm 
+      <RecipeForm
         onSubmit={handleSubmit}
-        initialData={{
-          id: '',
-          name: '',
-          description: '',
-          category: '',
-          cuisine: '',
-          status: 'draft',
-          image: '',
-          yield: 0,
-          yieldUnit: 'portions',
-          yieldVariants: [],
-          defaultVariantId: '',
-          allowsFractionalSales: false,
-          prepTime: 0,
-          cookTime: 0,
-          totalTime: 0,
-          difficulty: 'easy',
-          costPerPortion: 0,
-          sellingPrice: 0,
-          grossMargin: 0,
-          netPrice: 0,
-          grossPrice: 0,
-          totalCost: 0,
-          carbonFootprint: 0,
-          hasMedia: false,
-          deductFromStock: false,
-          ingredients: [],
-          steps: [],
-          prepNotes: '',
-          specialInstructions: '',
-          additionalInfo: '',
-          allergens: [],
-          tags: [],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          createdBy: 'Current User',
-          updatedBy: 'Current User',
-          targetFoodCost: 33,
-          laborCostPercentage: 30,
-          overheadPercentage: 20,
-          recommendedPrice: 0,
-          foodCostPercentage: 0,
-          grossProfit: 0,
-          unitOfSale: 'portion'
-        }} 
       />
     </div>
   )

@@ -50,6 +50,11 @@
 5. Selected "Carmen Wiki Main Menu"
 6. Saved changes to header template
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## ⚠️ Mermaid Diagram Plugin - Partial Implementation

@@ -6,6 +6,12 @@
 - **Version**: 1.0
 - **Last Updated**: 2024-01-15
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial creation with comprehensive validation schemas and test cases |
+
 ---
 
 ## 1. Client-Side Validation (Zod Schemas)
@@ -2119,14 +2125,6 @@ describe('Classification Rule Validation', () => {
   })
 })
 ```
-
----
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial creation with comprehensive validation schemas and test cases |
 
 ---
 

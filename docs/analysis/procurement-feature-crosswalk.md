@@ -1,5 +1,10 @@
 # Procurement Feature Crosswalk
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Purchase Requests (PR)
 
 ### 1) Code-only (not in docs)

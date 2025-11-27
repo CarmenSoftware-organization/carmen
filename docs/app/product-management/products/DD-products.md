@@ -2,9 +2,16 @@
 
 **Module**: Product Management
 **Sub-Module**: Products
-**Document Version**: 1.0
-**Last Updated**: 2025-01-06
+**Route**: `/product-management/products`
+**Document Version**: 1.1
+**Last Updated**: 2025-11-26
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.1.0 | 2025-11-26 | Documentation Team | Added route reference, aligned with BR-products.md |
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. Overview

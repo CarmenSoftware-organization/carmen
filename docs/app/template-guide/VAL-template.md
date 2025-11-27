@@ -7,6 +7,12 @@
 **Last Updated**: {YYYY-MM-DD}
 **Status**: Draft | Review | Approved | Active
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | {YYYY-MM-DD} | {Author} | Initial version |
+
 ---
 
 ## 1. Overview

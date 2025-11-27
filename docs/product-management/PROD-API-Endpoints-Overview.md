@@ -1,5 +1,10 @@
 # Product Management API Overview
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document provides an overview of the API endpoints available for the Product Management module in the Procurement & Inventory Management System.
 
 ## Base URL

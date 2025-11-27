@@ -17,7 +17,7 @@ import {
   FractionalSalesEfficiencyReport
 } from '@/lib/types/enhanced-consumption-tracking'
 
-import { Recipe, RecipeYieldVariant } from '@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes'
+import { Recipe, RecipeYieldVariant } from '@/lib/types'
 
 // Advanced Analytics Types
 export interface PredictiveConsumptionModel {
@@ -573,7 +573,7 @@ export class AdvancedConsumptionAnalyticsService {
           },
           constraints: {
             equipmentAvailability: this.getRequiredEquipment(recipe),
-            staffRequirements: Math.ceil((recipe.difficulty === 'easy' ? 1 : recipe.difficulty === 'medium' ? 2 : 3)),
+            staffRequirements: Math.ceil((recipe.skillLevel === 'beginner' ? 1 : recipe.skillLevel === 'intermediate' ? 2 : 3)),
             ingredientAvailability,
             storageCapacity: this.calculateStorageRequirement(recipe, demandForecast)
           }
@@ -1004,7 +1004,7 @@ export class AdvancedConsumptionAnalyticsService {
 
   private calculateCostOptimization(recipe: Recipe, demand: number): number {
     // Simplified cost optimization score
-    return recipe.costPerPortion < 10 ? 0.8 : 0.6
+    return recipe.costPerPortion.amount < 10 ? 0.8 : 0.6
   }
 
   private getRequiredEquipment(recipe: Recipe): string[] {
@@ -1026,7 +1026,7 @@ export class AdvancedConsumptionAnalyticsService {
 
   private getAverageRecipeCost(recipeId: string, recipes: Recipe[]): number {
     const recipe = recipes.find(r => r.id === recipeId)
-    return recipe ? recipe.costPerPortion : 0
+    return recipe ? recipe.costPerPortion.amount : 0
   }
 
   private generateRecommendation(check: any): string {

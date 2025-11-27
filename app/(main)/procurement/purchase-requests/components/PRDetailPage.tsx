@@ -50,7 +50,7 @@ import {
   PurchaseRequest,
   PurchaseRequestItem,
   PRType,
-  DocumentStatus,
+  PRStatus,
   WorkflowStatus,
   WorkflowStage,
   Requestor,
@@ -64,8 +64,8 @@ import {
   getNextWorkflowStage,
   getPreviousWorkflowStage,
 } from "./utils";
-import { samplePRData, samplePRItems } from "./sampleData";
-import { mockPRListData } from "./mockPRListData";
+import { samplePRData, samplePRItems } from "@/lib/mock-data/purchase-requests";
+import { mockPurchaseRequests as mockPRListData } from "@/lib/mock-data/purchase-requests";
 import { useSimpleUser } from "@/lib/context/simple-user-context";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -130,7 +130,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
     const mockFormData = asMockPurchaseRequest(formData);
     return mockFormData.items && mockFormData.items.length > 0 ? mockFormData.items : samplePRItems;
   });
-  
+
   // RBAC state
   const [availableActions, setAvailableActions] = useState<WorkflowAction[]>([]);
   const [isMounted, setIsMounted] = useState(false);
@@ -232,7 +232,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
 
     const updatedData = asMockPurchaseRequest({
       ...formData,
-      status: nextStage === 'completed' ? DocumentStatus.Completed : DocumentStatus.InProgress,
+      status: nextStage === 'completed' ? PRStatus.Completed : PRStatus.InProgress,
       currentStage: nextStage,
       ...(mockFormData.lastModified && { lastModified: new Date().toISOString() }),
     });
@@ -255,7 +255,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
 
     const updatedData = asMockPurchaseRequest({
       ...formData,
-      status: DocumentStatus.Rejected,
+      status: PRStatus.Cancelled,
       currentStage: nextStage,
       ...(mockFormData.lastModified && { lastModified: new Date().toISOString() }),
     });
@@ -268,16 +268,16 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
       console.warn('Cannot send back: workflow decision prevents submission');
       return;
     }
-    
+
     // Open step selector for PR-level return action
     setIsReturnStepSelectorOpen(true);
   };
-  
+
   const handleReturnWithStep = (step: any) => {
     const mockFormData = asMockPurchaseRequest(formData);
     const updatedData = asMockPurchaseRequest({
       ...formData,
-      status: DocumentStatus.InProgress,
+      status: PRStatus.InProgress,
       currentStage: step.targetStage,
       ...(mockFormData.lastModified && { lastModified: new Date().toISOString() }),
     });
@@ -302,7 +302,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
     const mockFormData = asMockPurchaseRequest(formData);
     const updatedData = asMockPurchaseRequest({
       ...formData,
-      status: DocumentStatus.InProgress,
+      status: PRStatus.InProgress,
       currentStage: WorkflowStage.departmentHeadApproval,
       ...(mockFormData.lastModified && { lastModified: new Date().toISOString() }),
     });
@@ -340,9 +340,22 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
     );
   };
 
-  // Check if user has any edit permissions based on workflow roles
+  // Check if user has any edit permissions based on workflow roles or user role
   const hasEditPermissions = (): boolean => {
-    return Object.values(workflowPermissions.canEditFields).some(permission => permission === true);
+    // First check workflow permissions
+    const hasWorkflowPermissions = Object.values(workflowPermissions.canEditFields).some(permission => permission === true);
+    if (hasWorkflowPermissions) return true;
+
+    // Fallback: Check user role name for edit permissions
+    // Almost all roles can edit PRs except viewers
+    const userRoleName = user?.context?.currentRole?.name || '';
+
+    // Only exclude view-only roles
+    const viewOnlyRoles = ['Auditor', 'Viewer', 'Guest'];
+    const isViewOnly = viewOnlyRoles.some(role => userRoleName.toLowerCase().includes(role.toLowerCase()));
+
+    // If user has a role and it's not view-only, they can edit
+    return Boolean(userRoleName) && !isViewOnly;
   };
 
   // Toggle sidebar visibility
@@ -360,14 +373,14 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
     },
     {
       id: "return-to-department",
-      label: "Return to Department Manager", 
+      label: "Return to Department Manager",
       description: "Send back to department manager for review",
       targetStage: "departmentHeadApproval"
     },
     {
       id: "return-to-previous",
       label: "Return to Previous Approver",
-      description: "Send back to previous approval stage", 
+      description: "Send back to previous approval stage",
       targetStage: "financialApproval"
     }
   ];
@@ -381,288 +394,288 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
           <Card className="shadow-sm overflow-hidden">
             <CardHeader className="pb-4 border-b bg-muted/10">
               <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-                  <div className="space-y-1">
-                      <div className="flex items-center gap-3">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 w-8 rounded-full p-0 mr-1"
-                          onClick={() => router.back()}
-                        >
-                          <ChevronLeft className="h-5 w-5" />
-                          <span className="sr-only">Back to Purchase Requests</span>
-                        </Button>
-                        <div className="flex flex-col">
-                          <h1 className="text-2xl font-bold">
-                            {mode === "add"
-                              ? "Create New Purchase Request"
-                              : asMockPurchaseRequest(formData).requestNumber || "Purchase Request Details"}
-                          </h1>
-                          {mode !== "add" && (
-                            <p className="text-sm text-muted-foreground mt-1">Purchase Request</p>
-                          )}
-                        </div>
-                        {asMockPurchaseRequest(formData).requestNumber && <StatusBadge status={formData.status} className="h-6" />}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap justify-end">
-                      {/* All action buttons in one consistent group */}
-                      {mode === "view" ? (
-                        (user && hasEditPermissions() || isAddMode) && (
-                          <Button onClick={() => handleModeChange("edit")} size="sm" className="h-9">
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit
-                  </Button>
-                )
-              ) : (
-                <>
-                  <Button variant="default" onClick={handleSubmit} size="sm" className="h-9">
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Save
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setMode("view");
-                      // Reset form data to original if needed
-                      if (!isAddMode) setFormData(asMockPurchaseRequest(samplePRData));
-                    }}
-                    size="sm"
-                    className="h-9"
-                  >
-                    <X className="mr-2 h-4 w-4" />
-                    Cancel
-                  </Button>
-                </>
-              )}
-              
-              <Button variant="outline" size="sm" className="h-9">
-                <PrinterIcon className="mr-2 h-4 w-4" />
-                Print
-              </Button>
-              <Button variant="outline" size="sm" className="h-9">
-                <DownloadIcon className="mr-2 h-4 w-4" />
-                Export
-              </Button>
-              <Button variant="outline" size="sm" className="h-9">
-                <ShareIcon className="mr-2 h-4 w-4" />
-                Share
-              </Button>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={toggleSidebar}
-                      className="h-9 w-9 p-0"
+                      className="h-8 w-8 rounded-full p-0 mr-1"
+                      onClick={() => router.back()}
                     >
-                      {isSidebarVisible ? (
-                        <PanelRightClose className="h-4 w-4" />
-                      ) : (
-                        <PanelRightOpen className="h-4 w-4" />
-                      )}
-                      <span className="sr-only">Toggle sidebar</span>
+                      <ChevronLeft className="h-5 w-5" />
+                      <span className="sr-only">Back to Purchase Requests</span>
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {isSidebarVisible ? "Hide Sidebar" : "Show Sidebar"}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </div>
-        </CardHeader>
-        
-        {/* Main Content */}
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 gap-6">
-            {/* Main Details */}
-            <div className="space-y-6">
-              {/* Main Details */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="requestDate" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
-                    <CalendarIcon className="h-4 w-4" />
-                    Date
-                  </Label>
-                  {mode === "view" ? (
-                    <div className="text-gray-900 font-medium">
-                      {formData.requestDate.toLocaleDateString('en-GB')}
+                    <div className="flex flex-col">
+                      <h1 className="text-2xl font-bold">
+                        {mode === "add"
+                          ? "Create New Purchase Request"
+                          : asMockPurchaseRequest(formData).requestNumber || "Purchase Request Details"}
+                      </h1>
+                      {mode !== "add" && (
+                        <p className="text-sm text-muted-foreground mt-1">Purchase Request</p>
+                      )}
                     </div>
-                  ) : (
-                    <Input
-                      id="requestDate"
-                      name="requestDate"
-                      type="date"
-                      value={formData.requestDate.toISOString().split("T")[0]}
-                      onChange={handleInputChange}
-                      disabled={!canEditField("date", user?.context.currentRole.name || "")}
-                      className={!canEditField("date", user?.context.currentRole.name || "") ? "bg-muted" : ""}
-                    />
-                  )}
+                    {asMockPurchaseRequest(formData).requestNumber && <StatusBadge status={formData.status} className="h-6" />}
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="requestType" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
-                    <TagIcon className="h-4 w-4" />
-                    PR Type
-                  </Label>
+                <div className="flex items-center gap-2 flex-wrap justify-end">
+                  {/* All action buttons in one consistent group */}
                   {mode === "view" ? (
-                    <div className="text-gray-900 font-medium">{formData.requestType}</div>
+                    user && hasEditPermissions() && (
+                      <Button onClick={() => handleModeChange("edit")} size="sm" className="h-9">
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </Button>
+                    )
                   ) : (
-                    <Select
-                      value={formData.requestType}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, requestType: value as typeof formData.requestType })
-                      }
-                      disabled={!canEditField("type", user?.context.currentRole.name || "")}
-                    >
-                      <SelectTrigger id="requestType" className={!canEditField("type", user?.context.currentRole.name || "") ? "bg-muted" : ""}>
-                        <SelectValue placeholder="Select PR Type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="goods">Goods</SelectItem>
-                        <SelectItem value="services">Services</SelectItem>
-                        <SelectItem value="capital">Capital</SelectItem>
-                        <SelectItem value="maintenance">Maintenance</SelectItem>
-                        <SelectItem value="emergency">Emergency</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <>
+                      <Button variant="default" onClick={handleSubmit} size="sm" className="h-9">
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Save
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setMode("view");
+                          // Reset form data to original if needed
+                          if (!isAddMode) setFormData(asMockPurchaseRequest(samplePRData));
+                        }}
+                        size="sm"
+                        className="h-9"
+                      >
+                        <X className="mr-2 h-4 w-4" />
+                        Cancel
+                      </Button>
+                    </>
                   )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="requestedBy" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
-                    <UserIcon className="h-4 w-4" />
-                    Requestor
-                  </Label>
-                  {mode === "view" ? (
-                    <div className="text-gray-900 font-medium">{formData.requestedBy}</div>
-                  ) : (
-                    <Input
-                      id="requestedBy"
-                      name="requestedBy"
-                      value={formData.requestedBy}
-                      onChange={handleInputChange}
-                      disabled={!canEditField("requestor", user?.context.currentRole.name || "")}
-                      className={!canEditField("requestor", user?.context.currentRole.name || "") ? "bg-muted" : ""}
-                    />
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="departmentId" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
-                    <BuildingIcon className="h-4 w-4" />
-                    Department
-                  </Label>
-                  {mode === "view" ? (
-                    <div className="text-gray-900 font-medium">{formData.departmentId || "Not specified"}</div>
-                  ) : (
-                    <Input
-                      id="departmentId"
-                      name="departmentId"
-                      value={formData.departmentId}
-                      onChange={handleInputChange}
-                      disabled={!canEditField("department", user?.context.currentRole.name || "")}
-                      className={!canEditField("department", user?.context.currentRole.name || "") ? "bg-muted" : ""}
-                    />
-                  )}
-                </div>
-              </div>
-              
-              {/* Secondary Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div className="space-y-2">
-                  <Label htmlFor="justification" className="text-sm text-muted-foreground mb-2 block flex items-center gap-1">
-                    <FileIcon className="h-4 w-4" />
-                    Description
-                  </Label>
-                  {mode === "view" ? (
-                    <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-md min-h-[60px]">
-                      {formData.justification || formData.notes || "No description"}
-                    </div>
-                  ) : (
-                    <Textarea
-                      id="justification"
-                      name="justification"
-                      value={formData.justification || ''}
-                      onChange={handleInputChange}
-                      disabled={!canEditField("description", user?.context.currentRole.name || "")}
-                      className={`min-h-[60px] ${!canEditField("description", user?.context.currentRole.name || "") ? "bg-muted" : ""}}`}
-                      placeholder="Add purchase request description..."
-                    />
-                  )}
-                </div>
 
-                {/* Workflow Progress - Right Half */}
-                <div className="space-y-2">
-                  <Label className="text-sm text-muted-foreground mb-2 block">
-                    Workflow Progress
-                  </Label>
-                  {asMockPurchaseRequest(formData).requestNumber && formData.currentStage ? (
-                    <div className="bg-gray-50 p-3 rounded-md min-h-[60px] flex items-center">
-                      <CompactWorkflowIndicator
-                        currentStage={formData.currentStage as WorkflowStage}
-                        prData={formData as PurchaseRequest}
-                        className="flex-shrink-0"
-                      />
+                  <Button variant="outline" size="sm" className="h-9">
+                    <PrinterIcon className="mr-2 h-4 w-4" />
+                    Print
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-9">
+                    <DownloadIcon className="mr-2 h-4 w-4" />
+                    Export
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-9">
+                    <ShareIcon className="mr-2 h-4 w-4" />
+                    Share
+                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={toggleSidebar}
+                          className="h-9 w-9 p-0"
+                        >
+                          {isSidebarVisible ? (
+                            <PanelRightClose className="h-4 w-4" />
+                          ) : (
+                            <PanelRightOpen className="h-4 w-4" />
+                          )}
+                          <span className="sr-only">Toggle sidebar</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {isSidebarVisible ? "Hide Sidebar" : "Show Sidebar"}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </div>
+            </CardHeader>
+
+            {/* Main Content */}
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 gap-6">
+                {/* Main Details */}
+                <div className="space-y-6">
+                  {/* Main Details */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="requestDate" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <CalendarIcon className="h-4 w-4" />
+                        Date
+                      </Label>
+                      {mode === "view" ? (
+                        <div className="text-gray-900 font-medium">
+                          {formData.requestDate.toLocaleDateString('en-GB')}
+                        </div>
+                      ) : (
+                        <Input
+                          id="requestDate"
+                          name="requestDate"
+                          type="date"
+                          value={formData.requestDate.toISOString().split("T")[0]}
+                          onChange={handleInputChange}
+                          disabled={!canEditField("date", user?.context.currentRole.name || "")}
+                          className={!canEditField("date", user?.context.currentRole.name || "") ? "bg-muted" : ""}
+                        />
+                      )}
                     </div>
-                  ) : (
-                    <div className="bg-gray-50 p-3 rounded-md min-h-[60px] flex items-center justify-center text-gray-500 text-sm">
-                      No workflow data available
+                    <div className="space-y-2">
+                      <Label htmlFor="requestType" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <TagIcon className="h-4 w-4" />
+                        PR Type
+                      </Label>
+                      {mode === "view" ? (
+                        <div className="text-gray-900 font-medium">{formData.requestType}</div>
+                      ) : (
+                        <Select
+                          value={formData.requestType}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, requestType: value as typeof formData.requestType })
+                          }
+                          disabled={!canEditField("type", user?.context.currentRole.name || "")}
+                        >
+                          <SelectTrigger id="requestType" className={!canEditField("type", user?.context.currentRole.name || "") ? "bg-muted" : ""}>
+                            <SelectValue placeholder="Select PR Type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="goods">Goods</SelectItem>
+                            <SelectItem value="services">Services</SelectItem>
+                            <SelectItem value="capital">Capital</SelectItem>
+                            <SelectItem value="maintenance">Maintenance</SelectItem>
+                            <SelectItem value="emergency">Emergency</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
                     </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="requestedBy" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <UserIcon className="h-4 w-4" />
+                        Requestor
+                      </Label>
+                      {mode === "view" ? (
+                        <div className="text-gray-900 font-medium">{formData.requestedBy}</div>
+                      ) : (
+                        <Input
+                          id="requestedBy"
+                          name="requestedBy"
+                          value={formData.requestedBy}
+                          onChange={handleInputChange}
+                          disabled={!canEditField("requestor", user?.context.currentRole.name || "")}
+                          className={!canEditField("requestor", user?.context.currentRole.name || "") ? "bg-muted" : ""}
+                        />
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="departmentId" className="text-sm text-muted-foreground mb-1 block flex items-center gap-1">
+                        <BuildingIcon className="h-4 w-4" />
+                        Department
+                      </Label>
+                      {mode === "view" ? (
+                        <div className="text-gray-900 font-medium">{formData.departmentId || "Not specified"}</div>
+                      ) : (
+                        <Input
+                          id="departmentId"
+                          name="departmentId"
+                          value={formData.departmentId}
+                          onChange={handleInputChange}
+                          disabled={!canEditField("department", user?.context.currentRole.name || "")}
+                          className={!canEditField("department", user?.context.currentRole.name || "") ? "bg-muted" : ""}
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Secondary Details */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="justification" className="text-sm text-muted-foreground mb-2 block flex items-center gap-1">
+                        <FileIcon className="h-4 w-4" />
+                        Description
+                      </Label>
+                      {mode === "view" ? (
+                        <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-md min-h-[60px]">
+                          {formData.justification || formData.notes || "No description"}
+                        </div>
+                      ) : (
+                        <Textarea
+                          id="justification"
+                          name="justification"
+                          value={formData.justification || ''}
+                          onChange={handleInputChange}
+                          disabled={!canEditField("description", user?.context.currentRole.name || "")}
+                          className={`min-h-[60px] ${!canEditField("description", user?.context.currentRole.name || "") ? "bg-muted" : ""}}`}
+                          placeholder="Add purchase request description..."
+                        />
+                      )}
+                    </div>
+
+                    {/* Workflow Progress - Right Half */}
+                    <div className="space-y-2">
+                      <Label className="text-sm text-muted-foreground mb-2 block">
+                        Workflow Progress
+                      </Label>
+                      {asMockPurchaseRequest(formData).requestNumber && formData.currentStage ? (
+                        <div className="bg-gray-50 p-3 rounded-md min-h-[60px] flex items-center">
+                          <CompactWorkflowIndicator
+                            currentStage={formData.currentStage as WorkflowStage}
+                            prData={formData as PurchaseRequest}
+                            className="flex-shrink-0"
+                          />
+                        </div>
+                      ) : (
+                        <div className="bg-gray-50 p-3 rounded-md min-h-[60px] flex items-center justify-center text-gray-500 text-sm">
+                          No workflow data available
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+
+          {/* Tabs and Content */}
+          <Card className="shadow-sm">
+            <Tabs defaultValue="items" className="w-full">
+              <CardHeader className="pb-0 pt-4 px-4">
+                <TabsList className="w-full grid grid-cols-3">
+                  {["items", "budgets", "workflow"].map(
+                    (tab) => (
+                      <TabsTrigger
+                        key={tab}
+                        value={tab}
+                        className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                      >
+                        {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                      </TabsTrigger>
+                    )
                   )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      
-      {/* Tabs and Content */}
-      <Card className="shadow-sm">
-        <Tabs defaultValue="items" className="w-full">
-          <CardHeader className="pb-0 pt-4 px-4">
-            <TabsList className="w-full grid grid-cols-3">
-              {["items", "budgets", "workflow"].map(
-                (tab) => (
-                  <TabsTrigger 
-                    key={tab} 
-                    value={tab} 
-                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                  >
-                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                  </TabsTrigger>
-                )
-              )}
-            </TabsList>
-          </CardHeader>
-          <CardContent className="p-0">
-            <form onSubmit={handleSubmit}>
-              <div className="w-full rounded-b-md border-t">
-                <div className="p-6">
-                  <TabsContent value="items" className="mt-0">
-                    {user && (
-                      <ItemsTab 
-                        items={currentItems}
-                        currentUser={user}
-                        onOrderUpdate={handleOrderUpdate}
-                        formMode={mode}
-                      />
-                    )}
-                  </TabsContent>
-                  <TabsContent value="budgets" className="mt-0">
-                    <ResponsiveBudgetScreen />
-                  </TabsContent>
-                  <TabsContent value="workflow" className="mt-0">
-                    <WorkflowTab />
-                  </TabsContent>
-                </div>
-              </div>
-            </form>
-          </CardContent>
-        </Tabs>
-      </Card>
-      
+                </TabsList>
+              </CardHeader>
+              <CardContent className="p-0">
+                <form onSubmit={handleSubmit}>
+                  <div className="w-full rounded-b-md border-t">
+                    <div className="p-6">
+                      <TabsContent value="items" className="mt-0">
+                        {user && (
+                          <ItemsTab
+                            items={currentItems}
+                            currentUser={user}
+                            onOrderUpdate={handleOrderUpdate}
+                            formMode={mode}
+                          />
+                        )}
+                      </TabsContent>
+                      <TabsContent value="budgets" className="mt-0">
+                        <ResponsiveBudgetScreen />
+                      </TabsContent>
+                      <TabsContent value="workflow" className="mt-0">
+                        <WorkflowTab />
+                      </TabsContent>
+                    </div>
+                  </div>
+                </form>
+              </CardContent>
+            </Tabs>
+          </Card>
+
           {/* Transaction Summary - Hidden from Requestors */}
           {user && workflowPermissions.canViewFinancialInfo && (
             <Card className="shadow-sm">
@@ -697,17 +710,19 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
           </Card>
         </div>
       </div>
-      
+
       {/* Smart Floating Action Menu - Workflow Decision Based */}
       {mode === "view" && user && workflowDecision && (
         <div className="fixed bottom-6 right-6 flex flex-col space-y-3 z-50">
           {/* Action Buttons */}
           <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-4 flex space-x-3 border border-gray-200 dark:border-gray-700">
             {(() => {
-              const userRole = user.role;
-              
+              // Get the actual role NAME from user context, not the role ID
+              const userRoleName = user.context?.currentRole?.name || '';
+
               // For Requestors - show Delete and Submit buttons
-              if (['Staff', 'Requestor'].includes(userRole)) {
+              const requestorRoles = ['Staff', 'Requestor', 'Store Staff', 'Chef', 'Counter Staff', 'Executive Chef', 'Warehouse Staff'];
+              if (requestorRoles.includes(userRoleName)) {
                 return (
                   <>
                     <Button
@@ -715,7 +730,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                       variant="destructive"
                       size="sm"
                       className="h-9"
-                      disabled={formData.status !== DocumentStatus.Draft}
+                      disabled={formData.status !== PRStatus.Draft}
                     >
                       <X className="mr-2 h-4 w-4" />
                       Delete
@@ -725,7 +740,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                       variant="default"
                       size="sm"
                       className="h-9"
-                      disabled={!workflowDecision.canSubmit || formData.status !== DocumentStatus.Draft}
+                      disabled={!workflowDecision.canSubmit || formData.status !== PRStatus.Draft}
                     >
                       <CheckCircle className="mr-2 h-4 w-4" />
                       Submit
@@ -733,9 +748,10 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                   </>
                 );
               }
-              
+
               // For Approvers - show smart workflow buttons
-              if (['Department Manager', 'Financial Manager'].includes(userRole)) {
+              const approverRoles = ['Department Manager', 'Financial Manager', 'Approver', 'General Manager', 'Finance Director'];
+              if (approverRoles.includes(userRoleName)) {
                 if (workflowDecision.action === 'blocked') {
                   return (
                     <Button
@@ -749,7 +765,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                     </Button>
                   );
                 }
-                
+
                 return (
                   <>
                     {workflowDecision.action === 'reject' && (
@@ -764,7 +780,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                         {workflowDecision.buttonText}
                       </Button>
                     )}
-                    
+
                     {workflowDecision.action === 'return' && (
                       <Button
                         onClick={handleSendBack}
@@ -777,7 +793,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                         {workflowDecision.buttonText}
                       </Button>
                     )}
-                    
+
                     {workflowDecision.action === 'approve' && (
                       <Button
                         onClick={handleApprove}
@@ -793,9 +809,10 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                   </>
                 );
               }
-              
+
               // For Purchasing Staff - show smart workflow buttons
-              if (['Purchasing Staff'].includes(userRole)) {
+              const purchaserRoles = ['Purchasing Staff', 'Purchaser', 'Procurement Manager'];
+              if (purchaserRoles.includes(userRoleName)) {
                 if (workflowDecision.action === 'blocked') {
                   return (
                     <Button
@@ -809,7 +826,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                     </Button>
                   );
                 }
-                
+
                 return (
                   <>
                     {workflowDecision.action === 'reject' && (
@@ -824,7 +841,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                         {workflowDecision.buttonText}
                       </Button>
                     )}
-                    
+
                     {workflowDecision.action === 'return' && (
                       <Button
                         onClick={handleSendBack}
@@ -837,7 +854,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                         {workflowDecision.buttonText}
                       </Button>
                     )}
-                    
+
                     {workflowDecision.action === 'approve' && (
                       <Button
                         onClick={handleSubmitForApproval}
@@ -853,14 +870,14 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                   </>
                 );
               }
-              
+
               // For other roles - no floating actions
               return null;
             })()}
           </div>
         </div>
       )}
-      
+
       {/* Return Step Selector Dialog for PR-Level Actions */}
       <Dialog open={isReturnStepSelectorOpen} onOpenChange={setIsReturnStepSelectorOpen}>
         <DialogContent className="max-w-lg">
@@ -871,7 +888,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
             <div className="text-sm text-gray-600">
               Choose where to return this purchase request for review:
             </div>
-            
+
             {/* Step Selection */}
             <div className="space-y-2">
               {returnSteps.map((step) => (
@@ -888,7 +905,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                 </Button>
               ))}
             </div>
-            
+
             {/* Comment Section */}
             {selectedReturnStep && (
               <div className="space-y-2 pt-4 border-t">
@@ -903,10 +920,10 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                 />
               </div>
             )}
-            
+
             <div className="flex justify-end gap-2 pt-4 border-t">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   setIsReturnStepSelectorOpen(false);
                   setReturnComment("");
@@ -915,7 +932,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 onClick={() => selectedReturnStep && handleReturnWithStep(selectedReturnStep)}
                 disabled={!selectedReturnStep || !returnComment.trim()}
                 className="bg-orange-600 hover:bg-orange-700"
@@ -936,13 +953,14 @@ function getEmptyPurchaseRequest(): PurchaseRequest {
     requestNumber: "",
     requestDate: new Date(),
     requiredDate: new Date(),
-    requestType: 'goods',
+    requestType: 'General',
     priority: 'normal',
-    status: DocumentStatus.Draft,
+    status: PRStatus.Draft,
     departmentId: "",
     locationId: "",
     requestedBy: "",
     totalItems: 0,
+    currency: 'THB',
     estimatedTotal: {
       amount: 0,
       currency: 'THB'

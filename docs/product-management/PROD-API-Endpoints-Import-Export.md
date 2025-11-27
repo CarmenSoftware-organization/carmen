@@ -1,5 +1,10 @@
 # Product Import/Export API Endpoints
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document provides detailed information about the Product Import/Export API endpoints in the Procurement & Inventory Management System.
 
 ## Authentication

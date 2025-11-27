@@ -2,9 +2,16 @@
 
 ## Document Information
 - **Module**: System Administration / Location Management
-- **Version**: 1.0
-- **Last Updated**: 2025-01-16
+- **Version**: 1.1
+- **Last Updated**: 2025-11-26
 - **Status**: Active
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+| 1.1.0 | 2025-11-26 | Documentation Team | Code compliance review - removed fictional features, aligned with BR document |
 
 ## Overview
 
@@ -19,8 +26,7 @@ This document details the use cases for Location Management functionality in the
 - **Inventory Manager**: Manages physical count settings and product assignments
 
 ### Supporting Actors
-- **System**: Automated validation and audit logging
-- **Database**: Persistence layer
+- **System**: Automated validation
 
 ---
 
@@ -31,71 +37,57 @@ This document details the use cases for Location Management functionality in the
 - **Preconditions**:
   - User has "Create Location" permission
   - User is authenticated
-  - Delivery points are configured in the system
 - **Postconditions**:
-  - New location created in database
+  - New location created
   - Location appears in location list
-  - Audit trail created
 
 ### Main Flow
 1. Operations Manager navigates to Location Management
 2. System displays location list
 3. Manager clicks "Create Location" button
-4. System displays location creation form with tabs:
-   - Basic Information tab (active by default)
-   - User Assignment tab
-   - Product Assignment tab
-5. Manager enters required information:
-   - Location Code (max 10 characters, unique)
+4. System navigates to create location page with form:
+   - Location Code (max 10 characters, uppercase alphanumeric with hyphens)
    - Location Name (max 100 characters)
-   - Type (Direct, Inventory, or Consignment)
-   - Physical Count Required (Yes/No)
-   - Delivery Point (from dropdown)
-   - Active status (checked by default)
-6. Manager optionally assigns users via User Assignment tab:
-   - Views dual-pane interface (Available Users | Assigned Users)
-   - Searches for users by name or email
-   - Selects users from available list
-   - Clicks left chevron to assign users
-7. Manager optionally assigns products via Product Assignment tab:
-   - Chooses view mode (Product Mode or Category Mode)
-   - Searches for products by code or name
-   - Selects products from available list
-   - Clicks left chevron to assign products
-8. Manager clicks "Save Location"
-9. System validates all required fields
-10. System creates location record with unique UUID
-11. System creates user assignment records (tb_user_location)
-12. System creates product assignment records (if implemented)
-13. System displays success message
-14. System redirects to location detail page
+   - Type (Inventory, Direct, or Consignment)
+   - Physical Count Enabled (Yes/No)
+   - Status (Active, Inactive, Closed, Pending Setup)
+   - Description (optional)
+   - Department (optional dropdown)
+   - Cost Center (optional dropdown)
+   - Consignment Vendor (optional, shown for Consignment type)
+   - Address fields (optional)
+5. Manager enters required information
+6. Manager clicks "Save Location"
+7. System validates all required fields
+8. System creates location record
+9. System displays success message
+10. System redirects to location detail page
 
 ### Alternative Flows
 
 **A1: Validation Errors**
-- At step 9, if validation fails:
+- At step 7, if validation fails:
   1. System displays inline error messages next to invalid fields
   2. System highlights fields with errors
   3. Manager corrects errors and resubmits
-  4. Flow continues from step 9
+  4. Flow continues from step 7
 
 **A2: Duplicate Location Code**
-- At step 10, if location code already exists:
+- At step 8, if location code already exists:
   1. System displays error: "Location code already exists"
   2. Manager enters different code
-  3. Flow continues from step 9
+  3. Flow continues from step 7
 
 **A3: Cancel Operation**
-- At any step before step 8:
+- At any step before step 6:
   1. Manager clicks "Cancel" button
-  2. System displays confirmation dialog
-  3. If confirmed, system discards changes and returns to location list
-  4. Use case ends
+  2. System returns to location list
+  3. Use case ends
 
 ### Exception Flows
 
 **E1: Network Error**
-- At step 10:
+- At step 8:
   1. System displays error: "Unable to create location. Please try again."
   2. Manager can retry or cancel
   3. Use case ends
@@ -108,61 +100,57 @@ This document details the use cases for Location Management functionality in the
 - **Actor**: Operations Manager, Store Manager
 - **Preconditions**:
   - User has "Edit Location" permission
-  - Location exists in database
+  - Location exists
   - User is authenticated
 - **Postconditions**:
   - Location information updated
-  - Changes reflected in all related records
-  - Audit trail updated with modification details
+  - Changes reflected in location list
 
 ### Main Flow
 1. User navigates to Location Management
 2. System displays location list with search and filters
 3. User searches/filters to find desired location
-4. User clicks Edit icon (pencil) for the location
-5. System navigates to edit page
-6. System displays location edit form with:
-   - Basic Information (pre-populated)
-   - User Assignment tab (with current assignments)
-   - Product Assignment tab (with current assignments)
-7. User modifies fields:
-   - Location Name (code is disabled for existing locations)
+4. User clicks on location row or View button
+5. System navigates to location detail page in view mode
+6. User clicks "Edit" button
+7. System switches to edit mode displaying tabbed interface:
+   - General tab (location details)
+   - Shelves tab
+   - Users tab
+   - Products tab
+   - Delivery Points tab
+8. User modifies fields in General tab:
+   - Location Name (code is displayed but disabled)
    - Type
-   - Physical Count Required
-   - Delivery Point
-   - Active status
-8. User optionally modifies user assignments:
-   - Removes users by selecting from assigned list and clicking right chevron
-   - Adds users by selecting from available list and clicking left chevron
-9. User optionally modifies product assignments:
-   - Removes products by selecting from assigned list and clicking right chevron
-   - Adds products by selecting from available list and clicking left chevron
-10. User clicks "Save Location"
-11. System validates all required fields
-12. System updates location record
-13. System updates user assignment records (tb_user_location)
-14. System updates product assignment records
-15. System updates audit fields (updated_at, updated_by_id)
-16. System displays success message
-17. System redirects to location detail page
+   - Status
+   - Physical Count Enabled
+   - Description
+   - Department
+   - Cost Center
+   - Consignment Vendor (for consignment type)
+   - Address
+9. User clicks "Save Changes"
+10. System validates all required fields
+11. System updates location record
+12. System displays success message
+13. System switches back to view mode
 
 ### Alternative Flows
 
 **A1: No Changes Made**
-- At step 10, if no changes detected:
+- At step 9, if no changes detected:
   1. System displays message: "No changes to save"
   2. User can continue editing or cancel
-  3. Flow returns to step 7
+  3. Flow returns to step 8
 
 **A2: Validation Errors**
 - Similar to UC-LOC-001 Alternative Flow A1
 
-**A3: Cannot Modify Location with Active Transactions**
-- At step 11, if location has active inventory transactions:
-  1. System restricts modification of certain fields (type, active status)
-  2. System displays warning message
-  3. User can modify allowed fields only
-  4. Flow continues from step 12
+**A3: Cancel Edit**
+- At any step:
+  1. User clicks "Cancel" button
+  2. System discards unsaved changes
+  3. System switches back to view mode
 
 ---
 
@@ -172,39 +160,54 @@ This document details the use cases for Location Management functionality in the
 - **Actor**: Any authenticated user
 - **Preconditions**:
   - User is authenticated
-  - Location exists in database
+  - Location exists
 - **Postconditions**: None (read-only operation)
 
 ### Main Flow
 1. User navigates to Location Management
 2. System displays location list
 3. User searches/filters to find desired location
-4. User clicks View icon (file/document) for the location
+4. User clicks on location row or View icon
 5. System navigates to location detail page
-6. System displays three information cards:
-   - **Basic Information Card**:
-     - Location Code
+6. System displays tabbed interface with 5 tabs:
+   - **General Tab**:
+     - Location Code (read-only)
      - Location Name
-     - Type (as badge)
-     - Status (Active/Inactive as badge)
-   - **Delivery Information Card**:
-     - Physical Count Required (Yes/No)
-     - Delivery Point
-   - **Assigned Users Card**:
-     - Count of assigned users
-     - User avatars with initials
-     - User name and email
-     - Empty state if no users assigned
+     - Type (with color-coded badge)
+     - Status (with color-coded badge)
+     - Physical Count Enabled (Yes/No icon)
+     - Description
+     - Department
+     - Cost Center
+     - Consignment Vendor (if applicable)
+     - Address
+   - **Shelves Tab**:
+     - List of storage shelves
+     - Shelf code, name, status
+   - **Users Tab**:
+     - List of assigned users
+     - User name, email, role, permissions
+     - Primary location indicator
+   - **Products Tab**:
+     - List of assigned products
+     - Product code, name, category
+     - Inventory parameters (min, max, reorder point, PAR level)
+     - Current quantity and low stock indicator
+   - **Delivery Points Tab**:
+     - List of delivery points
+     - Address, contact info, logistics details
+     - Primary delivery point indicator
 7. System displays action buttons:
    - Back (returns to list)
-   - Edit (navigates to edit page)
+   - Edit (switches to edit mode)
    - Delete (triggers deletion flow)
 
 ### Alternative Flows
 
-**A1: No Assigned Users**
-- At step 6:
-  1. System displays "No users assigned to this location" in Assigned Users card
+**A1: No Data in Tabs**
+- For any tab with no data:
+  1. System displays empty state message
+  2. In edit mode, displays "Add First [Item]" button
 
 ---
 
@@ -214,13 +217,11 @@ This document details the use cases for Location Management functionality in the
 - **Actor**: System Administrator
 - **Preconditions**:
   - User has "Delete Location" permission
-  - Location exists in database
+  - Location exists
   - User is authenticated
 - **Postconditions**:
-  - Location marked as deleted (soft delete)
-  - Location removed from active lists
-  - Historical data preserved
-  - Audit trail updated
+  - Location removed from list
+  - Location no longer available for selection
 
 ### Main Flow
 1. User views location in list or detail page
@@ -231,18 +232,10 @@ This document details the use cases for Location Management functionality in the
    - Buttons: Cancel, Delete (destructive style)
 4. User clicks "Delete" to confirm
 5. System validates deletion constraints:
-   - Checks for active inventory balances
-   - Checks for open transactions
-   - Checks for assigned users/products
-6. System performs soft delete:
-   - Sets deleted_at timestamp
-   - Sets deleted_by_id to current user
-   - Keeps is_active as true (for audit purposes)
-7. System removes user assignments (soft delete tb_user_location records)
-8. System removes product assignments (soft delete records)
-9. System displays success message: "Location deleted successfully"
-10. System refreshes location list
-11. Deleted location no longer appears in active lists
+   - Checks for assigned products (assignedProductsCount > 0)
+6. System removes location from list
+7. System displays success message: "Location deleted successfully"
+8. System refreshes location list
 
 ### Alternative Flows
 
@@ -252,15 +245,9 @@ This document details the use cases for Location Management functionality in the
   2. System closes dialog without changes
   3. Use case ends
 
-**A2: Cannot Delete - Has Active Stock**
-- At step 5, if location has inventory balances:
-  1. System displays error: "Cannot delete location with existing inventory. Please transfer stock first."
-  2. System closes dialog
-  3. Use case ends
-
-**A3: Cannot Delete - Has Open Transactions**
-- At step 5, if location has open transactions:
-  1. System displays error: "Cannot delete location with open transactions. Please complete or cancel transactions first."
+**A2: Cannot Delete - Has Assigned Products**
+- At step 5, if location has assigned products:
+  1. System displays error: "Cannot delete location with assigned products. Please remove product assignments first."
   2. System closes dialog
   3. Use case ends
 
@@ -272,46 +259,38 @@ This document details the use cases for Location Management functionality in the
 - **Actor**: Any authenticated user
 - **Preconditions**:
   - User is authenticated
-  - Locations exist in database
+  - Locations exist
 - **Postconditions**: Filtered list displayed to user
 
 ### Main Flow
 1. User navigates to Location Management
-2. System displays location list in table view (default)
+2. System displays location list in table view
 3. System displays search and filter controls:
-   - Search input field (placeholder: "Search locations...")
-   - Status dropdown (All Status, Active, Inactive)
-   - Type dropdown (All Types, Direct, Inventory, Consignment)
-   - Clear Filters button (if filters active)
-   - View toggle (Table/Card)
+   - Search input field (searches name, code, description, department)
+   - Type dropdown (All, Inventory, Direct, Consignment)
+   - Status dropdown (All, Active, Inactive, Closed, Pending Setup)
+   - Physical Count dropdown (All, Count Enabled, Count Disabled)
 4. User enters search term in search field
 5. System filters locations in real-time by:
    - Location name (case-insensitive partial match)
-   - Location type (case-insensitive partial match)
    - Location code (case-insensitive partial match)
-6. User selects status filter
-7. System applies status filter (AND logic with search)
-8. User selects type filter
-9. System applies type filter (AND logic with previous filters)
-10. System displays filtered results with count:
-    - "Showing X of Y records" in table footer
-11. User can clear all filters by clicking "Clear Filters"
-12. System resets search and filter controls
-13. System displays all locations
+   - Description (case-insensitive partial match)
+   - Department name (case-insensitive partial match)
+6. User selects type filter
+7. System applies type filter (AND logic with search)
+8. User selects status filter
+9. System applies status filter (AND logic with previous filters)
+10. User selects physical count filter
+11. System applies physical count filter
+12. System displays filtered results with count:
+    - "Showing X of Y locations"
 
 ### Alternative Flows
 
 **A1: No Results Found**
-- At step 10, if no locations match criteria:
+- At step 12, if no locations match criteria:
   1. System displays empty state in table
   2. User can modify filters or clear filters
-
-**A2: Switch View Mode**
-- At any point:
-  1. User clicks view toggle (Table/Card icon)
-  2. System switches between table and card view
-  3. Filters remain applied
-  4. Flow continues
 
 ---
 
@@ -321,7 +300,7 @@ This document details the use cases for Location Management functionality in the
 - **Actor**: Any authenticated user
 - **Preconditions**:
   - User is authenticated
-  - Locations exist in database
+  - Locations exist
 - **Postconditions**: List sorted by selected column
 
 ### Main Flow
@@ -330,231 +309,279 @@ This document details the use cases for Location Management functionality in the
    - Code
    - Name
    - Type
+   - Status
+   - Shelves (count)
+   - Products (count)
+   - Users (count)
 3. User clicks column header to sort
 4. System sorts list in ascending order
-5. System displays chevron-up icon next to column name
+5. System displays up arrow icon next to column name
 6. User clicks same column header again
 7. System reverses sort to descending order
-8. System displays chevron-down icon next to column name
+8. System displays down arrow icon next to column name
 9. User can click different column header to change sort field
 10. System applies new sort and updates icon
 
-### Alternative Flows
-
-**A1: Card View - No Sorting**
-- If user is in card view:
-  1. Sorting is maintained from table view
-  2. Cards displayed in current sort order
-
 ---
 
-## UC-LOC-007: Toggle View Mode
+## UC-LOC-007: Bulk Actions on Locations
 
 ### Basic Information
-- **Actor**: Any authenticated user
+- **Actor**: Operations Manager, System Administrator
 - **Preconditions**:
   - User is authenticated
-  - Locations exist in database
-- **Postconditions**: View mode changed, filters and sort preserved
+  - Multiple locations exist
+- **Postconditions**: Selected locations updated or deleted
 
 ### Main Flow
-1. User views location list in default table view
-2. System displays view toggle buttons in toolbar
-3. User clicks Card View icon (grid icon)
-4. System switches to card layout:
-   - Displays locations as cards in responsive grid
-   - Each card shows: Name, Code, Type, EOP, Delivery Point, Status, Actions
-   - Maintains current filters and search
-5. User can click Table View icon (table icon)
-6. System switches back to table layout
-7. Filters, search, and sort remain unchanged
+1. User views location list
+2. User selects locations using checkboxes
+3. System displays selection count: "X location(s) selected"
+4. System enables bulk action buttons:
+   - Activate
+   - Deactivate
+   - Delete
+   - Clear Selection
+5. User clicks desired bulk action
+6. System displays confirmation if needed
+7. System performs action on all selected locations
+8. System displays success message
+9. System refreshes list and clears selection
 
 ### Alternative Flows
 
-**A1: Mobile Responsive**
-- On mobile devices:
-  1. Card view automatically adjusts to single column
-  2. Table view displays horizontal scroll for full table
+**A1: Select All**
+- At step 2:
+  1. User clicks header checkbox
+  2. System selects all visible locations
+  3. Flow continues from step 3
+
+**A2: Bulk Delete with Products**
+- At step 7 for delete action:
+  1. If any location has assigned products, system shows error
+  2. System lists locations that cannot be deleted
+  3. User can proceed with remaining locations or cancel
 
 ---
 
-## UC-LOC-008: Assign Users to Location
+## UC-LOC-008: Manage Shelves
+
+### Basic Information
+- **Actor**: Warehouse Manager, Store Manager
+- **Preconditions**:
+  - User has "Edit Location" permission
+  - Location exists
+- **Postconditions**: Shelves created, updated, or deleted
+
+### Main Flow
+1. User opens location detail page in edit mode
+2. User clicks "Shelves" tab
+3. System displays shelf list table with:
+   - Shelf Code
+   - Shelf Name
+   - Status (Active/Inactive)
+   - Actions (Edit, Delete)
+4. User clicks "Add Shelf" button
+5. System displays Add Shelf dialog:
+   - Shelf Code (max 20 chars)
+   - Name
+6. User enters shelf information
+7. User clicks "Add Shelf"
+8. System validates and adds shelf to list
+9. System closes dialog
+10. Shelf appears in table
+
+### Alternative Flows
+
+**A1: Edit Shelf**
+- At step 3:
+  1. User clicks Edit from row actions
+  2. System displays Edit Shelf dialog with current values
+  3. User modifies fields
+  4. User clicks "Save Changes"
+  5. System updates shelf
+
+**A2: Delete Shelf**
+- At step 3:
+  1. User clicks Delete from row actions
+  2. System displays confirmation dialog
+  3. User confirms deletion
+  4. System removes shelf from list
+
+---
+
+## UC-LOC-009: Assign Users to Location
 
 ### Basic Information
 - **Actor**: Operations Manager, System Administrator
 - **Preconditions**:
   - User has "Edit Location" permission
-  - Location exists in database
+  - Location exists
   - Users exist in system
-- **Postconditions**:
-  - User-location associations created in tb_user_location
-  - Users can access location in their context
-  - Audit trail updated
+- **Postconditions**: Users assigned to location with roles and permissions
 
 ### Main Flow
-1. User opens location for editing (UC-LOC-002)
-2. User clicks "User Assignment" tab
-3. System displays dual-pane interface:
-   - **Assigned Users Pane** (left):
-     - Search field
-     - Select All checkbox
-     - List of currently assigned users with:
-       - Avatar with initials
-       - User name
-       - Role badge
-       - Primary location
-       - Additional location badges
-   - **Available Users Pane** (right):
-     - Search field
-     - Select All checkbox
-     - List of unassigned users
-4. User searches for users in available pane
-5. System filters available users by name or email
-6. User selects one or more users from available list
-7. User clicks left chevron button (assign)
-8. System moves selected users to assigned pane
-9. User can select users from assigned pane
-10. User clicks right chevron button (remove)
-11. System moves selected users to available pane
-12. User clicks "Save Location"
-13. System creates tb_user_location records for new assignments
-14. System soft-deletes tb_user_location records for removed assignments
-15. System displays success message
+1. User opens location detail page in edit mode
+2. User clicks "Users" tab
+3. System displays user assignment interface:
+   - Table of assigned users
+   - "Add User" button
+4. User clicks "Add User" button
+5. System displays user selection dialog:
+   - User dropdown/search
+   - Role selection (Location Manager, Inventory Controller, etc.)
+   - Permission checkboxes
+   - Primary location checkbox
+6. User selects user and configures role/permissions
+7. User clicks "Add"
+8. System adds user to assigned list
+9. User can edit or remove assignments from table
 
 ### Alternative Flows
 
-**A1: Select All Users**
-- At step 6:
-  1. User clicks "Select All" checkbox in available pane
-  2. System selects all filtered users
-  3. User clicks assign button
-  4. System moves all selected users
-  5. Flow continues from step 12
+**A1: Edit User Assignment**
+- At step 3:
+  1. User clicks Edit from row actions
+  2. System displays edit dialog with current values
+  3. User modifies role/permissions
+  4. User clicks "Save"
 
-**A2: No Users Selected**
-- At step 7 or 10:
-  1. If no users selected, chevron buttons are disabled
-  2. User must select at least one user to assign/remove
+**A2: Remove User Assignment**
+- At step 3:
+  1. User clicks Remove from row actions
+  2. System removes user from assigned list
 
 ---
 
-## UC-LOC-009: Assign Products to Location
+## UC-LOC-010: Assign Products to Location
 
 ### Basic Information
 - **Actor**: Store Manager, Inventory Manager
 - **Preconditions**:
   - User has "Edit Location" permission
-  - Location exists in database
+  - Location exists
   - Products exist in system
-- **Postconditions**:
-  - Product-location associations created
-  - Products available for requisitions at location
-  - Audit trail updated
+- **Postconditions**: Products assigned to location with inventory parameters
 
 ### Main Flow
-1. User opens location for editing (UC-LOC-002)
-2. User clicks "Product Assignment" tab
-3. System displays view mode toggle (Product Mode / Category Mode)
-4. User selects Product Mode (default)
-5. System displays dual-pane interface similar to user assignment:
-   - Assigned Products pane (left) with search and select all
-   - Available Products pane (right) with search and select all
-6. Each product displays:
-   - Product code with package icon
-   - Product name
-   - Category and base unit
-7. User searches for products by code or name
-8. System filters product list in real-time
-9. User selects products from available list
-10. User clicks left chevron to assign
-11. System moves products to assigned pane
-12. User can switch to Category Mode
-13. System displays products grouped by category:
-    - Expandable category folders
-    - Product count badges
-    - Nested product list under each category
-14. User expands categories and selects products
-15. User assigns/removes products using chevron buttons
-16. User clicks "Save Location"
-17. System creates product assignment records
-18. System displays success message
+1. User opens location detail page in edit mode
+2. User clicks "Products" tab
+3. System displays product assignment interface:
+   - Table of assigned products
+   - "Add Product" button
+4. User clicks "Add Product" button
+5. System displays product selection dialog:
+   - Product search by name/code/category
+   - Shelf selector (from location's shelves)
+   - Inventory parameters:
+     - Min Quantity
+     - Max Quantity
+     - Reorder Point
+     - PAR Level
+6. User selects product and sets parameters
+7. User clicks "Add"
+8. System adds product to assigned list
+9. Table shows current quantity and low stock indicators
 
 ### Alternative Flows
 
-**A1: Category Mode Operations**
-- At step 13:
-  1. User clicks category header to expand/collapse
-  2. System toggles category expansion
-  3. Products within category become visible/hidden
-  4. User can select individual products or use Select All within category
+**A1: Edit Product Assignment**
+- At step 3:
+  1. User clicks Edit from row actions
+  2. System displays edit dialog with current values
+  3. User modifies parameters or shelf
+  4. User clicks "Save"
 
-**A2: Switch Between View Modes**
-- At any time:
-  1. User clicks view mode toggle
-  2. System switches between Product and Category mode
-  3. Selections are preserved
-  4. Flow continues
+**A2: Remove Product Assignment**
+- At step 3:
+  1. User clicks Remove from row actions
+  2. System removes product from assigned list
 
 ---
 
-## UC-LOC-010: Print Location List
+## UC-LOC-011: Manage Delivery Points
+
+### Basic Information
+- **Actor**: Purchasing Manager, Operations Manager
+- **Preconditions**:
+  - User has "Edit Location" permission
+  - Location exists
+- **Postconditions**: Delivery points created, updated, or deleted
+
+### Main Flow
+1. User opens location detail page in edit mode
+2. User clicks "Delivery Points" tab
+3. System displays delivery points list:
+   - Name, Code
+   - Address
+   - Contact info
+   - Primary indicator
+   - Status
+4. User clicks "Add Delivery Point" button
+5. System displays delivery point form:
+   - Name, Code
+   - Address (line 1, line 2, city, postal code, country)
+   - Contact (name, phone, email)
+   - Instructions (delivery, access)
+   - Logistics (operating hours, max vehicle size, dock leveler, forklift)
+   - Primary checkbox
+   - Active checkbox
+6. User enters information
+7. User clicks "Save"
+8. System validates and adds delivery point
+
+### Alternative Flows
+
+**A1: Edit Delivery Point**
+- At step 3:
+  1. User clicks Edit from row actions
+  2. System displays form with current values
+  3. User modifies fields
+  4. User clicks "Save"
+
+**A2: Delete Delivery Point**
+- At step 3:
+  1. User clicks Delete from row actions
+  2. System displays confirmation
+  3. User confirms
+  4. System removes delivery point
+
+---
+
+## UC-LOC-012: Export Location List
+
+### Basic Information
+- **Actor**: Operations Manager
+- **Preconditions**:
+  - User is authenticated
+  - Locations exist
+- **Postconditions**: Location data exported to file
+
+### Main Flow
+1. User navigates to Location Management
+2. User applies desired filters
+3. User clicks "Export" button
+4. System generates CSV file with filtered locations
+5. Browser downloads CSV file
+
+---
+
+## UC-LOC-013: Print Location List
 
 ### Basic Information
 - **Actor**: Operations Manager, Store Manager
 - **Preconditions**:
   - User is authenticated
-  - Locations exist in database
-- **Postconditions**: Location list printed or saved as PDF
+  - Locations exist
+- **Postconditions**: Location list printed
 
 ### Main Flow
 1. User navigates to Location Management
 2. User applies desired filters and sorting
 3. User clicks "Print" button
-4. System opens browser print dialog with:
-   - Current filtered and sorted location list
-   - Print-optimized layout
-   - Company header
+4. System opens browser print dialog
 5. User configures print settings
-6. User clicks Print or Save as PDF
-7. System generates printable document
-
-### Alternative Flows
-
-**A1: Export to CSV**
-- Future enhancement:
-  1. User clicks "Export" button
-  2. System generates CSV file with filtered locations
-  3. Browser downloads CSV file
-
----
-
-## UC-LOC-011: View Location Assignments
-
-### Basic Information
-- **Actor**: Any authenticated user
-- **Preconditions**:
-  - User is authenticated
-  - Location has assignments (users or products)
-- **Postconditions**: None (read-only)
-
-### Main Flow
-1. User views location detail page (UC-LOC-003)
-2. System displays Assigned Users card
-3. For each assigned user, system shows:
-   - User avatar (colored background with initials)
-   - User name
-   - User email
-4. If no users assigned, system displays:
-   - "No users assigned to this location"
-5. System displays count: "Assigned Users (X)"
-
-### Alternative Flows
-
-**A1: View Product Assignments**
-- Future enhancement:
-  1. System displays Assigned Products card
-  2. Shows list of assigned products
-  3. Displays product code and name
+6. User clicks Print
 
 ---
 
@@ -565,24 +592,24 @@ This document details the use cases for Location Management functionality in the
 | UC-LOC-001: Create New Location | High | Medium | Medium |
 | UC-LOC-002: Edit Existing Location | High | High | Medium |
 | UC-LOC-003: View Location Details | High | Very High | Low |
-| UC-LOC-004: Delete Location | Medium | Low | High |
+| UC-LOC-004: Delete Location | Medium | Low | Low |
 | UC-LOC-005: Search and Filter Locations | High | Very High | Low |
 | UC-LOC-006: Sort Location List | Medium | High | Low |
-| UC-LOC-007: Toggle View Mode | Low | Medium | Low |
-| UC-LOC-008: Assign Users to Location | High | Medium | Medium |
-| UC-LOC-009: Assign Products to Location | High | Medium | Medium |
-| UC-LOC-010: Print Location List | Low | Low | Low |
-| UC-LOC-011: View Location Assignments | Medium | High | Low |
+| UC-LOC-007: Bulk Actions | Medium | Medium | Medium |
+| UC-LOC-008: Manage Shelves | Medium | Medium | Medium |
+| UC-LOC-009: Assign Users to Location | High | Medium | Medium |
+| UC-LOC-010: Assign Products to Location | High | Medium | Medium |
+| UC-LOC-011: Manage Delivery Points | Medium | Low | Medium |
+| UC-LOC-012: Export Location List | Low | Low | Low |
+| UC-LOC-013: Print Location List | Low | Low | Low |
 
 ## Business Rules Summary
 
-- **BR-001**: Location code must be unique and cannot be changed after creation
-- **BR-002**: Location name must be unique across the system
-- **BR-003**: Locations with inventory balances cannot be deleted (only deactivated)
-- **BR-004**: Delivery point must be active and valid
-- **BR-005**: Physical count setting determines if location appears in stock count schedules
-- **BR-006**: User assignments create records in tb_user_location
-- **BR-007**: Product assignments enable requisition and stock management at location
-- **BR-008**: Soft deletes preserve historical data and audit trail
-- **BR-009**: Location type cannot be changed if transactions exist
-- **BR-010**: Inactive locations hidden from dropdown selections but visible in historical reports
+Reference BR-location-management.md for complete business rules. Key rules affecting use cases:
+
+- **BR-001**: Location code must be uppercase alphanumeric with hyphens only, maximum 10 characters
+- **BR-002**: Cannot delete location with assigned products (assignedProductsCount > 0)
+- **BR-003**: Consignment type locations should have a vendor assigned
+- **BR-004**: Shelf codes should be unique within a location
+- **BR-005**: One primary delivery point per location
+- **BR-006**: One primary user assignment per user across locations

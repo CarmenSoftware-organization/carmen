@@ -2,22 +2,37 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PlusCircle } from 'lucide-react'
-import { roles } from "../data/mockData"
+import { mockRoles, mockUsers } from '@/lib/mock-data'
+import { Role } from '@/lib/types'
 
 interface RoleListProps {
-  selectedRoleId: number | null
-  onSelectRole: (id: number) => void
+  selectedRoleId: string | null
+  onSelectRole: (id: string) => void
+}
+
+// Map users to their roles (in a real app, this would come from the backend)
+const userRoleMap: Record<string, string[]> = {
+  '1': ['1', '2', '3', '4'],
+  '2': ['5', '6'],
+  '3': ['7', '8', '9', '10'],
+  '4': ['11', '12'],
+  '5': ['13'],
 }
 
 export function RoleList({ selectedRoleId, onSelectRole }: RoleListProps) {
-  const [localRoles, setLocalRoles] = useState(roles)
+  const [localRoles, setLocalRoles] = useState(mockRoles)
+
+  // Helper function to get user count for a role
+  const getRoleUserCount = (roleId: string): number => {
+    return userRoleMap[roleId]?.length || 0
+  }
 
   const addNewRole = () => {
-    const newRole = {
-      id: localRoles.length + 1,
+    const newRole: Role = {
+      id: String(localRoles.length + 1),
       name: `New Role ${localRoles.length + 1}`,
       description: "Description pending",
-      userCount: 0,
+      permissions: [],
     }
     setLocalRoles([...localRoles, newRole])
     onSelectRole(newRole.id)
@@ -37,7 +52,7 @@ export function RoleList({ selectedRoleId, onSelectRole }: RoleListProps) {
             >
               <h3 className="font-bold">{role.name}</h3>
               <p className="text-sm text-gray-600">{role.description}</p>
-              <p className="text-sm text-blue-600 mt-2">{role.userCount} users</p>
+              <p className="text-sm text-blue-600 mt-2">{getRoleUserCount(role.id)} users</p>
             </Card>
           ))}
         </div>

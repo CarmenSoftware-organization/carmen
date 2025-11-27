@@ -1,5 +1,10 @@
 # Carmen UI Guide
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This guide provides a comprehensive overview of UI layout patterns and best practices for the Carmen application. Following these guidelines will ensure consistency across the application and improve both user experience and development efficiency.
 
 ## Table of Contents

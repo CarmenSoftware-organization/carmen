@@ -147,11 +147,13 @@ export interface VendorBankAccount {
 
 /**
  * Price list validity and status
+ * Updated: 2025-11-17 - Changed 'expired' to 'inactive' per ARC-2024-001
  */
-export type PriceListStatus = 'draft' | 'active' | 'expired' | 'superseded' | 'cancelled';
+export type PriceListStatus = 'draft' | 'active' | 'inactive' | 'superseded' | 'cancelled';
 
 /**
  * Vendor price list header
+ * Updated: 2025-11-17 - Changed effectiveDate to effectiveStartDate/effectiveEndDate per ARC-2024-001
  */
 export interface VendorPriceList {
   id: string;
@@ -160,8 +162,9 @@ export interface VendorPriceList {
   priceListCode: string;
   description?: string;
   currency: string;
-  effectiveDate: Date;
-  expiryDate?: Date;
+  currencyCode: string; // Added: ISO 4217 currency code
+  effectiveStartDate: Date; // Changed from effectiveDate
+  effectiveEndDate?: Date | null; // Changed from expiryDate, null = open-ended
   status: PriceListStatus;
   version: string;
   supersedes?: string; // ID of previous price list
@@ -198,6 +201,7 @@ export interface VolumeDiscount {
 
 /**
  * Price list item
+ * Updated: 2025-11-17 - Added FOC, tax fields, product_identifier per ARC-2024-001
  */
 export interface VendorPriceListItem {
   id: string;
@@ -205,14 +209,20 @@ export interface VendorPriceListItem {
   itemId?: string; // Optional for non-catalog items
   itemCode: string;
   itemName: string;
-  description?: string;
+  productIdentifier: string; // Added: Combined product number and name (format: "CODE - NAME")
+  description: string; // Made required - now primary display field
   specification?: string;
   brandOffered?: string;
   modelNumber?: string;
   unit: string;
   unitPrice: Money;
   minimumOrderQuantity: number;
-  leadTimeDays: number;
+  leadTimeDays?: number; // Made optional
+  // Tax information (Added per ARC-2024-001)
+  isFoc: boolean; // Free of Charge indicator
+  taxProfileId?: string; // Optional FK to tax profile
+  taxRate?: number; // Tax rate percentage (0-100)
+  isPreferredVendor: boolean; // Preferred vendor flag
   // Packaging information
   packSize?: number;
   packUnit?: string;
@@ -228,6 +238,50 @@ export interface VendorPriceListItem {
   itemDiscounts: VolumeDiscount[];
   notes?: string;
   isActive: boolean;
+}
+
+/**
+ * Tax Profile
+ * Added: 2025-11-17 - Support for tax profiles per ARC-2024-001
+ */
+export interface TaxProfile {
+  id: string;
+  name: string;
+  description?: string;
+  taxRate: number; // Tax rate percentage (0-100)
+  taxType: 'VAT' | 'GST' | 'Sales Tax' | 'Other';
+  isActive: boolean;
+  effectiveDate?: Date;
+  expiryDate?: Date;
+  countryCode?: string; // ISO country code
+  stateCode?: string; // State/province code
+  notes?: string;
+}
+
+/**
+ * Import Result for bulk price list item imports
+ * Added: 2025-11-17 - Support for bulk import feature per ARC-2024-001
+ */
+export interface ImportResult {
+  success: boolean;
+  totalRows: number;
+  successfulImports: number;
+  failedImports: number;
+  errors: ImportError[];
+  importedAt: Date;
+  importedBy: string;
+}
+
+/**
+ * Import Error details
+ * Added: 2025-11-17 - Error tracking for imports per ARC-2024-001
+ */
+export interface ImportError {
+  row: number;
+  field: string;
+  value?: any;
+  error: string;
+  severity: 'error' | 'warning';
 }
 
 // ====== VENDOR CATEGORIES ======

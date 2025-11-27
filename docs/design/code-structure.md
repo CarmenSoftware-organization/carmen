@@ -1,5 +1,10 @@
 # Project Code Structure Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 This document outlines the code structure and organization of the Carmen project, a Next.js application with TypeScript.
 

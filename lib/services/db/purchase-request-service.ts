@@ -18,7 +18,7 @@ import {
   PurchaseRequestItem,
   PurchaseRequestPriority,
   PurchaseRequestType,
-  DocumentStatus,
+  PRStatus,
   ApprovalRecord,
   WorkflowStatus,
   Money,
@@ -33,7 +33,7 @@ import { ProductService } from './product-service'
 const prisma = new PrismaClient()
 
 export interface PurchaseRequestFilters {
-  status?: DocumentStatus[]
+  status?: PRStatus[]
   priority?: PurchaseRequestPriority[]
   requestType?: PurchaseRequestType[]
   departmentId?: string
@@ -988,7 +988,7 @@ export class PurchaseRequestService {
       deliveryLocationId: item.delivery_location_id,
       requiredDate: item.required_date,
       priority: item.priority as PurchaseRequestPriority,
-      status: item.status as DocumentStatus,
+      status: item.status as PRStatus,
       vendorSuggestion: item.vendor_suggestion,
       notes: item.notes,
       attachments: [],
@@ -1015,7 +1015,7 @@ export class PurchaseRequestService {
       requiredDate: dbRequest.required_date,
       requestType: dbRequest.request_type as PurchaseRequestType,
       priority: dbRequest.priority as PurchaseRequestPriority,
-      status: dbRequest.status as DocumentStatus,
+      status: dbRequest.status as PRStatus,
       departmentId: dbRequest.department_id,
       locationId: dbRequest.location_id,
       requestedBy: dbRequest.requested_by,
@@ -1025,6 +1025,7 @@ export class PurchaseRequestService {
       rejectedAt: dbRequest.rejected_at,
       rejectionReason: dbRequest.rejection_reason,
       totalItems: dbRequest.total_items,
+      currency: dbRequest.estimated_total_currency || 'THB',
       estimatedTotal: {
         amount: dbRequest.estimated_total_amount,
         currency: dbRequest.estimated_total_currency

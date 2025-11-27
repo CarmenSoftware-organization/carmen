@@ -7,6 +7,11 @@
 **Created**: January 2025  
 **Purpose**: Comprehensive technical definitions and function specifications for all implemented features in Carmen ERP
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Table of Contents

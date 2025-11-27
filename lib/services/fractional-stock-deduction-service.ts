@@ -9,8 +9,7 @@
  * - Multi-level recipe ingredient calculations
  */
 
-import { Recipe, RecipeYieldVariant, Ingredient } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
-import { RecipeMapping } from "@/app/(main)/system-administration/system-integrations/pos/mapping/recipes/types"
+import { Recipe, RecipeYieldVariant, Ingredient, RecipeMapping } from "@/lib/types"
 
 export interface POSTransaction {
   id: string
@@ -101,10 +100,10 @@ export class FractionalStockDeductionService {
     
     try {
       // Find the recipe variant
-      const variant = recipe.yieldVariants.find(v => v.id === mapping.recipeVariantId)
+      const variant = recipe.yieldVariants.find(v => v.id === mapping.variantId)
       if (!variant) {
         result.success = false
-        result.errors.push(`Recipe variant ${mapping.recipeVariantId} not found`)
+        result.errors.push(`Recipe variant ${mapping.variantId} not found`)
         return result
       }
       
@@ -141,7 +140,7 @@ export class FractionalStockDeductionService {
           unit: ingredient.unit,
           location: transaction.location,
           timestamp: transaction.timestamp,
-          reason: `POS Sale: ${mapping.posDescription}`,
+          reason: `POS Sale: ${mapping.posItemName}`,
           reference: transaction.id
         })
         
@@ -209,7 +208,7 @@ export class FractionalStockDeductionService {
       quantityProduced: baseQuantity,
       quantityConsumed: quantityWithWastage,
       conversionRate: variant.conversionRate,
-      unitCost: variant.costPerUnit,
+      unitCost: variant.costPerUnit.amount,
       totalCost,
       ingredientDeductions
     }
@@ -243,7 +242,7 @@ export class FractionalStockDeductionService {
       actualQuantityNeeded - availableStock : 0
     
     // Calculate costs
-    const totalCost = quantityDeducted * ingredient.costPerUnit
+    const totalCost = quantityDeducted * ingredient.costPerUnit.amount
     const wastageQuantity = quantityDeducted - theoreticalQuantity
     
     return {
@@ -253,7 +252,7 @@ export class FractionalStockDeductionService {
       quantityRequired: theoreticalQuantity,
       quantityDeducted,
       unit: ingredient.unit,
-      costPerUnit: ingredient.costPerUnit,
+      costPerUnit: ingredient.costPerUnit.amount,
       totalCost,
       wastageRate: ingredientWastage,
       wastageQuantity: Math.max(0, wastageQuantity),
@@ -309,12 +308,12 @@ export class FractionalStockDeductionService {
         continue
       }
       
-      const recipe = recipes.get(mapping.recipeCode)
+      const recipe = recipes.get(mapping.recipeId)
       if (!recipe) {
         results.push({
           transactionId: transaction.id,
           success: false,
-          errors: [`Recipe ${mapping.recipeCode} not found`],
+          errors: [`Recipe ${mapping.recipeId} not found`],
           deductions: [],
           totalCost: 0,
           totalWastage: 0,

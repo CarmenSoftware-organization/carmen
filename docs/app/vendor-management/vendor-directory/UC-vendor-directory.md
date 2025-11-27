@@ -3,9 +3,18 @@
 ## Document Information
 - **Document Type**: Use Cases Document
 - **Module**: Vendor Management > Vendor Directory
-- **Version**: 1.0
-- **Last Updated**: 2024-01-15
-- **Document Status**: Draft
+- **Version**: 2.2.0
+- **Last Updated**: 2025-11-25
+- **Document Status**: Updated
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.2.0 | 2025-11-25 | System | Added certification management use cases (UC-VD-031 to UC-VD-034); Added address management with Asian international format (UC-VD-035 to UC-VD-038); Updated address schema to 15 countries |
+| 2.1.0 | 2025-11-25 | System | Added multi-address and multi-contact management with primary designation |
+| 2.0.0 | 2025-11-25 | System | Updated to match actual code implementation |
+| 1.0 | 2024-01-15 | System | Initial creation |
 
 ---
 
@@ -107,6 +116,14 @@ This document covers all user interactions with the Vendor Directory module as d
 | UC-VD-028 | View Vendor History | All Users | Medium |
 | UC-VD-029 | Generate Vendor Report | Vendor Manager | Medium |
 | UC-VD-030 | Integrate with Purchase Order | Procurement Staff | Critical |
+| UC-VD-031 | Add Vendor Certification | Vendor Manager, Compliance Officer | High |
+| UC-VD-032 | Edit Vendor Certification | Vendor Manager, Compliance Officer | High |
+| UC-VD-033 | Delete Vendor Certification | Vendor Manager | Medium |
+| UC-VD-034 | View Certification Status Dashboard | Compliance Officer, Vendor Manager | High |
+| UC-VD-035 | Add Vendor Address (Asian Format) | Vendor Manager | High |
+| UC-VD-036 | Edit Vendor Address | Vendor Manager | High |
+| UC-VD-037 | Delete Vendor Address | Vendor Manager | Medium |
+| UC-VD-038 | Set Primary Address | Vendor Manager | High |
 
 ---
 
@@ -1936,13 +1953,842 @@ This document covers all user interactions with the Vendor Directory module as d
 
 ---
 
+### UC-VD-031: Add Vendor Certification
+
+**Primary Actor**: Vendor Manager, Compliance Officer
+**Priority**: High
+**Frequency**: Weekly (5-15 certifications/week)
+**Related FR**: FR-VD-002
+
+#### Preconditions
+- User is authenticated with Vendor Manager or Compliance Officer role
+- User has permission to manage certifications
+- Vendor exists in system
+- User has access to the vendor
+
+#### Main Flow
+1. User navigates to vendor profile
+2. User clicks on "Certifications" tab
+3. System displays certification list with status indicators
+4. User clicks "Add Certification" button
+5. System displays Add Certification dialog with form:
+   - Certification Type (dropdown, required) - 16 types available:
+     * ISO 9001 (Quality Management)
+     * ISO 14001 (Environmental Management)
+     * ISO 22000 (Food Safety)
+     * HACCP (Hazard Analysis Critical Control Points)
+     * GMP (Good Manufacturing Practice)
+     * Halal Certification
+     * Kosher Certification
+     * Organic Certification
+     * FDA Registered
+     * USDA Certified
+     * Fair Trade Certified
+     * Business License
+     * Health & Safety License
+     * Tax Registration Certificate
+     * Trade License
+     * Other Certification
+   - Certificate Number (text, required)
+   - Issuing Authority (text, required)
+   - Issue Date (date picker, required)
+   - Expiry Date (date picker, required)
+   - Notes (textarea, optional)
+   - Certificate Document (file upload, optional)
+6. User fills in certification details
+7. User optionally uploads certificate document (PDF, JPG, PNG)
+8. User clicks "Add Certification"
+9. System validates required fields
+10. System validates date logic (issue date < expiry date)
+11. System calculates certification status:
+    - "active": Expiry date > today + 30 days
+    - "expiring_soon": Today < expiry date ≤ today + 30 days
+    - "expired": Expiry date < today
+    - "pending": No expiry date or manual status
+12. System saves certification to database
+13. System closes dialog
+14. System refreshes certification list with new entry
+15. System displays success message: "Certification added successfully"
+16. System logs action in audit trail
+
+#### Postconditions
+- **Success**: Certification record created in database
+- **Success**: Certification status auto-calculated
+- **Success**: Document uploaded and linked (if provided)
+- **Success**: Audit trail entry created
+
+#### Alternate Flows
+
+**AF-001: Upload Certificate Document**
+- At step 7, user uploads certificate:
+  - User clicks "Upload" or drags file
+  - System validates file type (PDF, JPG, PNG)
+  - System validates file size (<10MB)
+  - System displays upload progress
+  - System shows file preview
+  - Continue to step 8
+
+**AF-002: Add Another Certification**
+- After step 15, user clicks "Add Another"
+  - System resets form
+  - User can add additional certification
+  - Repeat from step 5
+
+**AF-003: Certificate with No Expiry**
+- At step 6, for certifications without expiry (e.g., business license):
+  - User leaves expiry date blank
+  - User marks "No Expiry" checkbox
+  - System sets status to "active"
+  - Continue to step 8
+
+#### Exception Flows
+
+**EF-001: Duplicate Certification Type**
+- At step 9, if same certification type exists for vendor:
+  - System displays warning: "A [type] certification already exists for this vendor"
+  - System options: "Replace Existing" or "Cancel"
+  - If "Replace": System archives old certification, saves new
+  - If "Cancel": User returns to form
+
+**EF-002: Invalid Date Range**
+- At step 10, if issue date ≥ expiry date:
+  - System highlights both date fields in red
+  - System displays error: "Issue date must be before expiry date"
+  - User corrects dates
+  - Continue to step 10
+
+**EF-003: Upload Error**
+- At step 7, if file upload fails:
+  - System displays error: "Failed to upload document. Please try again."
+  - System preserves form data
+  - User can retry upload or skip document
+  - Continue to step 8
+
+**EF-004: Required Field Missing**
+- At step 9, if required field is empty:
+  - System highlights missing field
+  - System displays error message
+  - User completes field
+  - Continue to step 9
+
+#### Business Rules Applied
+- BR-VD-007: Certification status auto-calculated based on 30-day threshold
+- BR-VD-008: Each certification type can only have one active record per vendor
+- Maximum 20 certifications per vendor
+- Document file size limit: 10MB
+- Supported file types: PDF, JPG, PNG
+
+#### UI Requirements
+- Modal dialog for add certification
+- Dropdown with all 16 certification types
+- Date pickers with validation
+- File drag-and-drop upload area
+- Real-time validation feedback
+- Status preview based on selected dates
+- Mobile-responsive form layout
+
+---
+
+### UC-VD-032: Edit Vendor Certification
+
+**Primary Actor**: Vendor Manager, Compliance Officer
+**Priority**: High
+**Frequency**: Weekly (3-10 edits/week)
+**Related FR**: FR-VD-002
+
+#### Preconditions
+- User is authenticated with Vendor Manager or Compliance Officer role
+- User has permission to manage certifications
+- Certification exists for the vendor
+- User has access to the vendor
+
+#### Main Flow
+1. User navigates to vendor profile
+2. User clicks on "Certifications" tab
+3. System displays certification list with status badges
+4. User locates certification to edit
+5. User clicks "Edit" button on certification row/card
+6. System displays Edit Certification dialog with pre-filled form:
+   - Certification Type (read-only)
+   - Certificate Number (editable)
+   - Issuing Authority (editable)
+   - Issue Date (editable)
+   - Expiry Date (editable)
+   - Notes (editable)
+   - Current Document (display with replace option)
+7. User modifies certification details
+8. User optionally replaces certificate document
+9. User clicks "Save Changes"
+10. System validates modified fields
+11. System recalculates certification status based on new dates
+12. System updates certification record
+13. System closes dialog
+14. System refreshes certification list
+15. System displays success message: "Certification updated successfully"
+16. System logs change in audit trail with before/after values
+
+#### Postconditions
+- **Success**: Certification record updated in database
+- **Success**: Status recalculated if dates changed
+- **Success**: Document replaced if provided
+- **Success**: Audit trail entry created with changes
+
+#### Alternate Flows
+
+**AF-001: Replace Certificate Document**
+- At step 8, user replaces document:
+  - User clicks "Replace Document"
+  - User uploads new file
+  - System validates file
+  - System displays new file preview
+  - Old document retained in history
+  - Continue to step 9
+
+**AF-002: Remove Certificate Document**
+- At step 8, user removes document:
+  - User clicks "Remove Document"
+  - System prompts: "Remove document from certification?"
+  - If "Yes": Document unlinked (retained in storage)
+  - If "No": Document remains
+  - Continue to step 9
+
+**AF-003: Extend Expiry Date**
+- At step 7, user extends expiry date:
+  - User selects new expiry date (future)
+  - System previews new status (likely "active")
+  - Continue to step 9
+
+#### Exception Flows
+
+**EF-001: Concurrent Edit Conflict**
+- At step 12, if another user modified same certification:
+  - System displays conflict warning
+  - System shows other user's changes
+  - User options: "Override" or "Cancel"
+  - If "Override": User's changes saved
+  - If "Cancel": Dialog closes, no save
+
+**EF-002: Validation Error**
+- At step 10, if validation fails:
+  - System highlights invalid fields
+  - System displays specific error messages
+  - User corrects errors
+  - Continue to step 10
+
+**EF-003: Status Change Warning**
+- At step 11, if status changes to "expired" or "expiring_soon":
+  - System displays warning: "Certification status will change to [new status]"
+  - User confirms or adjusts dates
+  - Continue to step 12
+
+#### Business Rules Applied
+- BR-VD-007: Status recalculated on expiry date change
+- Certification type cannot be changed (create new if needed)
+- Changes to expired certifications trigger compliance notification
+- All changes logged with before/after values
+
+#### UI Requirements
+- Modal dialog for edit certification
+- Pre-filled form with current values
+- Visual indication of changed fields
+- Status preview when dates change
+- Document replace/remove options
+- Mobile-responsive edit form
+
+---
+
+### UC-VD-033: Delete Vendor Certification
+
+**Primary Actor**: Vendor Manager
+**Priority**: Medium
+**Frequency**: Monthly (1-5 deletions/month)
+**Related FR**: FR-VD-002
+
+#### Preconditions
+- User is authenticated with Vendor Manager role
+- User has permission to delete certifications
+- Certification exists for the vendor
+- User has access to the vendor
+
+#### Main Flow
+1. User navigates to vendor profile
+2. User clicks on "Certifications" tab
+3. System displays certification list
+4. User locates certification to delete
+5. User clicks "Delete" button on certification row/card
+6. System displays Delete Confirmation dialog:
+   - Title: "Delete Certification"
+   - Message: "Are you sure you want to delete the [certification type] certification?"
+   - Details: Certificate number, issuing authority, status
+   - Warning: "This action cannot be undone."
+7. User clicks "Delete" button
+8. System marks certification as deleted (soft delete)
+9. System removes certification from display
+10. System closes dialog
+11. System displays success message: "Certification deleted successfully"
+12. System logs deletion in audit trail
+
+#### Postconditions
+- **Success**: Certification soft-deleted (deleted_at timestamp set)
+- **Success**: Certification removed from active list
+- **Success**: Associated document retained for audit
+- **Success**: Audit trail entry created
+
+#### Alternate Flows
+
+**AF-001: Cancel Deletion**
+- At step 7, user clicks "Cancel":
+  - System closes dialog
+  - No changes made
+  - End use case
+
+#### Exception Flows
+
+**EF-001: Active Certification Warning**
+- At step 6, if certification is active and not expired:
+  - System displays additional warning: "This is an active certification. Deleting may affect vendor compliance status."
+  - User must confirm twice
+  - Continue to step 7
+
+**EF-002: Required Certification**
+- At step 6, if certification is required for vendor type:
+  - System displays warning: "This certification is required for [vendor type] vendors"
+  - System warns: "Vendor may be flagged as non-compliant"
+  - User options: "Delete Anyway" or "Cancel"
+  - If "Delete Anyway": Continue to step 7
+  - If "Cancel": End use case
+
+**EF-003: Deletion Error**
+- At step 8, if system error occurs:
+  - System displays error: "Failed to delete certification. Please try again."
+  - System logs error details
+  - User can retry
+  - Continue to step 5
+
+#### Business Rules Applied
+- BR-VD-008: Soft delete - records retained for audit
+- Deleted certifications not displayed in active list
+- Compliance reports may flag deleted required certifications
+- Only Vendor Manager can delete (not Compliance Officer)
+
+#### UI Requirements
+- Delete confirmation dialog
+- Clear warning about irreversibility
+- Display certification details before deletion
+- Cancel option prominent
+- Mobile-responsive dialog
+
+---
+
+### UC-VD-034: View Certification Status Dashboard
+
+**Primary Actor**: Compliance Officer, Vendor Manager
+**Priority**: High
+**Frequency**: Daily (5-20 views/day)
+**Related FR**: FR-VD-002
+
+#### Preconditions
+- User is authenticated with Compliance Officer or Vendor Manager role
+- User has permission to view certifications
+- User has access to the vendor(s)
+
+#### Main Flow
+1. User navigates to vendor profile
+2. User clicks on "Certifications" tab
+3. System displays certification dashboard:
+   - Summary statistics at top:
+     * Total certifications count
+     * Active certifications (green badge)
+     * Expiring soon certifications (yellow badge)
+     * Expired certifications (red badge)
+   - Certification list below with columns:
+     * Type
+     * Certificate Number
+     * Issuing Authority
+     * Issue Date
+     * Expiry Date
+     * Status (badge: active/expiring_soon/expired/pending)
+     * Actions (View, Edit, Delete)
+4. System auto-highlights certifications by status:
+   - Active: Default display
+   - Expiring Soon: Yellow background, sorted first
+   - Expired: Red background, flagged
+5. User can filter by status using status badges
+6. User can click certification row to expand details
+7. System displays:
+   - Full certification details
+   - Associated document (if any)
+   - Audit history for certification
+8. User can download certificate document
+
+#### Postconditions
+- **Success**: Certification dashboard displayed
+- **Success**: Status indicators correctly calculated
+- **Success**: Expired/expiring certifications prominently displayed
+
+#### Alternate Flows
+
+**AF-001: Filter by Status**
+- At step 5, user clicks status badge:
+  - System filters list to selected status
+  - System updates count display
+  - User can clear filter to see all
+
+**AF-002: View Document**
+- At step 8, user clicks "View Document":
+  - System opens document in new tab/modal
+  - System supports PDF viewer, image display
+
+**AF-003: Export Certification Report**
+- User clicks "Export" button:
+  - System generates certification report
+  - System downloads as Excel/PDF
+  - Report includes all certifications with status
+
+**AF-004: Set Expiry Reminder**
+- User clicks "Set Reminder" on certification:
+  - System displays reminder options (30, 60, 90 days)
+  - User selects reminder timeframe
+  - System creates reminder notification
+  - User receives notification before expiry
+
+#### Exception Flows
+
+**EF-001: No Certifications**
+- At step 3, if vendor has no certifications:
+  - System displays empty state
+  - Message: "No certifications recorded for this vendor"
+  - Action button: "Add Certification"
+
+**EF-002: Multiple Expired Certifications**
+- At step 3, if multiple certifications expired:
+  - System displays compliance alert banner
+  - Message: "This vendor has [X] expired certifications"
+  - Links to each expired certification
+  - Recommendation to contact vendor for renewals
+
+#### Business Rules Applied
+- BR-VD-007: Status auto-calculated based on 30-day threshold
+- Expiring soon certifications shown prominently
+- Compliance alerts for vendors with expired required certifications
+- Status refreshed on each page load
+
+#### UI Requirements
+- Summary statistics with status badges
+- List view with sortable columns
+- Color-coded status indicators
+- Expandable rows for details
+- Document preview/download
+- Export functionality
+- Mobile-responsive dashboard
+
+---
+
+### UC-VD-035: Add Vendor Address (Asian Format)
+
+**Primary Actor**: Vendor Manager
+**Priority**: High
+**Frequency**: Weekly (10-20 addresses/week)
+**Related FR**: FR-VD-003
+
+#### Preconditions
+- User is authenticated with Vendor Manager role
+- User has permission to manage vendor addresses
+- Vendor exists in system
+- User has access to the vendor
+
+#### Main Flow
+1. User navigates to vendor profile
+2. User clicks on "Addresses" tab
+3. System displays address list with primary indicator
+4. User clicks "Add Address" button
+5. System displays Add Address dialog with Asian International Format:
+   - Address Type (dropdown, required):
+     * Billing
+     * Shipping
+     * Remittance
+     * Office
+     * Warehouse
+   - Address Line 1 (text, required) - Street address, building name
+   - Address Line 2 (text, optional) - Floor, unit, suite number
+   - Sub-District (text, optional) - Tambon (Thailand), Kelurahan (Indonesia)
+   - District (text, optional) - Amphoe (Thailand), Kecamatan (Indonesia)
+   - City (text, required) - Main city/town name
+   - Province/State (text, required) - State/Province/Region
+   - Postal Code (text, required) - ZIP/Postal code
+   - Country (dropdown, required) - 15 supported countries:
+     * Thailand
+     * Singapore
+     * Malaysia
+     * Indonesia
+     * Vietnam
+     * Philippines
+     * Myanmar
+     * Cambodia
+     * Laos
+     * Brunei
+     * China
+     * Japan
+     * South Korea
+     * India
+     * United States
+   - Set as Primary Address (checkbox)
+6. User fills in address details
+7. System dynamically adjusts field labels based on country:
+   - Thailand: Province → "Province (จังหวัด)", District → "District (อำเภอ)", Sub-District → "Sub-District (ตำบล)"
+   - Indonesia: Province → "Province (Provinsi)", District → "Kabupaten/Kota", Sub-District → "Kecamatan"
+   - Other countries: Standard labels
+8. User marks as primary if this is the main address
+9. User clicks "Add Address"
+10. System validates required fields
+11. System validates postal code format for selected country
+12. If marked as primary:
+    - System updates existing primary address to non-primary
+    - System sets new address as primary
+13. System saves address to database
+14. System closes dialog
+15. System refreshes address list with new entry
+16. System displays success message: "Address added successfully"
+17. System logs action in audit trail
+
+#### Postconditions
+- **Success**: Address record created in database
+- **Success**: Primary flag correctly set
+- **Success**: Previous primary updated if needed
+- **Success**: Audit trail entry created
+
+#### Alternate Flows
+
+**AF-001: First Address Auto-Primary**
+- At step 5, if vendor has no addresses:
+  - System auto-checks "Set as Primary"
+  - Checkbox disabled with tooltip: "First address is automatically set as primary"
+  - Continue to step 6
+
+**AF-002: Country Change Updates Labels**
+- At step 6, when user changes country:
+  - System updates field labels for region-specific terminology
+  - System adjusts postal code validation pattern
+  - System shows/hides sub-district/district based on country norms
+  - Continue to step 7
+
+**AF-003: Add Another Address**
+- After step 16, user clicks "Add Another":
+  - System resets form
+  - User can add additional address
+  - Repeat from step 5
+
+#### Exception Flows
+
+**EF-001: Invalid Postal Code Format**
+- At step 11, if postal code format invalid for country:
+  - System highlights postal code field
+  - System displays error with expected format:
+    * Thailand: "5 digits (e.g., 10110)"
+    * Malaysia: "5 digits (e.g., 50450)"
+    * Indonesia: "5 digits (e.g., 12345)"
+    * Singapore: "6 digits (e.g., 123456)"
+  - User corrects postal code
+  - Continue to step 11
+
+**EF-002: Maximum Addresses Reached**
+- At step 4, if vendor has 10 addresses:
+  - System displays warning: "Maximum addresses reached (10)"
+  - System suggests: "Delete an existing address to add a new one"
+  - Button disabled
+  - End use case
+
+**EF-003: Required Field Missing**
+- At step 10, if required field is empty:
+  - System highlights missing field
+  - System displays error message
+  - User completes field
+  - Continue to step 10
+
+**EF-004: Primary Address Conflict**
+- At step 12, if changing primary:
+  - System prompts: "This will change the primary address from [current] to [new]. Continue?"
+  - If "Yes": System updates primary designation
+  - If "No": System unchecks primary checkbox
+
+#### Business Rules Applied
+- BR-VD-009: One primary address required per type (billing, shipping, etc.)
+- BR-VD-010: Maximum 10 addresses per vendor
+- Asian International Address format with sub-district and district fields
+- Country-specific postal code validation
+- First address automatically becomes primary
+
+#### UI Requirements
+- Modal dialog for add address
+- Country dropdown with 15 options
+- Dynamic field labels based on country
+- Postal code format validation with hints
+- Primary address checkbox with confirmation
+- Mobile-responsive form layout
+- Address preview before saving
+
+---
+
+### UC-VD-036: Edit Vendor Address
+
+**Primary Actor**: Vendor Manager
+**Priority**: High
+**Frequency**: Weekly (5-10 edits/week)
+**Related FR**: FR-VD-003
+
+#### Preconditions
+- User is authenticated with Vendor Manager role
+- User has permission to manage vendor addresses
+- Address exists for the vendor
+- User has access to the vendor
+
+#### Main Flow
+1. User navigates to vendor profile
+2. User clicks on "Addresses" tab
+3. System displays address list
+4. User locates address to edit
+5. User clicks "Edit" button on address card
+6. System displays Edit Address dialog with pre-filled form:
+   - All address fields from original entry
+   - Current primary status
+7. User modifies address details
+8. User optionally changes primary designation
+9. User clicks "Save Changes"
+10. System validates modified fields
+11. System validates postal code format
+12. If primary status changed:
+    - System updates primary designations accordingly
+13. System updates address record
+14. System closes dialog
+15. System refreshes address list
+16. System displays success message: "Address updated successfully"
+17. System logs change in audit trail with before/after values
+
+#### Postconditions
+- **Success**: Address record updated in database
+- **Success**: Primary designation correctly managed
+- **Success**: Audit trail entry created with changes
+
+#### Alternate Flows
+
+**AF-001: Change Country**
+- At step 7, user changes country:
+  - System prompts: "Changing country may require updating address format"
+  - System updates field labels
+  - System resets postal code validation
+  - User updates address format as needed
+  - Continue to step 9
+
+**AF-002: Make Primary**
+- At step 8, user marks as primary:
+  - System shows warning: "This will change the primary address"
+  - System shows current primary for comparison
+  - User confirms
+  - Continue to step 9
+
+#### Exception Flows
+
+**EF-001: Cannot Edit Primary Designation (Only Address)**
+- At step 8, if this is the only address:
+  - System disables primary checkbox
+  - Tooltip: "This is the only address and must remain primary"
+  - Continue to step 9
+
+**EF-002: Concurrent Edit Conflict**
+- At step 13, if another user modified same address:
+  - System displays conflict warning
+  - User options: "Override" or "Cancel"
+  - Proceed based on selection
+
+#### Business Rules Applied
+- BR-VD-009: Primary address designation managed
+- Country-specific validation applied
+- Changes logged with full detail
+
+#### UI Requirements
+- Modal dialog for edit address
+- Pre-filled form with current values
+- Visual indication of changed fields
+- Primary checkbox with confirmation
+- Mobile-responsive edit form
+
+---
+
+### UC-VD-037: Delete Vendor Address
+
+**Primary Actor**: Vendor Manager
+**Priority**: Medium
+**Frequency**: Monthly (2-5 deletions/month)
+**Related FR**: FR-VD-003
+
+#### Preconditions
+- User is authenticated with Vendor Manager role
+- User has permission to manage vendor addresses
+- Address exists for the vendor
+- Address is not the only address for the vendor
+- User has access to the vendor
+
+#### Main Flow
+1. User navigates to vendor profile
+2. User clicks on "Addresses" tab
+3. System displays address list
+4. User locates address to delete
+5. User clicks "Delete" button on address card
+6. System checks if address can be deleted:
+   - Not the only address
+   - Not primary (or another primary exists)
+7. System displays Delete Confirmation dialog:
+   - Title: "Delete Address"
+   - Message: "Are you sure you want to delete this address?"
+   - Address details preview
+   - Warning: "This action cannot be undone."
+8. User clicks "Delete" button
+9. System marks address as deleted (soft delete)
+10. System removes address from display
+11. System closes dialog
+12. System displays success message: "Address deleted successfully"
+13. System logs deletion in audit trail
+
+#### Postconditions
+- **Success**: Address soft-deleted
+- **Success**: Address removed from active list
+- **Success**: Primary designation managed if needed
+- **Success**: Audit trail entry created
+
+#### Alternate Flows
+
+**AF-001: Cancel Deletion**
+- At step 8, user clicks "Cancel":
+  - System closes dialog
+  - No changes made
+  - End use case
+
+#### Exception Flows
+
+**EF-001: Cannot Delete Only Address**
+- At step 6, if this is the only address:
+  - System displays error: "Cannot delete the only address. Vendor must have at least one address."
+  - Delete button disabled
+  - End use case
+
+**EF-002: Cannot Delete Primary Address Directly**
+- At step 6, if address is primary and other addresses exist:
+  - System displays error: "Cannot delete the primary address. Please designate another address as primary first."
+  - Suggestion: "Edit another address and mark it as primary"
+  - End use case
+
+**EF-003: Address Referenced in Active Documents**
+- At step 6, if address is referenced in active POs/invoices:
+  - System displays warning: "This address is referenced in [X] active documents"
+  - System shows document list
+  - User options: "Delete Anyway" or "Cancel"
+  - If "Delete Anyway": System soft deletes, documents retain reference
+  - If "Cancel": End use case
+
+#### Business Rules Applied
+- BR-VD-010: Vendor must have at least one address
+- BR-VD-009: Cannot delete primary address directly
+- Soft delete - records retained for historical references
+- Referenced addresses retained in documents
+
+#### UI Requirements
+- Delete confirmation dialog
+- Clear warning about implications
+- Display address details before deletion
+- Disabled delete for protected addresses
+- Mobile-responsive dialog
+
+---
+
+### UC-VD-038: Set Primary Address
+
+**Primary Actor**: Vendor Manager
+**Priority**: High
+**Frequency**: Monthly (5-10 changes/month)
+**Related FR**: FR-VD-003
+
+#### Preconditions
+- User is authenticated with Vendor Manager role
+- User has permission to manage vendor addresses
+- Vendor has multiple addresses
+- User has access to the vendor
+
+#### Main Flow
+1. User navigates to vendor profile
+2. User clicks on "Addresses" tab
+3. System displays address list with primary indicator
+4. User identifies address to set as primary
+5. User clicks "Set as Primary" action on address card
+6. System displays confirmation dialog:
+   - Title: "Change Primary Address"
+   - Message: "Set this address as the primary address?"
+   - Current primary: [address preview]
+   - New primary: [address preview]
+7. User clicks "Confirm"
+8. System updates previous primary address:
+   - Sets isPrimary to false
+9. System updates selected address:
+   - Sets isPrimary to true
+10. System saves changes to database
+11. System refreshes address list
+12. System displays updated primary indicator
+13. System displays success message: "Primary address updated"
+14. System logs change in audit trail
+
+#### Postconditions
+- **Success**: Primary address designation transferred
+- **Success**: Only one primary address per vendor
+- **Success**: Audit trail entry created
+
+#### Alternate Flows
+
+**AF-001: Quick Set Primary (Drag)**
+- At step 5, user drags address to top of list:
+  - System recognizes drag gesture
+  - System prompts confirmation
+  - Continue to step 7
+
+**AF-002: Cancel Change**
+- At step 7, user clicks "Cancel":
+  - System closes dialog
+  - No changes made
+  - End use case
+
+#### Exception Flows
+
+**EF-001: Already Primary**
+- At step 5, if address is already primary:
+  - "Set as Primary" action disabled or hidden
+  - Tooltip: "This address is already primary"
+  - End use case
+
+**EF-002: Concurrent Change**
+- At step 10, if another user changed primary:
+  - System displays warning: "Primary address was changed by another user"
+  - System shows current state
+  - User can retry or cancel
+
+#### Business Rules Applied
+- BR-VD-009: Only one primary address per vendor
+- Primary transfer is atomic (one transaction)
+- Historical primary designation tracked in audit trail
+
+#### UI Requirements
+- Clear primary indicator (badge, icon, or star)
+- "Set as Primary" action visible on non-primary addresses
+- Confirmation dialog with before/after comparison
+- Visual feedback on primary change
+- Mobile-responsive interface
+
+---
+
 ## 5. Use Case Dependencies
 
 ### 5.1 Dependency Matrix
 
 | Use Case | Depends On | Enables |
 |----------|-----------|---------|
-| UC-VD-001: Create Vendor | - | UC-VD-002, UC-VD-010, UC-VD-013, UC-VD-016 |
+| UC-VD-001: Create Vendor | - | UC-VD-002, UC-VD-010, UC-VD-013, UC-VD-016, UC-VD-031, UC-VD-035 |
 | UC-VD-002: Edit Vendor | UC-VD-001 | UC-VD-016 |
 | UC-VD-007: Search Vendors | UC-VD-001 | UC-VD-002, UC-VD-003, UC-VD-022 |
 | UC-VD-010: Add Contact | UC-VD-001 | UC-VD-011, UC-VD-016 |
@@ -1952,6 +2798,14 @@ This document covers all user interactions with the Vendor Directory module as d
 | UC-VD-019: Track Performance | UC-VD-017, transactions | UC-VD-020, UC-VD-021 |
 | UC-VD-022: Block Vendor | UC-VD-017 | - |
 | UC-VD-030: PO Integration | UC-VD-017 | UC-VD-019 |
+| UC-VD-031: Add Certification | UC-VD-001 | UC-VD-032, UC-VD-033, UC-VD-034 |
+| UC-VD-032: Edit Certification | UC-VD-031 | UC-VD-034 |
+| UC-VD-033: Delete Certification | UC-VD-031 | - |
+| UC-VD-034: View Certification Dashboard | UC-VD-001 | UC-VD-031 |
+| UC-VD-035: Add Address (Asian Format) | UC-VD-001 | UC-VD-036, UC-VD-037, UC-VD-038 |
+| UC-VD-036: Edit Address | UC-VD-035 | UC-VD-038 |
+| UC-VD-037: Delete Address | UC-VD-035 | - |
+| UC-VD-038: Set Primary Address | UC-VD-035 | - |
 
 ---
 
@@ -1969,6 +2823,14 @@ This document covers all user interactions with the Vendor Directory module as d
 | UC-VD-016: Submit for Approval | <5 minutes | >90% |
 | UC-VD-017: Approve Vendor | <10 minutes | >85% |
 | UC-VD-022: Block Vendor | <3 minutes | >95% |
+| UC-VD-031: Add Certification | <1 minute | >98% |
+| UC-VD-032: Edit Certification | <1 minute | >98% |
+| UC-VD-033: Delete Certification | <30 seconds | >99% |
+| UC-VD-034: View Certification Dashboard | <1 second | >99% |
+| UC-VD-035: Add Address (Asian Format) | <1 minute | >98% |
+| UC-VD-036: Edit Address | <1 minute | >98% |
+| UC-VD-037: Delete Address | <30 seconds | >99% |
+| UC-VD-038: Set Primary Address | <30 seconds | >99% |
 
 ### 6.2 User Satisfaction Targets
 - Overall satisfaction: >4.0/5.0
@@ -1978,19 +2840,11 @@ This document covers all user interactions with the Vendor Directory module as d
 
 ---
 
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial creation |
-
----
-
 ## Related Documents
-- BR-vendor-directory.md - Business Requirements
-- TS-vendor-directory.md - Technical Specification
-- data-structure-gaps.md - Data Structure Analysis
-- FD-vendor-directory.md - Flow Diagrams
+- BR-vendor-directory.md - Business Requirements (v2.2.0)
+- TS-vendor-directory.md - Technical Specification (v2.2.0)
+- DD-vendor-directory.md - Data Dictionary (v2.2.0)
+- FD-vendor-directory.md - Flow Diagrams (v2.2.0)
 - VAL-vendor-directory.md - Validations
 
 ---

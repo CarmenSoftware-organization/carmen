@@ -3,9 +3,29 @@
 **Module**: Procurement
 **Sub-Module**: Purchase Requests
 **Document Type**: Flow Diagrams (FD)
-**Version**: 1.0.0
-**Last Updated**: 2025-01-30
+**Version**: 1.1.0
+**Last Updated**: 2025-11-26
 **Status**: Active
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+| 1.1.0 | 2025-11-26 | Documentation Team | Synchronized with BR - updated status values, added implementation status markers |
+
+## Implementation Status
+
+This document defines **target process flows** for Purchase Requests. Each major flow includes an implementation status marker:
+
+| Status | Meaning |
+|--------|---------|
+| ✅ Implemented | Flow complete and functional |
+| 🔧 Partial | Frontend exists, backend development needed |
+| 🚧 Pending | Not yet implemented |
+| ⏳ Future | Post-MVP enhancement |
+
+**Current State**: Frontend prototype with mock data. Backend workflows pending development.
 
 ---
 
@@ -39,6 +59,8 @@ This document provides comprehensive flow diagrams for all processes, data flows
 ## 2. Process Flow Diagrams
 
 ### 2.1 Create Purchase Request - Main Flow
+
+**Implementation Status**: 🔧 Partial
 
 ```mermaid
 flowchart TD
@@ -86,10 +108,15 @@ flowchart TD
     CreateApprovals --> SendNotifications[Send notifications to approvers]
     SendNotifications --> UpdateStatus[(Update status='Submitted')]
     UpdateStatus --> Success3[Display success message]
+
+    %% Note: Status transitions use BR-defined values:
+    %% Submitted → In-progress, Rejected → Void, Converted → Completed
     Success3 --> End4([End])
 ```
 
 ### 2.2 Use Template to Create PR
+
+**Implementation Status**: 🚧 Pending
 
 ```mermaid
 flowchart TD
@@ -114,13 +141,15 @@ flowchart TD
 
 ### 2.3 Edit Purchase Request
 
+**Implementation Status**: 🔧 Partial
+
 ```mermaid
 flowchart TD
     Start([User opens PR]) --> CheckStatus{Status check}
-    CheckStatus -->|Submitted/Approved| ShowReadOnly[Display read-only view]
+    CheckStatus -->|In-progress/Approved| ShowReadOnly[Display read-only view]
     ShowReadOnly --> End1([End])
 
-    CheckStatus -->|Draft/Rejected| CheckOwner{Is owner?}
+    CheckStatus -->|Draft/Void| CheckOwner{Is owner?}
     CheckOwner -->|No| ShowReadOnly
 
     CheckOwner -->|Yes| LoadPR[(Load PR data)]
@@ -157,6 +186,8 @@ flowchart TD
 ---
 
 ### 2.4 Create PR with Inventory Context Flow
+
+**Implementation Status**: 🚧 Pending
 
 **Description**: Workflow for creating PR with real-time inventory visibility (on-hand and on-order quantities).
 
@@ -212,6 +243,8 @@ flowchart TD
 
 ### 2.5 Create PR with Item Delivery Details Flow
 
+**Implementation Status**: 🚧 Pending
+
 **Description**: Workflow for adding item-specific delivery metadata (comment, required date, delivery point).
 
 ```mermaid
@@ -254,6 +287,8 @@ flowchart TD
 
 ### 2.6 Approve PR with Enhanced Pricing Visibility Flow
 
+**Implementation Status**: 🚧 Pending
+
 **Description**: Approval workflow with full visibility of FOC, pricing breakdown, and delivery details.
 
 ```mermaid
@@ -286,15 +321,15 @@ flowchart TD
 
     MakeDecision --> Decision{Decision?}
     Decision -->|Approve| AddComment[Optional: Add approval comment]
-    Decision -->|Reject| RequireComment[Require rejection comment<br/>min 10 characters]
+    Decision -->|Void| RequireComment[Require void comment<br/>min 10 characters]
     Decision -->|Return| RequestRevision[Request revision with comment]
 
     AddComment --> ConfirmApprove[Confirm approval]
-    RequireComment --> ConfirmReject[Confirm rejection]
+    RequireComment --> ConfirmVoid[Confirm void]
     RequestRevision --> UpdateStatus2[Update PR status]
 
-    ConfirmApprove --> UpdateStatus[Update PR status<br/>Partially Approved or Approved]
-    ConfirmReject --> RejectPR[Set status = Rejected]
+    ConfirmApprove --> UpdateStatus[Update PR status<br/>In-progress or Approved]
+    ConfirmVoid --> VoidPR[Set status = Void]
 
     UpdateStatus --> MoreApprovals{More approvals<br/>needed?}
     MoreApprovals -->|Yes| NotifyNext[Notify next approver]
@@ -302,8 +337,8 @@ flowchart TD
 
     NotifyNext --> LogAction[Log approval action]
     NotifyRequestor --> LogAction
-    RejectPR --> NotifyReject[Notify requestor of rejection]
-    NotifyReject --> LogAction
+    VoidPR --> NotifyVoid[Notify requestor of void]
+    NotifyVoid --> LogAction
     UpdateStatus2 --> LogAction
 
     LogAction --> End6([End])
@@ -380,7 +415,7 @@ flowchart TD
 
 ```mermaid
 sequenceDiagram
-    actor User
+    participant User
     participant UI as PR Form
     participant API as Server Action
     participant DB as Database
@@ -429,7 +464,7 @@ sequenceDiagram
         Notify-->>API: Notification sent
     end
 
-    API->>DB: Update PR status = 'Submitted'
+    API->>DB: Update PR status = 'In-progress'
     API->>DB: Commit transaction
     DB-->>API: Success
 
@@ -441,7 +476,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    actor Approver
+    participant Approver
     participant UI as Approval UI
     participant API as Server Action
     participant DB as Database
@@ -494,7 +529,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    actor User
+    participant User
     participant UI as PR Detail
     participant API as Server Action
     participant DB as Database
@@ -524,7 +559,7 @@ sequenceDiagram
         end
 
         PO->>DB: Create PR-PO link
-        PO->>DB: Update PR status = 'Converted'
+        PO->>DB: Update PR status = 'Completed'
         PO->>DB: Commit transaction
         DB-->>PO: Success
 
@@ -534,11 +569,15 @@ sequenceDiagram
     end
 ```
 
-### 4.4 Reject Purchase Request
+### 4.4 Void Purchase Request (Rejection)
+
+**Implementation Status**: 🔧 Partial
+
+**Note**: "Void" is the BR-defined status for rejected PRs (returned to requestor with comments).
 
 ```mermaid
 sequenceDiagram
-    actor Approver
+    participant Approver
     participant UI as Approval UI
     participant API as Server Action
     participant DB as Database
@@ -552,12 +591,12 @@ sequenceDiagram
     API-->>UI: Display PR for review
 
     Approver->>UI: Review PR
-    Approver->>UI: Click "Reject"
-    UI->>Approver: Show rejection dialog
-    Approver->>UI: Enter rejection reason (min 10 chars)
-    Approver->>UI: Click "Confirm Rejection"
+    Approver->>UI: Click "Void" (reject)
+    UI->>Approver: Show void/rejection dialog
+    Approver->>UI: Enter void reason (min 10 chars)
+    Approver->>UI: Click "Confirm"
 
-    UI->>API: Submit rejection
+    UI->>API: Submit void action
     API->>API: Validate reason length
 
     alt Reason too short
@@ -567,18 +606,18 @@ sequenceDiagram
         API->>DB: Begin transaction
 
         API->>DB: Update approval record
-        Note over DB: status='Rejected'<br/>rejected_at=now<br/>comments=reason
+        Note over DB: status='Voided'<br/>voided_at=now<br/>comments=reason
 
-        API->>DB: Update PR status = 'Rejected'
+        API->>DB: Update PR status = 'Void'
 
         API->>Workflow: Cancel other pending approvals
         Workflow->>DB: Update all pending approvals to 'Cancelled'
         DB-->>Workflow: Approvals cancelled
 
         API->>DB: Log activity
-        Note over DB: Log: PR rejected by [approver]<br/>with reason
+        Note over DB: Log: PR voided by [approver]<br/>with reason
 
-        API->>Notify: Send rejection notification to creator
+        API->>Notify: Send void notification to creator
         Notify-->>API: Notification sent
 
         API->>DB: Commit transaction
@@ -587,7 +626,7 @@ sequenceDiagram
         API-->>UI: Success response
         UI-->>Approver: Display confirmation
 
-        Note over Notify: Email sent to PR creator<br/>with rejection reason<br/>and instructions to edit
+        Note over Notify: Email sent to PR creator<br/>with void reason<br/>and instructions to edit
     end
 ```
 
@@ -597,27 +636,31 @@ sequenceDiagram
 
 ### 5.1 Purchase Request Status Lifecycle
 
+**Implementation Status**: 🔧 Partial
+
+**BR-Defined Status Values**: Draft, In-progress, Approved, Void, Completed, Cancelled
+
 ```mermaid
-stateDiagram-v2
+stateDiagram
     [*] --> Draft: Create new PR
 
-    Draft --> Submitted: Submit for approval
+    Draft --> In-progress: Submit for approval
     Draft --> Cancelled: Cancel draft
     Draft --> [*]: Delete
 
-    Submitted --> Approved: All approvals complete
-    Submitted --> Rejected: Any approval rejected
-    Submitted --> Draft: Recall/Edit
-    Submitted --> Cancelled: Cancel request
+    In-progress --> Approved: All approvals complete
+    In-progress --> Void: Any approval rejected
+    In-progress --> Draft: Recall/Edit
+    In-progress --> Cancelled: Cancel request
 
-    Rejected --> Draft: Edit and resubmit
-    Rejected --> Cancelled: Cancel
-    Rejected --> [*]: Archive
+    Void --> Draft: Edit and resubmit
+    Void --> Cancelled: Cancel
+    Void --> [*]: Archive
 
-    Approved --> Converted: Create PO
+    Approved --> Completed: Create PO (conversion)
     Approved --> Cancelled: Cancel approved PR
 
-    Converted --> [*]: Archive after retention period
+    Completed --> [*]: Archive after retention period
     Cancelled --> [*]: Archive after retention period
 
     note right of Draft
@@ -625,25 +668,27 @@ stateDiagram-v2
         No approvals required
     end note
 
-    note right of Submitted
+    note right of In-progress
         Read-only
-        Awaiting approvals
+        Some approvals received, others pending
         Can be recalled
     end note
 
     note right of Approved
         Read-only
+        All approvals received
         Ready for PO conversion
     end note
 
-    note right of Rejected
-        Read-only
+    note right of Void
+        Approval denied
+        Returned to requestor with comments
         Can be edited and resubmitted
     end note
 
-    note right of Converted
+    note right of Completed
         Read-only
-        Linked to PO
+        Converted to Purchase Order(s)
         Cannot be modified
     end note
 ```
@@ -651,7 +696,7 @@ stateDiagram-v2
 ### 5.2 Approval Status Lifecycle
 
 ```mermaid
-stateDiagram-v2
+stateDiagram
     [*] --> Pending: PR submitted
 
     Pending --> Approved: Approver approves
@@ -689,17 +734,19 @@ stateDiagram-v2
 
 ### 6.1 Multi-Stage Sequential Approval Workflow
 
+**Implementation Status**: 🔧 Partial
+
 **Description**: Sequential approval flow where each stage must approve before proceeding to the next stage. The number of stages and specific approvers are determined by the workflow engine configuration.
 
 ```mermaid
 flowchart TD
-    Start([PR Submitted]) --> GetRules[(Query Workflow Engine:<br/>pr_type + amount + dept)]
+    Start([PR In-progress]) --> GetRules[(Query Workflow Engine:<br/>pr_type + amount + dept)]
     GetRules --> BuildChain[Build approval chain<br/>from workflow config]
     BuildChain --> Stage1[Stage 1 Approver<br/>processes PR]
 
     Stage1 --> Decision1{Stage 1<br/>Decision?}
-    Decision1 -->|Reject| Rejected[PR Status = Rejected]
-    Rejected --> NotifyCreator1[Notify creator with reason]
+    Decision1 -->|Void| Voided[PR Status = Void]
+    Voided --> NotifyCreator1[Notify creator with reason]
     NotifyCreator1 --> End1([End])
 
     Decision1 -->|Approve| CheckMore{More stages<br/>required?}
@@ -710,21 +757,21 @@ flowchart TD
 
     CheckMore -->|Yes| Stage2[Stage 2 Approver<br/>processes PR]
     Stage2 --> Decision2{Stage 2<br/>Decision?}
-    Decision2 -->|Reject| Rejected
+    Decision2 -->|Void| Voided
     Decision2 -->|Approve| CheckMore2{More stages<br/>required?}
 
     CheckMore2 -->|No| Approved
     CheckMore2 -->|Yes| Stage3[Stage 3 Approver<br/>processes PR]
 
     Stage3 --> Decision3{Stage 3<br/>Decision?}
-    Decision3 -->|Reject| Rejected
+    Decision3 -->|Void| Voided
     Decision3 -->|Approve| Approved
 
-    style Stage1 fill:#cce5ff,stroke:#0066cc,stroke-width:2px,color:#000
-    style Stage2 fill:#ffe0b3,stroke:#cc6600,stroke-width:2px,color:#000
-    style Stage3 fill:#ffcccc,stroke:#cc0000,stroke-width:2px,color:#000
-    style GetRules fill:#e8e8e8,stroke:#333,stroke-width:2px,color:#000
-    style Approved fill:#ccffcc,stroke:#00cc00,stroke-width:2px,color:#000
+    style Stage1 fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    style Stage2 fill:#ffe0b3,stroke:#cc6600,stroke-width:2px
+    style Stage3 fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style GetRules fill:#e8e8e8,stroke:#333,stroke-width:2px
+    style Approved fill:#ccffcc,stroke:#00cc00,stroke-width:2px
 ```
 
 **Note**: The workflow engine determines:
@@ -734,9 +781,11 @@ flowchart TD
 
 ### 6.2 Parallel Approval Workflow
 
+**Implementation Status**: 🚧 Pending
+
 ```mermaid
 flowchart TD
-    Start([PR Submitted]) --> Split{Amount ><br/>$25,000 AND<br/>Type = Asset?}
+    Start([PR In-progress]) --> Split{Amount ><br/>threshold AND<br/>Type = Asset?}
 
     Split -->|No| Sequential[Sequential approval]
     Sequential --> Stage1[Department Manager]
@@ -753,9 +802,9 @@ flowchart TD
     Path2 --> Check2{Approved?}
     Path3 --> Check3{Approved?}
 
-    Check1 -->|No| Rejected[PR Rejected]
-    Check2 -->|No| Rejected
-    Check3 -->|No| Rejected
+    Check1 -->|No| Voided[PR Void]
+    Check2 -->|No| Voided
+    Check3 -->|No| Voided
 
     Check1 -->|Yes| Join[All must approve]
     Check2 -->|Yes| Join
@@ -767,7 +816,7 @@ flowchart TD
     Wait --> Join
 
     Approved --> End2([End])
-    Rejected --> End3([End])
+    Voided --> End3([End])
 ```
 
 ---
@@ -778,21 +827,21 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    PR[Purchase Request<br/>System] -->|Check budget| Budget[Budget<br/>System]
+    PR[Purchase Request System] -->|Check budget| Budget[Budget System]
     Budget -->|Budget available| PR
     Budget -->|Insufficient funds| PR
 
     PR -->|Reserve funds| Budget
     Budget -->|Funds reserved| PR
 
-    PR -->|Release funds<br/>(rejected)| Budget
+    PR -->|Release funds rejected| Budget
     Budget -->|Funds released| PR
 
-    PR -->|Commit funds<br/>(converted to PO)| Budget
+    PR -->|Commit funds to PO| Budget
     Budget -->|Funds committed| PR
 
-    style PR fill:#cce5ff,stroke:#0066cc,stroke-width:2px,color:#000
-    style Budget fill:#ffe0b3,stroke:#cc6600,stroke-width:2px,color:#000
+    style PR fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    style Budget fill:#ffe0b3,stroke:#cc6600,stroke-width:2px
 ```
 
 ### 7.2 Product Master Integration
@@ -800,12 +849,12 @@ flowchart LR
 ```mermaid
 flowchart TD
     User([User]) -->|Search product| PR[PR Form]
-    PR -->|Query| PM[Product Master<br/>API]
+    PR -->|Query| PM[Product Master API]
     PM -->|Product list| PR
 
     User -->|Select product| PR
     PR -->|Get details| PM
-    PM -->|Product details:<br/>- Description<br/>- UOM<br/>- Last price<br/>- Preferred vendor| PR
+    PM -->|Product details| PR
 
     PR -->|Display in form| User
     User -->|Add to PR| PR
@@ -816,18 +865,18 @@ flowchart TD
 ```mermaid
 flowchart TD
     PR[PR System] -->|Approval needed| Queue[Message Queue]
-    Queue -->|Process| Notify[Notification<br/>Service]
+    Queue -->|Process| Notify[Notification Service]
 
-    Notify -->|Check preferences| UserPref[(User<br/>Preferences)]
-    UserPref -->|Email enabled| Email[Email<br/>Service]
-    UserPref -->|SMS enabled| SMS[SMS<br/>Service]
-    UserPref -->|In-app enabled| InApp[In-App<br/>Notification]
+    Notify -->|Check preferences| UserPref[(User Preferences)]
+    UserPref -->|Email enabled| Email[Email Service]
+    UserPref -->|SMS enabled| SMS[SMS Service]
+    UserPref -->|In-app enabled| InApp[In-App Notification]
 
     Email -->|Send email| Approver([Approver])
     SMS -->|Send SMS| Approver
     InApp -->|Push notification| Approver
 
-    Notify -->|Log notification| Log[(Notification<br/>Log)]
+    Notify -->|Log notification| Log[(Notification Log)]
 ```
 
 ---
@@ -884,10 +933,11 @@ flowchart TD
 
 ### 8.2 Multi-Level Approval Workflow with Decision Points
 
+**Implementation Status**: 🔧 Partial
+
 ```mermaid
 flowchart LR
-    subgraph Requestor [👤 Requestor]
-        direction TB
+    subgraph Requestor
         R1[Create PR]
         R2[Fill details &<br/>add items]
         R3{Save action?}
@@ -897,48 +947,43 @@ flowchart LR
         R12[Edit & Resubmit]
     end
 
-    subgraph System [⚙️ System]
-        direction TB
+    subgraph System
         S1[Validate PR]
         S2[Save as Draft]
         S3[Determine<br/>Approval Chain]
         S4[Create approval<br/>records]
-        S5[Update status<br/>to Submitted]
+        S5[Update status<br/>to In-progress]
         S6[Send<br/>notifications]
         S9{All approvals<br/>complete?}
         S10[Update to<br/>Approved]
-        S11[Update to<br/>Rejected]
+        S11[Update to<br/>Void]
     end
 
-    subgraph DeptMgr [👔 Department Manager]
-        direction TB
+    subgraph DeptMgr
         D1[Receive<br/>notification]
         D2[Review PR]
         D3{Decision?}
         D4[Approve]
-        D5[Reject]
+        D5[Void]
     end
 
-    subgraph FinMgr [💼 Finance Manager]
-        direction TB
+    subgraph FinMgr
         F1[Receive<br/>notification]
         F2[Review PR &<br/>Budget]
         F3{Decision?}
         F4[Approve]
-        F5[Reject]
+        F5[Void]
     end
 
-    subgraph GenMgr [🎩 General Manager]
-        direction TB
+    subgraph GenMgr
         G1[Receive<br/>notification]
         G2[Review PR]
         G3{Decision?}
         G4[Approve]
-        G5[Reject]
+        G5[Void]
     end
 
-    subgraph Purchasing [🛒 Purchasing Staff]
-        direction TB
+    subgraph Purchasing
         P1[Receive<br/>notification]
         P2[Convert<br/>to PO]
         P3[Send to<br/>vendor]
@@ -959,7 +1004,7 @@ flowchart LR
     D1 --> D2
     D2 --> D3
     D3 -->|Approve| D4
-    D3 -->|Reject| D5
+    D3 -->|Void| D5
     D5 --> S11
     S11 --> R10
 
@@ -968,7 +1013,7 @@ flowchart LR
     F1 --> F2
     F2 --> F3
     F3 -->|Approve| F4
-    F3 -->|Reject| F5
+    F3 -->|Void| F5
     F5 --> S11
     F4 --> S9
 
@@ -976,7 +1021,7 @@ flowchart LR
     G1 --> G2
     G2 --> G3
     G3 -->|Approve| G4
-    G3 -->|Reject| G5
+    G3 -->|Void| G5
     G5 --> S11
     G4 --> S9
 
@@ -989,12 +1034,12 @@ flowchart LR
     R11 -->|Edit| R12
     R12 --> R2
 
-    style System fill:#e8e8e8,stroke:#333,stroke-width:2px,color:#000
-    style Requestor fill:#cce5ff,stroke:#0066cc,stroke-width:2px,color:#000
-    style DeptMgr fill:#ffcccc,stroke:#cc0000,stroke-width:2px,color:#000
-    style FinMgr fill:#ffe0b3,stroke:#cc6600,stroke-width:2px,color:#000
-    style GenMgr fill:#e0ccff,stroke:#6600cc,stroke-width:2px,color:#000
-    style Purchasing fill:#ccffcc,stroke:#00cc00,stroke-width:2px,color:#000
+    style System fill:#e8e8e8,stroke:#333,stroke-width:2px
+    style Requestor fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    style DeptMgr fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style FinMgr fill:#ffe0b3,stroke:#cc6600,stroke-width:2px
+    style GenMgr fill:#e0ccff,stroke:#6600cc,stroke-width:2px
+    style Purchasing fill:#ccffcc,stroke:#00cc00,stroke-width:2px
 ```
 
 ---
@@ -1041,11 +1086,11 @@ flowchart TD
     CreateRecords3 --> Notify3[Notify first stage approvers]
     Notify3 --> End5([Approval Chain Created])
 
-    style QueryEngine fill:#cce5ff,stroke:#0066cc,stroke-width:2px,color:#000
-    style LookupRules fill:#e8e8e8,stroke:#333,stroke-width:2px,color:#000
-    style CheckMatch fill:#ffe0b3,stroke:#cc6600,stroke-width:2px,color:#000
-    style NoWorkflow fill:#ffcccc,stroke:#cc0000,stroke-width:2px,color:#000
-    style AutoApprove fill:#ccffcc,stroke:#00cc00,stroke-width:2px,color:#000
+    style QueryEngine fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    style LookupRules fill:#e8e8e8,stroke:#333,stroke-width:2px
+    style CheckMatch fill:#ffe0b3,stroke:#cc6600,stroke-width:2px
+    style NoWorkflow fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style AutoApprove fill:#ccffcc,stroke:#00cc00,stroke-width:2px
 ```
 
 **Workflow Configuration Note**:
@@ -1065,31 +1110,35 @@ Based on these parameters, the workflow engine:
 
 ### 9.2 Status Transition Logic
 
+**Implementation Status**: 🔧 Partial
+
+**BR-Defined Status Values**: Draft, In-progress, Approved, Void, Completed, Cancelled
+
 ```mermaid
 flowchart TD
     Start([User Action]) --> CurrentStatus{Current<br/>Status?}
 
     CurrentStatus -->|Draft| DraftActions{Action?}
     DraftActions -->|Submit| CheckValid{Valid?}
-    CheckValid -->|Yes| ToSubmitted[Status = Submitted]
+    CheckValid -->|Yes| ToInProgress[Status = In-progress]
     CheckValid -->|No| StayDraft[Stay in Draft]
     DraftActions -->|Cancel| ToCancelled[Status = Cancelled]
     DraftActions -->|Delete| DeletePR[Delete record]
 
-    CurrentStatus -->|Submitted| SubmitActions{Action?}
-    SubmitActions -->|Approve all| ToApproved[Status = Approved]
-    SubmitActions -->|Reject any| ToRejected[Status = Rejected]
-    SubmitActions -->|Recall| ToDraft[Status = Draft]
+    CurrentStatus -->|In-progress| InProgressActions{Action?}
+    InProgressActions -->|Approve all| ToApproved[Status = Approved]
+    InProgressActions -->|Reject any| ToVoid[Status = Void]
+    InProgressActions -->|Recall| ToDraft[Status = Draft]
 
     CurrentStatus -->|Approved| ApproveActions{Action?}
-    ApproveActions -->|Convert| ToConverted[Status = Converted]
+    ApproveActions -->|Convert to PO| ToCompleted[Status = Completed]
     ApproveActions -->|Cancel| ToCancelled
 
-    CurrentStatus -->|Rejected| RejectActions{Action?}
-    RejectActions -->|Edit| ToDraft
-    RejectActions -->|Cancel| ToCancelled
+    CurrentStatus -->|Void| VoidActions{Action?}
+    VoidActions -->|Edit| ToDraft
+    VoidActions -->|Cancel| ToCancelled
 
-    CurrentStatus -->|Converted| NoAction[Read-only<br/>No actions allowed]
+    CurrentStatus -->|Completed| NoAction[Read-only<br/>No actions allowed]
     CurrentStatus -->|Cancelled| NoAction
 ```
 
@@ -1303,8 +1352,29 @@ flowchart TD
 
 ---
 
+## 14. Implementation Summary
+
+| Category | Total | ✅ | 🔧 | 🚧 | ⏳ |
+|----------|-------|----|----|----|----|
+| Process Flows (Section 2) | 6 | 0 | 2 | 4 | 0 |
+| Sequence Diagrams (Section 4) | 4 | 0 | 3 | 1 | 0 |
+| State Diagrams (Section 5) | 2 | 0 | 2 | 0 | 0 |
+| Workflow Diagrams (Section 6) | 2 | 0 | 1 | 1 | 0 |
+| Swimlane Diagrams (Section 8) | 2 | 0 | 1 | 1 | 0 |
+| Decision Trees (Section 9) | 2 | 0 | 2 | 0 | 0 |
+
+**BR-Defined Status Values**: Draft, In-progress, Approved, Void, Completed, Cancelled
+
+**Status Value Mapping from Previous Documentation**:
+- Submitted → In-progress
+- Rejected → Void
+- Converted → Completed
+
+---
+
 **Document Control**:
 - **Created**: 2025-01-30
 - **Author**: System Architect
 - **Reviewed By**: Development Lead, Business Analyst
+- **Last Updated**: 2025-11-26
 - **Next Review**: 2025-04-30

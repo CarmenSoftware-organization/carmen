@@ -4,7 +4,7 @@ import { RoleList } from "./role-list"
 import { ConfigurationPanel } from "./configuration-panel"
 
 export default function RoleAssignmentLayout() {
-  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null)
+  const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null)
 
   return (
     <div className="container mx-auto p-4 max-w-7xl">

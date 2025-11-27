@@ -10,11 +10,16 @@
   - [UC-recipes.md](./UC-recipes.md) - Use Cases
   - [TS-recipes.md](./TS-recipes.md) - Technical Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial data schema document created for Recipe Management |
+
 ---
 
 ## 1. Database Schema
 | 1.1.0 | 2025-11-15 | Documentation Team | Migrated from DS to DD format |
-
 
 ### 1.1 Main Recipe Table
 
@@ -2708,9 +2713,3 @@ ORDER BY variance DESC;
 ```
 
 ---
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial data schema document created for Recipe Management |

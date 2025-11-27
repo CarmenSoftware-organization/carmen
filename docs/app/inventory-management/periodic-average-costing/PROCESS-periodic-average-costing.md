@@ -6,6 +6,12 @@
 **Version**: 1.0
 **Last Updated**: 2025-01-07
 
+## Document History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2025-01-07 | Initial document creation with complete process logic |
+
 ---
 
 ## Document Purpose
@@ -1254,14 +1260,6 @@ WHERE product_id = :product_id
 
 -- Should return single value (the period average)
 ```
-
----
-
-## Document History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2025-01-07 | Initial document creation with complete process logic |
 
 ---
 

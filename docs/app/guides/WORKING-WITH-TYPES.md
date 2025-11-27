@@ -2,6 +2,11 @@
 
 **Master Carmen's centralized type system** for type-safe development.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Core Principle

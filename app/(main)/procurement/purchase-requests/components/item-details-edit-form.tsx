@@ -49,7 +49,7 @@ import VendorComparison from "./vendor-comparison";
 import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
 import { PricingFormComponent } from "./pricing-form";
 import StatusBadge from "@/components/ui/custom-status-badge";
-import { PurchaseRequestItem, DocumentStatus, WorkflowStatus, PurchaseRequestPriority } from "@/lib/types";
+import { PurchaseRequestItem, PRStatus, WorkflowStatus, PurchaseRequestPriority } from "@/lib/types";
 
 // Type for button state (not in central types)
 type ConsolidatedButtonState = {
@@ -119,9 +119,9 @@ const getFieldPermissions = (userRole: string) => {
 };
 
 // Helper function to get approval button state for individual item
-const getItemApprovalButtonState = (status: DocumentStatus, userRole: string): ConsolidatedButtonState => {
+const getItemApprovalButtonState = (status: PRStatus, userRole: string): ConsolidatedButtonState => {
   const isApprover = ['Department Manager', 'Financial Manager', 'Purchasing Staff'].includes(userRole);
-  
+
   if (!isApprover) {
     return {
       action: "disabled",
@@ -132,28 +132,28 @@ const getItemApprovalButtonState = (status: DocumentStatus, userRole: string): C
   }
 
   switch (status) {
-    case DocumentStatus.Draft:
+    case PRStatus.Draft:
       return {
         action: "approve",
         label: "Approve",
         color: "green",
         disabled: false
       };
-    case DocumentStatus.Approved:
+    case PRStatus.Approved:
       return {
         action: "reject",
         label: "Reject",
         color: "red",
         disabled: false
       };
-    case DocumentStatus.Rejected:
+    case PRStatus.Cancelled:
       return {
         action: "approve",
         label: "Approve",
         color: "green",
         disabled: false
       };
-    case 'review' as DocumentStatus:
+    case PRStatus.InProgress:
       return {
         action: "return",
         label: "Return",
@@ -190,7 +190,7 @@ const emptyItemData: ExtendedPurchaseRequestItem = {
   requiredDate: new Date(),
   deliveryLocationId: "",
   priority: "normal" as PurchaseRequestPriority,
-  status: DocumentStatus.Draft,
+  status: PRStatus.Draft,
   convertedToPO: false,
   // Extended fields with defaults
   location: "",
@@ -272,7 +272,7 @@ export function ItemDetailsEditForm({
   };
 
   const handleApproveItem = () => {
-    const updatedData = { ...formData, status: DocumentStatus.Approved };
+    const updatedData = { ...formData, status: PRStatus.Approved };
     setFormData(updatedData);
     onSave(updatedData);
     console.log(`✓ Approving item: ${formData.itemName} (${formData.id})`);
@@ -280,7 +280,7 @@ export function ItemDetailsEditForm({
   };
 
   const handleRejectItem = () => {
-    const updatedData = { ...formData, status: DocumentStatus.Rejected };
+    const updatedData = { ...formData, status: PRStatus.Cancelled };
     setFormData(updatedData);
     onSave(updatedData);
     console.log(`✓ Rejecting item: ${formData.itemName} (${formData.id})`);
@@ -288,7 +288,7 @@ export function ItemDetailsEditForm({
   };
 
   const handleReturnItem = () => {
-    const updatedData = { ...formData, status: 'review' as DocumentStatus };
+    const updatedData = { ...formData, status: PRStatus.InProgress };
     setFormData(updatedData);
     onSave(updatedData);
     setIsReturnStepSelectorOpen(false);

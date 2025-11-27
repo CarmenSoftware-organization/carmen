@@ -1,5 +1,10 @@
 # Purchase Request List: RBAC-Controlled Preset Filter Configuration
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document outlines how the preset filter options are configured based on the workflow setup and RBAC system.
 
 ## 1. RBAC Widget Access Control

@@ -7,6 +7,11 @@
 **Last Updated**: 2025-11-02
 **Status**: Approved
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. Overview
@@ -1475,7 +1480,7 @@ All validation rules must have test cases covering:
 - **Business Requirements**: [BR-units.md](./BR-units.md) - Functional requirements and business rules
 - **Use Cases**: [UC-units.md](./UC-units.md) - Detailed user scenarios and workflows
 - **Technical Specification**: [TS-units.md](./TS-units.md) - Technical implementation details
-- **Data Schema**: [DS-units.md](./DS-units.md) - Database structure and relationships
+- **Data Dictionary**: [DD-units.md](./DD-units.md) - Database structure and relationships
 - **Flow Diagrams**: [FD-units.md](./FD-units.md) - Process flows and state diagrams
 
 ---

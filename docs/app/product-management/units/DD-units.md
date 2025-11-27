@@ -5,7 +5,7 @@
 - **Sub-Module**: Units Management
 - **Database**: CARMEN PostgreSQL (via Supabase)
 - **Schema Version**: 1.0.0
-- **Last Updated**: 2025-02-11
+- **Last Updated**: 2025-11-26
 - **Owner**: Product Management Team
 - **Status**: Approved
 
@@ -14,6 +14,7 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-02-11 | Product Management Team | Initial version |
 | 1.1.0 | 2025-11-15 | Documentation Team | Migrated from DS to DD format |
+| 1.2.0 | 2025-11-26 | Documentation Team | Added UnitUsageStats view entity to align with BR-units.md |
 
 
 ---
@@ -44,9 +45,11 @@ The schema supports business processes including product catalog management, rec
 
 ## Entity Relationship Overview
 
-**Primary Entities**: This sub-module contains one primary data entity
+**Primary Entities**: This sub-module contains one primary data entity and one view entity
 
 - **Unit**: Represents a measurement unit used for quantifying products, ingredients, inventory items, and purchase orders across the system. Each unit has a unique code, full name, type classification, and active status.
+
+- **Unit Usage Statistics (View)**: Read-only computed view that provides aggregated usage statistics for units, used for deletion validation and administrative reporting.
 
 **Key Relationships**:
 
@@ -382,6 +385,94 @@ Business Context:
 - Remains in database for historical purchase orders
 - Not available in dropdown selectors for new orders
 - Can be reactivated if business needs change
+```
+
+---
+
+### View Entity: Unit Usage Statistics
+
+**Description**: Read-only view entity that provides aggregated usage statistics for units. Used to determine whether a unit can be safely deleted and to provide administrators with visibility into unit usage across the system.
+
+**Business Purpose**: Prevents accidental deletion of units that are in active use. Informs management decisions about unit deactivation. Provides audit and reporting capabilities for unit usage patterns.
+
+**Data Ownership**: System-generated view, not directly editable. Computed from relationships between units and referencing entities (products, recipes, transactions).
+
+**Access Pattern**:
+- Primary access by unit ID for deletion validation (O(n) aggregate query)
+- Batch access for reporting on all units (O(n) full computation)
+- Triggered on delete or status change operations
+
+**Data Volume**: Virtual view, no storage. One record per unit computed on demand.
+
+#### Fields Overview
+
+**Identification Fields**:
+- **unitId**: Reference to the unit being analyzed (UUID)
+- **unitCode**: Unit code for display (VARCHAR, from units.code)
+- **unitName**: Unit name for display (VARCHAR, from units.name)
+
+**Usage Count Fields**:
+- **productCount**: Number of products using this unit as base unit or alternative unit
+  - Source: COUNT from products + product_units tables
+  - Purpose: Determine if unit is used in product definitions
+
+- **recipeCount**: Number of recipes using this unit in ingredient specifications
+  - Source: COUNT from recipe_ingredients table
+  - Purpose: Determine if unit is used in recipe management
+
+**Computed Flags**:
+- **canBeDeleted**: Boolean indicating whether unit can be safely deleted
+  - Computed: true if productCount = 0 AND recipeCount = 0
+  - Purpose: Prevent deletion of units with active references
+
+- **deletionBlockedReason**: Human-readable explanation when canBeDeleted is false
+  - Format: "Referenced by {N} products and {M} recipes"
+  - Purpose: Provide clear feedback to administrators
+
+#### Field Definitions Table
+
+| Field Name | Data Type | Source | Description | Example Values |
+|-----------|-----------|--------|-------------|----------------|
+| unitId | UUID | units.id | Reference to unit | 550e8400-e29b-41d4-a716-446655440001 |
+| unitCode | VARCHAR(10) | units.code | Unit code for display | KG, ML, BOX |
+| unitName | VARCHAR(100) | units.name | Unit name for display | Kilogram, Milliliter |
+| productCount | INTEGER | Computed | Products using this unit | 0, 5, 12 |
+| recipeCount | INTEGER | Computed | Recipes using this unit | 0, 3, 8 |
+| canBeDeleted | BOOLEAN | Computed | Whether deletion is safe | true, false |
+| deletionBlockedReason | VARCHAR | Computed | Reason if deletion blocked | "Referenced by 5 products and 3 recipes" |
+
+#### Sample Data Examples
+
+**Example 1: Unit Safe to Delete**
+```
+Unit ID: 550e8400-e29b-41d4-a716-446655440099
+Unit Code: DRUM
+Unit Name: Drum
+Product Count: 0
+Recipe Count: 0
+Can Be Deleted: true
+Deletion Blocked Reason: NULL
+
+Business Context:
+- DRUM unit was created but never used
+- No products or recipes reference this unit
+- Safe to delete or deactivate
+```
+
+**Example 2: Unit with Active References**
+```
+Unit ID: 550e8400-e29b-41d4-a716-446655440001
+Unit Code: KG
+Unit Name: Kilogram
+Product Count: 15
+Recipe Count: 8
+Can Be Deleted: false
+Deletion Blocked Reason: "Referenced by 15 products and 8 recipes"
+
+Business Context:
+- KG is a heavily used inventory unit
+- Cannot be deleted without affecting 23 entities
+- Recommend deactivation instead of deletion
 ```
 
 ---

@@ -461,7 +461,7 @@ export class ProcurementIntegrationService {
       const autoApprovals: ProcurementWorkflowAutomation['autoApprovals'] = []
       const requiredApprovals: ProcurementWorkflowAutomation['requiredApprovals'] = []
 
-      const totalAmount = request.estimatedTotal.amount
+      const totalAmount = request.estimatedTotal?.amount ?? 0
 
       // Auto-approve low-value requests
       if (totalAmount < 500) {

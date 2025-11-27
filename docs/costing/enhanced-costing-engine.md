@@ -1,5 +1,10 @@
 # Enhanced Costing Engine for Portion-Based Pricing
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 The Enhanced Costing Engine is a sophisticated system designed to handle portion-based pricing for fractional sales in the Carmen ERP system. It provides advanced cost calculation algorithms, dynamic pricing optimization, and comprehensive profitability analysis for items like pizza slices, cake portions, and other fractional products.

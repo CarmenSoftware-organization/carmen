@@ -2,6 +2,11 @@
 
 **Complete guide to Carmen's 7 documentation types** and how to use them effectively.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Overview

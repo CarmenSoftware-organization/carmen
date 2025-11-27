@@ -70,7 +70,28 @@ import {
   CheckCircle2,
   XCircle,
 } from "lucide-react"
-import { RecipeCategory, mockCategories } from "../data/mock-categories"
+import { RecipeCategory } from "@/lib/types"
+import { mockCategories } from "@/lib/mock-data"
+
+// Extended interface for form data with additional UI-specific properties
+interface CategoryFormData extends Omit<Partial<RecipeCategory>, 'id'> {
+  id: string; // id is required
+  status?: string;
+  recipeCount?: number;
+  activeRecipeCount?: number;
+  averageCost?: number;
+  averageMargin?: number;
+  lastUpdated?: string;
+  defaultCostSettings?: {
+    laborCostPercentage: number;
+    overheadPercentage: number;
+    targetFoodCostPercentage: number;
+  };
+  defaultMargins?: {
+    minimumMargin: number;
+    targetMargin: number;
+  };
+}
 
 interface FilterState {
   status: string[]
@@ -117,7 +138,7 @@ export function EnhancedCategoryList() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<RecipeCategory | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<CategoryFormData | null>(null)
   const [viewMode, setViewMode] = useState<'list' | 'card'>('list')
   const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState(false)
   const [filters, setFilters] = useState<FilterState>({
@@ -129,11 +150,14 @@ export function EnhancedCategoryList() {
     maxMargin: null,
   })
   const [quickFilters, setQuickFilters] = useState<string[]>([])
-  const [formData, setFormData] = useState<Partial<RecipeCategory>>({
+  const [formData, setFormData] = useState<CategoryFormData>({
+    id: "",
     name: "",
     code: "",
     description: "",
-    parentId: null,
+    parentId: undefined,
+    level: 1,
+    isActive: true,
     status: "active",
     defaultCostSettings: {
       laborCostPercentage: 30,
@@ -160,7 +184,7 @@ export function EnhancedCategoryList() {
     })
   }
 
-  const handleEdit = (category: RecipeCategory) => {
+  const handleEdit = (category: CategoryFormData) => {
     setSelectedCategory(category)
     setFormData({
       ...category,
@@ -168,7 +192,7 @@ export function EnhancedCategoryList() {
     setIsEditDialogOpen(true)
   }
 
-  const handleView = (category: RecipeCategory) => {
+  const handleView = (category: CategoryFormData) => {
     setSelectedCategory(category)
     setIsViewDialogOpen(true)
   }
@@ -182,17 +206,20 @@ export function EnhancedCategoryList() {
     setIsEditDialogOpen(true)
   }
 
-  const handleDelete = (category: RecipeCategory) => {
+  const handleDelete = (category: CategoryFormData) => {
     setSelectedCategory(category)
     setIsDeleteDialogOpen(true)
   }
 
   const handleCreate = () => {
     setFormData({
+      id: "",
       name: "",
       code: "",
       description: "",
-      parentId: null,
+      parentId: undefined,
+      level: 1,
+      isActive: true,
       status: "active",
       defaultCostSettings: {
         laborCostPercentage: 30,
@@ -217,10 +244,13 @@ export function EnhancedCategoryList() {
     }
     
     setFormData({
+      id: "",
       name: "",
       code: "",
       description: "",
-      parentId: null,
+      parentId: undefined,
+      level: 1,
+      isActive: true,
       status: "active",
       defaultCostSettings: {
         laborCostPercentage: 30,
@@ -278,12 +308,12 @@ export function EnhancedCategoryList() {
     )
   }
 
-  const applyFilters = (category: RecipeCategory) => {
+  const applyFilters = (category: CategoryFormData) => {
     if (quickFilters.length > 0) {
-      if (quickFilters.includes('noRecipes') && category.recipeCount > 0) return false
-      if (quickFilters.includes('hasRecipes') && category.recipeCount === 0) return false
-      if (quickFilters.includes('topLevel') && category.parentId !== null) return false
-      if (quickFilters.includes('subLevel') && category.parentId === null) return false
+      if (quickFilters.includes('noRecipes') && (category.recipeCount ?? 0) > 0) return false
+      if (quickFilters.includes('hasRecipes') && (category.recipeCount ?? 0) === 0) return false
+      if (quickFilters.includes('topLevel') && category.parentId !== null && category.parentId !== undefined) return false
+      if (quickFilters.includes('subLevel') && (category.parentId === null || category.parentId === undefined)) return false
     }
 
     return filterConditions.every((condition) => {
@@ -343,7 +373,7 @@ export function EnhancedCategoryList() {
     }
   }
 
-  const renderCategoryRow = (category: RecipeCategory, depth = 0): JSX.Element[] => {
+  const renderCategoryRow = (category: CategoryFormData, depth = 0): JSX.Element[] => {
     const isExpanded = expandedCategories.has(category.id)
     const childCategories = categories.filter(c => c.parentId === category.id)
     const hasChildren = childCategories.length > 0
@@ -401,11 +431,11 @@ export function EnhancedCategoryList() {
             {category.status}
           </Badge>
         </TableCell>
-        <TableCell className="text-right font-medium text-xs py-2">{category.recipeCount}</TableCell>
-        <TableCell className="text-right hidden sm:table-cell text-xs py-2">{category.activeRecipeCount}</TableCell>
-        <TableCell className="text-right hidden lg:table-cell font-mono text-xs py-2">${category.averageCost.toFixed(2)}</TableCell>
-        <TableCell className="text-right hidden lg:table-cell font-mono text-xs py-2">{category.averageMargin.toFixed(1)}%</TableCell>
-        <TableCell className="hidden xl:table-cell text-xs text-muted-foreground py-2">{category.lastUpdated}</TableCell>
+        <TableCell className="text-right font-medium text-xs py-2">{category.recipeCount ?? 0}</TableCell>
+        <TableCell className="text-right hidden sm:table-cell text-xs py-2">{category.activeRecipeCount ?? 0}</TableCell>
+        <TableCell className="text-right hidden lg:table-cell font-mono text-xs py-2">${(category.averageCost ?? 0).toFixed(2)}</TableCell>
+        <TableCell className="text-right hidden lg:table-cell font-mono text-xs py-2">{(category.averageMargin ?? 0).toFixed(1)}%</TableCell>
+        <TableCell className="hidden xl:table-cell text-xs text-muted-foreground py-2">{category.lastUpdated ?? 'N/A'}</TableCell>
         <TableCell className="py-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -447,7 +477,7 @@ export function EnhancedCategoryList() {
     return result
   }
 
-  const renderCategoryCard = (category: RecipeCategory): JSX.Element => {
+  const renderCategoryCard = (category: CategoryFormData): JSX.Element => {
     const childCategories = categories.filter(c => c.parentId === category.id)
     const hasChildren = childCategories.length > 0
 
@@ -517,19 +547,19 @@ export function EnhancedCategoryList() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <div className="font-medium text-foreground">Recipes</div>
-                <div className="text-muted-foreground">{category.recipeCount} total</div>
+                <div className="text-muted-foreground">{category.recipeCount ?? 0} total</div>
               </div>
               <div>
                 <div className="font-medium text-foreground">Active</div>
-                <div className="text-muted-foreground">{category.activeRecipeCount}</div>
+                <div className="text-muted-foreground">{category.activeRecipeCount ?? 0}</div>
               </div>
               <div>
                 <div className="font-medium text-foreground">Avg. Cost</div>
-                <div className="font-mono text-muted-foreground">${category.averageCost.toFixed(2)}</div>
+                <div className="font-mono text-muted-foreground">${(category.averageCost ?? 0).toFixed(2)}</div>
               </div>
               <div>
                 <div className="font-medium text-foreground">Avg. Margin</div>
-                <div className="font-mono text-muted-foreground">{category.averageMargin.toFixed(1)}%</div>
+                <div className="font-mono text-muted-foreground">{(category.averageMargin ?? 0).toFixed(1)}%</div>
               </div>
             </div>
 
@@ -548,9 +578,9 @@ export function EnhancedCategoryList() {
 
   const rootCategories = categories.filter(category => !category.parentId)
   const filteredCategories = rootCategories
-    .filter(category => 
-      (category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       category.code.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    .filter(category =>
+      (category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+       category.code?.toLowerCase().includes(searchTerm.toLowerCase())) &&
       applyFilters(category)
     )
 
@@ -1019,7 +1049,7 @@ export function EnhancedCategoryList() {
                       Total Recipes
                     </Label>
                     <div className="text-2xl font-bold text-foreground">
-                      {selectedCategory.recipeCount}
+                      {selectedCategory.recipeCount ?? 0}
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -1027,7 +1057,7 @@ export function EnhancedCategoryList() {
                       Active Recipes
                     </Label>
                     <div className="text-2xl font-bold text-foreground">
-                      {selectedCategory.activeRecipeCount}
+                      {selectedCategory.activeRecipeCount ?? 0}
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -1035,7 +1065,7 @@ export function EnhancedCategoryList() {
                       Average Cost
                     </Label>
                     <div className="text-2xl font-bold font-mono text-foreground">
-                      ${selectedCategory.averageCost.toFixed(2)}
+                      ${(selectedCategory.averageCost ?? 0).toFixed(2)}
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -1043,7 +1073,7 @@ export function EnhancedCategoryList() {
                       Average Margin
                     </Label>
                     <div className="text-2xl font-bold font-mono text-foreground">
-                      {selectedCategory.averageMargin.toFixed(1)}%
+                      {(selectedCategory.averageMargin ?? 0).toFixed(1)}%
                     </div>
                   </div>
                 </div>
@@ -1060,7 +1090,7 @@ export function EnhancedCategoryList() {
                       Labor Cost Percentage
                     </Label>
                     <div className="text-base font-mono text-foreground">
-                      {selectedCategory.defaultCostSettings.laborCostPercentage}%
+                      {selectedCategory.defaultCostSettings?.laborCostPercentage ?? 0}%
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -1068,7 +1098,7 @@ export function EnhancedCategoryList() {
                       Overhead Percentage
                     </Label>
                     <div className="text-base font-mono text-foreground">
-                      {selectedCategory.defaultCostSettings.overheadPercentage}%
+                      {selectedCategory.defaultCostSettings?.overheadPercentage ?? 0}%
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -1076,7 +1106,7 @@ export function EnhancedCategoryList() {
                       Target Food Cost Percentage
                     </Label>
                     <div className="text-base font-mono text-foreground">
-                      {selectedCategory.defaultCostSettings.targetFoodCostPercentage}%
+                      {selectedCategory.defaultCostSettings?.targetFoodCostPercentage ?? 0}%
                     </div>
                   </div>
                 </div>
@@ -1093,7 +1123,7 @@ export function EnhancedCategoryList() {
                       Minimum Profit Margin
                     </Label>
                     <div className="text-base font-mono text-foreground">
-                      {selectedCategory.defaultMargins.minimumMargin}%
+                      {selectedCategory.defaultMargins?.minimumMargin ?? 0}%
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Minimum acceptable profit margin
@@ -1104,7 +1134,7 @@ export function EnhancedCategoryList() {
                       Target Profit Margin
                     </Label>
                     <div className="text-base font-mono text-foreground">
-                      {selectedCategory.defaultMargins.targetMargin}%
+                      {selectedCategory.defaultMargins?.targetMargin ?? 0}%
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Ideal profit margin to target
@@ -1124,7 +1154,7 @@ export function EnhancedCategoryList() {
                       Last Updated
                     </Label>
                     <div className="text-base text-foreground">
-                      {selectedCategory.lastUpdated}
+                      {selectedCategory.lastUpdated ?? 'N/A'}
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -1224,7 +1254,7 @@ export function EnhancedCategoryList() {
                   </Label>
                   <Select
                     value={formData.parentId || "none"}
-                    onValueChange={(value) => setFormData({ ...formData, parentId: value === "none" ? null : value })}
+                    onValueChange={(value) => setFormData({ ...formData, parentId: value === "none" ? undefined : value })}
                   >
                     <SelectTrigger className="h-9">
                       <SelectValue placeholder="Select parent category" />

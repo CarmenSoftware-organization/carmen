@@ -898,6 +898,11 @@ stateDiagram-v2
 3. **Base Currency**: All amounts converted using exchange rate
 4. **Stock Impact**: Automatic inventory updates on status change
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 *Documentation Version: 1.0*

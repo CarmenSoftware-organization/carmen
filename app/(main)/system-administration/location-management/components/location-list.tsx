@@ -1,380 +1,389 @@
 "use client"
 
-import { useState, useMemo } from 'react'
-import { mockLocations, Location } from '../data/mock-locations'
-import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { FileText, Edit, Trash2, Table as TableIcon, LayoutGrid, ChevronUp, ChevronDown, Plus } from 'lucide-react'
-import clsx from 'clsx'
-import Link from 'next/link'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { toast } from 'sonner'
+import React, { useState, useMemo } from "react"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Search,
+  Filter,
+  MoreHorizontal,
+  Eye,
+  Pencil,
+  Trash2,
+  ArrowUpDown,
+  Warehouse,
+  Package,
+  Users,
+  Layers,
+  CheckCircle,
+  XCircle,
+} from "lucide-react"
+import {
+  InventoryLocation,
+  InventoryLocationType,
+  LocationStatus,
+  LOCATION_TYPE_LABELS,
+} from "@/lib/types/location-management"
 
-interface SortConfig {
-  field: keyof Location
-  direction: 'asc' | 'desc'
+interface LocationListProps {
+  locations: InventoryLocation[]
+  selectedLocations: string[]
+  onSelectItem: (id: string) => void
+  onSelectAll: () => void
+  onView: (location: InventoryLocation) => void
+  onEdit: (location: InventoryLocation) => void
+  onDelete: (location: InventoryLocation) => void
 }
 
-interface FilterConfig {
-  search: string
-  active: string
-  type: string
-}
+type SortField = 'code' | 'name' | 'type' | 'status' | 'shelvesCount' | 'assignedProductsCount' | 'assignedUsersCount'
+type SortDirection = 'asc' | 'desc'
 
-function LocationList() {
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'name', direction: 'asc' })
-  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
-  const [filters, setFilters] = useState<FilterConfig>({
-    search: '',
-    active: 'all',
-    type: 'all'
-  })
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [deleteLocationId, setDeleteLocationId] = useState<string | null>(null)
+export function LocationList({
+  locations,
+  selectedLocations,
+  onSelectItem,
+  onSelectAll,
+  onView,
+  onEdit,
+  onDelete,
+}: LocationListProps) {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [typeFilter, setTypeFilter] = useState<InventoryLocationType | 'all'>('all')
+  const [statusFilter, setStatusFilter] = useState<LocationStatus | 'all'>('all')
+  const [physicalCountFilter, setPhysicalCountFilter] = useState<'all' | 'yes' | 'no'>('all')
+  const [sortField, setSortField] = useState<SortField>('code')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
 
-  // Get unique values for filter options
-  const filterOptions = useMemo(() => {
-    const types = Array.from(new Set(mockLocations.map(loc => loc.type))).sort()
-    return { types }
-  }, [])
-
-  const handleSort = (field: keyof Location) => {
-    setSortConfig(prev => ({
-      field,
-      direction: prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc'
-    }))
-  }
-
-  const handleDelete = (id: string) => {
-    setDeleteLocationId(id)
-    setDeleteDialogOpen(true)
-  }
-
-  const confirmDelete = () => {
-    if (deleteLocationId) {
-      toast.success('Location deleted successfully')
-      setDeleteDialogOpen(false)
-      setDeleteLocationId(null)
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortDirection('asc')
     }
   }
 
-  const clearFilters = () => {
-    setFilters({
-      search: '',
-      active: 'all',
-      type: 'all'
+  const filteredAndSortedLocations = useMemo(() => {
+    let result = [...locations]
+
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      result = result.filter(loc =>
+        loc.code.toLowerCase().includes(query) ||
+        loc.name.toLowerCase().includes(query) ||
+        loc.description?.toLowerCase().includes(query) ||
+        loc.departmentName?.toLowerCase().includes(query)
+      )
+    }
+
+    // Apply type filter
+    if (typeFilter !== 'all') {
+      result = result.filter(loc => loc.type === typeFilter)
+    }
+
+    // Apply status filter
+    if (statusFilter !== 'all') {
+      result = result.filter(loc => loc.status === statusFilter)
+    }
+
+    // Apply physical count filter
+    if (physicalCountFilter !== 'all') {
+      const enabled = physicalCountFilter === 'yes'
+      result = result.filter(loc => loc.physicalCountEnabled === enabled)
+    }
+
+    // Apply sorting
+    result.sort((a, b) => {
+      let comparison = 0
+      switch (sortField) {
+        case 'code':
+          comparison = a.code.localeCompare(b.code)
+          break
+        case 'name':
+          comparison = a.name.localeCompare(b.name)
+          break
+        case 'type':
+          comparison = a.type.localeCompare(b.type)
+          break
+        case 'status':
+          comparison = a.status.localeCompare(b.status)
+          break
+        case 'shelvesCount':
+          comparison = a.shelvesCount - b.shelvesCount
+          break
+        case 'assignedProductsCount':
+          comparison = a.assignedProductsCount - b.assignedProductsCount
+          break
+        case 'assignedUsersCount':
+          comparison = a.assignedUsersCount - b.assignedUsersCount
+          break
+      }
+      return sortDirection === 'asc' ? comparison : -comparison
     })
+
+    return result
+  }, [locations, searchQuery, typeFilter, statusFilter, physicalCountFilter, sortField, sortDirection])
+
+  const getTypeVariant = (type: InventoryLocationType): "default" | "secondary" | "outline" => {
+    switch (type) {
+      case InventoryLocationType.INVENTORY:
+        return "default"
+      case InventoryLocationType.DIRECT:
+        return "secondary"
+      case InventoryLocationType.CONSIGNMENT:
+        return "outline"
+      default:
+        return "default"
+    }
   }
 
-  const filteredAndSortedData = useMemo(() => {
-    let filtered = mockLocations.filter(location => {
-      const matchesSearch = location.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-                           location.type.toLowerCase().includes(filters.search.toLowerCase()) ||
-                           location.code.toLowerCase().includes(filters.search.toLowerCase())
-      
-      const matchesActive = filters.active === 'all' || location.isActive.toString() === filters.active
-      const matchesType = filters.type === 'all' || location.type === filters.type
-
-      return matchesSearch && matchesActive && matchesType
-    })
-
-    return filtered.sort((a, b) => {
-      const aValue = a[sortConfig.field]
-      const bValue = b[sortConfig.field]
-
-      // Handle undefined values
-      if (aValue === undefined && bValue === undefined) return 0
-      if (aValue === undefined) return sortConfig.direction === 'asc' ? 1 : -1
-      if (bValue === undefined) return sortConfig.direction === 'asc' ? -1 : 1
-
-      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
-      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
-      return 0
-    })
-  }, [mockLocations, sortConfig, filters])
-
-  const hasActiveFilters = filters.active !== 'all' || filters.type !== 'all'
-
-  const SortIcon = ({ field }: { field: keyof Location }) => {
-    if (sortConfig.field !== field) return null
-    return sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+  const getStatusVariant = (status: LocationStatus): "default" | "secondary" | "destructive" | "outline" => {
+    switch (status) {
+      case 'active':
+        return "default"
+      case 'inactive':
+        return "secondary"
+      case 'closed':
+        return "destructive"
+      case 'pending_setup':
+        return "outline"
+      default:
+        return "default"
+    }
   }
+
+  const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
+    <button
+      onClick={() => handleSort(field)}
+      className="flex items-center gap-1 hover:text-foreground"
+    >
+      {children}
+      <ArrowUpDown className="h-3 w-3" />
+    </button>
+  )
+
+  const allSelected = filteredAndSortedLocations.length > 0 &&
+    filteredAndSortedLocations.every(loc => selectedLocations.includes(loc.id))
 
   return (
-    <div className="space-y-4 px-6 pt-6">
-      {/* Header Row - Title and Action Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Location Management</h1>
-          <p className="text-muted-foreground">Manage your business locations and their configurations</p>
+    <div className="space-y-4">
+      {/* Filters */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search locations..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
         </div>
+
         <div className="flex gap-2">
-          <Link href="/system-administration/location-management/new/edit">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Location
-            </Button>
-          </Link>
-          <Button variant="outline">
-            <FileText className="h-4 w-4 mr-2" />
-            Print
-          </Button>
-        </div>
-      </div>
-
-      {/* Search and View Controls Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <Input
-          placeholder="Search locations..."
-          value={filters.search}
-          onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-          className="flex-1 max-w-sm"
-        />
-        <div className="flex flex-wrap gap-2 items-center">
-          {/* Quick Filters */}
-          <Select value={filters.active} onValueChange={(value) => setFilters(prev => ({ ...prev, active: value }))}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="All Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="true">Active</SelectItem>
-              <SelectItem value="false">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={filters.type} onValueChange={(value) => setFilters(prev => ({ ...prev, type: value }))}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="All Types" />
+          <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as InventoryLocationType | 'all')}>
+            <SelectTrigger className="w-[150px]">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
-              {filterOptions.types.map(type => (
-                <SelectItem key={type} value={type}>{type}</SelectItem>
-              ))}
+              <SelectItem value={InventoryLocationType.INVENTORY}>Inventory</SelectItem>
+              <SelectItem value={InventoryLocationType.DIRECT}>Direct</SelectItem>
+              <SelectItem value={InventoryLocationType.CONSIGNMENT}>Consignment</SelectItem>
             </SelectContent>
           </Select>
 
-          {hasActiveFilters && (
-            <Button variant="outline" size="sm" onClick={clearFilters}>
-              Clear Filters
-            </Button>
-          )}
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as LocationStatus | 'all')}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="closed">Closed</SelectItem>
+              <SelectItem value="pending_setup">Pending Setup</SelectItem>
+            </SelectContent>
+          </Select>
 
-          {/* View Toggle Buttons */}
-          <TooltipProvider>
-            <div className="flex gap-1 border rounded bg-muted">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={viewMode === 'table' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setViewMode('table')}
-                  >
-                    <TableIcon className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Table View</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={viewMode === 'card' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setViewMode('card')}
-                  >
-                    <LayoutGrid className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Card View</TooltipContent>
-              </Tooltip>
-            </div>
-          </TooltipProvider>
+          <Select value={physicalCountFilter} onValueChange={(v) => setPhysicalCountFilter(v as 'all' | 'yes' | 'no')}>
+            <SelectTrigger className="w-[170px]">
+              <SelectValue placeholder="Physical Count" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="yes">Count Enabled</SelectItem>
+              <SelectItem value="no">Count Disabled</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {/* Table View */}
-      {viewMode === 'table' && (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
+      {/* Results count */}
+      <div className="text-sm text-muted-foreground">
+        Showing {filteredAndSortedLocations.length} of {locations.length} locations
+      </div>
+
+      {/* Table */}
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={onSelectAll}
+                  aria-label="Select all"
+                />
+              </TableHead>
+              <TableHead>
+                <SortableHeader field="code">Code</SortableHeader>
+              </TableHead>
+              <TableHead>
+                <SortableHeader field="name">Name</SortableHeader>
+              </TableHead>
+              <TableHead>
+                <SortableHeader field="type">Type</SortableHeader>
+              </TableHead>
+              <TableHead>
+                <SortableHeader field="status">Status</SortableHeader>
+              </TableHead>
+              <TableHead className="text-center">Physical Count</TableHead>
+              <TableHead className="text-center">
+                <SortableHeader field="shelvesCount">
+                  <Layers className="h-4 w-4" />
+                </SortableHeader>
+              </TableHead>
+              <TableHead className="text-center">
+                <SortableHeader field="assignedProductsCount">
+                  <Package className="h-4 w-4" />
+                </SortableHeader>
+              </TableHead>
+              <TableHead className="text-center">
+                <SortableHeader field="assignedUsersCount">
+                  <Users className="h-4 w-4" />
+                </SortableHeader>
+              </TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead className="w-[80px]">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredAndSortedLocations.length === 0 ? (
               <TableRow>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50 select-none"
-                  onClick={() => handleSort('code')}
-                >
-                  <div className="flex items-center gap-1">
-                    Code
-                    {sortConfig.field === 'code' && (
-                      sortConfig.direction === 'asc' ? 
-                      <ChevronUp className="h-4 w-4" /> : 
-                      <ChevronDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50 select-none"
-                  onClick={() => handleSort('name')}
-                >
-                  <div className="flex items-center gap-1">
-                    Name
-                    {sortConfig.field === 'name' && (
-                      sortConfig.direction === 'asc' ? 
-                      <ChevronUp className="h-4 w-4" /> : 
-                      <ChevronDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50 select-none"
-                  onClick={() => handleSort('type')}
-                >
-                  <div className="flex items-center gap-1">
-                    Type
-                    {sortConfig.field === 'type' && (
-                      sortConfig.direction === 'asc' ? 
-                      <ChevronUp className="h-4 w-4" /> : 
-                      <ChevronDown className="h-4 w-4" />
-                    )}
-                  </div>
-                </TableHead>
-                <TableHead>EOP</TableHead>
-                <TableHead>Delivery Point</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableCell colSpan={11} className="text-center py-8 text-muted-foreground">
+                  <Warehouse className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  No locations found
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAndSortedData.map((location) => (
-                <TableRow key={location.id}>
-                  <TableCell className="font-medium">{location.code}</TableCell>
-                  <TableCell>{location.name}</TableCell>
-                  <TableCell>{location.type}</TableCell>
-                  <TableCell>{location.eop === 'true' ? 'Yes' : 'No'}</TableCell>
-                  <TableCell>{location.deliveryPoint}</TableCell>
-                  <TableCell>
-                    <Badge variant={location.isActive ? 'default' : 'secondary'}>
-                      {location.isActive ? 'Active' : 'Inactive'}
-                    </Badge>
+            ) : (
+              filteredAndSortedLocations.map((location) => (
+                <TableRow
+                  key={location.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => onView(location)}
+                >
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={selectedLocations.includes(location.id)}
+                      onCheckedChange={() => onSelectItem(location.id)}
+                      aria-label={`Select ${location.name}`}
+                    />
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Link href={`/system-administration/location-management/${location.id}`}>
-                        <Button variant="ghost" size="sm">
-                          <FileText className="h-4 w-4" />
-                        </Button>
-                      </Link>
-                      <Link href={`/system-administration/location-management/${location.id}/edit`}>
-                        <Button variant="ghost" size="sm">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </Link>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(location.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                  <TableCell className="font-mono font-medium">
+                    {location.code}
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{location.name}</div>
+                      {location.description && (
+                        <div className="text-sm text-muted-foreground truncate max-w-[200px]">
+                          {location.description}
+                        </div>
+                      )}
                     </div>
                   </TableCell>
+                  <TableCell>
+                    <Badge variant={getTypeVariant(location.type)}>
+                      {LOCATION_TYPE_LABELS[location.type]}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getStatusVariant(location.status)}>
+                      {location.status.replace('_', ' ')}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {location.physicalCountEnabled ? (
+                      <CheckCircle className="h-4 w-4 text-green-600 mx-auto" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-muted-foreground mx-auto" />
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">{location.shelvesCount}</TableCell>
+                  <TableCell className="text-center">{location.assignedProductsCount}</TableCell>
+                  <TableCell className="text-center">{location.assignedUsersCount}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {location.departmentName || '-'}
+                  </TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => onView(location)}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onEdit(location)}>
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => onDelete(location)}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          
-          {/* Table Footer */}
-          <div className="flex items-center justify-between px-2 py-4 border-t bg-muted/30">
-            <span className="text-sm text-muted-foreground">
-              Showing {filteredAndSortedData.length} of {mockLocations.length} records
-            </span>
-            <div className="text-sm text-muted-foreground">
-              {/* Future pagination controls can go here */}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Card View */}
-      {viewMode === 'card' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredAndSortedData.map((location) => (
-            <Card key={location.id} className="p-4">
-              <div className="space-y-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold">{location.name}</h3>
-                    <p className="text-sm text-muted-foreground">{location.code}</p>
-                  </div>
-                  <Badge variant={location.isActive ? 'default' : 'secondary'}>
-                    {location.isActive ? 'Active' : 'Inactive'}
-                  </Badge>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Type:</span>
-                    <div>{location.type}</div>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">EOP:</span>
-                    <div>{location.eop === 'true' ? 'Yes' : 'No'}</div>
-                  </div>
-                </div>
-                <div className="text-sm">
-                  <span className="text-muted-foreground">Delivery Point:</span>
-                  <div>{location.deliveryPoint}</div>
-                </div>
-                <div className="flex justify-end gap-2 pt-2">
-                  <Link href={`/system-administration/location-management/${location.id}`}>
-                    <Button variant="ghost" size="sm">
-                      <FileText className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                  <Link href={`/system-administration/location-management/${location.id}/edit`}>
-                    <Button variant="ghost" size="sm">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(location.id)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Location</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this location? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }
-
-export default LocationList 

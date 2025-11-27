@@ -8,6 +8,12 @@
 - **Related Documents**:
   - [BR-cuisine-types.md](./BR-cuisine-types.md) - Business Requirements
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial use cases document created |
+
 ---
 
 ## 1. Overview
@@ -1594,9 +1600,3 @@ UC-CUI-006 (View Details)
 - **VAL-cuisine-types.md** - Validations (to be created)
 
 ---
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial use cases document created |

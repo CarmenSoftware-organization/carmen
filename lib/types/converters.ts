@@ -41,10 +41,10 @@ export const purchaseRequestToPurchaseOrder = (
     status: 'draft',
     currency: 'USD', // Default currency
     exchangeRate: 1.0,
-    subtotal: pr.estimatedTotal,
-    taxAmount: { amount: 0, currency: 'USD' }, // Calculate based on tax rules
-    discountAmount: { amount: 0, currency: 'USD' },
-    totalAmount: pr.estimatedTotal,
+    subtotal: pr.estimatedTotal ?? { amount: 0, currency: pr.currency || 'THB' },
+    taxAmount: { amount: 0, currency: pr.currency || 'THB' }, // Calculate based on tax rules
+    discountAmount: { amount: 0, currency: pr.currency || 'THB' },
+    totalAmount: pr.estimatedTotal ?? { amount: 0, currency: pr.currency || 'THB' },
     deliveryLocationId: pr.locationId,
     expectedDeliveryDate: pr.requiredDate,
     paymentTerms: vendor.preferredPaymentTerms || 'Net 30',

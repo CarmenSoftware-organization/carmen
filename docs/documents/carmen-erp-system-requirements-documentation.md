@@ -6,6 +6,11 @@ Carmen is a comprehensive hospitality-focused Enterprise Resource Planning (ERP)
 
 **Vision**: A complete end-to-end hospitality management system that streamlines operations from procurement to service delivery, with intelligent automation, real-time analytics, and seamless integration across all hotel departments.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. Authentication & User Management

@@ -6,7 +6,12 @@
 - **Version**: 1.0
 - **Last Updated**: 2024-01-15
 
----
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial business requirements document created |
+
 
 ## 1. Overview
 
@@ -1553,9 +1558,3 @@ enum PriceRange {
 **Weighted Contribution Margin**: Contribution margin multiplied by menu mix percentage, representing actual profit contribution.
 
 ---
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial business requirements document created |

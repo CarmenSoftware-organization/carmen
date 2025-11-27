@@ -1,5 +1,10 @@
 # Hotel Supply Chain Mobile App - Section Flow Diagram
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 The following diagram illustrates the primary user flows and relationships between the main sections of the hotel supply chain mobile application.
 
 ```mermaid

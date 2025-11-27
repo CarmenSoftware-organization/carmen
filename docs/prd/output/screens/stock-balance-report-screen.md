@@ -8,6 +8,11 @@
 **Date:** August 14, 2025  
 **Status:** Based on Actual Source Code Analysis  
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Implementation Overview
 
 **Purpose:** This screen provides comprehensive inventory balance reporting with real-time stock valuations, detailed balance breakdowns by location/category/product, and movement history tracking for operational inventory management.

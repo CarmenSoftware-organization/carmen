@@ -1,5 +1,10 @@
 # Physical Count Module - Complete Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 The Physical Count module is a comprehensive inventory management system designed for hospitality environments. It provides a structured workflow for conducting physical inventory counts with multi-step processes, location-based organization, and real-time progress tracking.

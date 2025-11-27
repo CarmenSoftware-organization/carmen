@@ -1,5 +1,10 @@
 # Reporting & Analytics Module PRD
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Executive Summary
 
 The Reporting & Analytics Module serves as the business intelligence command center for the Carmen hospitality ERP system, transforming operational data into actionable insights that drive strategic decision-making. This module specializes in advanced consumption analytics, fractional sales intelligence, predictive modeling, and automated reporting to optimize business performance across all operational areas.

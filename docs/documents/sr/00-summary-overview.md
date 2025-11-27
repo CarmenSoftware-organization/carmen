@@ -1,5 +1,10 @@
 # Carmen ERP System - Feature Specifications Summary
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 This document provides a comprehensive overview of the Carmen ERP system features based on systematic analysis of the source code. The documentation covers all major functional areas identified within the application architecture, providing detailed specifications for each feature group.
 

@@ -15,6 +15,11 @@
 - [Data Definition](./DS-purchase-orders.md)
 - [Flow Diagrams](./FD-purchase-orders.md)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Overview

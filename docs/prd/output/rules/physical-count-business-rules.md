@@ -6,6 +6,11 @@
 **Date**: January 15, 2025  
 **Status**: Active  
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 This document defines business rules for managing physical inventory counts within the Carmen ERP system, including cycle counting, annual counts, count accuracy requirements, and variance management for hospitality operations.

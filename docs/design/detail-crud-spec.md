@@ -1,5 +1,10 @@
 # Detail/CRUD Screen Layout Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 This specification defines a standardized layout pattern for detail views and CRUD (Create, Read, Update, Delete) operations that can be consistently applied across different content types.
 

@@ -8,6 +8,11 @@
 **Date:** 2025-01-14  
 **Status:** Based on Actual Source Code Analysis  
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Visual Interface
 
 ![Goods Received Note List View](./images/goods-received-note-list/goods-received-note-list-populated.png)

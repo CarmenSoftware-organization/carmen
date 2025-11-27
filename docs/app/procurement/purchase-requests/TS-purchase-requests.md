@@ -4,15 +4,31 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Requests
 - **Route**: `/procurement/purchase-requests`
-- **Version**: 1.0.0
-- **Last Updated**: 2025-10-30
+- **Version**: 1.1.0
+- **Last Updated**: 2025-11-26
 - **Owner**: Development Team
-- **Status**: Draft
+- **Status**: Active
 
 ## Document History
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0.0 | 2025-10-30 | Development Team | Initial technical specification |
+| 1.1.0 | 2025-11-26 | Documentation Team | Synchronized with BR - updated status values, added implementation status markers |
+
+## Implementation Status
+
+This document defines **target technical specifications** for Purchase Requests. Implementation status markers indicate current development state:
+
+| Status | Meaning |
+|--------|---------|
+| ✅ Implemented | Feature complete and functional |
+| 🔧 Partial | Frontend exists, backend development needed |
+| 🚧 Pending | Not yet implemented |
+| ⏳ Future | Post-MVP enhancement |
+
+**Current State**: Frontend prototype with mock data. Backend API and integrations pending development.
+
+**BR-Defined Status Values**: Draft, In-progress, Approved, Void, Completed, Cancelled
 
 ---
 
@@ -146,7 +162,7 @@ graph TD
 **Layout Components**:
 - **Page Header**: Title, breadcrumb, Create button
 - **Filter Bar**: Status filter, Date range, Department, Location, Requestor, Amount range
-- **Quick Filters**: My PRs, Pending Approval, Recently Approved, In Process, Rejected
+- **Quick Filters**: Primary toggle (My Pending / All Documents), Secondary dropdowns (Status, Stage, Requester)
 - **Search Bar**: Search by PR number, item name, description, vendor
 - **Data Table**: Paginated list of PRs with sortable columns
 - **Action Buttons**: View, Edit (contextual based on status), Delete (draft only)
@@ -253,13 +269,13 @@ graph TD
    - Links to converted from PRs (if created from template)
 
 9. **Context Action Buttons** (status-dependent)
-   - Edit (Draft, Rejected status only)
+   - Edit (Draft, Void status only)
    - Submit for Approval (Draft only)
-   - Approve (Pending Approval, for approvers)
-   - Reject (Pending Approval, for approvers)
-   - Recall (Submitted, for requestor)
+   - Approve (In-progress, for approvers)
+   - Void (In-progress, for approvers)
+   - Recall (In-progress, for requestor)
    - Convert to PO (Approved, for purchasing staff)
-   - Cancel (Draft, Submitted)
+   - Cancel (Draft, In-progress)
    - Save as Template (any status)
    - Print/Export PDF
 
@@ -279,7 +295,7 @@ graph TD
 - Save changes button
 - Discard changes button
 
-**Access Control**: Only accessible when PR status is "Draft" or "Rejected" and user is the requestor
+**Access Control**: Only accessible when PR status is "Draft" or "Void" and user is the requestor
 
 ---
 
@@ -386,7 +402,7 @@ flowchart TD
     ClickReject --> RejectDialog[Rejection Dialog Opens]
     RejectDialog --> EnterReason[Enter rejection reason<br/>minimum 10 characters]
     EnterReason --> ConfirmReject[Confirm Rejection]
-    ConfirmReject --> ProcessReject[System processes:<br/>Update status to Rejected,<br/>Notify requestor]
+    ConfirmReject --> ProcessReject[System processes:<br/>Update status to Void,<br/>Notify requestor]
 
     AddComment --> NotifyRequestor[System notifies<br/>requestor]
     NotifyRequestor --> WaitResponse[Wait for response]
@@ -431,7 +447,7 @@ flowchart TD
 
     CreatePOs --> LinkPRPO[Link PR to POs]
 
-    LinkPRPO --> UpdatePRStatus[Update PR status<br/>to Converted]
+    LinkPRPO --> UpdatePRStatus[Update PR status<br/>to Completed]
 
     UpdatePRStatus --> NotifyCreator[Notify PR creator]
 
@@ -460,12 +476,11 @@ graph TD
     EditPage["Edit Page<br/>(/procurement/purchase-requests/[id]/edit)"]
     TemplatePage["Template Management<br/>(/procurement/purchase-requests/templates)"]
 
-    %% List Page Tabs
-    ListPage --> ListTab1["Tab: All PRs"]
-    ListPage --> ListTab2["Tab: My PRs"]
-    ListPage --> ListTab3["Tab: Pending Approval"]
-    ListPage --> ListTab4["Tab: Approved"]
-    ListPage --> ListTab5["Tab: Drafts"]
+    %% List Page Primary Filters
+    ListPage --> PrimaryFilter1["Primary: My Pending (Default)"]
+    ListPage --> PrimaryFilter2["Primary: All Documents"]
+    PrimaryFilter1 --> SecondaryFilter1["Secondary: Stage Filter"]
+    PrimaryFilter2 --> SecondaryFilter2["Secondary: Status Filter"]
 
     %% List Page Dialogs
     ListPage -.-> ListDialog1["Dialog: Quick Create"]
@@ -559,15 +574,17 @@ graph TD
 - **Pagination**: Page size selector (10/20/50/100), page navigation, total count display
 
 **Tabs**:
-- **All PRs** (Default): Shows all purchase requests user has access to
+- **My Pending** (Default): Shows actionable PRs requiring user attention
+  - Filters PRs with statuses: Draft, In-progress, Approved, Void
   - Sort by: Date (newest first)
-  - Filters available: All standard filters
-  - Action buttons: View, Edit (if draft), Delete (if draft)
+  - Secondary filters: Stage, Requester
+  - Action buttons: View, Edit (if draft), Submit (if draft), Recall (if submitted)
 
-- **My PRs**: Shows only PRs created by current user
+- **All Documents**: Shows comprehensive view of all accessible PRs
+  - Displays all PRs based on user role and department permissions
   - Sort by: Date (newest first)
-  - Filters available: Status, Date range
-  - Action buttons: View, Edit (if draft), Recall (if submitted), Clone
+  - Secondary filters: Status, Requester
+  - Action buttons: View, Edit (if draft), Delete (if draft)
 
 - **Pending Approval**: Shows PRs awaiting current user's approval
   - Sort by: Submission date (oldest first - urgent first)
@@ -692,7 +709,7 @@ graph TD
   - Content: PO form pre-filled with PR data, vendor selection per item, delivery dates
   - Actions: "Create PO", "Split to Multiple POs", "Cancel"
   - Validation: All items must have vendors selected, budget re-check
-  - Success: Creates PO(s), links to PR, updates PR status to "Converted", redirects to PO detail
+  - Success: Creates PO(s), links to PR, updates PR status to "Completed", redirects to PO detail
 
 - **Recall PR Dialog** (Modal - Small)
   - Trigger: Click "Recall" button (visible to requestor, submitted PRs only)
@@ -1035,7 +1052,7 @@ flowchart TD
     DetailPage -->|Share| ShareDialog[Share Dialog]
 
     ApproveDialog -->|Confirm| ApprovalSuccess[PR Approved]
-    RejectDialog -->|Confirm| RejectionSuccess[PR Rejected]
+    RejectDialog -->|Confirm| RejectionSuccess[PR Voided]
     ConvertDialog -->|Create PO| POCreated[PO Created]
     RecallDialog -->|Confirm| EditPage
     CancelDialog -->|Confirm| PRCancelled[PR Cancelled]
@@ -1132,7 +1149,7 @@ flowchart TD
    - Success toast appears: "PR-2025-0042 submitted successfully"
    - Redirects to Detail Page for PR-2025-0042
 8. **Detail Page**:
-   - Status badge shows: "Submitted" (yellow)
+   - Status badge shows: "In-progress" (yellow)
    - Approval Timeline tab shows: Pending approval from "John Smith (Dept Manager)"
    - User clicks "Back to List" → Returns to PR List Page
 9. **Notification**: Email sent to approver (John Smith) with PR link
@@ -1217,14 +1234,14 @@ flowchart TD
 8. **Success**:
    - System creates 3 POs: PO-2025-0088, PO-2025-0089, PO-2025-0090
    - Links POs to PR-2025-0042
-   - Updates PR status to "Converted"
+   - Updates PR status to "Completed"
    - Success toast: "Created 3 Purchase Orders from PR-2025-0042"
    - Redirects to PO Detail Page (PO-2025-0088)
 9. **Verify**:
    - PO Detail Page shows linked PR
    - User navigates back to PR Detail Page
    - Related Documents tab shows all 3 linked POs
-   - Status badge: "Converted" (blue)
+   - Status badge: "Completed" (blue)
 10. **Notification**: Email sent to requestor with PO numbers
 
 **Accessibility**: Dialog keyboard navigation, vendor selection via keyboard (arrows, Enter)
@@ -1255,11 +1272,13 @@ flowchart TD
 #### Visual Accessibility
 - **Color Contrast**: All text meets WCAG 2.1 AA standards (4.5:1 for normal text, 3:1 for large text)
 - **Focus Indicators**: Visible focus outline on all interactive elements (2px solid blue)
-- **Status Colors**: Color-coded statuses supplemented with icons and text
+- **Status Colors**: Color-coded statuses supplemented with icons and text (BR-defined values)
   - Draft: Gray + Draft icon + "Draft" text
-  - Submitted: Blue + Clock icon + "Submitted" text
+  - In-progress: Blue + Clock icon + "In-progress" text
   - Approved: Green + Check icon + "Approved" text
-  - Rejected: Red + X icon + "Rejected" text
+  - Void: Red + X icon + "Void" text
+  - Completed: Blue + Check icon + "Completed" text
+  - Cancelled: Gray + X icon + "Cancelled" text
 - **Error States**: Red borders + error icon + error text (not color alone)
 - **Required Fields**: Asterisk (*) + "required" text in label
 - **Font Size**: Minimum 14px for body text, 16px for inputs
@@ -1804,7 +1823,7 @@ erDiagram
         date delivery_date "Requested delivery date"
         text description
         text justification
-        varchar status "Draft, Submitted, Approved, Rejected, Cancelled, Converted"
+        varchar status "Draft, In-progress, Approved, Void, Completed, Cancelled"
         boolean hide_price "Hide pricing from requestor view"
         uuid delivery_point FK "Header-level delivery point (nullable)"
         decimal subtotal "DECIMAL(15,2)"
@@ -1869,7 +1888,7 @@ erDiagram
         uuid approver_id FK
         varchar approver_role "Department Manager, Finance Manager, General Manager"
         decimal approval_threshold "Amount threshold for this level (nullable)"
-        varchar status "Pending, Approved, Rejected, Cancelled"
+        varchar status "Pending, Approved, Voided, Cancelled"
         timestamp approved_at
         timestamp rejected_at
         text comments "Approval/rejection comments"
@@ -1908,7 +1927,7 @@ erDiagram
     pr_activity_log {
         uuid id PK
         uuid pr_id FK
-        varchar activity_type "Created, Submitted, Approved, Rejected, Edited, Commented, etc."
+        varchar activity_type "Created, Submitted, Approved, Voided, Edited, Commented, Completed, Cancelled, etc."
         text description "Human-readable activity description"
         jsonb changes "Before/after values for edits"
         uuid performed_by FK
@@ -2016,16 +2035,16 @@ erDiagram
 **Indexes** (Recommended):
 - `purchase_requests(pr_number)` - Unique index for PR number lookups
 - `purchase_requests(status, pr_date)` - Composite index for status filtering with date sorting
-- `purchase_requests(requestor_id, status)` - For "My PRs" queries
+- `purchase_requests(requestor_id, status)` - For "My Pending" and user-specific queries
 - `purchase_requests(department_id, status)` - For department-based filtering
 - `pr_line_items(pr_id, line_number)` - For ordered line item retrieval
 - `pr_approvals(pr_id, approval_level)` - For approval workflow queries
-- `pr_approvals(approver_id, status)` - For "My Approvals" queries
+- `pr_approvals(approver_id, status)` - For approval-related queries
 - `pr_activity_log(pr_id, performed_at)` - For activity timeline retrieval
 
 **Constraints**:
 - `pr_number` must be unique across all purchase requests
-- `status` must be one of: Draft, Submitted, Approved, Rejected, Cancelled, Converted
+- `status` must be one of: Draft, In-progress, Approved, Void, Completed, Cancelled
 - `pr_type` must be one of: Market List, Standard Order, Fixed Asset
 - All monetary amounts use DECIMAL(15,2) for precision
 - All quantity fields use DECIMAL(15,3) to support fractional quantities
@@ -2188,7 +2207,7 @@ classDiagram
         +cancel() Boolean
         +isPending() Boolean
         +isApproved() Boolean
-        +isRejected() Boolean
+        +isVoided() Boolean
         +canApprove(userId) Boolean
     }
 

@@ -7,6 +7,11 @@
 **Date**: August 14, 2025  
 **Status**: Based on Source Code Analysis & System Behavior  
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Business Rules Overview
 
 **Purpose**: These business rules govern the approval workflow processing for purchase requests in a hospitality ERP system, ensuring proper financial controls, budget compliance, and procurement authorization through structured approval templates.

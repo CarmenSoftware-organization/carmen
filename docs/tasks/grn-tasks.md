@@ -1,5 +1,10 @@
 # Goods Received Note (GRN) Module - Development Tasks
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 Based on: `docs/good-recive-note-managment/grn-master-prd.md` and `docs/good-recive-note-managment/GRN-API-Overview.md`
 
 ## Frontend Tasks

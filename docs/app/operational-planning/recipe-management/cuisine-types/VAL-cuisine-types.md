@@ -6,6 +6,12 @@
 - **Version**: 1.0
 - **Last Updated**: 2024-01-15
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial validations document created |
+
 ---
 
 ## 1. Client-Side Validation (Zod Schemas)
@@ -548,9 +554,3 @@ export function sanitizeCuisineInput(input: CreateCuisineInput): CreateCuisineIn
 - Content Security Policy headers
 
 ---
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial validations document created |

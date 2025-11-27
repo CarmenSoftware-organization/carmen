@@ -2,6 +2,11 @@
 
 **Welcome to the Carmen ERP development team!** This guide will help you get up to speed with the Carmen hospitality ERP system in a structured, step-by-step manner.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 📋 Table of Contents

@@ -21,6 +21,14 @@ export * from './pos-transactions'
 export * from './pos-mappings'
 export * from './campaigns'
 export * from './pricelists'
+export * from './workflow-config'
+export * from './stock-movements'
+export * from './inventory-balance'
+export * from './stock-cards'
+export * from './categories'
+export * from './cuisines'
+// Export mockIngredients and mockBaseRecipes from recipe-management (mockRecipes is in ./recipes)
+export { mockIngredients, mockBaseRecipes } from './recipe-management'
 
 // Export roles, departments, locations and helper functions from users for compatibility
 export { 
@@ -87,3 +95,6 @@ export {
 } from './permission-policies'
 
 export * from './permission-subscriptions'
+
+// Inventory locations and related mock data
+export * from './inventory-locations'

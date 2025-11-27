@@ -1,5 +1,10 @@
 # Credit Note Module - Product Requirements Document (PRD)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## 1. Executive Summary
 
 The Credit Note Module is a critical component of the Carmen F&B Management System that enables businesses to process vendor returns, discounts, and adjustments. This module integrates with the Goods Received Note (GRN) system, Accounts Payable (AP), and Inventory Management to provide a comprehensive solution for handling credit transactions. The system supports multi-currency operations, tracks both order and inventory units, manages lot numbers, and provides detailed audit trails for all transactions.

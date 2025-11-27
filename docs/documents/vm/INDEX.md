@@ -249,5 +249,10 @@ docs/documents/vm/
 ---
 
 **Last Updated**: 2025-10-02
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Documentation Version**: 1.0.0
 **Maintained By**: Development Team

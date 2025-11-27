@@ -15,6 +15,11 @@ This document identifies files and directories in the Carmen ERP codebase that a
 ### 1. `_backup/` Directory
 **Location**: `/Users/peak/Documents/GitHub/carmen/_backup/`
 **Status**: ⚠️ **ORPHANED**
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Description**: Contains backup files from previous development iterations
 **Files**: 
 - `_backup/app/` - Old application structure

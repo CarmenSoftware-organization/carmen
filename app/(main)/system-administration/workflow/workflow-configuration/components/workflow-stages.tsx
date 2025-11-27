@@ -10,7 +10,7 @@ import { Edit, Save, X, UserPlus, Trash2, Filter, MoreHorizontal } from 'lucide-
 import { Stage } from "../types/workflow"
 import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { users } from "../../role-assignment/data/mockData"
+import { mockUsers } from '@/lib/mock-data'
 
 interface WorkflowStagesProps {
   stages: Stage[]
@@ -91,7 +91,7 @@ export function WorkflowStages({
     setStages(updatedStages)
   }
 
-  const handleAssignUser = (user: { id: number; name: string; department: string; location: string }) => {
+  const handleAssignUser = (user: import('@/lib/types').User) => {
     if (!selectedStage) return
 
     const updatedStages = stages.map(stage => {
@@ -155,7 +155,7 @@ export function WorkflowStages({
     setIsStageEditing(false)
   }
 
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = mockUsers.filter(user => {
     const isAssigned = selectedStage?.assignedUsers.some(u => u.id === user.id) ?? false
     switch (userFilter) {
       case 'assigned':
@@ -635,7 +635,7 @@ export function WorkflowStages({
                     <Card>
                       <CardContent className="p-6">
                         <div className="flex justify-between items-center mb-4">
-                          <span className="font-semibold">Total Users: {selectedStage.assignedUsers.length} / {users.length}</span>
+                          <span className="font-semibold">Total Users: {selectedStage.assignedUsers.length} / {mockUsers.length}</span>
                           <Button variant="outline" size="sm">Bulk Actions</Button>
                         </div>
 

@@ -2,6 +2,11 @@
 
 This document provides a comprehensive, consolidated overview of the Purchase Order (PO) module, combining all related business, functional, and technical documentation into a single source of truth.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. Business Analysis

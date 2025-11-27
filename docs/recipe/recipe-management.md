@@ -1,5 +1,10 @@
 ## Recipe Master List/Library Page
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 HEADER SECTION
 
 * System Navigation Bar  

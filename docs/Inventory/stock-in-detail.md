@@ -96,6 +96,11 @@ Reference: Contains a reference code or number that links this stock movement to
 Footer Section
 Comment Section
 #: A numerical identifier for each comment made.
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 Date: When the comment was added.
 By: Who made the comment.
 Comment: The content of the comment itself.

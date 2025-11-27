@@ -1,5 +1,10 @@
 # Goods Received Note Module - Overview
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 > **Document Status**: Content Migration Complete (Phase 2)  
 > **Last Updated**: March 14, 2024  
 > **Next Update**: Phase 3 - Content Review and Refinement

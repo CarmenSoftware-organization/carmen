@@ -13,6 +13,11 @@
 **Submodule Name**: Campaigns
 **Route**: `/vendor-management/campaigns`
 **Status**: 🚧 Prototype
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Purpose**: RFP/RFQ campaign management for collecting vendor pricing through coordinated invitations
 
 **Key Features**:

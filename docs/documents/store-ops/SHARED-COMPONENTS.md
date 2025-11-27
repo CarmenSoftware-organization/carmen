@@ -674,3 +674,9 @@ Store Operations > Store Requisitions > SR-2024-001
 **Last Updated**: 2025-10-02
 **Module**: Store Operations
 **Status**: ✅ Production (Store Requisitions), 🚧 Prototype (Others)
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |

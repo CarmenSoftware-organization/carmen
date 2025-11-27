@@ -1,5 +1,10 @@
 # Source Code Documentation Prompt
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
   Create a comprehensive Product Requirements Document (PRD) for [PAGE/COMPONENT NAME] based strictly on actual source code
   implementation. Follow these guidelines:
 

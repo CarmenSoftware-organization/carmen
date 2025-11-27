@@ -4,6 +4,11 @@
 **Last Updated:** March 27, 2024  
 **Author:** Carmen Development Team
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Table of Contents
 1. [Overview](#1-overview)
 2. [Feature Requirements](#2-feature-requirements)

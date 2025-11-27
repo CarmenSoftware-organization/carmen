@@ -14,7 +14,6 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-01-12 | Store Operations Team | Initial version |
 
----
 
 ## Overview
 

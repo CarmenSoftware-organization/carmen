@@ -41,6 +41,13 @@
 #### 1.1 tb_vendor_portal_user ❌
 
 **Status**: NOT IN SCHEMA - Requires Implementation
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+
+---
 **Priority**: CRITICAL
 **Estimated Effort**: 4-5 hours
 

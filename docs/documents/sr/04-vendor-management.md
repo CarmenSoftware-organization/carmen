@@ -1,5 +1,10 @@
 # Feature: Vendor Management System
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Description
 The Carmen ERP Vendor Management System provides comprehensive vendor lifecycle management including vendor directory management, pricelist management, template-based pricing requests, campaign management, and vendor portal integration. The system features advanced vendor profiling with tax configuration, certification tracking, performance metrics, contact management, and address management. The vendor management module integrates with procurement processes to provide vendor comparison capabilities, pricing intelligence, and vendor performance analytics throughout the procurement workflow.
 

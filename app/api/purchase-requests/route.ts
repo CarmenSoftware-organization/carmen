@@ -38,7 +38,7 @@ import { SecurityEventType } from '@/lib/security/audit-logger'
 const purchaseRequestFiltersSchema = z.object({
   status: z.array(z.enum(['draft', 'inprogress', 'approved', 'rejected', 'void', 'converted'])).optional(),
   priority: z.array(z.enum(['low', 'normal', 'high', 'urgent', 'emergency'])).optional(),
-  requestType: z.array(z.enum(['goods', 'services', 'capital', 'maintenance', 'emergency'])).optional(),
+  requestType: z.array(z.enum(['General', 'MarketList', 'Asset'])).optional(),
   departmentId: SecureSchemas.uuid.optional(),
   requestedBy: SecureSchemas.uuid.optional(),
   dateFrom: z.coerce.date().optional(),
@@ -81,7 +81,7 @@ const createPurchaseRequestItemSchema = z.object({
 const createPurchaseRequestSchema = z.object({
   requestDate: z.coerce.date(),
   requiredDate: z.coerce.date(),
-  requestType: z.enum(['goods', 'services', 'capital', 'maintenance', 'emergency']),
+  requestType: z.enum(['General', 'MarketList', 'Asset']),
   priority: z.enum(['low', 'normal', 'high', 'urgent', 'emergency']),
   departmentId: SecureSchemas.uuid,
   locationId: SecureSchemas.uuid,

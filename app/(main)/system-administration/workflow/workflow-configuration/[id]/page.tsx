@@ -1,5 +1,5 @@
 import { WorkflowDetail } from "../components/workflow-detail"
-import { sampleWorkflows } from "../data/mockData"
+import { sampleWorkflows } from '@/lib/mock-data'
 
 export default function WorkflowDetailPage({ params }: { params: { id: string } }) {
   const workflowId = params.id

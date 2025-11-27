@@ -68,6 +68,11 @@ The Vendor Management module consists of 6 main submodules:
 
 **Status**: 🚧 Prototype/Demo Only
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Purpose**: Pricelist template management and configuration
 
 ![Templates List](screenshots/vm-templates-list.png)

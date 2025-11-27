@@ -1,5 +1,10 @@
 # Carmen ERP Screenshots
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This directory contains screenshots of key interfaces from the Carmen ERP application to complement the feature specifications.
 
 ## Captured Screenshots

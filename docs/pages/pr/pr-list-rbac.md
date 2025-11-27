@@ -1,5 +1,10 @@
 # Purchase Request List Page: Role-Based Access Control (RBAC)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document outlines the Role-Based Access Control (RBAC) specifications for the Purchase Request List page, defining what users can see and do based on their roles and permissions.
 
 ## 1. User Roles Definition

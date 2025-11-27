@@ -1,5 +1,10 @@
 # Carmen ERP Accessibility Test Implementation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 This document outlines the comprehensive accessibility testing setup implemented for the Carmen ERP system using Playwright. The tests are designed to verify that all pages in the application are accessible and can be navigated to without errors.

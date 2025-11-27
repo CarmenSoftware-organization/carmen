@@ -1,5 +1,10 @@
 # Hotel Supply Chain Mobile Application
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 A comprehensive mobile solution for hotel supply chain management, designed to streamline approval, inventory management, receiving, and reporting processes.

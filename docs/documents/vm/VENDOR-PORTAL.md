@@ -12,6 +12,11 @@
 **Submodule Name**: Vendor Portal
 **Route**: `/vendor-management/vendor-portal`
 **Status**: 🚧 Prototype/Demo
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Purpose**: External vendor self-service portal for price submission and campaign response
 
 **Key Features**:

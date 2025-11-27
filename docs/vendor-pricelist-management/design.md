@@ -1,5 +1,10 @@
 # Vendor Pricelist Management - Design Document
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 The Price Management Module provides centralized pricing capabilities including vendor management, vendor pricelist collection, and standardized price collection processes. The system operates as part of the larger system at `app/(main)/vendor-management/`, leveraging existing vendor profiles, currency, and product information from mock data.

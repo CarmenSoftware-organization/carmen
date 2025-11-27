@@ -312,68 +312,134 @@ app/(main)/finance/currency-management/
 
 ## Sitemap
 
+### Overview
+This section provides a complete navigation structure of all pages, tabs, and dialogues in the Currency Management sub-module.
+
 ### Page Hierarchy
 
 ```mermaid
 graph TD
-    A["Currency Management"] --> B["Currencies"]
-    A --> C["Exchange Rates"]
-    A --> D["Foreign Transactions"]
-    A --> E["Revaluation"]
-    A --> F["Bank Accounts"]
-    A --> G["Reports"]
+    ListPage["Currency List Page<br/>(/finance/currency-management/currencies)"]
+    RatePage["Exchange Rate Dashboard<br/>(/finance/currency-management/exchange-rates)"]
+    TransPage["Foreign Transaction Processing<br/>(/finance/currency-management/foreign-transactions/process)"]
+    RevalPage["Period-End Revaluation<br/>(/finance/currency-management/revaluation/run)"]
+    ExposurePage["Currency Exposure Report<br/>(/finance/currency-management/reports/exposure)"]
 
-    B --> B1["Currency List"]
-    B --> B2["Currency Detail"]
-    B --> B3["Add Currency"]
+    %% Currency List Page Tabs
+    ListPage --> ListTab1["Tab: All Currencies"]
+    ListPage --> ListTab2["Tab: Active"]
+    ListPage --> ListTab3["Tab: Inactive"]
 
-    C --> C1["Rate Dashboard"]
-    C --> C2["Rate History"]
-    C --> C3["Manual Entry"]
+    %% Currency List Page Dialogues
+    ListPage -.-> ListDialog1["Dialog: Add Currency"]
+    ListPage -.-> ListDialog2["Dialog: Edit Currency"]
+    ListPage -.-> ListDialog3["Dialog: Deactivate Confirm"]
+    ListPage -.-> ListDialog4["Dialog: Filter Settings"]
 
-    D --> D1["Transaction List"]
-    D --> D2["Transaction Detail"]
-    D --> D3["Process Foreign Txn"]
+    %% Exchange Rate Dashboard Tabs
+    RatePage --> RateTab1["Tab: Current Rates"]
+    RatePage --> RateTab2["Tab: Rate History"]
+    RatePage --> RateTab3["Tab: Manual Rates"]
 
-    E --> E1["Revaluation Dashboard"]
-    E --> E2["Run Revaluation"]
-    E --> E3["Revaluation History"]
+    %% Exchange Rate Dashboard Dialogues
+    RatePage -.-> RateDialog1["Dialog: Manual Rate Entry"]
+    RatePage -.-> RateDialog2["Dialog: Rate Alert Config"]
+    RatePage -.-> RateDialog3["Dialog: Refresh Confirm"]
+    RatePage -.-> RateDialog4["Dialog: Rate Source Settings"]
 
-    F --> F1["Multi-Currency Accounts"]
-    F --> F2["Account Detail"]
+    %% Foreign Transaction Processing Tabs
+    TransPage --> TransTab1["Tab: Transaction Entry"]
+    TransPage --> TransTab2["Tab: Journal Preview"]
 
-    G --> G1["Multi-Currency Trial Balance"]
-    G --> G2["Exchange Gain/Loss Report"]
-    G --> G3["Currency Exposure Report"]
+    %% Foreign Transaction Processing Dialogues
+    TransPage -.-> TransDialog1["Dialog: Save Draft"]
+    TransPage -.-> TransDialog2["Dialog: Cancel Confirm"]
+    TransPage -.-> TransDialog3["Dialog: Rate Override"]
+    TransPage -.-> TransDialog4["Dialog: Post Confirm"]
+
+    %% Period-End Revaluation Tabs
+    RevalPage --> RevalTab1["Tab: Setup"]
+    RevalPage --> RevalTab2["Tab: Calculation Preview"]
+    RevalPage --> RevalTab3["Tab: Revaluation History"]
+
+    %% Period-End Revaluation Dialogues
+    RevalPage -.-> RevalDialog1["Dialog: Wizard Step Navigation"]
+    RevalPage -.-> RevalDialog2["Dialog: Post Confirm"]
+    RevalPage -.-> RevalDialog3["Dialog: Save Progress"]
+    RevalPage -.-> RevalDialog4["Dialog: Cancel Revaluation"]
+
+    %% Currency Exposure Report Tabs
+    ExposurePage --> ExpTab1["Tab: Summary"]
+    ExposurePage --> ExpTab2["Tab: Details"]
+    ExposurePage --> ExpTab3["Tab: Trends"]
+
+    %% Currency Exposure Report Dialogues
+    ExposurePage -.-> ExpDialog1["Dialog: Export Options"]
+    ExposurePage -.-> ExpDialog2["Dialog: Schedule Email"]
+    ExposurePage -.-> ExpDialog3["Dialog: Alert Configuration"]
+    ExposurePage -.-> ExpDialog4["Dialog: Filter Advanced"]
+
+    style ListPage fill:#e1f5ff
+    style RatePage fill:#fff4e1
+    style TransPage fill:#e8f5e9
+    style RevalPage fill:#fce4ec
+    style ExposurePage fill:#f3e5f5
 ```
 
 ### Pages
 
 #### 1. Currency Master List Page
 **Route**: `/finance/currency-management/currencies`
+**File**: `page.tsx`
 **Purpose**: Display and manage all supported currencies
+
 **Sections**:
 - Header: Title, base currency indicator, "Add Currency" button
 - Active Currencies Table: Code, name, symbol, decimal places, exchange rate, status, actions
 - Inactive Currencies Section: Collapsed list of deactivated currencies
-**Actions**: View detail, edit configuration, deactivate, reactivate
-**Filters**: Active/Inactive, search by code/name
+- Search & Filter Bar: Quick search by code/name, status filters
+
+**Tabs**:
+- **All Currencies**: Complete list of all currencies (active and inactive)
+- **Active**: Filter to show only active currencies
+- **Inactive**: View deactivated currencies
+
+**Dialogues**:
+- **Add Currency**: Form to add new currency with code, name, symbol, decimal places, and initial exchange rate
+- **Edit Currency**: Modify currency configuration including rounding rules and display settings
+- **Deactivate Confirm**: Confirmation dialogue before deactivating currency (checks for open balances)
+- **Filter Settings**: Advanced filtering options by currency code pattern, rate range, and last update date
 
 #### 2. Exchange Rate Dashboard Page
 **Route**: `/finance/currency-management/exchange-rates`
+**File**: `page.tsx`
 **Purpose**: Monitor current and historical exchange rates
+
 **Sections**:
 - Current Rates Panel: Grid of all currency pairs with base currency
 - Rate Changes: Highlight significant changes in last 24 hours
 - Rate Charts: 30-day trend charts for major currencies
 - Manual Rates: List of manually entered rates pending approval
 - Rate Alerts: Notifications for rate volatility or retrieval failures
-**Actions**: Refresh rates, enter manual rate, view full history
+
+**Tabs**:
+- **Current Rates**: Real-time exchange rates with last update timestamp and refresh option
+- **Rate History**: Historical exchange rate data with date range selection and comparison
+- **Manual Rates**: Manually entered exchange rates requiring approval or pending posting
+
+**Dialogues**:
+- **Manual Rate Entry**: Form to enter manual exchange rate with effective date, rate, and reason
+- **Rate Alert Config**: Configure alerts for exchange rate volatility thresholds and retrieval failures
+- **Refresh Confirm**: Confirmation before forcing immediate rate refresh from external API
+- **Rate Source Settings**: Configure external API source, fallback options, and cache TTL settings
+
 **Real-Time Updates**: Exchange rates refresh every 60 minutes automatically
 
 #### 3. Foreign Transaction Processing Page
 **Route**: `/finance/currency-management/foreign-transactions/process`
+**File**: `page.tsx`
 **Purpose**: Enter and post foreign currency transactions
+
 **Sections**:
 - Transaction Type Selection: Invoice, Payment, Receipt
 - Vendor/Customer Selection: Auto-populates currency
@@ -382,24 +448,49 @@ graph TD
 - Line Items: Enter amounts in foreign currency
 - Dual Currency Preview: Show both foreign and base amounts
 - Journal Entry Preview: Display full journal entry
-**Actions**: Post transaction, save draft, cancel
+
+**Tabs**:
+- **Transaction Entry**: Form to enter transaction details in foreign currency
+- **Journal Preview**: Preview of accounting journal entry in both currencies with posting details
+
+**Dialogues**:
+- **Save Draft**: Save incomplete transaction as draft for later completion with draft name
+- **Cancel Confirm**: Confirmation before discarding unsaved transaction changes
+- **Rate Override**: Manual exchange rate override with reason and effective date selection
+- **Post Confirm**: Final confirmation before posting transaction with journal entry summary
+
 **Validation**: Real-time validation of balanced entry, period open, rate validity
 
 #### 4. Period-End Revaluation Page
 **Route**: `/finance/currency-management/revaluation/run`
+**File**: `page.tsx`
 **Purpose**: Execute period-end currency revaluation
+
 **Sections**:
 - Revaluation Wizard: 7-step guided process
 - Balance Summary: Open foreign currency balances by currency
 - Calculation Details: Gain/loss breakdown per account/currency
 - Journal Entry Preview: Revaluation entry with net P&L impact
 - Posting Confirmation: Final review before posting
-**Actions**: Next step, previous step, save and resume, post revaluation
-**Progress**: Visual progress indicator showing current step
+
+**Tabs**:
+- **Setup**: Configure revaluation parameters including period, accounts, and currencies
+- **Calculation Preview**: Review calculated unrealized gains/losses before posting
+- **Revaluation History**: Historical revaluation entries with reversal and audit trail
+
+**Dialogues**:
+- **Wizard Step Navigation**: Multi-step wizard navigation with progress indicator and step validation
+- **Post Confirm**: Final confirmation with summary of unrealized gains/losses before posting
+- **Save Progress**: Save current revaluation setup and calculation state for resuming later
+- **Cancel Revaluation**: Confirm cancellation of revaluation process with unsaved changes warning
+
+**Progress**: Visual progress indicator showing current step (1-7) in revaluation wizard
 
 #### 5. Currency Exposure Report Page
 **Route**: `/finance/currency-management/reports/exposure`
+**File**: `page.tsx`
 **Purpose**: Analyze currency risk exposure
+
 **Sections**:
 - Exposure Summary: Net position by currency (long/short)
 - AR Exposure: Foreign currency receivables by currency
@@ -407,8 +498,19 @@ graph TD
 - Cash Exposure: Foreign currency bank balances
 - Exposure Trend: Historical exposure charts
 - Sensitivity Analysis: Impact of 10% rate change
-**Actions**: Export to Excel, schedule email, configure alerts
-**Filters**: Date range, currency, exposure threshold
+
+**Tabs**:
+- **Summary**: High-level exposure overview with net positions and risk indicators
+- **Details**: Detailed breakdown by account, transaction, and aging for each currency
+- **Trends**: Historical exposure trends with charts and pattern analysis over time
+
+**Dialogues**:
+- **Export Options**: Export report to Excel, PDF, or CSV with format and filter selection
+- **Schedule Email**: Schedule automatic email delivery of report with frequency and recipients
+- **Alert Configuration**: Configure exposure threshold alerts and notification preferences
+- **Filter Advanced**: Advanced filtering by date range, currency, exposure threshold, and account type
+
+**Filters**: Date range, currency, exposure threshold, account type
 
 ---
 

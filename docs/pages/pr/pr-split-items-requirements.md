@@ -3,6 +3,11 @@
 **Document Version**: 1.0  
 **Last Updated**: January 2025  
 **Status**: Draft - Pending Implementation  
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Author**: System Analysis Team  
 
 This document outlines the product requirements, technical specifications, and functional design for the Purchase Request (PR) Split Items feature, enabling users to divide existing PRs into multiple independent requests for optimized workflow management.

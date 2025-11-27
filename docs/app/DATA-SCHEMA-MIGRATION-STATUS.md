@@ -4,6 +4,11 @@
 **Last Updated**: 2025-11-15
 **Status**: Migration in progress
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Format Definitions

@@ -63,6 +63,13 @@ This document defines the use cases for the lot-based costing system with automa
 
 **Priority**: High
 **Status**: New Feature
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+
+---
 **Trigger**: Purchasing Staff commits a Good Received Note (GRN)
 
 #### Primary Flow

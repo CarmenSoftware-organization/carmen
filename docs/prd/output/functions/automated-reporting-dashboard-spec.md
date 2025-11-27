@@ -1,5 +1,10 @@
 # Automated Reporting Dashboard Functional Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 The Automated Reporting Dashboard provides comprehensive management and monitoring capabilities for scheduled reports, automated alerts, and business intelligence automation within the Carmen ERP system. This component enables hospitality businesses to automate critical reporting processes, monitor key performance indicators, and ensure timely delivery of business-critical information with specific focus on fractional sales analytics.
 

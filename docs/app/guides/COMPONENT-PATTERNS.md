@@ -2,6 +2,11 @@
 
 **Standard patterns for building Carmen components** with consistency and best practices.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Core Patterns

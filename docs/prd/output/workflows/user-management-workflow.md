@@ -6,6 +6,11 @@
 **Date**: January 2025  
 **Status**: Core ERP Function - System Security
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Overview

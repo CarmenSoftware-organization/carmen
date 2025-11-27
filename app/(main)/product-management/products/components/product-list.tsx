@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, ArrowUpDown, Edit, Eye, Plus, Printer, Upload, ChevronLeft, FileText, CheckCircle, XCircle, Download, Trash2, Filter, LayoutGrid, List, MoreVertical, ImageIcon } from "lucide-react"
+import { Search, ArrowUpDown, Edit, Eye, Plus, Printer, Upload, ChevronLeft, FileText, CheckCircle, XCircle, Download, Trash2, Filter, LayoutGrid, List, MoreVertical, ImageIcon, Copy } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import StatusBadge from '@/components/ui/custom-status-badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
@@ -17,7 +17,11 @@ import { toast } from '@/components/ui/use-toast'
 import { Card } from "@/components/ui/card"
 import Image from 'next/image';
 
-interface Product {
+import { Product as CentralProduct } from '@/lib/types';
+import { mockProducts } from '@/lib/mock-data/products';
+import { mockProductCategories } from '@/lib/mock-data/product-categories';
+
+interface ProductViewModel {
   id: string;
   productCode: string;
   name: string;
@@ -69,10 +73,44 @@ interface ProductListProps {
   onBack: () => void;
 }
 
+// Helper to map centralized Product to ProductViewModel
+const mapToViewModel = (product: CentralProduct): ProductViewModel => {
+  const category = mockProductCategories.find(c => c.id === product.categoryId);
+  const subcategory = category?.subcategories.find(s => s.id === product.subcategoryId);
+
+  return {
+    id: product.id,
+    productCode: product.productCode,
+    name: product.productName,
+    description: product.description || '',
+    localDescription: undefined,
+    categoryId: product.categoryId,
+    categoryName: category?.name,
+    subCategoryId: product.subcategoryId || '',
+    subCategoryName: subcategory?.name,
+    itemGroupId: undefined,
+    itemGroupName: undefined,
+    primaryInventoryUnitId: 'UNIT-PLACEHOLDER',
+    primaryUnitName: product.baseUnit,
+    isActive: product.status === 'active',
+    basePrice: product.standardCost?.amount || 0,
+    currency: product.standardCost?.currency || 'USD',
+    standardCost: product.standardCost?.amount,
+    isForSale: product.isPurchasable, // approximation
+    isIngredient: product.productType === 'raw_material',
+    weight: product.weight,
+    imagesUrl: product.images?.[0]?.imageUrl,
+    // Defaults for missing fields
+    taxRate: 7,
+    minStockLevel: 0,
+    maxStockLevel: 100,
+  };
+};
+
 export default function ProductList({ onBack }: ProductListProps): JSX.Element {
   const router = useRouter();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductViewModel[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<ProductViewModel[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,9 +118,9 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 10;
-  const [sortField, setSortField] = useState<keyof Product | null>(null);
+  const [sortField, setSortField] = useState<keyof ProductViewModel | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [activeFilters, setActiveFilters] = useState<FilterType<Product>[]>([]);
+  const [activeFilters, setActiveFilters] = useState<FilterType<ProductViewModel>[]>([]);
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,14 +154,14 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
       try {
         // Delete product logic would go here (API call)
         console.log("Deleting product:", id);
-        
+
         // Show toast notification
         toast({
           title: "Product deleted",
           description: "The product has been successfully deleted.",
           variant: "default"
         });
-        
+
         // Refresh products list
         // Since fetchProducts is inside a useEffect, we need to trigger a re-render
         // We can do this by setting isLoading to true which will trigger the useEffect
@@ -139,212 +177,44 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
     }
   };
 
-  const productList = {
-    total: 8,
-    products: [
-      {
-        id: 'PRD001',
-        productCode: 'PRD-001',
-        name: 'Organic Jasmine Rice',
-        description: 'Premium quality organic jasmine rice sourced from certified organic farms. Known for its fragrant aroma and soft, sticky texture when cooked.',
-        localDescription: 'ข้าวหอมะลิอินทรีย์',
-        categoryId: 'CAT-001',
-        categoryName: 'Rice & Grains',
-        subCategoryId: 'SCAT-001',
-        subCategoryName: 'Rice',
-        itemGroupId: 'GRP-001',
-        itemGroupName: 'Organic Products',
-        primaryInventoryUnitId: 'UNIT-001',
-        primaryUnitName: 'KG',
-        size: '1',
-        color: 'White',
-        barcode: '8851234567890',
-        isActive: true,
-        basePrice: 35.50,
-        currency: 'THB',
-        taxType: 'VAT',
-        taxRate: 7,
-        standardCost: 28.40,
-        lastCost: 29.15,
-        priceDeviationLimit: 10,
-        quantityDeviationLimit: 5,
-        minStockLevel: 100,
-        maxStockLevel: 1000,
-        isForSale: true,
-        isIngredient: true,
-        weight: 1,
-        shelfLife: 365,
-        storageInstructions: 'Store in a cool, dry place',
-        imagesUrl: '/images/products/jasmine-rice.jpg'
-      },
-      {
-        id: 'PRD002',
-        productCode: 'PRD-002',
-        name: 'Palm Sugar',
-        description: 'Traditional palm sugar made from coconut palm sap. Natural sweetener with rich caramel notes.',
-        localDescription: 'น้ำตาลมะพร้าว',
-        categoryId: 'CAT-002',
-        categoryName: 'Sweeteners',
-        subCategoryId: 'SCAT-002',
-        subCategoryName: 'Natural Sweeteners',
-        itemGroupId: 'GRP-002',
-        itemGroupName: 'Traditional Products',
-        primaryInventoryUnitId: 'UNIT-001',
-        primaryUnitName: 'KG',
-        size: '1',
-        color: 'Brown',
-        barcode: '8851234567891',
-        isActive: true,
-        basePrice: 45.00,
-        currency: 'THB',
-        taxType: 'VAT',
-        taxRate: 7,
-        standardCost: 36.00,
-        lastCost: 37.50,
-        priceDeviationLimit: 10,
-        quantityDeviationLimit: 5,
-        minStockLevel: 50,
-        maxStockLevel: 500,
-        isForSale: true,
-        isIngredient: true,
-        weight: 1,
-        shelfLife: 180,
-        storageInstructions: 'Store in airtight container',
-        imagesUrl: '/images/products/palm-sugar.jpg'
-      },
-      {
-        id: 'PRD003',
-        productCode: 'PRD-003',
-        name: 'Fish Sauce Premium Grade',
-        description: 'Premium fish sauce made from anchovies, featuring a rich umami flavor perfect for Thai cuisine.',
-        localDescription: 'น้ำปลาชั้นดี',
-        categoryId: 'CAT-003',
-        categoryName: 'Sauces & Condiments',
-        subCategoryId: 'SCAT-003',
-        subCategoryName: 'Fish Sauce',
-        itemGroupId: 'GRP-003',
-        itemGroupName: 'Premium Products',
-        primaryInventoryUnitId: 'UNIT-002',
-        primaryUnitName: 'L',
-        size: '1',
-        color: 'Amber',
-        barcode: '8851234567892',
-        isActive: true,
-        basePrice: 65.00,
-        currency: 'THB',
-        taxType: 'VAT',
-        taxRate: 7,
-        standardCost: 52.00,
-        lastCost: 54.00,
-        priceDeviationLimit: 10,
-        quantityDeviationLimit: 5,
-        minStockLevel: 100,
-        maxStockLevel: 800,
-        isForSale: true,
-        isIngredient: true,
-        weight: 1,
-        shelfLife: 730,
-        storageInstructions: 'Store in a cool, dark place',
-        imagesUrl: '/images/products/fish-sauce.jpg'
-      },
-      {
-        id: 'PRD004',
-        productCode: 'ELEC-002',
-        name: 'Dell UltraSharp Monitor',
-        description: 'A high-resolution monitor with a 4K display',
-        categoryId: 'CAT-004',
-        categoryName: 'Electronics',
-        subCategoryId: 'SCAT-004',
-        subCategoryName: 'Monitors',
-        itemGroupId: 'GRP-004',
-        itemGroupName: 'Computing Devices',
-        basePrice: 499.99,
-        currency: 'USD',
-        isActive: true,
-        primaryInventoryUnitId: 'UNIT-005',
-        primaryUnitName: 'PC',
-        imagesUrl: '/images/products/monitor.jpg'
-      },
-      {
-        id: 'PRD005',
-        productCode: 'OFF-002',
-        name: 'Standing Desk',
-        description: 'A standing desk to promote better posture',
-        categoryId: 'CAT-005',
-        categoryName: 'Office Furniture',
-        subCategoryId: 'SCAT-005',
-        subCategoryName: 'Desks',
-        itemGroupId: 'GRP-005',
-        itemGroupName: 'Furniture',
-        basePrice: 699.99,
-        currency: 'USD',
-        isActive: false,
-        primaryInventoryUnitId: 'UNIT-005',
-        primaryUnitName: 'PC',
-        imagesUrl: '/images/products/standing-desk.jpg'
-      },
-      {
-        id: 'PRD006',
-        productCode: 'TECH-001',
-        name: 'Wireless Mouse',
-        description: 'A wireless mouse for easy navigation',
-        categoryId: 'CAT-004',
-        categoryName: 'Electronics',
-        subCategoryId: 'SCAT-006',
-        subCategoryName: 'Accessories',
-        itemGroupId: 'GRP-004',
-        itemGroupName: 'Computing Devices',
-        basePrice: 79.99,
-        currency: 'USD',
-        isActive: true,
-        primaryInventoryUnitId: 'UNIT-005',
-        primaryUnitName: 'PC',
-        imagesUrl: '/images/products/wireless-mouse.jpg'
-      },
-      {
-        id: 'PRD007',
-        productCode: 'STAT-002',
-        name: 'Filing Cabinet',
-        description: 'A large filing cabinet for storage',
-        categoryId: 'CAT-005',
-        categoryName: 'Office Furniture',
-        subCategoryId: 'SCAT-007',
-        subCategoryName: 'Storage',
-        itemGroupId: 'GRP-006',
-        itemGroupName: 'Office Supplies',
-        basePrice: 199.99,
-        currency: 'USD',
-        isActive: true,
-        primaryInventoryUnitId: 'UNIT-005',
-        primaryUnitName: 'PC',
-        imagesUrl: '/images/products/filing-cabinet.jpg'
-      },
-      {
-        id: 'PRD008',
-        productCode: 'TECH-002',
-        name: 'Mechanical Keyboard',
-        description: 'A mechanical keyboard for typing',
-        categoryId: 'CAT-004',
-        categoryName: 'Electronics',
-        subCategoryId: 'SCAT-006',
-        subCategoryName: 'Accessories',
-        itemGroupId: 'GRP-004',
-        itemGroupName: 'Computing Devices',
-        basePrice: 149.99,
-        currency: 'USD',
-        isActive: false,
-        primaryInventoryUnitId: 'UNIT-005',
-        primaryUnitName: 'PC',
-        imagesUrl: '/images/products/mechanical-keyboard.jpg'
-      }
-    ]
+  const handleDuplicateProduct = (product: ProductViewModel) => {
+    try {
+      // Generate a new unique ID
+      const newId = Math.random().toString(36).substr(2, 9);
+
+      // Create duplicated product with modified code and name
+      const duplicatedProduct: ProductViewModel = {
+        ...product,
+        id: newId,
+        productCode: `${product.productCode}_COPY`,
+        name: `${product.name} (Copy)`,
+      };
+
+      // Add to products list
+      setProducts(prev => [...prev, duplicatedProduct]);
+
+      // Show success toast
+      toast({
+        title: "Product duplicated",
+        description: `Created copy of ${product.productCode} as ${duplicatedProduct.productCode}`,
+        variant: "default"
+      });
+    } catch (error) {
+      console.error("Error duplicating product:", error);
+      toast({
+        title: "Error",
+        description: "There was a problem duplicating the product.",
+        variant: "destructive"
+      });
+    }
   };
 
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const data = productList;
-        setProducts(data.products);
+        // Use centralized mock data mapped to view model
+        const mappedProducts = mockProducts.map(mapToViewModel);
+        setProducts(mappedProducts);
       } catch (err) {
         setError('Error fetching products');
         console.error(err);
@@ -356,7 +226,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
     fetchProducts();
   }, []);
 
-  const handleSort = (field: keyof Product) => {
+  const handleSort = (field: keyof ProductViewModel) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
@@ -368,7 +238,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
   // Update useEffect for filtering and sorting
   useEffect(() => {
     let filtered = [...products];
-    
+
     // Apply search filter
     if (searchQuery) {
       filtered = filtered.filter(
@@ -390,8 +260,8 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
           let fieldValue: any;
           if (field.toString().includes('.')) {
             const [parentField, childField] = field.toString().split('.');
-            const parentValue = product[parentField as keyof Product];
-            
+            const parentValue = product[parentField as keyof ProductViewModel];
+
             // Handle nested objects
             if (parentValue && typeof parentValue === 'object' && !Array.isArray(parentValue)) {
               fieldValue = (parentValue as any)[childField];
@@ -444,7 +314,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
 
         // Handle boolean values
         if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
-          return sortDirection === 'asc' 
+          return sortDirection === 'asc'
             ? (aValue === bValue ? 0 : aValue ? -1 : 1)
             : (aValue === bValue ? 0 : aValue ? 1 : -1);
         }
@@ -455,7 +325,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
         return 0;
       });
     }
-    
+
     setFilteredProducts(filtered);
     setTotalPages(Math.ceil(filtered.length / pageSize));
   }, [products, searchQuery, pageSize, sortField, sortDirection, activeFilters]);
@@ -499,7 +369,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
     console.log('Bulk status update:', selectedItems, status);
   };
 
-  const handleApplyFilters = (filters: FilterType<Product>[]) => {
+  const handleApplyFilters = (filters: FilterType<ProductViewModel>[]) => {
     try {
       setActiveFilters(filters);
       setCurrentPage(1);
@@ -558,11 +428,11 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
         />
       </div>
       <div className="flex flex-wrap gap-2">
-        <AdvancedFilter 
+        <AdvancedFilter
           onApplyFilters={handleApplyFilters}
           onClearFilters={handleClearFilters}
         />
-        
+
         <div className="flex items-center border rounded-md ml-auto">
           <Button
             variant={viewMode === 'table' ? 'default' : 'ghost'}
@@ -591,17 +461,17 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
         <TableHeader>
           <TableRow className="bg-muted/30">
             <TableHead className="font-semibold text-xs py-2">
-              <Checkbox 
+              <Checkbox
                 checked={
                   getCurrentPageData().length > 0 &&
-                  getCurrentPageData().every(product => 
+                  getCurrentPageData().every(product =>
                     selectedItems.includes(product.id)
                   )
                 }
                 onCheckedChange={handleSelectAll}
               />
             </TableHead>
-            <TableHead 
+            <TableHead
               className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('name')}
             >
@@ -612,7 +482,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                 )}
               </div>
             </TableHead>
-            <TableHead 
+            <TableHead
               className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('categoryName')}
             >
@@ -623,7 +493,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                 )}
               </div>
             </TableHead>
-            <TableHead 
+            <TableHead
               className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('subCategoryName')}
             >
@@ -634,7 +504,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                 )}
               </div>
             </TableHead>
-            <TableHead 
+            <TableHead
               className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('itemGroupName')}
             >
@@ -645,7 +515,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                 )}
               </div>
             </TableHead>
-            <TableHead 
+            <TableHead
               className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('primaryUnitName')}
             >
@@ -656,7 +526,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                 )}
               </div>
             </TableHead>
-            <TableHead 
+            <TableHead
               className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('basePrice')}
             >
@@ -667,7 +537,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                 )}
               </div>
             </TableHead>
-            <TableHead 
+            <TableHead
               className="font-semibold text-xs py-2 cursor-pointer"
               onClick={() => handleSort('isActive')}
             >
@@ -683,12 +553,12 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
         </TableHeader>
         <TableBody>
           {getCurrentPageData().map((product) => (
-            <TableRow 
+            <TableRow
               key={product.id}
               className="hover:bg-muted/30 transition-colors"
             >
               <TableCell className="py-2" onClick={(e) => e.stopPropagation()}>
-                <Checkbox 
+                <Checkbox
                   checked={selectedItems.includes(product.id)}
                   onCheckedChange={(checked) => handleSelectItem(product.id, checked as boolean)}
                 />
@@ -714,7 +584,7 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                 {product.basePrice ? `${product.basePrice} ${product.currency || ''}` : '-'}
               </TableCell>
               <TableCell className="py-2">
-                <StatusBadge 
+                <StatusBadge
                   status={product.isActive ? 'Active' : 'Inactive'}
                 />
               </TableCell>
@@ -741,6 +611,15 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                   variant="ghost"
                   size="sm"
                   className="h-6 w-6 p-0"
+                  onClick={() => handleDuplicateProduct(product)}
+                  title="Duplicate Product"
+                >
+                  <Copy className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
                   onClick={() => handleDeleteProduct(product.id)}
                   title="Delete Product"
                 >
@@ -757,8 +636,8 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
   const renderCardView = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       {getCurrentPageData().map((product) => (
-        <Card 
-          key={product.id} 
+        <Card
+          key={product.id}
           className="overflow-hidden hover:bg-secondary/10 transition-colors h-full shadow-sm"
         >
           <div className="flex flex-col h-full">
@@ -806,14 +685,14 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                 <StatusBadge status={product.isActive ? 'Active' : 'Inactive'} />
               </div>
             </div>
-            
+
             {/* Card Content */}
             <div className="p-4 flex-grow">
               <div className="mb-3">
                 <p className="text-xs font-medium text-muted-foreground mb-1">Description</p>
                 <p className="text-xs line-clamp-2">{product.description || 'No description available'}</p>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-x-3 gap-y-2 mt-3">
                 <div>
                   <p className="text-xs font-medium text-muted-foreground mb-1">Category</p>
@@ -836,20 +715,20 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
                   <p className="text-xs font-medium">{product.basePrice ? `${product.basePrice} ${product.currency || ''}` : '-'}</p>
                 </div>
                 {product.taxType && (
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-1">Tax Type</p>
-                  <p className="text-xs font-medium">{product.taxType}</p>
-                </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Tax Type</p>
+                    <p className="text-xs font-medium">{product.taxType}</p>
+                  </div>
                 )}
                 {product.barcode && (
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-1">Barcode</p>
-                  <p className="text-xs font-medium">{product.barcode}</p>
-                </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Barcode</p>
+                    <p className="text-xs font-medium">{product.barcode}</p>
+                  </div>
                 )}
               </div>
             </div>
-            
+
             {/* Card Actions */}
             <div className="flex justify-end px-4 py-3 bg-muted/20 border-t gap-1">
               <Button
@@ -869,6 +748,16 @@ export default function ProductList({ onBack }: ProductListProps): JSX.Element {
               >
                 <Edit className="h-3 w-3" />
                 <span className="sr-only">Edit</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleDuplicateProduct(product)}
+                className="h-6 w-6 p-0"
+                title="Duplicate Product"
+              >
+                <Copy className="h-3 w-3" />
+                <span className="sr-only">Duplicate</span>
               </Button>
               <Button
                 variant="ghost"

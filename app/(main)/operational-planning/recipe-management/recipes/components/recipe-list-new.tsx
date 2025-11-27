@@ -50,7 +50,8 @@ import {
   LayoutList,  
   FileText,
 } from "lucide-react"
-import { Recipe, mockRecipes } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
+import { Recipe } from '@/lib/types'
+import { mockRecipes } from '@/lib/mock-data'
 import { RecipeCardCompact } from "./recipe-card-compact"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
@@ -65,13 +66,13 @@ interface FilterCondition {
 
 const FILTER_FIELDS = [
   { label: "Name", value: "name" },
-  { label: "Category", value: "category" },
-  { label: "Cuisine", value: "cuisine" },
+  { label: "Category", value: "categoryId" },
+  { label: "Cuisine", value: "cuisineTypeId" },
   { label: "Status", value: "status" },
   { label: "Cost Range", value: "costRange" },
   { label: "Margin", value: "margin" },
   { label: "Preparation Time", value: "preparationTime" },
-  { label: "Difficulty", value: "difficulty" },
+  { label: "Complexity", value: "complexity" },
 ]
 
 const FILTER_OPERATORS = [
@@ -165,8 +166,9 @@ export default function RecipeList() {
     }
 
     // Quick filters
-    if (quickFilters.includes('noMedia') && recipe.hasMedia) return false
-    if (quickFilters.includes('hasMedia') && !recipe.hasMedia) return false
+    const hasMedia = !!recipe.image || (recipe.additionalImages && recipe.additionalImages.length > 0) || !!recipe.videoUrl
+    if (quickFilters.includes('noMedia') && hasMedia) return false
+    if (quickFilters.includes('hasMedia') && !hasMedia) return false
     if (quickFilters.includes('active') && recipe.status !== 'published') return false
     if (quickFilters.includes('draft') && recipe.status !== 'draft') return false
 
@@ -506,10 +508,10 @@ export default function RecipeList() {
                     />
                   </TableCell>
                   <TableCell className="font-medium">{recipe.name}</TableCell>
-                  <TableCell>{recipe.category}</TableCell>
-                  <TableCell>${recipe.costPerPortion.toFixed(2)}</TableCell>
-                  <TableCell>${recipe.sellingPrice.toFixed(2)}</TableCell>
-                  <TableCell>{recipe.grossMargin.toFixed(1)}%</TableCell>
+                  <TableCell>{recipe.categoryId}</TableCell>
+                  <TableCell>${recipe.costPerPortion.amount.toFixed(2)}</TableCell>
+                  <TableCell>{recipe.yieldVariants[0]?.sellingPrice ? `$${recipe.yieldVariants[0].sellingPrice.amount.toFixed(2)}` : 'N/A'}</TableCell>
+                  <TableCell>{recipe.yieldVariants[0]?.marginPercentage ? `${recipe.yieldVariants[0].marginPercentage.toFixed(1)}%` : 'N/A'}</TableCell>
                   <TableCell>
                     <Badge variant={recipe.status === "published" ? "default" : "secondary"}>
                       {recipe.status}

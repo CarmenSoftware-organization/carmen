@@ -1,5 +1,10 @@
 # Credit Note Module Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This directory contains comprehensive documentation for the Credit Note (CN) module in the Carmen F&B Management System.
 
 ## Documentation Index

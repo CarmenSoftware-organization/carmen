@@ -1,5 +1,10 @@
 # API Security Reference
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 Complete reference for implementing and using the Carmen ERP API security features.
 
 ## Table of Contents

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { RecipeForm } from '../components/recipe-form'
-import { Recipe } from '../data/mock-recipes'
+import { Recipe } from '@/lib/types'
 
 export default function CreateRecipePage() {
   const router = useRouter()

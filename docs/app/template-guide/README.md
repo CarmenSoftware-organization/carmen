@@ -7,6 +7,7 @@ This directory contains all documentation templates for the Carmen ERP system.
 ```
 docs/app/
 └── template-guide/
+    ├── ARC-template.md                       - Architecture Change Request (ISO 29110)
     ├── BR-template.md                        - Business Requirements template
     ├── UC-template.md                        - Use Cases template
     ├── TS-template.md                        - Technical Specifications template
@@ -14,6 +15,7 @@ docs/app/
     ├── FD-template.md                        - Flow Diagrams template
     ├── VAL-template.md                       - Validations template
     ├── PC-template.md                        - Page Content template
+    ├── DD-template.md                        - Data Dictionary template
     ├── README.md                             - This file
     ├── USER-STORY-TEMPLATE.md                - User Story writing guide
     ├── HOSPITALITY-PERSONAS-UPDATE.md        - Hospitality personas reference
@@ -54,6 +56,20 @@ When creating documentation for a new sub-module:
    - Update document history and metadata
 
 ## Template Descriptions
+
+### ARC-template.md (Architecture Change Request - ISO 29110)
+Documents **ARCHITECTURE CHANGES** following ISO/IEC 29110 standards for Very Small Entities:
+- Formal change request process for architecture modifications
+- Current state analysis and proposed architecture
+- Comprehensive impact assessment (technical, business, security, performance)
+- ISO 29110 compliance checklist and traceability
+- Risk assessment and mitigation strategies
+- Implementation plan with phases and timeline
+- Testing strategy and deployment plan
+- Approval workflow and sign-off procedures
+- Post-implementation review requirements
+- **Use For**: Major architecture changes, technology stack updates, design pattern changes
+- **ISO Alignment**: ISO/IEC 29110-4-1 (Software Implementation), ISO/IEC 29110-5-1-2 (PM & SI Guide)
 
 ### BR-template.md (Business Requirements)
 Documents **WHAT** the system needs to do from a business perspective:

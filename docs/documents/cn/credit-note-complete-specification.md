@@ -711,6 +711,11 @@ stateDiagram-v2
 4. **Inventory Impact**: Only occurs when transitioning to Posted status
 5. **Journal Entries**: Generated automatically when credit note is posted
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 *Generated on: 2025-09-23*

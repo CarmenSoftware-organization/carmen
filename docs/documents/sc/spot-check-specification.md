@@ -13,6 +13,11 @@
 7. [Screenshots](#screenshots)
 8. [Site Map](#site-map)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Overview

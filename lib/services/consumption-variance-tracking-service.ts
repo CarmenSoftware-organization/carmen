@@ -13,7 +13,7 @@ import {
   RealTimeConsumptionMetrics
 } from '@/lib/types/enhanced-consumption-tracking'
 
-import { Recipe, RecipeYieldVariant } from '@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes'
+import { Recipe, RecipeYieldVariant } from '@/lib/types'
 
 export interface VarianceAlert {
   id: string

@@ -470,6 +470,11 @@ The detail page employs a progressive disclosure design with three main areas:
 - Technical Issues: Development Team
 - Documentation Updates: Business Analysis Team
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 *This functional specification document provides a comprehensive overview of the Purchase Request Detail Page functionality based on actual source code implementation and business requirements analysis. It serves as the authoritative reference for business users, testers, and stakeholders to understand system capabilities and workflows.*

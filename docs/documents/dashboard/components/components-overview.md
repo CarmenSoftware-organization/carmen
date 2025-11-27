@@ -1,5 +1,10 @@
 # Dashboard Components Overview
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Component Architecture
 
 The Dashboard module consists of 4 main components that work together to provide a comprehensive system overview.

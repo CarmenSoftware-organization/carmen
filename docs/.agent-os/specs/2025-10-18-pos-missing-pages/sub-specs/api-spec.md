@@ -7,6 +7,11 @@
 
 This document specifies the API endpoints required to support the four missing POS Integration pages: Stock-out Review, Transaction Detail Drawer, Mapping Drawer Modal, and Failed Transaction View.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. Stock-out Review & Approval API

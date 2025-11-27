@@ -27,18 +27,147 @@ Units are categorized into three types: INVENTORY units for stock management, OR
 **⚠️ IMPORTANT: This is a Technical Specification Document - TEXT FORMAT ONLY**
 - **DO NOT include actual code** - describe implementation patterns in text
 - **DO NOT include TypeScript/JavaScript code** - describe component responsibilities
-- **DO NOT include SQL code** - refer to DS (Data Schema) document for database descriptions
+- **DO NOT include SQL code** - refer to DD (Data Dictionary) document for database descriptions
 - **DO include**: Architecture descriptions, component responsibilities, data flow descriptions, integration patterns
 - **Focus on**: WHAT components do, HOW they interact, WHERE data flows - all in descriptive text
 
 **Related Documents**:
 - [Business Requirements](./BR-units.md) - Business requirements in text format (no code)
 - [Use Cases](./UC-units.md) - Use cases in text format (no code)
-- [Data Schema](./DS-units.md) - Data schema definitions in text format (no SQL code)
+- [Data Dictionary](./DD-units.md) - Data dictionary definitions in text format (no SQL code)
 - [Flow Diagrams](./FD-units.md) - Visual diagrams (no code)
 - [Validations](./VAL-units.md) - Validation rules in text format (no code)
 
 ---
+
+## Sitemap
+
+### Overview
+This section provides a complete navigation structure of all pages, tabs, and dialogues in the Units sub-module.
+
+### Page Hierarchy
+
+```mermaid
+graph TD
+    ListPage["List Page<br/>(/product-management/units)"]
+    CreatePage["Create Page<br/>(/product-management/units/new)"]
+    DetailPage["Detail Page<br/>(/product-management/units/[id])"]
+    EditPage["Edit Page<br/>(/product-management/units/[id]/edit)"]
+
+    %% List Page Tabs
+    ListPage --> ListTab1["Tab: All Items"]
+    ListPage --> ListTab2["Tab: Active"]
+    ListPage --> ListTab3["Tab: Archived"]
+
+    %% List Page Dialogues
+    ListPage -.-> ListDialog1["Dialog: Quick Create"]
+    ListPage -.-> ListDialog2["Dialog: Bulk Actions"]
+    ListPage -.-> ListDialog3["Dialog: Export"]
+    ListPage -.-> ListDialog4["Dialog: Filter"]
+
+    %% Detail Page Tabs
+    DetailPage --> DetailTab1["Tab: Overview"]
+    DetailPage --> DetailTab2["Tab: History"]
+    DetailPage --> DetailTab3["Tab: Activity Log"]
+
+    %% Detail Page Dialogues
+    DetailPage -.-> DetailDialog1["Dialog: Edit"]
+    DetailPage -.-> DetailDialog2["Dialog: Delete Confirm"]
+    DetailPage -.-> DetailDialog3["Dialog: Status Change"]
+
+    %% Create/Edit Dialogues
+    CreatePage -.-> CreateDialog1["Dialog: Cancel Confirm"]
+    CreatePage -.-> CreateDialog2["Dialog: Save Draft"]
+
+    EditPage -.-> EditDialog1["Dialog: Discard Changes"]
+    EditPage -.-> EditDialog2["Dialog: Save Draft"]
+
+    %% Navigation Flow
+    ListPage --> DetailPage
+    ListPage --> CreatePage
+    DetailPage --> EditPage
+    CreatePage --> DetailPage
+    EditPage --> DetailPage
+
+    style ListPage fill:#e1f5ff
+    style CreatePage fill:#fff4e1
+    style DetailPage fill:#e8f5e9
+    style EditPage fill:#fce4ec
+```
+
+### Pages
+
+#### 1. List Page
+**Route**: `/product-management/units`
+**File**: `page.tsx`
+**Purpose**: Display paginated list of all units
+
+**Sections**:
+- Header: Title, breadcrumbs, primary actions
+- Filters: Quick filters, advanced filter panel
+- Search: Global search with autocomplete
+- Data Table: Sortable columns, row actions, bulk selection
+- Pagination: Page size selector, page navigation
+
+**Tabs**:
+- **All Items**: Complete list of all units
+- **Active**: Filter active items only
+- **Archived**: View archived items
+
+**Dialogues**:
+- **Quick Create**: Fast creation form with essential fields only
+- **Bulk Actions**: Multi-select actions (delete, export, status change)
+- **Export**: Export data in various formats (CSV, Excel, PDF)
+- **Filter**: Advanced filtering with multiple criteria
+
+#### 2. Detail Page
+**Route**: `/product-management/units/[id]`
+**File**: `[id]/page.tsx`
+**Purpose**: Display comprehensive unit details
+
+**Sections**:
+- Header: Breadcrumbs, unit title, action buttons
+- Info Cards: Multiple cards showing different aspects
+- Related Data: Associated records and relationships
+
+**Tabs**:
+- **Overview**: Key information and summary
+- **History**: Change history and audit trail
+- **Activity Log**: User actions and system events
+
+**Dialogues**:
+- **Edit**: Navigate to edit form
+- **Delete Confirm**: Confirmation before deletion
+- **Status Change**: Change unit status with reason
+
+#### 3. Create Page
+**Route**: `/product-management/units/new`
+**File**: `new/page.tsx`
+**Purpose**: Create new unit
+
+**Sections**:
+- Form Header: Title, Save/Cancel actions
+- Form Fields: All required and optional fields
+- Validation: Real-time field validation
+
+**Dialogues**:
+- **Cancel Confirm**: Confirm discarding unsaved changes
+- **Save Draft**: Save incomplete form as draft
+
+#### 4. Edit Page
+**Route**: `/product-management/units/[id]/edit`
+**File**: `[id]/edit/page.tsx`
+**Purpose**: Modify existing unit
+
+**Sections**:
+- Form Header: Title, Save/Cancel/Delete actions
+- Form Fields: Pre-populated with existing data
+- Change Tracking: Highlight modified fields
+
+**Dialogues**:
+- **Discard Changes**: Confirm discarding modifications
+- **Save Draft**: Save changes as draft
+
 
 ## Architecture
 
@@ -723,7 +852,7 @@ All server actions use the "use server" directive to mark them as server-only co
 
 ## Database Schema
 
-**NOTE**: Detailed database definitions including SQL DDL statements, constraints, and indexes are documented in the [Data Schema (DS) document](./DS-units.md). This section provides a high-level overview only.
+**NOTE**: Detailed database definitions including SQL DDL statements, constraints, and indexes are documented in the [Data Dictionary (DD) document](./DD-units.md). This section provides a high-level overview only.
 
 ### Tables Overview
 
@@ -1639,7 +1768,7 @@ If issues are discovered after migration:
 ### Related Documents
 - [Business Requirements (BR-units.md)](./BR-units.md) - Business requirements and rules
 - [Use Cases (UC-units.md)](./UC-units.md) - User workflows and scenarios
-- [Data Schema (DS-units.md)](./DS-units.md) - Database schema and constraints
+- [Data Dictionary (DD-units.md)](./DD-units.md) - Database schema and constraints
 - [Flow Diagrams (FD-units.md)](./FD-units.md) - Visual workflow diagrams
 - [Validation Rules (VAL-units.md)](./VAL-units.md) - Comprehensive validation specifications
 

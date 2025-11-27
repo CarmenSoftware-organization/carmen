@@ -572,51 +572,11 @@ graph LR
 
 ## Data Flow
 
-### Read Operations
+**NOTE**: Detailed data flow diagrams including read/write operations, system integrations, and data transformations are documented in the [Flow Diagrams (FD) document](./FD-template.md).
 
-```
-User Action
-    ↓
-Component
-    ↓
-React Query (cache check)
-    ↓ (cache miss)
-API Client Function
-    ↓
-Server Action / API Route
-    ↓
-Data Access Layer
-    ↓
-Database Query
-    ↓
-Return Data
-    ↓
-Cache Update
-    ↓
-Component Update
-```
-
-### Write Operations
-
-```
-User Submits Form
-    ↓
-Form Validation (Client)
-    ↓
-Server Action
-    ↓
-Validation (Server)
-    ↓
-Business Logic
-    ↓
-Database Transaction
-    ↓
-Success Response
-    ↓
-Cache Invalidation
-    ↓
-UI Update / Redirect
-```
+For quick reference, the general data flow follows:
+- **Read**: Component → React Query → Server Action → Database → Cache Update → Component Update
+- **Write**: Form → Validation → Server Action → Database → Cache Invalidation → UI Update
 
 ---
 
@@ -669,27 +629,7 @@ Server actions are located in `actions.ts` and handle all server-side operations
 
 ## Database Schema
 
-**NOTE**: Detailed database definitions are documented in the [Data Definition (DD) document](./DD-template.md). This section provides a high-level overview only.
-
-### Tables Overview
-
-#### {table_name}
-**Purpose**: {What this table stores}
-**Key Fields**:
-- Primary key: UUID identifier
-- Core business fields: {list main fields}
-- Status field: Tracks entity lifecycle
-- Foreign keys: References to related tables
-- Audit fields: created_at, created_by, updated_at, updated_by
-
-**Indexes**: Indexes created on frequently queried fields (status, dates, foreign keys)
-**Constraints**: Business rule constraints enforced at database level
-
-### Views
-Database views provide pre-joined data and calculated fields for common queries. Views simplify complex queries and improve performance.
-
-### Stored Procedures
-Stored procedures encapsulate complex business logic and multi-step operations at the database level for performance and consistency.
+**NOTE**: Complete database definitions including entities, relationships, constraints, indexes, and stored procedures are documented in the [Data Definition (DD) document](./DD-template.md).
 
 ---
 

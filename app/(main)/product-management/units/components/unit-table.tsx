@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { FileText, Edit, MoreVertical, ArrowUpDown, Trash2 } from "lucide-react"
-import { Unit } from "./unit-list"
+import { Unit } from "@/lib/types"
 import StatusBadge from "@/components/ui/custom-status-badge"
 import {
   AlertDialog,
@@ -40,7 +40,7 @@ interface UnitTableProps {
 }
 
 export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitTableProps) {
-  const [sortField, setSortField] = useState<keyof Unit>("code")
+  const [sortField, setSortField] = useState<keyof Unit>("name")
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
   const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null)
   const selectAllCheckboxRef = useRef<HTMLButtonElement>(null)
@@ -76,12 +76,6 @@ export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitT
       return sortDirection === "asc"
         ? aValue - bValue
         : bValue - aValue
-    }
-
-    if (aValue instanceof Date && bValue instanceof Date) {
-      return sortDirection === "asc"
-        ? aValue.getTime() - bValue.getTime()
-        : bValue.getTime() - aValue.getTime()
     }
 
     return 0
@@ -135,11 +129,11 @@ export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitT
             </TableHead>
             <TableHead 
               className="py-3 font-medium cursor-pointer"
-              onClick={() => handleSort("code")}
+              onClick={() => handleSort("name")}
             >
               <div className="flex items-center gap-1">
                 Code
-                {sortField === "code" && (
+                {sortField === "name" && (
                   <ArrowUpDown className="h-4 w-4" />
                 )}
               </div>
@@ -155,13 +149,13 @@ export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitT
                 )}
               </div>
             </TableHead>
-            <TableHead 
+            <TableHead
               className="py-3 font-medium cursor-pointer"
-              onClick={() => handleSort("type")}
+              onClick={() => handleSort("category")}
             >
               <div className="flex items-center gap-1">
                 Type
-                {sortField === "type" && (
+                {sortField === "category" && (
                   <ArrowUpDown className="h-4 w-4" />
                 )}
               </div>
@@ -193,18 +187,16 @@ export function UnitTable({ units, onEdit, selectedItems, onSelectItems }: UnitT
                   aria-label={`Select ${unit.name}`}
                 />
               </TableCell>
-              <TableCell className="py-4 font-medium">{unit.code}</TableCell>
+              <TableCell className="py-4 font-medium">{unit.name}</TableCell>
               <TableCell className="py-4">
                 <div className="flex flex-col">
                   <span>{unit.name}</span>
-                  {unit.description && (
-                    <span className="text-sm text-muted-foreground mt-0.5 line-clamp-1">
-                      {unit.description}
-                    </span>
-                  )}
+                  <span className="text-sm text-muted-foreground mt-0.5">
+                    {unit.symbol}
+                  </span>
                 </div>
               </TableCell>
-              <TableCell className="py-4">{unit.type}</TableCell>
+              <TableCell className="py-4">{unit.category}</TableCell>
               <TableCell className="py-4">
                 <StatusBadge status={unit.isActive ? "Active" : "Inactive"} />
               </TableCell>

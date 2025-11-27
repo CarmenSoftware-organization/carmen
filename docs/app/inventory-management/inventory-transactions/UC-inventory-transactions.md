@@ -16,6 +16,11 @@ This document describes the use cases for inventory transaction management, cove
 - [Business Requirements](./BR-inventory-transactions.md)
 - [Flow Diagrams](./FD-inventory-transactions.md)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Use Case Index

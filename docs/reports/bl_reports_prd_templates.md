@@ -4,6 +4,11 @@
 **Date:** February 24, 2025  
 **Purpose:** Detailed PRD and template specifications for all Blue Ledger reports
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Table of Contents

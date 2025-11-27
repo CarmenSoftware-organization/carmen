@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { sampleWorkflows } from '@/app/(main)/system-administration/workflow/workflow-configuration/data/mockData';
-import { users } from '@/app/(main)/system-administration/workflow/role-assignment/data/mockData';
+import { sampleWorkflows } from '@/lib/mock-data/workflow-config';
+import { users } from '@/lib/mock-data/role-assignments';
 import { useSimpleUser } from './simple-user-context';
 import type { WorkflowRoleType } from '@/app/(main)/system-administration/workflow/workflow-configuration/types/workflow';
 
@@ -10,7 +10,7 @@ interface WorkflowStage {
   id: number;
   name: string;
   roleType: WorkflowRoleType;
-  assignedUsers: number[];
+  assignedUsers: string[];
 }
 
 interface WorkflowPermissions {

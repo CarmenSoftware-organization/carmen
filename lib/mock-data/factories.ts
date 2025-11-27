@@ -10,7 +10,7 @@ import {
   Recipe,
   PurchaseRequest,
   POSTransaction,
-  DocumentStatus
+  PRStatus
 } from '@/lib/types'
 import type {
   PendingTransaction,
@@ -196,24 +196,30 @@ export function createMockRecipe(overrides: Partial<Recipe> = {}): Recipe {
  * Create a mock purchase request with optional overrides
  */
 export function createMockPurchaseRequest(overrides: Partial<PurchaseRequest> = {}): PurchaseRequest {
-  return {
+  const defaults = {
     id: `PR-${Date.now()}`,
     requestDate: new Date(),
     requiredDate: new Date(),
-    requestType: 'goods',
-    priority: 'normal',
-    status: DocumentStatus.Draft,
+    requestType: 'General' as const,
+    priority: 'normal' as const,
+    status: PRStatus.Draft,
     departmentId: 'dept-general',
     locationId: 'loc-main',
     requestedBy: 'test-user',
     totalItems: 0,
+    currency: 'THB',
     estimatedTotal: {
       amount: 100.00,
-      currency: 'USD'
+      currency: 'THB'
     },
     workflowStages: [],
     items: [],
-    ...overrides
+  }
+  return {
+    ...defaults,
+    ...overrides,
+    // Ensure currency is never undefined
+    currency: overrides.currency ?? defaults.currency,
   }
 }
 

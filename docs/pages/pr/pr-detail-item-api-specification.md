@@ -741,6 +741,11 @@ interface WebhookPayload {
 }
 ```
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 This API specification provides comprehensive coverage of all PR Detail Item operations with proper role-based access control, error handling, and scalability considerations for the multi-tenant architecture.

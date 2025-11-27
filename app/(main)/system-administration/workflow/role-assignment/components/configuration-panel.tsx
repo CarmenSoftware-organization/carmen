@@ -6,7 +6,7 @@ import { RoleConfiguration } from "./role-configuration"
 import { AssignedUsers } from "./assigned-users"
 
 interface ConfigurationPanelProps {
-  selectedRoleId: number | null
+  selectedRoleId: string | null
 }
 
 export function ConfigurationPanel({ selectedRoleId }: ConfigurationPanelProps) {

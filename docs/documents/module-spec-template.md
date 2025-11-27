@@ -61,6 +61,11 @@ flowchart LR
 
 **Status**: 🚧 Prototype / ✅ Production
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Components**:
 - Data table with sorting
 - Search bar

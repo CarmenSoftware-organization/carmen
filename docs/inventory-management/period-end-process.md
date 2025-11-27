@@ -1,5 +1,10 @@
 # Inventory Period End Process
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 The Inventory Period End Process is a crucial accounting and inventory management procedure that ensures accurate stock valuation, reconciliation of discrepancies, and proper financial reporting at the end of each accounting period. This document outlines the complete process, requirements, and best practices.

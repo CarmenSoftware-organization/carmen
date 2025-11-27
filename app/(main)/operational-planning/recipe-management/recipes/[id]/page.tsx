@@ -1,7 +1,8 @@
 "use client"
 
 import { Suspense, useState } from "react"
-import { Recipe, Ingredient, PreparationStep, mockRecipes } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
+import { Recipe, Ingredient, PreparationStep } from '@/lib/types'
+import { mockRecipes } from '@/lib/mock-data'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
@@ -150,7 +151,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Category</p>
-                <p className="font-medium">{recipe.category}</p>
+                <p className="font-medium">{recipe.categoryId}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Recipe Unit</p>
@@ -179,17 +180,17 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                 </p>
               </div>
               <div>
-                <p className="text-muted-foreground">Created</p>
-                <p className="font-medium">{recipe.createdAt}</p>
+                <p className="text-muted-foreground">Developed By</p>
+                <p className="font-medium">{recipe.developedBy || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-muted-foreground">Last Modified</p>
-                <p className="font-medium">{recipe.updatedAt}</p>
+                <p className="text-muted-foreground">Last Tested</p>
+                <p className="font-medium">{recipe.lastTestedDate ? new Date(recipe.lastTestedDate).toLocaleDateString() : 'N/A'}</p>
               </div>
               <div>
-                <p className="text-muted-foreground">Stock Management:</p>
-                <Badge variant={recipe.deductFromStock ? "default" : "secondary"}>
-                  {recipe.deductFromStock ? "Deduct from Stock" : "Manual Stock Management"}
+                <p className="text-muted-foreground">Status</p>
+                <Badge variant={recipe.isActive ? "default" : "secondary"}>
+                  {recipe.isActive ? "Active" : "Inactive"}
                 </Badge>
               </div>
             </div>
@@ -197,19 +198,24 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
 
           <Card className="px-3 py-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Carbon Footprint</h2>
+              <h2 className="text-lg font-semibold">Dietary Information</h2>
               <Leaf className="h-5 w-5 text-green-500" />
             </div>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Standard Value (CO₂eq):</span>
-                <span className="font-medium">{recipe.carbonFootprint} kg</span>
-              </div>
-              {recipe.carbonFootprintSource && (
-                <div className="text-sm text-muted-foreground">
-                  <span className="block font-medium mb-1">Source:</span>
-                  <span>{recipe.carbonFootprintSource}</span>
-                </div>
+            <div className="space-y-2">
+              {recipe.isVegetarian && (
+                <Badge variant="secondary">Vegetarian</Badge>
+              )}
+              {recipe.isVegan && (
+                <Badge variant="secondary">Vegan</Badge>
+              )}
+              {recipe.isGlutenFree && (
+                <Badge variant="secondary">Gluten Free</Badge>
+              )}
+              {recipe.isHalal && (
+                <Badge variant="secondary">Halal</Badge>
+              )}
+              {recipe.isKosher && (
+                <Badge variant="secondary">Kosher</Badge>
               )}
             </div>
           </Card>
@@ -307,19 +313,19 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Cost/Unit</span>
-                            <span>${selectedIngredient.costPerUnit}/{selectedIngredient.unit}</span>
+                            <span>${selectedIngredient.costPerUnit.amount.toFixed(2)}/{selectedIngredient.unit}</span>
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Net Cost</span>
-                            <span>${(selectedIngredient.quantity * selectedIngredient.costPerUnit).toFixed(2)}</span>
+                            <span>${(selectedIngredient.quantity * selectedIngredient.costPerUnit.amount).toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between text-sm">
                             <span className="text-muted-foreground">Wastage Cost</span>
-                            <span>${((selectedIngredient.quantity * selectedIngredient.costPerUnit * selectedIngredient.wastage) / 100).toFixed(2)}</span>
+                            <span>${((selectedIngredient.quantity * selectedIngredient.costPerUnit.amount * selectedIngredient.wastage) / 100).toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between text-sm font-medium">
                             <span>Total Cost</span>
-                            <span>${selectedIngredient.totalCost.toFixed(2)}</span>
+                            <span>${selectedIngredient.totalCost.amount.toFixed(2)}</span>
                           </div>
                         </div>
                       </div>
@@ -424,7 +430,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
             </TabsContent>
 
             <TabsContent value="preparation" className="space-y-6">
-              {recipe.steps.map((step) => (
+              {recipe.preparationSteps.map((step) => (
                 <Card key={step.id} className="px-3 py-6">
                   <div className="grid grid-cols-[auto,300px,1fr] gap-6">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -508,9 +514,9 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                             recipe.ingredients.map((ingredient, index) => (
                               <tr key={index} className="border-b">
                                 <td className="p-3 text-sm">{ingredient.name}</td>
-                                <td className="p-3 text-sm text-right">${ingredient.totalCost.toFixed(2)}</td>
+                                <td className="p-3 text-sm text-right">${ingredient.totalCost.amount.toFixed(2)}</td>
                                 <td className="p-3 text-sm text-right">
-                                  {((ingredient.totalCost / recipe.totalCost) * 100).toFixed(1)}%
+                                  {((ingredient.totalCost.amount / recipe.totalCost.amount) * 100).toFixed(1)}%
                                 </td>
                               </tr>
                             ))
@@ -526,7 +532,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                           <tr>
                             <td className="p-3 text-sm font-medium">Total Ingredient Cost</td>
                             <td colSpan={2} className="p-3 text-sm text-right font-medium">
-                              ${recipe.totalCost.toFixed(2)}
+                              ${recipe.totalCost.amount.toFixed(2)}
                             </td>
                           </tr>
                         </tfoot>
@@ -569,19 +575,19 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                     <div className="space-y-3">
                       <div className="flex justify-between py-2">
                         <span className="text-sm">Ingredient Cost:</span>
-                        <span className="font-medium">${recipe.totalCost.toFixed(2)}</span>
+                        <span className="font-medium">${recipe.totalCost.amount.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between py-2">
                         <span className="text-sm">Labor Cost (30%):</span>
-                        <span className="font-medium">${(recipe.totalCost * 0.3).toFixed(2)}</span>
+                        <span className="font-medium">${(recipe.totalCost.amount * 0.3).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between py-2">
                         <span className="text-sm">Overhead (20%):</span>
-                        <span className="font-medium">${(recipe.totalCost * 0.2).toFixed(2)}</span>
+                        <span className="font-medium">${(recipe.totalCost.amount * 0.2).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between py-2 border-t">
                         <span className="font-medium">Total Cost Per Portion:</span>
-                        <span className="font-medium">${recipe.costPerPortion.toFixed(2)}</span>
+                        <span className="font-medium">${recipe.costPerPortion.amount.toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
@@ -613,7 +619,7 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                         <input
                           type="number"
                           className="w-full rounded-md border px-3 py-2"
-                          defaultValue={recipe.sellingPrice}
+                          defaultValue={recipe.yieldVariants[0]?.sellingPrice?.amount || 0}
                           disabled
                         />
                       </div>
@@ -622,30 +628,34 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
                     <div className="space-y-3 text-sm">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Recommended Price:</span>
-                        <span>${(recipe.costPerPortion * 3).toFixed(2)}</span>
+                        <span>${(recipe.costPerPortion.amount * 3).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Current Price:</span>
-                        <span>${recipe.sellingPrice.toFixed(2)}</span>
+                        <span>${recipe.yieldVariants[0]?.sellingPrice?.amount.toFixed(2) || 'N/A'}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Food Cost %:</span>
                         <span className={cn(
-                          (recipe.costPerPortion / recipe.sellingPrice) * 100 > 33 ? "text-destructive" : "text-green-600"
+                          recipe.foodCostPercentage > 33 ? "text-destructive" : "text-green-600"
                         )}>
-                          {((recipe.costPerPortion / recipe.sellingPrice) * 100).toFixed(1)}%
+                          {recipe.foodCostPercentage.toFixed(1)}%
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Gross Profit:</span>
-                        <span>${(recipe.sellingPrice - recipe.costPerPortion).toFixed(2)}</span>
+                        <span>
+                          {recipe.yieldVariants[0]?.sellingPrice
+                            ? `$${(recipe.yieldVariants[0].sellingPrice.amount - recipe.costPerPortion.amount).toFixed(2)}`
+                            : 'N/A'}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Gross Margin:</span>
-                        <span className={cn(
-                          recipe.grossMargin < 60 ? "text-destructive" : "text-green-600"
-                        )}>
-                          {recipe.grossMargin.toFixed(1)}%
+                        <span>
+                          {recipe.yieldVariants[0]?.marginPercentage
+                            ? `${recipe.yieldVariants[0].marginPercentage.toFixed(1)}%`
+                            : 'N/A'}
                         </span>
                       </div>
                     </div>
@@ -692,17 +702,35 @@ export default function RecipeViewPage({ params }: RecipeViewPageProps) {
               <Card className="px-3 py-6">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="font-semibold mb-2">Preparation Notes</h3>
-                    <p className="text-muted-foreground">{recipe.prepNotes || 'No preparation notes available.'}</p>
+                    <h3 className="font-semibold mb-2">Review Notes</h3>
+                    <p className="text-muted-foreground">{recipe.reviewNotes || 'No review notes available.'}</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-2">Special Instructions</h3>
-                    <p className="text-muted-foreground">{recipe.specialInstructions || 'No special instructions available.'}</p>
+                    <h3 className="font-semibold mb-2">Plating Instructions</h3>
+                    <p className="text-muted-foreground">{recipe.platingInstructions || 'No plating instructions available.'}</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-2">Additional Information</h3>
-                    <p className="text-muted-foreground">{recipe.additionalInfo || 'No additional information available.'}</p>
+                    <h3 className="font-semibold mb-2">Storage Instructions</h3>
+                    <p className="text-muted-foreground">{recipe.storageInstructions || 'No storage instructions available.'}</p>
                   </div>
+                  {recipe.reheatingInstructions && (
+                    <div>
+                      <h3 className="font-semibold mb-2">Reheating Instructions</h3>
+                      <p className="text-muted-foreground">{recipe.reheatingInstructions}</p>
+                    </div>
+                  )}
+                  {recipe.garnishInstructions && (
+                    <div>
+                      <h3 className="font-semibold mb-2">Garnish Instructions</h3>
+                      <p className="text-muted-foreground">{recipe.garnishInstructions}</p>
+                    </div>
+                  )}
+                  {recipe.qualityStandards && (
+                    <div>
+                      <h3 className="font-semibold mb-2">Quality Standards</h3>
+                      <p className="text-muted-foreground">{recipe.qualityStandards}</p>
+                    </div>
+                  )}
                 </div>
               </Card>
             </TabsContent>

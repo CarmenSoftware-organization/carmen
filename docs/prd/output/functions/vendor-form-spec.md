@@ -1,5 +1,10 @@
 # Vendor Form Functional Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ```yaml
 Title: Vendor Form Functional Specification
 Module: Vendor Management

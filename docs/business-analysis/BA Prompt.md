@@ -1,3 +1,8 @@
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 Here’s a detailed prompt you can use to guide an AI (like ChatGPT or similar) to structure a business logic documentation based on content extracted from a prototype codebase organized in a module structure:
 
 \---

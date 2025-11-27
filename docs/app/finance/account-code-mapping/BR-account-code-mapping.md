@@ -86,8 +86,6 @@ The Account Code Mapping sub-module provides the foundation for automated financ
 - Bulk import supports CSV/Excel with validation
 - Export includes full hierarchy in multiple formats
 
----
-
 ### FR-ACM-002: Mapping Rule Configuration
 **Priority**: Critical
 **User Story**: As a Finance Manager, I want to configure automated mapping rules so that operational transactions are automatically assigned to correct GL accounts based on transaction type, department, product category, and other dimensions.
@@ -145,7 +143,11 @@ Accounts:
 - Unmapped transactions flagged for manual review
 - Rule effectiveness tracked with metrics (% auto-mapped vs manual)
 
----
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 
 ### FR-ACM-003: Multi-Dimensional Accounting
 **Priority**: High

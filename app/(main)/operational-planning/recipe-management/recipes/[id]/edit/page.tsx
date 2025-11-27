@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { RecipeForm } from '../../components/recipe-form'
-import { Recipe, mockRecipes } from '../../data/mock-recipes'
+import { Recipe } from '@/lib/types'
+import { mockRecipes } from '@/lib/mock-data'
 
 interface EditRecipePageProps {
   params: {

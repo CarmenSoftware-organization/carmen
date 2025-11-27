@@ -1,5 +1,11 @@
 # Shared Methods Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+
 ## Overview
 
 This directory contains documentation for application-wide shared methods and services that are used across multiple modules in the Carmen ERP system. These shared methods provide centralized, consistent functionality to ensure data integrity and business rule compliance throughout the application.

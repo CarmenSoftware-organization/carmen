@@ -1,5 +1,10 @@
 # Carmen - Project Structure Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 Carmen is a comprehensive enterprise resource planning (ERP) system designed for food service operations. The application follows Next.js 13+ App Router architecture with a focus on modularity and maintainability.
 

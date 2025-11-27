@@ -1,3 +1,8 @@
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 You are a Product Specialist. Your task is to create a Feature Specification and Functional Requirements document for the Purchase Requisition (PR) module in the Carmen ERP system.
 
 The document should be based on the existing code in the `app/(main)/procurement/purchase-requests/` directory.

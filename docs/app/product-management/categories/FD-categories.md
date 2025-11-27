@@ -4,10 +4,11 @@
 
 - **Module**: Product Management
 - **Sub-Module**: Product Categories
+- **Route**: `/product-management/categories`
 - **Document Type**: Flow Diagrams (FD)
 - **Version**: 1.0.0
-- **Last Updated**: 2025-02-11
-- **Status**: Draft
+- **Last Updated**: 2025-11-26
+- **Status**: Approved
 
 ---
 
@@ -1623,7 +1624,7 @@ All diagram changes should be:
 - **[Business Requirements](./BR-categories.md)**: Business rules and functional requirements for Categories
 - **[Use Cases](./UC-categories.md)**: Detailed use case scenarios and user interactions
 - **[Technical Specification](./TS-categories.md)**: Technical implementation details and architecture
-- **[Data Definition](./DS-categories.md)**: Complete database schema and field definitions
+- **[Data Dictionary](./DD-categories.md)**: Complete database schema and field definitions
 - **[Validation Rules](./VAL-categories.md)**: Input validation and business rule validation logic
 
 ---

@@ -1,5 +1,10 @@
 # Screen Documentation Agent Prompt
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Agent Purpose
 Create comprehensive screen/page documentation based on actual source code implementation using the SCREEN-PROMPTS.md methodology.
 

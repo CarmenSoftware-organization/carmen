@@ -12,6 +12,11 @@
 - [Use Cases](./UC-fractional-inventory.md)
 - [Technical Specification](./TS-fractional-inventory.md)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 | 1.1.0 | 2025-11-15 | Documentation Team | Migrated from DS to DD format |
 

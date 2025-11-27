@@ -11,13 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { 
-  CheckCircle, 
-  Download, 
-  Plus, 
-  Search, 
-  Trash2, 
-  XCircle, 
+import {
+  CheckCircle,
+  Download,
+  Plus,
+  Search,
+  Trash2,
+  XCircle,
   FileText,
   Edit,
   MoreHorizontal,
@@ -34,7 +34,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { mockUnits } from "../data/mock-units"
+import { mockUnits } from "@/lib/mock-data/units"
+import { Unit } from "@/lib/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -45,17 +46,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
-export interface Unit {
-  id: string
-  code: string
-  name: string
-  description?: string
-  type: 'INVENTORY' | 'ORDER' | 'RECIPE'
-  isActive: boolean
-  createdAt: Date
-  updatedAt: Date
-}
 
 export function UnitList() {
   const router = useRouter()
@@ -71,16 +61,15 @@ export function UnitList() {
   const units = mockUnits
 
   const filteredUnits = units.filter((unit) => {
-    const matchesSearch = 
-      unit.code.toLowerCase().includes(search.toLowerCase()) ||
-      unit.name.toLowerCase().includes(search.toLowerCase()) ||
-      unit.description?.toLowerCase().includes(search.toLowerCase())
-    
-    const matchesType = filterType === "all" || unit.type === filterType
-    const matchesStatus = statusFilter === "all" || 
-      (statusFilter === "active" && unit.isActive) || 
+    const matchesSearch =
+      unit.symbol.toLowerCase().includes(search.toLowerCase()) ||
+      unit.name.toLowerCase().includes(search.toLowerCase())
+
+    const matchesType = filterType === "all" || unit.category === filterType
+    const matchesStatus = statusFilter === "all" ||
+      (statusFilter === "active" && unit.isActive) ||
       (statusFilter === "inactive" && !unit.isActive)
-    
+
     return matchesSearch && matchesType && matchesStatus
   })
 
@@ -118,10 +107,9 @@ export function UnitList() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Unit Code</TableHead>
+          <TableHead>Unit Symbol</TableHead>
           <TableHead>Unit Name</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Description</TableHead>
+          <TableHead>Category</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="w-[50px]"></TableHead>
         </TableRow>
@@ -129,23 +117,19 @@ export function UnitList() {
       <TableBody>
         {filteredUnits.map((unit) => (
           <TableRow key={unit.id} className="hover:bg-muted/50">
-            <TableCell className="font-medium">{unit.code}</TableCell>
+            <TableCell className="font-medium">{unit.symbol}</TableCell>
             <TableCell>{unit.name}</TableCell>
             <TableCell>
               <Badge variant="outline" className="text-xs">
-                {unit.type}
+                {unit.category}
               </Badge>
             </TableCell>
-            <TableCell className="max-w-[200px] truncate">
-              {unit.description || 'No description'}
-            </TableCell>
             <TableCell>
-              <Badge 
-                className={`text-xs px-2 py-1 ${
-                  unit.isActive 
-                    ? 'bg-green-100 text-green-700 hover:bg-green-100' 
+              <Badge
+                className={`text-xs px-2 py-1 ${unit.isActive
+                    ? 'bg-green-100 text-green-700 hover:bg-green-100'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 {unit.isActive ? 'Active' : 'Inactive'}
               </Badge>
@@ -191,8 +175,8 @@ export function UnitList() {
   const renderCardView = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       {filteredUnits.map((unit) => (
-        <Card 
-          key={unit.id} 
+        <Card
+          key={unit.id}
           className="overflow-hidden hover:bg-secondary/10 transition-colors h-full shadow-sm"
         >
           <div className="flex flex-col h-full">
@@ -201,40 +185,31 @@ export function UnitList() {
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="text-lg font-semibold text-primary">{unit.name}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{unit.code}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{unit.symbol}</p>
                 </div>
-                <Badge 
-                  className={`text-xs px-2 py-1 ${
-                    unit.isActive 
-                      ? 'bg-green-100 text-green-700 hover:bg-green-100' 
+                <Badge
+                  className={`text-xs px-2 py-1 ${unit.isActive
+                      ? 'bg-green-100 text-green-700 hover:bg-green-100'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-100'
-                  }`}
+                    }`}
                 >
                   {unit.isActive ? 'Active' : 'Inactive'}
                 </Badge>
               </div>
             </div>
-            
+
             {/* Card Content */}
             <div className="p-5 flex-grow">
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Type</p>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Category</p>
                   <Badge variant="outline" className="text-xs">
-                    {unit.type}
+                    {unit.category}
                   </Badge>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Description</p>
-                  <p className="text-sm line-clamp-2">{unit.description || 'No description available'}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Last Updated</p>
-                  <p className="text-sm">{unit.updatedAt.toLocaleDateString()}</p>
                 </div>
               </div>
             </div>
-            
+
             {/* Card Actions */}
             <div className="flex justify-end px-4 py-3 bg-muted/20 border-t">
               <DropdownMenu>
@@ -285,7 +260,7 @@ export function UnitList() {
                 <CardTitle className="text-2xl font-bold text-gray-900">Unit Management</CardTitle>
                 <div className="text-sm text-gray-600">Manage measurement units and conversions</div>
               </div>
-              
+
               <div className="flex gap-2">
                 <Button variant="outline" size="sm">
                   <Download className="h-4 w-4 mr-2" />
@@ -327,7 +302,7 @@ export function UnitList() {
                       <SelectItem value="inactive">Inactive</SelectItem>
                     </SelectContent>
                   </Select>
-                  
+
                   <Select value={filterType} onValueChange={setFilterType}>
                     <SelectTrigger className="w-[140px]">
                       <SelectValue placeholder="All Types" />
@@ -355,16 +330,16 @@ export function UnitList() {
 
                 {/* View Toggle */}
                 <div className="flex border rounded-lg">
-                  <Button 
-                    variant={viewMode === 'table' ? 'default' : 'ghost'} 
-                    size="sm" 
+                  <Button
+                    variant={viewMode === 'table' ? 'default' : 'ghost'}
+                    size="sm"
                     className="border-r"
                     onClick={() => setViewMode('table')}
                   >
                     <List className="h-4 w-4" />
                   </Button>
-                  <Button 
-                    variant={viewMode === 'card' ? 'default' : 'ghost'} 
+                  <Button
+                    variant={viewMode === 'card' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setViewMode('card')}
                   >

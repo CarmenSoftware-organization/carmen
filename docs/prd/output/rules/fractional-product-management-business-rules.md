@@ -6,6 +6,11 @@
 **Date**: January 15, 2025  
 **Status**: Active  
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 This document defines business rules for managing fractional products in the Carmen ERP system, specifically focusing on pizza slices, cake portions, and other divisible food items. These rules ensure food safety compliance, quality standards, operational efficiency, and revenue optimization while supporting hospitality business objectives.

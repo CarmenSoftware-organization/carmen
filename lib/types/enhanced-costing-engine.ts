@@ -5,7 +5,7 @@
  * variant-specific cost allocation, and profitability optimization.
  */
 
-import { Recipe, RecipeYieldVariant, Ingredient } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
+import { Recipe, RecipeYieldVariant, Ingredient } from "@/lib/types"
 import { FractionalSalesTransaction, ConsumptionPeriod } from "./enhanced-consumption-tracking"
 
 // Core Costing Interfaces

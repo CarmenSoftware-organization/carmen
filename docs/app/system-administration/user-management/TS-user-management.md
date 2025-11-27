@@ -89,8 +89,6 @@ graph TD
 4. DataTable or CardView renders filtered users
 5. User actions (view/edit/delete) trigger navigation or state updates
 
----
-
 ### User Detail Page
 
 **Route**: `/system-administration/user-management/[id]/page.tsx`
@@ -136,6 +134,11 @@ graph TD
 - Integrates with TanStack Table for data operations
 - Renders `cardView` when `viewMode === 'card'`
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ### UserCardView Component

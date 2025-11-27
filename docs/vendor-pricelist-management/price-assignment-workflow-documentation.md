@@ -8,6 +8,11 @@
 - **Date**: July 2025
 - **Author**: Development Team
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Table of Contents

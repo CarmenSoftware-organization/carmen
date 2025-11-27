@@ -17,24 +17,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { fetchPurchaseRequests } from "@/app/lib/data"
-import { mockPRListData } from "./mockPRListData"
+import { mockPurchaseRequests as mockPRListData } from "@/lib/mock-data/purchase-requests"
+import { MockPurchaseRequest } from "@/lib/types"
 
 export function ModernPurchaseRequestList() {
   const router = useRouter()
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
   const [selectedItems, setSelectedItems] = useState<string[]>([])
-  const [data, setData] = useState<PurchaseRequest[]>([])
+  const [data, setData] = useState<MockPurchaseRequest[]>([])
 
   useEffect(() => {
     async function fetchData() {
       const purchaseRequests = await fetchPurchaseRequests();
-      setData(purchaseRequests);
+      setData(purchaseRequests as MockPurchaseRequest[]);
     }
     fetchData();
   }, []);
 
   // Use the existing mock data instead of fetched data for now
-  const displayData = useMemo(() => mockPRListData as PurchaseRequest[], [])
+  const displayData = useMemo(() => mockPRListData as MockPurchaseRequest[], [])
 
   const handleSelectItem = (id: string) => {
     setSelectedItems(prev =>
@@ -50,11 +51,11 @@ export function ModernPurchaseRequestList() {
     )
   }
 
-  const handleView = (pr: PurchaseRequest) => {
+  const handleView = (pr: MockPurchaseRequest) => {
     router.push(`/procurement/purchase-requests/${pr.id}?id=${pr.id}&mode=view`)
   }
 
-  const handleEdit = (pr: PurchaseRequest) => {
+  const handleEdit = (pr: MockPurchaseRequest) => {
     router.push(`/procurement/purchase-requests/${pr.id}?id=${pr.id}&mode=edit`)
   }
 
@@ -75,12 +76,12 @@ export function ModernPurchaseRequestList() {
 
   const cardView = (
     <PurchaseRequestsCardView
-      data={displayData}
+      data={displayData as unknown as PurchaseRequest[]}
       selectedItems={selectedItems}
       onSelectItem={handleSelectItem}
       onSelectAll={handleSelectAll}
-      onView={handleView}
-      onEdit={handleEdit}
+      onView={handleView as (pr: PurchaseRequest) => void}
+      onEdit={handleEdit as (pr: PurchaseRequest) => void}
       onApprove={handleApprove}
       onReject={handleReject}
       onDelete={handleDelete}
@@ -139,7 +140,7 @@ export function ModernPurchaseRequestList() {
 
       <PurchaseRequestsDataTable
         columns={purchaseRequestColumns}
-        data={displayData}
+        data={displayData as unknown as PurchaseRequest[]}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         cardView={cardView}

@@ -1,5 +1,10 @@
 # Product Units API Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Authentication
 All API requests require authentication using Bearer token authentication.
 

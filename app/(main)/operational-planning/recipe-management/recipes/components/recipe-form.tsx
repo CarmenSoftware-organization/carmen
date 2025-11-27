@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Recipe, mockIngredients, mockBaseRecipes } from '@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes'
+import { Recipe, Ingredient } from '@/lib/types'
+import { mockIngredients, mockBaseRecipes } from '@/lib/mock-data'
 import { Plus, Trash2, UploadCloud, Clock, ChevronLeft, History, Share2, Printer, Download, Search, Info, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -29,49 +30,66 @@ interface RecipeFormProps {
 export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
   const [formData, setFormData] = useState<Recipe>(initialData || {
     id: '',
+    recipeCode: '',
     name: '',
+    displayName: '',
     description: '',
-    category: '',
-    cuisine: '',
+    shortDescription: '',
+    categoryId: '',
+    cuisineTypeId: '',
     status: 'draft',
-    image: '',
+    complexity: 'simple',
     yield: 0,
     yieldUnit: 'portions',
+    basePortionSize: 0,
+    servingSize: '',
     yieldVariants: [],
-    defaultVariantId: '',
-    allowsFractionalSales: false,
+    defaultYieldVariantId: '',
+    ingredients: [],
+    preparationSteps: [],
     prepTime: 0,
     cookTime: 0,
     totalTime: 0,
-    difficulty: 'easy',
-    costPerPortion: 0,
-    sellingPrice: 0,
-    grossMargin: 0,
-    netPrice: 0,
-    grossPrice: 0,
-    totalCost: 0,
-    carbonFootprint: 0,
-    carbonFootprintSource: '',
-    deductFromStock: false,
-    hasMedia: false,
-    ingredients: [],
-    steps: [],
-    prepNotes: '',
-    specialInstructions: '',
-    additionalInfo: '',
-    allergens: [],
-    tags: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    createdBy: 'Current User',
-    updatedBy: 'Current User',
-    targetFoodCost: 33,
-    laborCostPercentage: 30,
-    overheadPercentage: 20,
-    recommendedPrice: 0,
+    restTime: 0,
+    totalCost: { amount: 0, currency: 'USD' },
+    costPerPortion: { amount: 0, currency: 'USD' },
     foodCostPercentage: 0,
-    grossProfit: 0,
-    unitOfSale: 'portion'
+    targetFoodCostPercentage: 33,
+    laborCostPerPortion: { amount: 0, currency: 'USD' },
+    overheadCostPerPortion: { amount: 0, currency: 'USD' },
+    requiredEquipment: [],
+    skillLevel: 'beginner',
+    storageInstructions: '',
+    shelfLife: 0,
+    reheatingInstructions: '',
+    allergens: [],
+    dietaryRestrictions: [],
+    isVegetarian: false,
+    isVegan: false,
+    isGlutenFree: false,
+    isHalal: false,
+    isKosher: false,
+    image: '',
+    additionalImages: [],
+    videoUrl: '',
+    documentUrls: [],
+    qualityStandards: '',
+    platingInstructions: '',
+    garnishInstructions: '',
+    isActive: true,
+    isMenuActive: false,
+    seasonality: [],
+    popularity: 0,
+    difficultyRating: 0,
+    version: '1.0',
+    parentRecipeId: '',
+    tags: [],
+    keywords: [],
+    developedBy: 'Current User',
+    testedBy: [],
+    approvedBy: '',
+    lastTestedDate: new Date(),
+    reviewNotes: ''
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -89,17 +107,23 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
   }
 
   const handleAddIngredient = () => {
-    const newIngredient = {
+    const newIngredient: Ingredient = {
       id: '',
       name: '',
-      type: 'product' as const,
+      type: 'product',
       quantity: 0,
       unit: '',
       wastage: 0,
+      yield: 100,
+      netQuantity: 0,
       inventoryQty: 0,
       inventoryUnit: '',
-      costPerUnit: 0,
-      totalCost: 0
+      conversionFactor: 1,
+      costPerUnit: { amount: 0, currency: 'USD' },
+      totalCost: { amount: 0, currency: 'USD' },
+      isOptional: false,
+      substitutes: [],
+      displayOrder: formData.ingredients.length
     }
     setFormData(prev => ({
       ...prev,
@@ -150,7 +174,7 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
   const handleAddStep = () => {
     const newStep = {
       id: '',
-      order: formData.steps.length + 1,
+      order: formData.preparationSteps.length + 1,
       description: '',
       duration: 0,
       temperature: undefined,
@@ -159,13 +183,13 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
     }
     setFormData(prev => ({
       ...prev,
-      steps: [...prev.steps, newStep]
+      steps: [...prev.preparationSteps, newStep]
     }))
   }
 
   const handleStepChange = (index: number, field: string, value: any) => {
     setFormData(prev => {
-      const newSteps = [...prev.steps]
+      const newSteps = [...prev.preparationSteps]
       newSteps[index] = {
         ...newSteps[index],
         [field]: value
@@ -179,7 +203,7 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
 
   const handleRemoveStep = (index: number) => {
     setFormData(prev => {
-      const newSteps = prev.steps.filter((_, i) => i !== index)
+      const newSteps = prev.preparationSteps.filter((_, i) => i !== index)
       newSteps.forEach((step, i) => {
         step.order = i + 1
       })
@@ -237,9 +261,9 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
               {/* Category */}
               <div>
                 <Label>Category</Label>
-                <Select 
-                  value={formData.category}
-                  onValueChange={(value) => handleInputChange('category', value)}
+                <Select
+                  value={formData.categoryId}
+                  onValueChange={(value) => handleInputChange('categoryId', value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
@@ -281,24 +305,6 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
                 />
               </div>
 
-              {/* Unit of Sale */}
-              <div>
-                <Label>Unit of Sale</Label>
-                <Select 
-                  value={formData.unitOfSale}
-                  onValueChange={(value) => handleInputChange('unitOfSale', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select unit of sale" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="portion">Per Portion</SelectItem>
-                    <SelectItem value="plate">Per Plate</SelectItem>
-                    <SelectItem value="piece">Per Piece</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               {/* Preparation Time */}
               <div>
                 <Label>Preparation Time</Label>
@@ -325,62 +331,21 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
                 </div>
               </div>
 
-              {/* Deduct from Stock */}
+              {/* Active Status */}
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
-                  id="deductFromStock"
-                  checked={formData.deductFromStock}
-                  onChange={(e) => handleInputChange('deductFromStock', e.target.checked)}
+                  id="isActive"
+                  checked={formData.isActive}
+                  onChange={(e) => handleInputChange('isActive', e.target.checked)}
                   className="h-4 w-4"
                 />
-                <Label htmlFor="deductFromStock">Deduct from Stock</Label>
+                <Label htmlFor="isActive">Active Recipe</Label>
               </div>
 
-              {/* Created & Modified */}
-              <div className="space-y-2">
-                <div>
-                  <Label className="text-xs text-muted-foreground">Created</Label>
-                  <div className="text-sm">{new Date(formData.createdAt).toLocaleString()}</div>
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground">Last Modified</Label>
-                  <div className="text-sm">{new Date(formData.updatedAt).toLocaleString()}</div>
-                </div>
-              </div>
             </div>
           </Card>
 
-          {/* Carbon Footprint Card */}
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Carbon Footprint</h2>
-            <div className="space-y-4">
-              <div>
-                <Label>Standard Value (CO₂eq)</Label>
-                <div className="flex gap-2">
-                  <Input 
-                    type="number"
-                    value={formData.carbonFootprint}
-                    onChange={(e) => handleInputChange('carbonFootprint', parseFloat(e.target.value))}
-                    className="w-full"
-                  />
-                  <span className="flex items-center text-muted-foreground px-3">kg</span>
-                </div>
-              </div>
-              <div>
-                <Label>Information Source</Label>
-                <div className="flex gap-2">
-                  <Input 
-                    type="text"
-                    value={formData.carbonFootprintSource}
-                    onChange={(e) => handleInputChange('carbonFootprintSource', e.target.value)}
-                    placeholder="e.g., Environmental Working Group Food Emissions Database"
-                    className="w-full"
-                  />
-                </div>
-              </div>
-            </div>
-          </Card>
         </div>
 
         {/* Right Column - Recipe Detail */}
@@ -528,7 +493,7 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
                             <span className="text-xs text-muted-foreground">$</span>
                             <Input
                               type="number"
-                              value={ingredient.costPerUnit}
+                              value={ingredient.costPerUnit.amount}
                               onChange={(e) => handleIngredientChange(index, 'costPerUnit', parseFloat(e.target.value))}
                               className="h-8 w-16"
                               disabled
@@ -541,7 +506,7 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
                         <div className="space-y-1.5">
                           <Label className="text-xs">Net Cost</Label>
                           <div className="text-xs text-muted-foreground">
-                            ${(ingredient.quantity * ingredient.costPerUnit).toFixed(2)}
+                            ${(ingredient.quantity * ingredient.costPerUnit.amount).toFixed(2)}
                           </div>
                         </div>
 
@@ -549,7 +514,7 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
                         <div className="space-y-1.5">
                           <Label className="text-xs">Wastage Cost</Label>
                           <div className="text-xs text-muted-foreground">
-                            ${((ingredient.quantity * ingredient.costPerUnit * ingredient.wastage) / 100).toFixed(2)}
+                            ${((ingredient.quantity * ingredient.costPerUnit.amount * ingredient.wastage) / 100).toFixed(2)}
                           </div>
                         </div>
 
@@ -557,7 +522,7 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
                         <div className="space-y-1.5">
                           <Label className="text-xs">Total Cost</Label>
                           <div className="text-xs font-medium">
-                            ${(ingredient.quantity * ingredient.costPerUnit * (1 + ingredient.wastage / 100)).toFixed(2)}
+                            ${(ingredient.quantity * ingredient.costPerUnit.amount * (1 + ingredient.wastage / 100)).toFixed(2)}
                           </div>
                         </div>
 
@@ -603,7 +568,7 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
 
                 {/* Steps List */}
                 <div className="space-y-4">
-                  {formData.steps.map((step, index) => (
+                  {formData.preparationSteps.map((step, index) => (
                     <Card key={index} className="p-6 relative">
                       <div className="grid grid-cols-[auto,300px,1fr] gap-6">
                         <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -737,9 +702,9 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
                                 formData.ingredients.map((ingredient, index) => (
                                   <tr key={index} className="border-b">
                                     <td className="p-3 text-sm">{ingredient.name}</td>
-                                    <td className="p-3 text-sm text-right">${ingredient.totalCost.toFixed(2)}</td>
+                                    <td className="p-3 text-sm text-right">${ingredient.totalCost.amount.toFixed(2)}</td>
                                     <td className="p-3 text-sm text-right">
-                                      {((ingredient.totalCost / formData.totalCost) * 100).toFixed(1)}%
+                                      {((ingredient.totalCost.amount / formData.totalCost.amount) * 100).toFixed(1)}%
                                     </td>
                                   </tr>
                                 ))
@@ -755,7 +720,7 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
                               <tr>
                                 <td className="p-3 text-sm font-medium">Total Ingredient Cost</td>
                                 <td colSpan={2} className="p-3 text-sm text-right font-medium">
-                                  ${formData.ingredients.reduce((sum, ing) => sum + ing.totalCost, 0).toFixed(2)}
+                                  ${formData.ingredients.reduce((sum, ing) => sum + ing.totalCost.amount, 0).toFixed(2)}
                                 </td>
                               </tr>
                             </tfoot>
@@ -768,56 +733,35 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
                     <Card className="p-6">
                       <h3 className="font-medium mb-4">Cost Summary</h3>
                       <div className="space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label className="text-sm text-muted-foreground">Labor Cost %</Label>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Input
-                                type="number"
-                                value={formData.laborCostPercentage}
-                                onChange={(e) => handleInputChange('laborCostPercentage', parseFloat(e.target.value))}
-                                className="w-full"
-                              />
-                              <span className="text-muted-foreground">%</span>
-                            </div>
-                          </div>
-                          <div>
-                            <Label className="text-sm text-muted-foreground">Overhead %</Label>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Input
-                                type="number"
-                                value={formData.overheadPercentage}
-                                onChange={(e) => handleInputChange('overheadPercentage', parseFloat(e.target.value))}
-                                className="w-full"
-                              />
-                              <span className="text-muted-foreground">%</span>
-                            </div>
-                          </div>
-                        </div>
-
                         <div className="space-y-3">
                           <div className="flex justify-between py-2">
-                            <span className="text-sm">Ingredient Cost:</span>
+                            <span className="text-sm">Total Ingredient Cost:</span>
                             <span className="font-medium">
-                              ${formData.ingredients.reduce((sum, ing) => sum + ing.totalCost, 0).toFixed(2)}
+                              ${formData.ingredients.reduce((sum, ing) => sum + ing.totalCost.amount, 0).toFixed(2)}
                             </span>
                           </div>
                           <div className="flex justify-between py-2">
-                            <span className="text-sm">Labor Cost ({formData.laborCostPercentage}%):</span>
+                            <span className="text-sm">Labor Cost Per Portion:</span>
                             <span className="font-medium">
-                              ${(formData.ingredients.reduce((sum, ing) => sum + ing.totalCost, 0) * formData.laborCostPercentage / 100).toFixed(2)}
+                              ${formData.laborCostPerPortion?.amount.toFixed(2) || '0.00'}
                             </span>
                           </div>
                           <div className="flex justify-between py-2">
-                            <span className="text-sm">Overhead ({formData.overheadPercentage}%):</span>
+                            <span className="text-sm">Overhead Cost Per Portion:</span>
                             <span className="font-medium">
-                              ${(formData.ingredients.reduce((sum, ing) => sum + ing.totalCost, 0) * formData.overheadPercentage / 100).toFixed(2)}
+                              ${formData.overheadCostPerPortion?.amount.toFixed(2) || '0.00'}
                             </span>
                           </div>
                           <div className="flex justify-between py-2 border-t">
-                            <span className="font-medium">Total Cost Per Portion:</span>
+                            <span className="font-medium">Cost Per Portion:</span>
                             <span className="font-medium">
-                              ${((formData.ingredients.reduce((sum, ing) => sum + ing.totalCost, 0) * (1 + (formData.laborCostPercentage + formData.overheadPercentage) / 100)) / formData.yield).toFixed(2)}
+                              ${formData.costPerPortion.amount.toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between py-2">
+                            <span className="font-medium">Total Recipe Cost:</span>
+                            <span className="font-medium">
+                              ${formData.totalCost.amount.toFixed(2)}
                             </span>
                           </div>
                         </div>
@@ -825,75 +769,6 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
                     </Card>
                   </div>
                 </div>
-
-                {/* Pricing Analysis */}
-                <Card className="p-6">
-                  <h3 className="font-medium mb-4">Pricing Analysis</h3>
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-6">
-                      <div>
-                        <Label className="text-sm text-muted-foreground block mb-1">Target Food Cost %</Label>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number"
-                            value={formData.targetFoodCost}
-                            onChange={(e) => handleInputChange('targetFoodCost', parseFloat(e.target.value))}
-                            className="w-24"
-                          />
-                          <span className="text-muted-foreground">%</span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label className="text-sm text-muted-foreground block mb-1">Selling Price</Label>
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground">$</span>
-                          <Input
-                            type="number"
-                            value={formData.sellingPrice}
-                            onChange={(e) => handleInputChange('sellingPrice', parseFloat(e.target.value))}
-                            className="w-24"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-3 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Recommended Price:</span>
-                          <span>${(formData.costPerPortion * 3).toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Current Price:</span>
-                          <span>${formData.sellingPrice.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Food Cost %:</span>
-                          <span className={cn(
-                            (formData.costPerPortion / formData.sellingPrice) * 100 > 33 ? "text-destructive" : "text-green-600"
-                          )}>
-                            {((formData.costPerPortion / formData.sellingPrice) * 100).toFixed(1)}%
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Gross Profit:</span>
-                          <span>${(formData.sellingPrice - formData.costPerPortion).toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Gross Margin:</span>
-                          <span className={cn(
-                            formData.grossMargin < 60 ? "text-destructive" : "text-green-600"
-                          )}>
-                            {formData.grossMargin.toFixed(1)}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="border rounded-lg p-4 flex items-center justify-center text-muted-foreground">
-                      Profitability Chart Coming Soon
-                    </div>
-                  </div>
-                </Card>
 
                 {/* Competitor Analysis */}
                 <Card className="p-6">
@@ -1026,8 +901,8 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
                     </TooltipProvider>
                   </div>
                   <Textarea
-                    value={formData.additionalInfo}
-                    onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
+                    value={formData.reviewNotes}
+                    onChange={(e) => handleInputChange('reviewNotes', e.target.value)}
                     placeholder="Add any additional notes..."
                     className="h-[100px]"
                   />

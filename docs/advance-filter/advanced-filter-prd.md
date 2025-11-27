@@ -1,5 +1,10 @@
 # Product Requirements Document: Advanced Filter Component
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 The Advanced Filter Component is a reusable UI element designed for Carmen Supply Chain platform that allows users to create, save, and apply complex filters across all list screens and reports. The component will handle large datasets (up to 1M records), support multiple filter types, and work across desktop and mobile devices.
 

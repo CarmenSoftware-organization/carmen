@@ -1,5 +1,10 @@
 # API Requirements
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document outlines the key API endpoints required for the inventory management system.
 
 ## Authentication

@@ -1,5 +1,10 @@
 # Account Code Mapping
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 The Account Code Mapping screen is used for setting up and managing mappings between account codes used internally and codes used for external reporting, compliance, or integration with other systems. This module ensures that all financial transactions are correctly categorized and accounted for in financial statements.

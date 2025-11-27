@@ -5,12 +5,17 @@
 - **Version**: 1.0
 - **Last Updated**: 2025-01-16
 - **Status**: Active
-- **Related Documents**: BR-workflow.md, TS-workflow.md, DS-workflow.md
+- **Related Documents**: BR-workflow.md, TS-workflow.md, DD-workflow.md
 
 ## Overview
 
 This document describes the use cases for the Workflow Management module, which enables administrators to configure and manage multi-stage approval workflows for hospitality business processes. The module supports workflow configuration, stage management, dynamic routing, user assignments, and notification setup.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Use Case Index

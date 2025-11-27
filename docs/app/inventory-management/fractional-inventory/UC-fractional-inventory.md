@@ -12,6 +12,11 @@
 - [Technical Specification](./TS-fractional-inventory.md)
 - [Fractional Inventory System Overview](../../../fractional-inventory-system.md)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. Use Case Overview

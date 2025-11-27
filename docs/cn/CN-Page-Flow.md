@@ -1,5 +1,10 @@
 # Credit Note Module - Page Flow
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document provides a detailed overview of the page flow within the Credit Note Module, illustrating the user journey through different screens and actions.
 
 ## 1. Main Page Flows

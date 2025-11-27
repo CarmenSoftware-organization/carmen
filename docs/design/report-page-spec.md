@@ -1,5 +1,10 @@
 # Report Page Layout Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 This specification defines a standardized layout pattern for report pages, including data visualization, filtering, and analysis capabilities.
 

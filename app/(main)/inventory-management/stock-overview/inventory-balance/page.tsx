@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/collapsible"
 import type { BalanceReport, BalanceReportParams } from './types'
 import { formatCurrency, formatNumber } from './utils'
-import { mockBalanceReport } from './mock-data'
+import { mockBalanceReport } from '@/lib/mock-data'
 import { Skeleton } from '@/components/ui/skeleton'
 import { MovementHistory } from './components/MovementHistory'
 

@@ -45,6 +45,11 @@ export function getFieldPermissions(userRole: string): FieldPermissions {
   switch (userRole) {
     case 'Requestor':
     case 'Staff':
+    case 'Store Staff':
+    case 'Chef':
+    case 'Counter Staff':
+    case 'Executive Chef':
+    case 'Warehouse Staff':
       return {
         ...permissions,
         location: true,
@@ -100,6 +105,6 @@ export function canEditField(fieldName: keyof FieldPermissions, userRole: string
  * This function is kept for backward compatibility but should not be used for new code
  */
 export function canViewFinancialInfo(userRole: string): boolean {
-  const restrictedRoles = ['Requestor', 'Staff'];
+  const restrictedRoles = ['Requestor', 'Staff', 'Store Staff', 'Chef', 'Counter Staff', 'Executive Chef', 'Warehouse Staff'];
   return !restrictedRoles.includes(userRole);
 }

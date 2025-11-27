@@ -14,6 +14,11 @@
 - [ ] Test Data Loaded
 - [ ] Admin Access Confirmed
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## TC-01: User Creation

@@ -6,6 +6,11 @@
 **Date**: January 15, 2025  
 **Status**: Active  
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 This document defines business rules for workflow authorization within the Carmen ERP system, ensuring appropriate approval processes, delegation management, escalation procedures, and audit compliance for hospitality operations.

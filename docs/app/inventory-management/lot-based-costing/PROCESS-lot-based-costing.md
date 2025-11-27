@@ -6,6 +6,12 @@
 **Version**: 1.0
 **Last Updated**: 2025-01-07
 
+## Document History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2025-01-07 | Initial document creation with complete process logic |
+
 ---
 
 ## Document Purpose
@@ -2126,14 +2132,6 @@ WHERE product_id = :product_id
 GROUP BY lot_no, cost_per_unit
 HAVING SUM(in_qty) - SUM(out_qty) > 0;
 ```
-
----
-
-## Document History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2025-01-07 | Initial document creation with complete process logic |
 
 ---
 

@@ -4,6 +4,11 @@
 
 **Version**: 2.1.0 (LOT/ADJUSTMENT Implementation)
 **Status**: Transaction Type System Implemented
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Last Updated**: 2025-11-06
 
 ---

@@ -2,6 +2,11 @@
 
 **Carmen's multi-layered state management strategy** using the right tool for each type of state.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## State Types

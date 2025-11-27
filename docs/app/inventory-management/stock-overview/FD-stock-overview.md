@@ -25,6 +25,11 @@ This document provides visual representations of Stock Overview workflows, inclu
 - [Data Schema](./DS-stock-overview.md)
 - [Validations](./VAL-stock-overview.md)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Diagram Index

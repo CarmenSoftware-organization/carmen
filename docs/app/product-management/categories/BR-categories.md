@@ -14,7 +14,6 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-11-02 | Documentation Team | Initial version |
 
----
 
 ## Overview
 
@@ -755,7 +754,7 @@ interface Product {
 
 - **Use Cases**: [UC-categories.md](./UC-categories.md) - Detailed user scenarios and workflows
 - **Technical Specification**: [TS-categories.md](./TS-categories.md) - Technical implementation details
-- **Data Schema**: [DS-categories.md](./DS-categories.md) - Database design and relationships
+- **Data Dictionary**: [DD-categories.md](./DD-categories.md) - Database design and relationships
 - **Flow Diagrams**: [FD-categories.md](./FD-categories.md) - Process flows and state diagrams
 - **Validation Rules**: [VAL-categories.md](./VAL-categories.md) - Input validation and business rules
 

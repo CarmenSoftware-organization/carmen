@@ -3,9 +3,19 @@
 ## Document Information
 - **Document Type**: Flow Diagrams Document
 - **Module**: Vendor Management > Vendor Directory
-- **Version**: 1.0
-- **Last Updated**: 2024-01-15
-- **Document Status**: Draft
+- **Version**: 2.2.0
+- **Last Updated**: 2025-11-25
+- **Document Status**: Updated
+- **Mermaid Version**: 8.8.2+
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.2.0 | 2025-11-25 | System | Added certification management workflow; Updated address workflow for Asian international format |
+| 2.1.0 | 2025-11-25 | System | Added multi-address and multi-contact workflows with primary designation |
+| 2.0.0 | 2025-11-25 | System | Updated to match actual code implementation |
+| 1.0 | 2024-01-15 | System | Initial creation |
 
 ---
 
@@ -127,7 +137,7 @@ graph TB
 
 ```mermaid
 flowchart TD
-    Start([User Clicks<br/>'Create Vendor']) --> CheckAuth{Authenticated?}
+    Start([User Clicks 'Create Vendor']) --> CheckAuth{Authenticated?}
     CheckAuth -->|No| Login[Redirect to Login]
     CheckAuth -->|Yes| ShowForm[Display Vendor Form]
 
@@ -138,16 +148,16 @@ flowchart TD
 
     TabNav -->|No| Submit{Submit Action?}
     Submit -->|Save Draft| SaveDraft[Save as Draft]
-    Submit -->|Submit for Approval| ValidateRequired{Required Fields<br/>Complete?}
+    Submit -->|Submit for Approval| ValidateRequired{Required Fields Complete?}
 
     ValidateRequired -->|No| ShowErrors[Highlight Missing Fields]
     ShowErrors --> EnterData
 
-    ValidateRequired -->|Yes| ValidateCode{Vendor Code<br/>Unique?}
+    ValidateRequired -->|Yes| ValidateCode{Vendor Code Unique?}
     ValidateCode -->|No| DuplicateError[Show Duplicate Error]
     DuplicateError --> EnterData
 
-    ValidateCode -->|Yes| ValidateName{Company Name<br/>Unique?}
+    ValidateCode -->|Yes| ValidateName{Company Name Unique?}
     ValidateName -->|No| NameWarning{Continue?}
     NameWarning -->|No| EnterData
     NameWarning -->|Yes| ConstructJSON
@@ -175,13 +185,13 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([Vendor Submitted<br/>for Approval]) --> CreateWorkflow[Create Workflow Instance]
+    Start([Vendor Submitted for Approval]) --> CreateWorkflow[Create Workflow Instance]
     CreateWorkflow --> Stage1[Stage 1: Compliance Review]
 
     Stage1 --> NotifyCompliance[Notify Compliance Officer]
     NotifyCompliance --> WaitCompliance[Wait for Review]
 
-    WaitCompliance --> ComplianceDecision{Compliance<br/>Decision?}
+    WaitCompliance --> ComplianceDecision{Compliance Decision?}
     ComplianceDecision -->|Approve| Stage2[Stage 2: Financial Review]
     ComplianceDecision -->|Reject| Rejected[Status: Rejected]
     ComplianceDecision -->|Request Info| InfoRequested[Status: Info Requested]
@@ -196,7 +206,7 @@ flowchart TD
     Stage2 --> NotifyFinance[Notify Finance Manager]
     NotifyFinance --> WaitFinance[Wait for Review]
 
-    WaitFinance --> FinanceDecision{Finance<br/>Decision?}
+    WaitFinance --> FinanceDecision{Finance Decision?}
     FinanceDecision -->|Approve| Stage3[Stage 3: Quality Review]
     FinanceDecision -->|Reject| Rejected
     FinanceDecision -->|Request Info| InfoRequested
@@ -204,8 +214,8 @@ flowchart TD
     Stage3 --> NotifyQuality[Notify Quality Manager]
     NotifyQuality --> WaitQuality[Wait for Review]
 
-    WaitQuality --> QualityDecision{Quality<br/>Decision?}
-    QualityDecision -->|Approve| CheckType{High-Value<br/>Vendor?}
+    WaitQuality --> QualityDecision{Quality Decision?}
+    QualityDecision -->|Approve| CheckType{High-Value Vendor?}
     QualityDecision -->|Reject| Rejected
     QualityDecision -->|Request Info| InfoRequested
 
@@ -215,7 +225,7 @@ flowchart TD
     Stage4 --> NotifyManagement[Notify Management]
     NotifyManagement --> WaitManagement[Wait for Review]
 
-    WaitManagement --> ManagementDecision{Management<br/>Decision?}
+    WaitManagement --> ManagementDecision{Management Decision?}
     ManagementDecision -->|Approve| Approved
     ManagementDecision -->|Reject| Rejected
     ManagementDecision -->|Request Info| InfoRequested
@@ -236,7 +246,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([User Opens Vendor<br/>for Edit]) --> LoadVendor[(Load Vendor from DB)]
+    Start([User Opens Vendor for Edit]) --> LoadVendor[(Load Vendor from DB)]
     LoadVendor --> ParseJSON[Parse JSON Fields]
     ParseJSON --> DisplayForm[Display Form with Data]
 
@@ -253,20 +263,20 @@ flowchart TD
     ValidationResult -->|No| ShowErrors[Show Validation Errors]
     ShowErrors --> UserEdits
 
-    ValidationResult -->|Yes| CheckConflict{Concurrent<br/>Edit?}
+    ValidationResult -->|Yes| CheckConflict{Concurrent Edit?}
     CheckConflict -->|Yes| ConflictResolution{Resolution?}
     ConflictResolution -->|Override| MergeChanges
     ConflictResolution -->|Merge| MergeChanges[Merge Changes]
     ConflictResolution -->|Cancel| End
 
-    CheckConflict -->|No| CheckApproval{Changes Require<br/>Approval?}
+    CheckConflict -->|No| CheckApproval{Changes Require Approval?}
     CheckApproval -->|Yes| CreateApproval[Create Approval Request]
     CreateApproval --> PendingStatus[Set Status: Pending Approval]
     PendingStatus --> NotifyApprovers[Notify Approvers]
 
     CheckApproval -->|No| SaveChanges[Save Changes to DB]
     SaveChanges --> UpdateJSON[Update JSON Fields]
-    UpdateJSON --> CheckImpact{Active<br/>Transactions?}
+    UpdateJSON --> CheckImpact{Active Transactions?}
 
     CheckImpact -->|Yes| ShowWarning[Show Impact Warning]
     ShowWarning --> ConfirmSave{Confirm Save?}
@@ -287,7 +297,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([User Clicks<br/>'Upload Document']) --> SelectFile[User Selects File]
+    Start([User Clicks 'Upload Document']) --> SelectFile[User Selects File]
     SelectFile --> ValidateFile{File Valid?}
 
     ValidateFile -->|Size > 50MB| SizeError[Show Size Error]
@@ -313,7 +323,7 @@ flowchart TD
     ValidateMetadata -->|No| MetadataErrors[Show Validation Errors]
     MetadataErrors --> UserEntersMetadata
 
-    ValidateMetadata -->|Yes| CheckDuplicate{Duplicate<br/>Document?}
+    ValidateMetadata -->|Yes| CheckDuplicate{Duplicate Document?}
     CheckDuplicate -->|Yes| DuplicatePrompt{Action?}
     DuplicatePrompt -->|Replace| ArchiveOld[Archive Old Version]
     DuplicatePrompt -->|Save New| CreateNew
@@ -325,14 +335,14 @@ flowchart TD
 
     CheckDuplicate -->|No| CreateNew[Create Document Entry]
     CreateNew --> UpdateJSON[Update vendor.info JSON]
-    UpdateJSON --> CheckApproval{Requires<br/>Approval?}
+    UpdateJSON --> CheckApproval{Requires Approval?}
 
     CheckApproval -->|Yes| CreateApprovalRequest[Create Approval Request]
     CreateApprovalRequest --> SetPending[Status: Pending]
     SetPending --> NotifyApprover[Notify Approver]
 
     CheckApproval -->|No| SetActive[Status: Active]
-    SetActive --> CheckExpiry{Has Expiry<br/>Date?}
+    SetActive --> CheckExpiry{Has Expiry Date?}
 
     CheckExpiry -->|Yes| ScheduleAlerts[Schedule Expiry Alerts]
     ScheduleAlerts --> SaveDB
@@ -354,8 +364,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([User Enters<br/>Search Term]) --> Debounce[Debounce 300ms]
-    Debounce --> CheckCache{Result in<br/>Cache?}
+    Start([User Enters Search Term]) --> Debounce[Debounce 300ms]
+    Debounce --> CheckCache{Result in Cache?}
 
     CheckCache -->|Yes| ReturnCached[Return Cached Results]
     ReturnCached --> DisplayResults
@@ -363,7 +373,7 @@ flowchart TD
     CheckCache -->|No| BuildQuery[Build Search Query]
     BuildQuery --> SearchDB[(Query Database)]
 
-    SearchDB --> ApplyFilters{Filters<br/>Applied?}
+    SearchDB --> ApplyFilters{Filters Applied?}
     ApplyFilters -->|Yes| FilterResults[Apply Client-Side Filters]
     ApplyFilters -->|No| CalculateRelevance
 
@@ -390,7 +400,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([User Opens<br/>Filter Panel]) --> LoadFilters[Load Filter Options]
+    Start([User Opens Filter Panel]) --> LoadFilters[Load Filter Options]
     LoadFilters --> DisplayPanel[Display Filter Panel]
 
     DisplayPanel --> UserSelects[User Selects Filters]
@@ -436,8 +446,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([Monthly Cron Job<br/>Triggers]) --> SelectVendors[Select Eligible Vendors]
-    SelectVendors --> CheckEligibility{Min 5<br/>Transactions?}
+    Start([Monthly Cron Job Triggers]) --> SelectVendors[Select Eligible Vendors]
+    SelectVendors --> CheckEligibility{Min 5 Transactions?}
 
     CheckEligibility -->|No| Skip[Skip Vendor]
     CheckEligibility -->|Yes| FetchData[Fetch Transaction Data]
@@ -448,21 +458,21 @@ flowchart TD
     GatherInvoices --> GatherIssues[Gather Issue Tickets]
 
     GatherIssues --> CalcQuality[Calculate Quality Score]
-    CalcQuality --> QualityFormula["Quality = 100 -<br/>(defect_rate × 40) -<br/>(reject_rate × 30) -<br/>(complaint_impact × 30)"]
+    CalcQuality --> QualityFormula["Quality = 100 - (defect_rate * 40) - (reject_rate * 30) - (complaint_impact * 30)"]
 
     QualityFormula --> CalcDelivery[Calculate Delivery Score]
-    CalcDelivery --> DeliveryFormula["Delivery =<br/>(on_time / total) × 100"]
+    CalcDelivery --> DeliveryFormula["Delivery = (on_time / total) * 100"]
 
     DeliveryFormula --> CalcService[Calculate Service Score]
-    CalcService --> ServiceFormula["Service = 100 -<br/>(response_delay × 2) -<br/>(unresolved × 10)"]
+    CalcService --> ServiceFormula["Service = 100 - (response_delay * 2) - (unresolved * 10)"]
 
     ServiceFormula --> CalcPricing[Calculate Pricing Score]
-    CalcPricing --> PricingFormula["Pricing = 100 -<br/>(price_variance × 2)"]
+    CalcPricing --> PricingFormula["Pricing = 100 - (price_variance * 2)"]
 
     PricingFormula --> ApplyWeights[Apply Weights]
-    ApplyWeights --> OverallFormula["Overall =<br/>Quality × 0.35 +<br/>Delivery × 0.30 +<br/>Service × 0.20 +<br/>Pricing × 0.15"]
+    ApplyWeights --> OverallFormula["Overall = Quality * 0.35 + Delivery * 0.30 + Service * 0.20 + Pricing * 0.15"]
 
-    OverallFormula --> Compare{Rating Change<br/>>10 points?}
+    OverallFormula --> Compare{Rating Change >10 points?}
     Compare -->|Yes| FlagChange[Flag Significant Change]
     Compare -->|No| SaveRating
 
@@ -472,8 +482,8 @@ flowchart TD
     SaveRating --> UpdateHistory[Update Performance History]
     UpdateHistory --> CheckThreshold{Rating < 60?}
 
-    CheckThreshold -->|Yes| TriggerPIP[Trigger Performance<br/>Improvement Plan]
-    CheckThreshold -->|No| CheckHigh{Rating ≥ 90<br/>for 6 months?}
+    CheckThreshold -->|Yes| TriggerPIP[Trigger Performance Improvement Plan]
+    CheckThreshold -->|No| CheckHigh{Rating >= 90 for 6 months?}
 
     TriggerPIP --> NotifyManager[Notify Vendor Manager]
     CheckHigh -->|Yes| SuggestPreferred[Suggest Preferred Status]
@@ -494,7 +504,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([Manager Initiates<br/>Performance Review]) --> SelectVendor[Select Vendor]
+    Start([Manager Initiates Performance Review]) --> SelectVendor[Select Vendor]
     SelectVendor --> LoadMetrics[Load Performance Metrics]
     LoadMetrics --> DisplayDashboard[Display Performance Dashboard]
 
@@ -515,12 +525,12 @@ flowchart TD
     CorrectData -->|Yes| NotifyVendor[Notify Vendor]
     NotifyVendor --> End
 
-    Action -->|Create PIP| CreatePIP[Create Performance<br/>Improvement Plan]
+    Action -->|Create PIP| CreatePIP[Create Performance Improvement Plan]
     CreatePIP --> SetGoals[Set Improvement Goals]
     SetGoals --> ScheduleReview[Schedule Follow-up Review]
     ScheduleReview --> SaveChanges
 
-    Action -->|Recommend Preferred| SubmitRecommendation[Submit Preferred Status<br/>Recommendation]
+    Action -->|Recommend Preferred| SubmitRecommendation[Submit Preferred Status Recommendation]
     SubmitRecommendation --> ApprovalFlow[Trigger Approval Workflow]
     ApprovalFlow --> SaveChanges
 
@@ -538,7 +548,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([Manager Initiates<br/>Block Vendor]) --> CheckAuth{Has Permission?}
+    Start([Manager Initiates Block Vendor]) --> CheckAuth{Has Permission?}
     CheckAuth -->|No| PermissionError[Show Permission Error]
     PermissionError --> End([End])
 
@@ -581,7 +591,7 @@ flowchart TD
 
     NotifyVendor -->|Yes| ComposeNotification[Compose Notification]
     ComposeNotification --> RequireApproval
-    NotifyVendor -->|No| RequireApproval{Requires<br/>Approval?}
+    NotifyVendor -->|No| RequireApproval{Requires Approval?}
 
     RequireApproval -->|Yes| SubmitApproval[Submit for Approval]
     SubmitApproval --> WaitApproval[Wait for Approval]
@@ -599,13 +609,13 @@ flowchart TD
     AllowExisting --> SendNotifications[Send Notifications]
     SendNotifications --> NotifyProcurement[Notify Procurement Team]
     NotifyProcurement --> NotifyFinance[Notify Finance Team]
-    NotifyFinance --> NotifyVendorEmail{Vendor<br/>Notification?}
+    NotifyFinance --> NotifyVendorEmail{Vendor Notification?}
 
     NotifyVendorEmail -->|Yes| SendVendorEmail[Send Email to Vendor]
     SendVendorEmail --> LogAction
     NotifyVendorEmail -->|No| LogAction[Log in Audit Trail]
 
-    LogAction --> CheckTemporary{Temporary<br/>Block?}
+    LogAction --> CheckTemporary{Temporary Block?}
     CheckTemporary -->|Yes| ScheduleReview[Schedule Review Reminder]
     ScheduleReview --> DisplaySuccess
     CheckTemporary -->|No| DisplaySuccess[Display Success Message]
@@ -619,19 +629,19 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([Manager Initiates<br/>Unblock Vendor]) --> CheckBlock{Vendor<br/>Blocked?}
+    Start([Manager Initiates Unblock Vendor]) --> CheckBlock{Vendor Blocked?}
     CheckBlock -->|No| NotBlockedError[Show Error: Not Blocked]
     NotBlockedError --> End([End])
 
     CheckBlock -->|Yes| ReviewReason[Review Block Reason]
-    ReviewReason --> CheckResolution{Issue<br/>Resolved?}
+    ReviewReason --> CheckResolution{Issue Resolved?}
 
     CheckResolution -->|No| CannotUnblock[Cannot Unblock Yet]
     CannotUnblock --> CreateFollowup[Create Follow-up Task]
     CreateFollowup --> End
 
     CheckResolution -->|Yes| EnterResolution[Enter Resolution Details]
-    EnterResolution --> VerifyDocs{Required Docs<br/>Updated?}
+    EnterResolution --> VerifyDocs{Required Docs Updated?}
 
     VerifyDocs -->|No| RequestDocs[Request Updated Documents]
     RequestDocs --> WaitDocs[Wait for Documents]
@@ -678,18 +688,18 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start([User Clicks<br/>'Add Contact']) --> ShowForm[Display Contact Form]
+    Start([User Clicks 'Add Contact']) --> ShowForm[Display Contact Form]
     ShowForm --> EnterData[User Enters Contact Info]
 
-    EnterData --> ValidateEmail{Email<br/>Valid?}
+    EnterData --> ValidateEmail{Email Valid?}
     ValidateEmail -->|No| EmailError[Show Email Error]
     EmailError --> EnterData
 
-    ValidateEmail -->|Yes| ValidatePhone{Phone<br/>Valid?}
+    ValidateEmail -->|Yes| ValidatePhone{Phone Valid?}
     ValidatePhone -->|No| PhoneError[Show Phone Error]
     PhoneError --> EnterData
 
-    ValidatePhone -->|Yes| CheckDuplicate{Email Already<br/>Exists?}
+    ValidatePhone -->|Yes| CheckDuplicate{Email Already Exists?}
     CheckDuplicate -->|Yes| DuplicatePrompt{Action?}
     DuplicatePrompt -->|Add Anyway| CreateContact
     DuplicatePrompt -->|View Existing| ViewExisting[View Existing Contact]
@@ -698,8 +708,8 @@ flowchart TD
     ViewExisting --> End([End])
     UpdateExisting --> End
 
-    CheckDuplicate -->|No| CheckPrimary{Marked as<br/>Primary?}
-    CheckPrimary -->|Yes| PrimaryExists{Primary Already<br/>Exists?}
+    CheckDuplicate -->|No| CheckPrimary{Marked as Primary?}
+    CheckPrimary -->|Yes| PrimaryExists{Primary Already Exists?}
     PrimaryExists -->|Yes| ReplacePrompt{Replace Primary?}
     ReplacePrompt -->|Yes| UpdateOldPrimary[Update Old Primary]
     UpdateOldPrimary --> CreateContact
@@ -711,7 +721,7 @@ flowchart TD
 
     CreateContact --> ConstructJSON[Construct ContactInfo JSON]
     ConstructJSON --> UpdateVendor[Update tb_vendor_contact]
-    UpdateVendor --> TestEmail{Send Test<br/>Email?}
+    UpdateVendor --> TestEmail{Send Test Email?}
 
     TestEmail -->|Yes| SendTest[Send Test Email]
     SendTest --> TestResult{Delivered?}
@@ -726,22 +736,233 @@ flowchart TD
     Success --> End
 ```
 
----
-
-## 9. Integration Workflows
-
-### 9.1 Vendor Selection in Purchase Order
+### 8.2 Address Management Workflow (Asian International Format)
 
 ```mermaid
 flowchart TD
-    Start([User Creates<br/>Purchase Order]) --> SelectVendor[Click 'Select Vendor']
+    Start([User Clicks 'Add Address']) --> ShowForm[Display Address Form]
+    ShowForm --> EnterData[User Enters Address Info]
+
+    subgraph "Asian International Format Fields"
+        EnterData --> EnterLabel[Enter Label e.g. Main Office]
+        EnterLabel --> EnterLine1[Enter Address Line 1 *]
+        EnterLine1 --> EnterLine2[Enter Address Line 2]
+        EnterLine2 --> EnterSubDistrict[Enter Sub-District]
+        EnterSubDistrict --> EnterDistrict[Enter District]
+        EnterDistrict --> EnterCity[Enter City *]
+        EnterCity --> EnterProvince[Enter Province]
+        EnterProvince --> EnterPostal[Enter Postal Code]
+        EnterPostal --> SelectCountry[Select Country *]
+    end
+
+    SelectCountry --> ValidateRequired{Required Fields Complete?}
+    ValidateRequired -->|No| RequiredError[Show Required Field Error]
+    RequiredError --> EnterData
+
+    ValidateRequired -->|Yes| ValidateCountry{Country Valid?}
+    ValidateCountry -->|No| CountryError[Show Unsupported Country Error]
+    CountryError --> SelectCountry
+
+    ValidateCountry -->|Yes| CheckPrimary{Set as Primary?}
+    CheckPrimary -->|Yes| CheckExistingPrimary{Primary Exists?}
+    CheckExistingPrimary -->|Yes| UpdateOldPrimary[Update Old Primary to Non-Primary]
+    UpdateOldPrimary --> CreateAddress
+    CheckExistingPrimary -->|No| CreateAddress
+
+    CheckPrimary -->|No| FirstAddress{First Address?}
+    FirstAddress -->|Yes| SetPrimaryAuto[Auto-Set as Primary]
+    SetPrimaryAuto --> CreateAddress
+    FirstAddress -->|No| CreateAddress[Create Address Entry]
+
+    CreateAddress --> SaveDB[(Save to Database)]
+    SaveDB --> RefreshList[Refresh Address List]
+    RefreshList --> Success[Display Success Toast]
+    Success --> End([End])
+```
+
+**Supported Countries (15):**
+- Thailand, Singapore, Malaysia, Indonesia, Vietnam
+- Philippines, Myanmar, Cambodia, Laos, Brunei
+- China, Japan, South Korea, India, United States
+
+---
+
+## 9. Certification Management Workflows
+
+### 9.1 Add Certification Workflow
+
+```mermaid
+flowchart TD
+    Start([User Clicks 'Add Certification']) --> ShowDialog[Display Certification Dialog]
+    ShowDialog --> EnterData[User Enters Certification Info]
+
+    subgraph "Certification Form Fields"
+        EnterData --> EnterName[Enter Certification Name *]
+        EnterName --> SelectType[Select Certification Type *]
+        SelectType --> EnterIssuer[Enter Issuer *]
+        EnterIssuer --> EnterCertNum[Enter Certificate Number]
+        EnterCertNum --> SelectIssueDate[Select Issue Date *]
+        SelectIssueDate --> SelectExpiryDate[Select Expiry Date *]
+        SelectExpiryDate --> EnterDocUrl[Enter Document URL]
+        EnterDocUrl --> EnterNotes[Enter Notes]
+    end
+
+    EnterNotes --> ValidateRequired{Required Fields Complete?}
+    ValidateRequired -->|No| RequiredError[Show Validation Error]
+    RequiredError --> EnterData
+
+    ValidateRequired -->|Yes| ValidateDates{Expiry > Issue Date?}
+    ValidateDates -->|No| DateError[Show Date Validation Error]
+    DateError --> SelectIssueDate
+
+    ValidateDates -->|Yes| ValidateType{Valid Certification Type?}
+    ValidateType -->|No| TypeError[Show Invalid Type Error]
+    TypeError --> SelectType
+
+    ValidateType -->|Yes| CalcStatus[Calculate Status Auto]
+
+    subgraph "Status Calculation"
+        CalcStatus --> CheckExpiry{Days Until Expiry?}
+        CheckExpiry -->|< 0| SetExpired[Status: Expired]
+        CheckExpiry -->|0-30| SetExpiringSoon[Status: Expiring Soon]
+        CheckExpiry -->|> 30| SetActive[Status: Active]
+    end
+
+    SetExpired --> CreateCert
+    SetExpiringSoon --> CreateCert
+    SetActive --> CreateCert[Create Certification Entry]
+
+    CreateCert --> SaveDB[(Save to Vendor Record)]
+    SaveDB --> RefreshList[Refresh Certifications List]
+    RefreshList --> ShowToast[Show Success Toast]
+    ShowToast --> End([End])
+```
+
+### 9.2 Edit Certification Workflow
+
+```mermaid
+flowchart TD
+    Start([User Clicks 'Edit' on Certification]) --> LoadData[Load Existing Data]
+    LoadData --> ShowDialog[Display Dialog with Data]
+    ShowDialog --> UserEdits[User Modifies Fields]
+
+    UserEdits --> SaveAction{User Action?}
+    SaveAction -->|Cancel| CloseDialog[Close Dialog]
+    CloseDialog --> End([End])
+
+    SaveAction -->|Save| ValidateFields{Fields Valid?}
+    ValidateFields -->|No| ShowErrors[Show Validation Errors]
+    ShowErrors --> UserEdits
+
+    ValidateFields -->|Yes| ValidateDates{Expiry > Issue Date?}
+    ValidateDates -->|No| DateError[Show Date Error]
+    DateError --> UserEdits
+
+    ValidateDates -->|Yes| RecalcStatus[Recalculate Status]
+
+    subgraph "Status Recalculation"
+        RecalcStatus --> CheckNewExpiry{New Days Until Expiry?}
+        CheckNewExpiry -->|< 0| UpdateExpired[Status: Expired]
+        CheckNewExpiry -->|0-30| UpdateExpiringSoon[Status: Expiring Soon]
+        CheckNewExpiry -->|> 30| UpdateActive[Status: Active]
+    end
+
+    UpdateExpired --> SaveChanges
+    UpdateExpiringSoon --> SaveChanges
+    UpdateActive --> SaveChanges[(Save Changes)]
+
+    SaveChanges --> RefreshUI[Refresh Certifications Tab]
+    RefreshUI --> ShowSuccess[Show Success Toast]
+    ShowSuccess --> End
+```
+
+### 9.3 Delete Certification Workflow
+
+```mermaid
+flowchart TD
+    Start([User Clicks 'Delete' on Certification]) --> ShowConfirm[Show Confirmation Dialog]
+    ShowConfirm --> UserDecision{User Confirms?}
+
+    UserDecision -->|Cancel| CloseDialog[Close Dialog]
+    CloseDialog --> End([End])
+
+    UserDecision -->|Confirm Delete| RemoveCert[Remove Certification from List]
+    RemoveCert --> SaveDB[(Save Updated Vendor)]
+    SaveDB --> RefreshList[Refresh Certifications List]
+    RefreshList --> ShowToast[Show Success Toast]
+    ShowToast --> End
+```
+
+### 9.4 Certification Status Auto-Calculation Flow
+
+```mermaid
+flowchart LR
+    subgraph "Page Load / Edit"
+        A[Load Certification] --> B[Get Expiry Date]
+        B --> C[Get Current Date]
+        C --> D[Calculate Days Difference]
+    end
+
+    subgraph "Status Decision"
+        D --> E{Days Until Expiry}
+        E -->|< 0 days| F[EXPIRED]
+        E -->|0-30 days| G[EXPIRING SOON]
+        E -->|> 30 days| H[ACTIVE]
+    end
+
+    subgraph "Visual Display"
+        F --> I[Red Badge]
+        G --> J[Yellow Badge]
+        H --> K[Green Badge]
+    end
+```
+
+### 9.5 Certification Types Reference
+
+```mermaid
+graph TB
+    subgraph "ISO Standards"
+        ISO9001[ISO 9001 - Quality]
+        ISO14001[ISO 14001 - Environmental]
+        ISO22000[ISO 22000 - Food Safety]
+        ISO45001[ISO 45001 - Occupational Safety]
+    end
+
+    subgraph "Food & Safety"
+        HACCP[HACCP - Hazard Analysis]
+        GMP[GMP - Good Manufacturing]
+        Halal[Halal Certification]
+        Kosher[Kosher Certification]
+        Organic[Organic Certification]
+        FairTrade[Fair Trade]
+        FDA[FDA Approved]
+    end
+
+    subgraph "Business & Trade"
+        CE[CE Marking]
+        BizLicense[Business License]
+        TradeLicense[Trade License]
+        ImportExport[Import/Export License]
+        Other[Other]
+    end
+```
+
+---
+
+## 10. Integration Workflows
+
+### 10.1 Vendor Selection in Purchase Order
+
+```mermaid
+flowchart TD
+    Start([User Creates Purchase Order]) --> SelectVendor[Click 'Select Vendor']
     SelectVendor --> ShowModal[Show Vendor Selection Modal]
 
     ShowModal --> SearchVendors[Search/Filter Vendors]
     SearchVendors --> ApplyFilters[Apply Filters]
     ApplyFilters --> FilterStatus{Status Filter}
 
-    FilterStatus --> OnlyApproved[Show Only Approved/<br/>Preferred Vendors]
+    FilterStatus --> OnlyApproved[Show Only Approved/ Preferred Vendors]
     OnlyApproved --> FilterLocation{Location Filter}
     FilterLocation --> MatchLocation[Match PO Location]
     MatchLocation --> FilterCatalog{Product Filter}
@@ -749,7 +970,7 @@ flowchart TD
 
     MatchProducts --> DisplayResults[Display Filtered Vendors]
     DisplayResults --> UserSelects[User Selects Vendor]
-    UserSelects --> CheckStatus{Vendor Status<br/>Valid?}
+    UserSelects --> CheckStatus{Vendor Status Valid?}
 
     CheckStatus -->|Blocked| BlockedError[Show Error: Vendor Blocked]
     CheckStatus -->|Blacklisted| BlacklistError[Show Error: Vendor Blacklisted]
@@ -769,7 +990,7 @@ flowchart TD
     FillPaymentTerms --> FillCurrency[Fill Default Currency]
     FillCurrency --> FillCreditLimit[Check Credit Limit]
 
-    FillCreditLimit --> CheckLimit{Within Credit<br/>Limit?}
+    FillCreditLimit --> CheckLimit{Within Credit Limit?}
     CheckLimit -->|No| CreditWarning[Show Credit Limit Warning]
     CreditWarning --> RequireApproval[Require Additional Approval]
     RequireApproval --> CompleteFill
@@ -781,11 +1002,11 @@ flowchart TD
     EnableNext --> End([End])
 ```
 
-### 9.2 Performance Data Update from GRN
+### 10.2 Performance Data Update from GRN
 
 ```mermaid
 flowchart TD
-    Start([GRN Created/<br/>Updated]) --> ExtractData[Extract GRN Data]
+    Start([GRN Created/ Updated]) --> ExtractData[Extract GRN Data]
     ExtractData --> GetVendor[Get Vendor ID]
     GetVendor --> LoadVendor[Load Vendor Record]
 
@@ -798,7 +1019,7 @@ flowchart TD
     RejectRate --> ComplaintImpact[Calculate Complaint Impact]
 
     ComplaintImpact --> UpdateDelivery[Update Delivery Metrics]
-    UpdateDelivery --> OnTimeStatus{Delivered<br/>On Time?}
+    UpdateDelivery --> OnTimeStatus{Delivered On Time?}
     OnTimeStatus -->|Yes| IncrementOnTime[Increment On-Time Count]
     OnTimeStatus -->|No| IncrementLate[Increment Late Count]
 
@@ -806,19 +1027,19 @@ flowchart TD
     IncrementLate --> CalcDeliveryRate[Calculate Delivery Rate]
     CalcDeliveryRate --> UpdateQuantity[Update Quantity Accuracy]
 
-    UpdateQuantity --> CheckTransactions{Transaction<br/>Count ≥ 5?}
+    UpdateQuantity --> CheckTransactions{Transaction Count >= 5?}
     CheckTransactions -->|No| SaveMetrics[Save Updated Metrics]
     CheckTransactions -->|Yes| RecalcRating[Recalculate Overall Rating]
 
     RecalcRating --> ApplyWeights[Apply Weighted Formula]
-    ApplyWeights --> CompareOld{Significant<br/>Change?}
+    ApplyWeights --> CompareOld{Significant Change?}
     CompareOld -->|Yes| TriggerAlert[Trigger Rating Alert]
     TriggerAlert --> SaveMetrics
     CompareOld -->|No| SaveMetrics
 
     SaveMetrics --> UpdateJSON[Update vendor.info JSON]
     UpdateJSON --> SaveDB[(Save to Database)]
-    SaveDB --> CheckThreshold{Rating Below<br/>Threshold?}
+    SaveDB --> CheckThreshold{Rating Below Threshold?}
 
     CheckThreshold -->|Yes| NotifyManager[Notify Vendor Manager]
     NotifyManager --> LogUpdate
@@ -829,16 +1050,16 @@ flowchart TD
 
 ---
 
-## 10. Notification Workflows
+## 11. Notification Workflows
 
-### 10.1 Document Expiry Alert Workflow
+### 11.1 Document Expiry Alert Workflow
 
 ```mermaid
 flowchart TD
-    Start([Daily Cron Job<br/>Triggers]) --> QueryDocuments[Query Documents with Expiry]
+    Start([Daily Cron Job Triggers]) --> QueryDocuments[Query Documents with Expiry]
     QueryDocuments --> FilterExpiring[Filter Expiring Documents]
 
-    FilterExpiring --> CheckDays{Days Until<br/>Expiry?}
+    FilterExpiring --> CheckDays{Days Until Expiry?}
     CheckDays -->|90 Days| Create90DayAlert
     CheckDays -->|60 Days| Create60DayAlert
     CheckDays -->|30 Days| Create30DayAlert
@@ -858,7 +1079,7 @@ flowchart TD
 
     UpdateDashboard --> LogNotifications[Log Notifications Sent]
     LogNotifications --> MarkSent[Mark Alerts as Sent]
-    MarkSent --> CheckAutoRenew{Auto-Renew<br/>Enabled?}
+    MarkSent --> CheckAutoRenew{Auto-Renew Enabled?}
 
     CheckAutoRenew -->|Yes| TriggerRenewal[Trigger Renewal Workflow]
     TriggerRenewal --> NotifyVendor[Notify Vendor]
@@ -867,12 +1088,12 @@ flowchart TD
     CheckAutoRenew -->|No| End
 ```
 
-### 10.2 Approval Notification Workflow
+### 11.2 Approval Notification Workflow
 
 ```mermaid
 flowchart TD
-    Start([Approval Request<br/>Created]) --> IdentifyApprover[Identify Approver]
-    IdentifyApprover --> CheckAvailability{Approver<br/>Available?}
+    Start([Approval Request Created]) --> IdentifyApprover[Identify Approver]
+    IdentifyApprover --> CheckAvailability{Approver Available?}
 
     CheckAvailability -->|No| FindBackup[Find Backup Approver]
     FindBackup --> NotifyBackup[Notify Backup]
@@ -895,12 +1116,12 @@ flowchart TD
 
     WaitResponse --> CheckSLA{SLA Exceeded?}
     CheckSLA -->|Yes| SendReminder[Send Reminder]
-    SendReminder --> EscalateCount{Reminder<br/>Count?}
+    SendReminder --> EscalateCount{Reminder Count?}
     EscalateCount -->|3rd| EscalateManager[Escalate to Manager]
     EscalateManager --> WaitResponse
     EscalateCount -->|<3| WaitResponse
 
-    CheckSLA -->|No| ResponseReceived{Response<br/>Received?}
+    CheckSLA -->|No| ResponseReceived{Response Received?}
     ResponseReceived -->|No| WaitResponse
     ResponseReceived -->|Yes| ProcessResponse[Process Response]
 
@@ -909,14 +1130,6 @@ flowchart TD
     UpdateWorkflow --> LogResponse[Log in Audit Trail]
     LogResponse --> End([End])
 ```
-
----
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial creation |
 
 ---
 

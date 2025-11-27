@@ -12,17 +12,67 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Vendor } from '@/app/(main)/vendor-management/manage-vendors/[id]/types'; // Assuming Vendor type exists
-import { GoodsReceiveNoteItem, GoodsReceiveNote } from '@/lib/types';
+import { Vendor, GoodsReceiveNoteItem, GoodsReceiveNote } from '@/lib/types';
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CalendarIcon, Trash2, PlusCircle, ChevronLeft } from 'lucide-react'
 
 // Mock data - replace with actual API calls
 const MOCK_VENDORS: Vendor[] = [
-  { id: 'vendor-1', companyName: 'Global Foods Inc.', businessRegistrationNumber: 'BRN001', taxId: 'T001', establishmentDate: '2000-01-01', businessTypeId: 'Food', rating: 4, isActive: true, addresses: [], contacts: [], certifications: [] },
-  { id: 'vendor-2', companyName: 'Local Produce Suppliers', businessRegistrationNumber: 'BRN002', taxId: 'T002', establishmentDate: '2010-05-15', businessTypeId: 'Produce', rating: 5, isActive: true, addresses: [], contacts: [], certifications: [] },
-  { id: 'vendor-3', companyName: 'Specialty Imports Ltd.', businessRegistrationNumber: 'BRN003', taxId: 'T003', establishmentDate: '2005-11-20', businessTypeId: 'Import', rating: 3, isActive: false, addresses: [], contacts: [], certifications: [] },
+  {
+    id: 'vendor-1',
+    vendorCode: 'V001',
+    companyName: 'Global Foods Inc.',
+    businessRegistrationNumber: 'BRN001',
+    taxId: 'T001',
+    establishmentDate: '2000-01-01',
+    businessType: 'distributor',
+    status: 'active',
+    rating: 4,
+    isActive: true,
+    preferredCurrency: 'USD',
+    preferredPaymentTerms: 'Net 30',
+    addresses: [],
+    contacts: [],
+    certifications: [],
+    bankAccounts: []
+  },
+  {
+    id: 'vendor-2',
+    vendorCode: 'V002',
+    companyName: 'Local Produce Suppliers',
+    businessRegistrationNumber: 'BRN002',
+    taxId: 'T002',
+    establishmentDate: '2010-05-15',
+    businessType: 'wholesaler',
+    status: 'active',
+    rating: 5,
+    isActive: true,
+    preferredCurrency: 'USD',
+    preferredPaymentTerms: 'Net 15',
+    addresses: [],
+    contacts: [],
+    certifications: [],
+    bankAccounts: []
+  },
+  {
+    id: 'vendor-3',
+    vendorCode: 'V003',
+    companyName: 'Specialty Imports Ltd.',
+    businessRegistrationNumber: 'BRN003',
+    taxId: 'T003',
+    establishmentDate: '2005-11-20',
+    businessType: 'distributor',
+    status: 'inactive',
+    rating: 3,
+    isActive: false,
+    preferredCurrency: 'USD',
+    preferredPaymentTerms: 'Net 30',
+    addresses: [],
+    contacts: [],
+    certifications: [],
+    bankAccounts: []
+  },
 ];
 // Mock items for lookup
 const MOCK_ITEMS = [

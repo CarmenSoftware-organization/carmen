@@ -705,6 +705,11 @@ describe('PR Item Workflow', () => {
 });
 ```
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 This UI specification provides comprehensive guidance for implementing a consistent, accessible, and role-appropriate user interface for the PR Detail Item CRUD system.

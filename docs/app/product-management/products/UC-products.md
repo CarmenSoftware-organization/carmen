@@ -25,7 +25,7 @@ Products serve as the central master data repository for all operational modules
 **Related Documents**:
 - [Business Requirements](./BR-products.md)
 - [Technical Specification](./TS-products.md)
-- [Data Definition](./DS-products.md)
+- [Data Dictionary](./DD-products.md)
 - [Flow Diagrams](./FD-products.md)
 - [Validations](./VAL-products.md)
 

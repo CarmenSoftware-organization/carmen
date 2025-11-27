@@ -1,7 +1,5 @@
 import { create } from 'zustand';
-import { Vendor } from '@/app/(main)/vendor-management/manage-vendors/[id]/types'; // Assuming Vendor type exists
-import { PurchaseOrder } from '@/lib/types'; // Assuming PurchaseOrder type exists
-import { GoodsReceiveNoteItem, GoodsReceiveNote } from '@/lib/types'; // Added GoodsReceiveNote
+import { Vendor, PurchaseOrder, GoodsReceiveNoteItem, GoodsReceiveNote } from '@/lib/types';
 
 type ProcessType = 'po' | 'manual' | null;
 type Step = 'process-selection' | 'vendor-selection' | 'po-selection' | 'item-location-selection' | 'manual-entry' | 'confirmation';

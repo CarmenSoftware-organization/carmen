@@ -43,7 +43,8 @@ interface SummaryTotalProps {
 
 // Temporary SummaryTotal component until we create the actual one
 function SummaryTotal({ prData }: SummaryTotalProps) {
-  const formatMoney = (money: { amount: number; currency: string }) => {
+  const formatMoney = (money: { amount: number; currency: string } | undefined) => {
+    if (!money) return `${prData.currency || 'THB'} 0.00`
     return `${money.currency} ${money.amount.toFixed(2)}`
   }
 

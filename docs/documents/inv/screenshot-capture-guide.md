@@ -37,6 +37,11 @@ const widget = await page.$('.inventory-levels-widget');
 await widget.screenshot({ path: 'inv-dashboard-inventory-levels-widget.png' });
 ```
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ### 2. Stock Overview

@@ -80,14 +80,26 @@ View and manage all purchase requests. Use filters to find specific requests, or
 | Apply Filters | Apply selected filters to list |
 | Clear All | Reset all filters to default values |
 
-### Quick Filters (Chips/Tabs)
-| Chip Label | Filter Criteria | Badge Count |
-|------------|-----------------|-------------|
-| My PRs | Requests created by logged-in user | Yes |
-| Pending Approval | Status = Pending Approval | Yes |
-| Recently Approved | Status = Approved, last 7 days | No |
-| In Process | Status = In Process or Partially Received | Yes |
-| Rejected | Status = Rejected | Yes |
+### Quick Filters
+
+#### Primary Filter Toggle (Mutually Exclusive Buttons)
+| Button Label | Filter Criteria | Default | Badge Count |
+|--------------|-----------------|---------|-------------|
+| My Pending | Status in: Draft, Submitted, InProgress, Rejected | ✓ | Yes |
+| All Documents | All PRs based on user permissions | | No |
+
+#### Secondary Filter Dropdowns (Context-Sensitive)
+**When "My Pending" is selected:**
+| Dropdown Label | Options | Multi-Select |
+|----------------|---------|--------------|
+| Stage Filter | All Stages / Request Creation / Approval Process / Purchasing / Receiving / Completed | No |
+| Requester Filter | All Requesters / [List of users] | Yes (searchable) |
+
+**When "All Documents" is selected:**
+| Dropdown Label | Options | Multi-Select |
+|----------------|---------|--------------|
+| Status Filter | All Statuses / Draft / Submitted / InProgress / Approved / Rejected / Cancelled / Completed / Closed | Yes (searchable) |
+| Requester Filter | All Requesters / [List of users] | Yes (searchable) |
 
 ---
 
@@ -394,7 +406,8 @@ Select export format and options
 | "Create Purchase Request" | Primary action button | 40 characters |
 | Status badge text | Short status indicators in table | 20 characters each |
 | Column headers | Table column names | 25 characters |
-| "My PRs" | Quick filter chip | 15 characters |
+| "My Pending" / "All Documents" | Primary filter toggle buttons | 20 characters each |
+| "Stage" / "Status" / "Requester" | Secondary filter dropdown labels | 15 characters each |
 
 ### Non-Translatable Content
 | Content | Reason |
@@ -443,7 +456,8 @@ Select export format and options
 - Status badge colors and text shared across all PR pages
 - Button labels consistent with other list pages in system
 - Error messages follow application-wide patterns
-- Quick filter labels may appear in other contexts
+- Primary filter labels ("My Pending", "All Documents") are standard across all list pages
+- Secondary filter options (Stage, Status, Requester) follow consistent patterns
 
 ### Change Log
 | Date | Change | Reason | Updated By |

@@ -1,5 +1,8 @@
 import React, { ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from 'next/link';
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from 'lucide-react';
 
 interface DetailPageTemplateProps {
   title: React.ReactNode;
@@ -10,7 +13,7 @@ interface DetailPageTemplateProps {
   isEditing?: boolean;
   actionButtons?: React.ReactNode;
   content: React.ReactNode;
-  backLink?: React.ReactElement | string;
+  backLink?: string;
 }
 
 const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
@@ -32,16 +35,31 @@ const DetailPageTemplate: React.FC<DetailPageTemplateProps> = ({
             <CardContent className="p-6">
               <div className="flex flex-col gap-6">
                 <div className="flex items-center justify-between">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-3">
-                      <div className="text-2xl font-bold">
-                        {title}
-                      </div>
-                      {status}
-                    </div>
-                    {subtitle && (
-                      <p className="text-sm text-muted-foreground">{subtitle}</p>
+                  <div className="flex items-center gap-4">
+                    {backLink && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        asChild
+                        className="h-8 w-8 shrink-0"
+                      >
+                        <Link href={backLink}>
+                          <ChevronLeft className="h-4 w-4" />
+                          <span className="sr-only">Back</span>
+                        </Link>
+                      </Button>
                     )}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-3">
+                        <div className="text-2xl font-bold">
+                          {title}
+                        </div>
+                        {status}
+                      </div>
+                      {subtitle && (
+                        <p className="text-sm text-muted-foreground">{subtitle}</p>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     {actionButtons}

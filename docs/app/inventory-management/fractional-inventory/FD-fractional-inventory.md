@@ -14,6 +14,11 @@
 - [Data Schema](./DS-fractional-inventory.md)
 - [Data Structure Gaps](./data-structure-gaps.md)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. Introduction

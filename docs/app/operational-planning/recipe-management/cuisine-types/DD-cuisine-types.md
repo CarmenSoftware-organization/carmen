@@ -9,6 +9,12 @@
   - [BR-cuisine-types.md](./BR-cuisine-types.md) - Business Requirements
   - [TS-cuisine-types.md](./TS-cuisine-types.md) - Technical Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial data schema document created |
+
 ---
 
 ## 1. Database Schema
@@ -687,9 +693,3 @@ GROUP BY c.id;
 ```
 
 ---
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial data schema document created |

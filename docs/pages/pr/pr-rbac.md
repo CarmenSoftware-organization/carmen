@@ -1,5 +1,10 @@
 # Purchase Request: Role-Based Access Control (RBAC)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document outlines the Role-Based Access Control (RBAC) for the Purchase Request (PR) module, categorizing permissions based on user roles and workflow stages.
 
 ## 1. Enhanced Role Definitions

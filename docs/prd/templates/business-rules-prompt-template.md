@@ -1,5 +1,10 @@
 # Business Rules Prompt Template
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 Create a comprehensive Business Rules Document (BRD) for [FEATURE/MODULE NAME] based strictly on actual source code implementation and observable system behavior. Follow these guidelines:
 
 ## CRITICAL REQUIREMENTS:

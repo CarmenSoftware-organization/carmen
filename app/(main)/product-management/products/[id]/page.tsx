@@ -8,11 +8,35 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Edit, TrashIcon, PlusIcon, XIcon, ImageIcon, ChevronLeft } from 'lucide-react'
-import { Input } from '@/components/ui/input';
-import { toast } from '@/components/ui/use-toast';
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  ChevronLeft,
+  Plus,
+  Search,
+  Filter,
+  MoreHorizontal,
+  ArrowUpDown,
+  Edit,
+  Trash,
+  Save,
+  X,
+  Check,
+  MapPin,
+  History,
+  BarChart3,
+  Package,
+  AlertTriangle,
+  FileText,
+  Tag,
+  Scale,
+  ShoppingCart,
+  DollarSign,
+  AlignLeft,
+  ImageIcon
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Product } from '@/lib/types';
+import { Product, ProductUnit } from '@/lib/types';
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -26,229 +50,54 @@ import { StoreAssignment } from './components/StoreAssignment'
 import { ProductInformation } from './components/ProductInformation'
 import { LatestPurchaseDialog } from './components/LatestPurchaseDialog'
 import InventoryTab from '../components/inventory'
-import { Label } from "@/components/ui/label"
+import { mockProducts } from '@/lib/mock-data/products';
+import { mockProductCategories } from '@/lib/mock-data/product-categories';
 
-const inventoryUnits = [
-  { id: 'UNIT-001', name: 'Kilogram', code: 'KG' },
-  { id: 'UNIT-002', name: 'Gram', code: 'G' },
-  { id: 'UNIT-003', name: 'Liter', code: 'L' },
-  { id: 'UNIT-004', name: 'Milliliter', code: 'ML' },
-  { id: 'UNIT-005', name: 'Piece', code: 'PC' },
-  { id: 'UNIT-006', name: 'Bag', code: 'BAG' },
-  { id: 'UNIT-007', name: 'Case', code: 'CS' },
-];
+// ViewModel to bridge centralized Product type with component expectations
+interface ViewModelUnitConversion extends Omit<ProductUnit, 'unitType'> {
+  unitType: 'INVENTORY' | 'ORDER' | 'RECIPE';
+}
 
-const inventoryData = {
-  totalStock: {
-    onHand: 3300,
-    onOrder: 500
-  },
-  locations: [
-    {
-      code: 'MK-001',
-      name: 'Main Kitchen Storage',
-      type: 'Primary',
-      onHand: 1500,
-      onOrder: 500,
-      minimum: 1000,
-      maximum: 3000,
-      reorderPoint: 1200,
-      parLevel: 2000
-    },
-    {
-      code: 'DR-001',
-      name: 'Dry Storage Room',
-      type: 'Secondary',
-      onHand: 1000,
-      onOrder: 0,
-      minimum: 800,
-      maximum: 2000,
-      reorderPoint: 1000,
-      parLevel: 1500
-    },
-    {
-      code: 'CS-001',
-      name: 'Cold Storage',
-      type: 'Cold Storage',
-      onHand: 500,
-      onOrder: 0,
-      minimum: 300,
-      maximum: 1000,
-      reorderPoint: 400,
-      parLevel: 800
-    },
-    {
-      code: 'BQ-001',
-      name: 'Banquet Kitchen',
-      type: 'Kitchen',
-      onHand: 200,
-      onOrder: 0,
-      minimum: 150,
-      maximum: 500,
-      reorderPoint: 200,
-      parLevel: 400
-    },
-    {
-      code: 'PB-001',
-      name: 'Pool Bar',
-      type: 'Bar',
-      onHand: 100,
-      onOrder: 0,
-      minimum: 50,
-      maximum: 200,
-      reorderPoint: 75,
-      parLevel: 150
-    }
-  ],
-  aggregateSettings: {
-    minimum: 2300,
-    maximum: 6700,
-    reorderPoint: 2875,
-    parLevel: 4850
-  }
+interface ProductDetailViewModel extends Omit<Product, 'standardCost' | 'lastPurchaseCost' | 'unitConversions'> {
+  // Override Money types with number for UI inputs
+  standardCost: number;
+  lastCost: number;
+
+  // Add fields expected by the UI but missing in Product type
+  basePrice: number;
+  taxRate: number;
+  priceDeviationLimit: number;
+  quantityDeviationLimit: number;
+  minStockLevel: number;
+  maxStockLevel: number;
+  quantityDecimals: number;
+
+  // Override unitConversions to include unitType
+  unitConversions: ViewModelUnitConversion[];
+}
+
+const mapToViewModel = (product: Product): ProductDetailViewModel => {
+  return {
+    ...product,
+    standardCost: product.standardCost?.amount || 0,
+    lastCost: product.lastPurchaseCost?.amount || 0,
+    basePrice: 0, // Default value
+    taxRate: 0, // Default value
+    priceDeviationLimit: 0, // Default value
+    quantityDeviationLimit: 0, // Default value
+    minStockLevel: 0, // Default value
+    maxStockLevel: 0, // Default value
+    quantityDecimals: 2, // Default value
+    unitConversions: (product.unitConversions || []).map(u => ({
+      ...u,
+      unitType: u.isInventoryUnit ? 'INVENTORY' : u.isPurchaseUnit ? 'ORDER' : 'RECIPE'
+    }))
+  };
 };
 
-// Mock data - Replace with actual API calls
-const mockCategories = [
-  {
-    id: 'CAT-001',
-    name: 'Rice & Grains',
-    subCategories: [
-      { id: 'SCAT-001', name: 'Rice' },
-      { id: 'SCAT-002', name: 'Noodles' }
-    ]
-  },
-  {
-    id: 'CAT-002',
-    name: 'Condiments',
-    subCategories: [
-      { id: 'SCAT-003', name: 'Sauces' },
-      { id: 'SCAT-004', name: 'Spices' }
-    ]
-  },
-  {
-    id: 'CAT-003',
-    name: 'Sauces & Condiments',
-    subCategories: [
-      { id: 'SCAT-005', name: 'Fish Sauce' },
-      { id: 'SCAT-006', name: 'Soy Sauce' }
-    ]
-  },
-  {
-    id: 'CAT-004',
-    name: 'Electronics',
-    subCategories: [
-      { id: 'SCAT-007', name: 'Monitors' },
-      { id: 'SCAT-008', name: 'Accessories' }
-    ]
-  },
-  {
-    id: 'CAT-005',
-    name: 'Office Furniture',
-    subCategories: [
-      { id: 'SCAT-009', name: 'Desks' },
-      { id: 'SCAT-010', name: 'Storage' }
-    ]
-  }
-]
-
-const mockItemGroups = [
-  { id: 'GRP-001', name: 'Organic Products' },
-  { id: 'GRP-002', name: 'Thai Essentials' },
-  { id: 'GRP-003', name: 'Premium Products' },
-  { id: 'GRP-004', name: 'Computing Devices' },
-  { id: 'GRP-005', name: 'Furniture' },
-  { id: 'GRP-006', name: 'Office Supplies' }
-]
-
-const mockStores = [
-  { id: 'STR-001', code: 'BKK-001', name: 'Bangkok Central' },
-  { id: 'STR-002', code: 'BKK-002', name: 'Bangkok North' },
-  { id: 'STR-003', code: 'CNX-001', name: 'Chiang Mai Central' }
-]
-
-const mockUsers = [
-  { id: 'USR-001', name: 'John Doe' },
-  { id: 'USR-002', name: 'Jane Smith' }
-]
-
-const mockUnits = [
-  { id: 'UNIT-001', name: 'Kilogram (kg)' },
-  { id: 'UNIT-002', name: 'Gram (g)' },
-  { id: 'UNIT-003', name: 'Liter (L)' },
-  { id: 'UNIT-004', name: 'Milliliter (ml)' },
-  { id: 'UNIT-005', name: 'Each (ea)' },
-  { id: 'UNIT-006', name: 'Box' },
-  { id: 'UNIT-007', name: 'Case' }
-]
-
-const mockTaxTypes = [
-  { id: 'ADDED', name: 'Added Tax' },
-  { id: 'INCLUDED', name: 'Include Tax' },
-  { id: 'NONE', name: 'None' }
-]
-
-interface EditableTitleProps {
-  value: string
-  code: string
-  onNameChange: (value: string) => void
-  onCodeChange: (value: string) => void 
-}
-
-function EditableTitle({ value, code, onNameChange, onCodeChange }: EditableTitleProps) {
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Product Code</label>
-          <Input
-            value={code}
-            onChange={(e) => onCodeChange(e.target.value)}
-            className="text-lg font-semibold h-auto"
-            placeholder="Enter product code"
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Product Name</label>
-          <Input
-            value={value}
-            onChange={(e) => onNameChange(e.target.value)}
-            className="text-lg font-semibold h-auto"
-            placeholder="Enter product name"
-          />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-interface ProductImageProps {
-  src: string
-  alt: string
-}
-
-function ProductImage({ src, alt }: ProductImageProps) {
-  const [error, setError] = useState(false)
-
-  return (
-    <div className="relative w-full aspect-square rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors overflow-hidden">
-      {src && !error ? (
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          className="object-cover rounded-lg"
-          onError={() => setError(true)}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-      ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/10">
-          <ImageIcon className="h-12 w-12 text-muted-foreground/25" />
-          <span className="mt-2 text-sm text-muted-foreground">No image available</span>
-        </div>
-      )}
-    </div>
-  )
+interface ProductDetailProps {
+  params: { id: string }
+  searchParams?: { [key: string]: string | string[] | undefined }
 }
 
 interface LocationAssignment {
@@ -256,311 +105,139 @@ interface LocationAssignment {
   locationId: string
   locationName: string
   locationCode: string
+  shelfId: string
+  shelfName: string
   minQuantity: number
   maxQuantity: number
   reorderPoint: number
   parLevel: number
 }
 
-interface ProductDetailProps {
-  params: { id: string }
-  searchParams?: { [key: string]: string | string[] | undefined }
-}
-
-// Define product list as a named constant to avoid linter errors
-const mockProductList = [
-  {
-    id: 'PRD001',
-    productCode: 'PRD-001',
-    name: 'Organic Jasmine Rice',
-    description: 'Premium quality organic jasmine rice sourced from certified organic farms. Known for its fragrant aroma and soft, sticky texture when cooked.',
-    localDescription: 'ข้าวหอมะลิอินทรีย์',
-    categoryId: 'CAT-001',
-    categoryName: 'Rice & Grains',
-    subCategoryId: 'SCAT-001',
-    subCategoryName: 'Rice',
-    itemGroupId: 'GRP-001',
-    itemGroupName: 'Organic Products',
-    primaryInventoryUnitId: 'UNIT-001',
-    primaryUnitName: 'KG',
-    size: '1 kg',
-    color: 'White',
-    barcode: '8851234567890',
-    isActive: true,
-    basePrice: 35.50,
-    currency: 'THB',
-    taxType: 'ADDED',
-    taxRate: 7,
-    standardCost: 28.40,
-    lastCost: 29.15,
-    priceDeviationLimit: 10,
-    quantityDeviationLimit: 5,
-    minStockLevel: 100,
-    maxStockLevel: 1000,
-    isForSale: true,
-    isIngredient: true,
-    weight: 1,
-    shelfLife: 365,
-    storageInstructions: 'Store in a cool, dry place',
-    imagesUrl: '/images/products/jasmine-rice.jpg',
-    unitConversions: [
-      {
-        id: 'CONV-001',
-        unitId: 'UNIT-001',
-        fromUnit: 'KG',
-        toUnit: 'G',
-        unitName: 'Gram',
-        conversionFactor: 1000,
-        unitType: "INVENTORY" as const
-      },
-      {
-        id: 'CONV-002',
-        unitId: 'UNIT-006',
-        fromUnit: 'KG',
-        toUnit: 'BAG',
-        unitName: 'Bag',
-        conversionFactor: 0.2,
-        unitType: "ORDER" as const
-      }
-    ]
-  },
-  {
-    id: 'PRD002',
-    productCode: 'PRD-002',
-    name: 'Palm Sugar',
-    description: 'Traditional palm sugar made from coconut palm sap. Natural sweetener with rich caramel notes.',
-    localDescription: 'น้ำตาลมะพร้าว',
-    categoryId: 'CAT-002',
-    categoryName: 'Condiments',
-    subCategoryId: 'SCAT-004',
-    subCategoryName: 'Spices',
-    itemGroupId: 'GRP-002',
-    itemGroupName: 'Thai Essentials',
-    primaryInventoryUnitId: 'UNIT-001',
-    primaryUnitName: 'KG',
-    size: '500g',
-    color: 'Brown',
-    barcode: '8851234567891',
-    isActive: true,
-    basePrice: 45.00,
-    currency: 'THB',
-    taxType: 'INCLUDED',
-    taxRate: 7,
-    standardCost: 36.00,
-    lastCost: 37.50,
-    priceDeviationLimit: 10,
-    quantityDeviationLimit: 5,
-    minStockLevel: 50,
-    maxStockLevel: 500,
-    isForSale: true,
-    isIngredient: true,
-    weight: 0.5,
-    shelfLife: 180,
-    storageInstructions: 'Store in airtight container',
-    imagesUrl: '/images/products/palm-sugar.jpg',
-    unitConversions: [
-      {
-        id: 'CONV-003',
-        unitId: 'UNIT-001',
-        fromUnit: 'KG',
-        toUnit: 'G',
-        unitName: 'Gram',
-        conversionFactor: 1000,
-        unitType: "INVENTORY" as const
-      },
-      {
-        id: 'CONV-004',
-        unitId: 'UNIT-007',
-        fromUnit: 'KG',
-        toUnit: 'CS',
-        unitName: 'Case',
-        conversionFactor: 0.1,
-        unitType: "ORDER" as const
-      }
-    ]
-  },
-  {
-    id: 'PRD003',
-    productCode: 'PRD-003',
-    name: 'Fish Sauce Premium Grade',
-    description: 'Premium fish sauce made from anchovies, featuring a rich umami flavor perfect for Thai cuisine.',
-    localDescription: 'น้ำปลาชั้นดี',
-    categoryId: 'CAT-003',
-    categoryName: 'Sauces & Condiments',
-    subCategoryId: 'SCAT-005',
-    subCategoryName: 'Fish Sauce',
-    itemGroupId: 'GRP-003',
-    itemGroupName: 'Premium Products',
-    primaryInventoryUnitId: 'UNIT-003',
-    primaryUnitName: 'L',
-    size: '700ml',
-    color: 'Amber',
-    barcode: '8851234567892',
-    isActive: true,
-    basePrice: 65.00,
-    currency: 'THB',
-    taxType: 'ADDED',
-    taxRate: 7,
-    standardCost: 52.00,
-    lastCost: 54.00,
-    priceDeviationLimit: 10,
-    quantityDeviationLimit: 5,
-    minStockLevel: 100,
-    maxStockLevel: 800,
-    isForSale: true,
-    isIngredient: true,
-    weight: 0.7,
-    shelfLife: 730,
-    storageInstructions: 'Store in a cool, dark place',
-    imagesUrl: '/images/products/fish-sauce.jpg',
-    unitConversions: [
-      {
-        id: 'CONV-005',
-        unitId: 'UNIT-003',
-        fromUnit: 'L',
-        toUnit: 'ML',
-        unitName: 'Milliliter',
-        conversionFactor: 1000,
-        unitType: "INVENTORY" as const
-      },
-      {
-        id: 'CONV-006',
-        unitId: 'UNIT-005',
-        fromUnit: 'L',
-        toUnit: 'BTL',
-        unitName: 'Bottle',
-        conversionFactor: 1,
-        unitType: "ORDER" as const
-      }
-    ]
-  },
-  {
-    id: 'PRD004',
-    productCode: 'ELEC-002',
-    name: 'Dell UltraSharp Monitor',
-    description: 'A high-resolution monitor with a 4K display for professional use.',
-    localDescription: 'จอมอนิเตอร์ Dell UltraSharp ความละเอียดสูง',
-    categoryId: 'CAT-004',
-    categoryName: 'Electronics',
-    subCategoryId: 'SCAT-007',
-    subCategoryName: 'Monitors',
-    itemGroupId: 'GRP-004',
-    itemGroupName: 'Computing Devices',
-    primaryInventoryUnitId: 'UNIT-005',
-    primaryUnitName: 'PC',
-    size: '27 inch',
-    color: 'Black',
-    barcode: '5901234123457',
-    isActive: true,
-    basePrice: 499.99,
-    currency: 'USD',
-    taxType: 'ADDED',
-    taxRate: 7,
-    standardCost: 420.00,
-    lastCost: 425.50,
-    priceDeviationLimit: 5,
-    quantityDeviationLimit: 2,
-    minStockLevel: 5,
-    maxStockLevel: 20,
-    isForSale: true,
-    isIngredient: false,
-    weight: 6.5,
-    shelfLife: 0,
-    storageInstructions: 'Store in dry area, avoid direct sunlight',
-    imagesUrl: '/images/products/monitor.jpg',
-    unitConversions: []
-  }
-] as any as Product[];
-
 export default function ProductDetail({ params, searchParams }: ProductDetailProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [product, setProduct] = useState<Product | null>(null)
-  const [editedProduct, setEditedProduct] = useState<Product | null>(null)
+  const [product, setProduct] = useState<ProductDetailViewModel | null>(null)
+  const [editedProduct, setEditedProduct] = useState<ProductDetailViewModel | null>(null)
   const [isEditing, setIsEditing] = useState(Boolean(searchParams?.edit))
   const isAddMode = params.id === 'new'
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(false)
-  const [locationAssignments, setLocationAssignments] = useState<LocationAssignment[]>([])
+
+  const [locationAssignments, setLocationAssignments] = useState<LocationAssignment[]>([
+    {
+      id: '1',
+      locationId: 'LOC1',
+      locationName: 'Main Kitchen',
+      locationCode: 'MK-001',
+      shelfId: 'SH1-1',
+      shelfName: 'Shelf A1',
+      minQuantity: 10,
+      maxQuantity: 50,
+      reorderPoint: 15,
+      parLevel: 40
+    },
+    {
+      id: '2',
+      locationId: 'LOC4',
+      locationName: 'Bar Storage',
+      locationCode: 'BS-001',
+      shelfId: 'SH4-2',
+      shelfName: 'Middle Shelf',
+      minQuantity: 5,
+      maxQuantity: 20,
+      reorderPoint: 8,
+      parLevel: 15
+    }
+  ])
 
   useEffect(() => {
-    async function fetchProduct() {
-      if (isAddMode) {
-        // Initialize empty product for add mode
-        const emptyProduct: Product = {
-          id: '',
-          productCode: '',
-          productName: '',
-          displayName: '',
-          description: '',
-          shortDescription: '',
-          productType: 'raw_material',
-          status: 'draft',
-          categoryId: '',
-          subcategoryId: '',
-          brandId: '',
-          manufacturerId: '',
-          specifications: [],
-          baseUnit: '',
-          alternativeUnits: [],
-          isInventoried: true,
-          isSerialTrackingRequired: false,
-          isBatchTrackingRequired: false,
-          shelfLifeDays: undefined,
-          storageConditions: '',
-          handlingInstructions: '',
-          isPurchasable: true,
-          isSellable: false,
-          defaultVendorId: '',
-          minimumOrderQuantity: 0,
-          maximumOrderQuantity: undefined,
-          standardOrderQuantity: undefined,
-          leadTimeDays: undefined,
-          standardCost: { amount: 0, currency: 'THB' },
-          lastPurchaseCost: { amount: 0, currency: 'THB' },
-          averageCost: { amount: 0, currency: 'THB' },
-          weight: 0,
-          weightUnit: 'kg',
-          dimensions: undefined,
-          color: '',
-          material: '',
-          hazardousClassification: '',
-          regulatoryApprovals: [],
-          safetyDataSheetUrl: '',
-          images: [],
-          documents: [],
-          relatedProducts: [],
-          substitutes: [],
-          accessories: [],
-          keywords: [],
-          tags: [],
-          notes: '',
-          isActive: true
-        }
-        setProduct(emptyProduct)
-        setEditedProduct(emptyProduct)
-        setIsLoading(false)
-        return
-      }
+    fetchProduct()
+  }, [params.id])
 
-      try {
-        // In a real app, fetch from API
-        const fetchedProduct = mockProductList.find((p: Product) => p.id === params.id)
-        if (!fetchedProduct) throw new Error('Product not found')
-        
-        setProduct(fetchedProduct)
-        setEditedProduct(fetchedProduct)
-        setIsLoading(false)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch product')
-        setIsLoading(false)
+  async function fetchProduct() {
+    if (isAddMode) {
+      // Initialize empty product for add mode
+      const emptyProduct: ProductDetailViewModel = {
+        id: '',
+        productCode: '',
+        productName: '',
+        displayName: '',
+        description: '',
+        shortDescription: '',
+        productType: 'raw_material',
+        status: 'draft',
+        categoryId: '',
+        subcategoryId: '',
+        brandId: '',
+        manufacturerId: '',
+        specifications: [],
+        baseUnit: '',
+        alternativeUnits: [],
+        isInventoried: true,
+        isSerialTrackingRequired: false,
+        isBatchTrackingRequired: false,
+        shelfLifeDays: undefined,
+        storageConditions: '',
+        handlingInstructions: '',
+        isPurchasable: true,
+        isSellable: false,
+        defaultVendorId: '',
+        minimumOrderQuantity: 0,
+        maximumOrderQuantity: 0,
+        standardOrderQuantity: 0,
+        leadTimeDays: 0,
+        standardCost: 0,
+        lastCost: 0,
+        averageCost: { amount: 0, currency: 'USD' },
+        weight: 0,
+        weightUnit: 'kg',
+        dimensions: { length: 0, width: 0, height: 0, unit: 'cm' },
+        color: '',
+        material: '',
+        hazardousClassification: '',
+        regulatoryApprovals: [],
+        safetyDataSheetUrl: '',
+        images: [],
+        documents: [],
+        relatedProducts: [],
+        substitutes: [],
+        accessories: [],
+        keywords: [],
+        tags: [],
+        notes: '',
+        isActive: true,
+        basePrice: 0,
+        taxRate: 0,
+        priceDeviationLimit: 0,
+        quantityDeviationLimit: 0,
+        minStockLevel: 0,
+        maxStockLevel: 0,
+        quantityDecimals: 2,
+        unitConversions: []
       }
+      setProduct(emptyProduct)
+      setEditedProduct(emptyProduct)
+      setIsLoading(false)
+      return
     }
 
-    fetchProduct()
-  }, [params.id, isAddMode])
+    try {
+      // In a real app, fetch from API
+      const foundProduct = mockProducts.find((p) => p.id === params.id || p.productCode === params.id)
 
-  const handleInputChange = (field: keyof Product, value: any) => {
+      if (!foundProduct) throw new Error('Product not found')
+
+      const viewModel = mapToViewModel(foundProduct)
+      setProduct(viewModel)
+      setEditedProduct(viewModel)
+      setIsLoading(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch product')
+      setIsLoading(false)
+    }
+  }
+
+  const handleInputChange = (field: keyof ProductDetailViewModel, value: any) => {
     setEditedProduct(prev => {
       if (!prev) return prev
       return {
@@ -585,9 +262,9 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
         }
       })
       setIsEditing(false)
-        toast({
-          title: "Success",
-          description: "Product updated successfully",
+      toast({
+        title: "Success",
+        description: "Product updated successfully",
       })
     } catch (error) {
       toast({
@@ -601,9 +278,12 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
   const handleCancel = () => {
     setIsEditing(false)
     // Reset changes
-    const originalProduct = mockProductList.find((p: Product) => p.id === params.id) || null
-    setProduct(originalProduct)
-    setEditedProduct(originalProduct)
+    const originalProduct = mockProducts.find((p) => p.id === params.id || p.productCode === params.id)
+    if (originalProduct) {
+      const viewModel = mapToViewModel(originalProduct)
+      setProduct(viewModel)
+      setEditedProduct(viewModel)
+    }
   };
 
   const handleDelete = async () => {
@@ -620,6 +300,36 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
         description: "Failed to delete product",
         variant: "destructive"
       })
+    }
+  };
+
+  // Add these handlers for location management
+  const handleAddLocation = (location: LocationAssignment) => {
+    setLocationAssignments(prev => [...prev, location])
+    toast({
+      title: "Success",
+      description: "Location assigned successfully",
+    })
+  }
+
+  const handleUpdateLocation = (id: string, updates: Partial<LocationAssignment>) => {
+    setLocationAssignments(prev =>
+      prev.map(loc => loc.id === id ? { ...loc, ...updates } : loc)
+    )
+  }
+
+  const handleRemoveLocation = (id: string) => {
+    setLocationAssignments(prev => prev.filter(loc => loc.id !== id))
+    toast({
+      title: "Success",
+      description: "Location removed successfully",
+    })
+  }
+
+  const handleDeleteLocation = (locationCode: string) => {
+    if (window.confirm('Are you sure you want to delete this location?')) {
+      // Here you would make an API call to delete the location
+      console.log(`Deleting location: ${locationCode}`);
     }
   };
 
@@ -646,7 +356,7 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
   };
 
   const handleAddConversion = async (unitType: 'INVENTORY' | 'ORDER' | 'RECIPE') => {
-    if (!product) return; // Add this line to handle the case when product is null
+    if (!product) return;
     try {
       const response = await fetch('/api/product-units', {
         method: 'POST',
@@ -737,256 +447,100 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
     }
   }
 
-  const handleDeleteLocation = (locationCode: string) => {
-    if (window.confirm('Are you sure you want to delete this location?')) {
-      // Here you would make an API call to delete the location
-      console.log(`Deleting location: ${locationCode}`);
-    }
-  };
-
-  // Add these handlers for location management
-  const handleAddLocation = (location: LocationAssignment) => {
-    setLocationAssignments(prev => [...prev, location])
-    toast({
-      title: "Success",
-      description: "Location assigned successfully",
-    })
-  }
-
-  const handleUpdateLocation = (id: string, updates: Partial<LocationAssignment>) => {
-    setLocationAssignments(prev => 
-      prev.map(loc => loc.id === id ? { ...loc, ...updates } : loc)
-    )
-  }
-
-  const handleRemoveLocation = (id: string) => {
-    setLocationAssignments(prev => prev.filter(loc => loc.id !== id))
-    toast({
-      title: "Success",
-      description: "Location removed successfully",
-    })
-  }
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!product) return <div>Product not found</div>;
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>Error: {error}</div>
+  if (!product && !isAddMode) return <div>Product not found</div>
 
   const actionButtons = (
-    <>
-      {isEditing || isAddMode ? (
+    <div className="flex gap-2">
+      {isEditing ? (
         <>
-          <Button onClick={handleSave} variant="default">Save</Button>
-          <Button onClick={handleCancel} variant="outline">Cancel</Button>
+          <Button variant="outline" onClick={handleCancel}>
+            <X className="h-4 w-4 mr-2" />
+            Cancel
+          </Button>
+          <Button onClick={() => handleSave(editedProduct)}>
+            <Save className="h-4 w-4 mr-2" />
+            Save Changes
+          </Button>
         </>
       ) : (
         <>
-          <Button onClick={handleEdit}>Edit</Button>
-          <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+          <Button variant="outline" onClick={handleDelete} className="text-destructive hover:text-destructive">
+            <Trash className="h-4 w-4 mr-2" />
+            Delete
+          </Button>
+          <Button onClick={handleEdit}>
+            <Edit className="h-4 w-4 mr-2" />
+            Edit Product
+          </Button>
         </>
       )}
-    </>
+    </div>
   );
 
-  const content = (
-    <>
-      <Tabs defaultValue="general" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="inventory">Inventory</TabsTrigger>
-          <TabsTrigger value="order-units">Order Units</TabsTrigger>
-          <TabsTrigger value="ingredient-units">Ingredient Units</TabsTrigger>
-          <TabsTrigger value="locations">Location Assignment</TabsTrigger>
-        </TabsList>
+  const details = product && (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <Label className="text-sm text-muted-foreground flex items-center gap-1">
+            <FileText className="h-4 w-4" />
+            Description
+          </Label>
+          <p className="text-sm font-medium">{product.description}</p>
+        </div>
+        <div className="space-y-1">
+          <Label className="text-sm text-muted-foreground flex items-center gap-1">
+            <AlignLeft className="h-4 w-4" />
+            Short Description
+          </Label>
+          <p className="text-sm font-medium">{product.shortDescription || '-'}</p>
+        </div>
+      </div>
 
-        <TabsContent value="general">
-          <div className="space-y-6">
-            <Card>
-                <CardHeader>
-                <CardTitle>Pricing & Tax</CardTitle>
-                </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    <div className="space-y-2">
-                    <Label>Base Price</Label>
-                    <Input type="number" placeholder="Enter base price" />
-                    </div>
-                    <div className="space-y-2">
-                    <Label>Tax Rate (%)</Label>
-                    <Input type="number" placeholder="Enter tax rate" />
-                    </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Cost Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label>Standard Cost</Label>
-                    <Input type="number" placeholder="Enter standard cost" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Last Cost</Label>
-                    <Input type="number" placeholder="Enter last cost" disabled />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-            <Card>
-                <CardHeader>
-                <CardTitle>Deviations & Thresholds</CardTitle>
-                </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    <div className="space-y-2">
-                    <Label>Price Deviation Limit (%)</Label>
-                      <Input
-                        type="number"
-                      placeholder="Enter limit" 
-                      min={0}
-                      max={100}
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Maximum allowed deviation from standard price
-                    </p>
-                    </div>
-                    <div className="space-y-2">
-                    <Label>Quantity Deviation Limit (%)</Label>
-                    <Input 
-                      type="number" 
-                      placeholder="Enter limit"
-                      min={0}
-                      max={100}
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Maximum allowed deviation from ordered quantity
-                    </p>
-                    </div>
-                    <div className="space-y-2">
-                    <Label>Minimum Stock Level</Label>
-                    <Input type="number" placeholder="Enter minimum level" />
-                    </div>
-                    <div className="space-y-2">
-                    <Label>Maximum Stock Level</Label>
-                    <Input type="number" placeholder="Enter maximum level" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-            <Card>
-                <CardHeader>
-                <CardTitle>Additional Attribute(s)</CardTitle>
-                </CardHeader>
-                <CardContent>
-                <div className="grid gap-4">
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label>Weight</Label>
-                    <Input 
-                      type="number" 
-                      placeholder="Enter weight in kg"
-                      defaultValue={product?.weight || 0}
-                      disabled={!isEditing}
-                      onChange={(e) => handleInputChange('weight', Number(e.target.value))}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label>Shelf Life (Days)</Label>
-                    <Input
-                      type="number"
-                      placeholder="Enter shelf life in days"
-                      defaultValue={product?.shelfLifeDays || 0}
-                      disabled={!isEditing}
-                      onChange={(e) => handleInputChange('shelfLifeDays', Number(e.target.value))}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label>Storage Conditions</Label>
-                    <Textarea
-                      placeholder="Enter storage conditions"
-                      defaultValue={product?.storageConditions || ''}
-                      disabled={!isEditing}
-                      onChange={(e) => handleInputChange('storageConditions', e.target.value)}
-                    />
-                  </div>
-                  {/* Size property not available in Product interface - needs to be added as ProductSpecification */}
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label>Color</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="Enter color"
-                      defaultValue={product?.color || ''}
-                      disabled={!isEditing}
-                      onChange={(e) => handleInputChange('color', e.target.value)}
-                    />
-                  </div>
-                </div>
-                </CardContent>
-              </Card>
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <Label className="text-sm text-muted-foreground flex items-center gap-1">
+            <Tag className="h-4 w-4" />
+            Category
+          </Label>
+          <div className="flex gap-2">
+            <Badge variant="outline">{mockProductCategories.find(c => c.id === product.categoryId)?.name || product.categoryId}</Badge>
+            {product.subcategoryId && (
+              <Badge variant="secondary">{mockProductCategories.find(c => c.id === product.categoryId)?.subcategories?.find(s => s.id === product.subcategoryId)?.name || product.subcategoryId}</Badge>
+            )}
           </div>
-        </TabsContent>
+        </div>
+        <div className="space-y-1">
+          <Label className="text-sm text-muted-foreground flex items-center gap-1">
+            <Scale className="h-4 w-4" />
+            Base Unit
+          </Label>
+          <p className="text-sm font-medium">{product.baseUnit}</p>
+        </div>
+      </div>
 
-        <TabsContent value="inventory">
-          <InventoryTab isEditing={isEditing} />
-        </TabsContent>
-
-        <TabsContent value="order-units">
-          <OrderUnitTab isEditing={isEditing} />
-        </TabsContent>
-
-        <TabsContent value="ingredient-units">
-          <IngredientUnitTab isEditing={isEditing} />
-        </TabsContent>
-
-        <TabsContent value="locations">
-          <LocationsTab 
-            isEditing={isEditing}
-            locations={locationAssignments}
-            onAddLocation={handleAddLocation}
-            onUpdateLocation={handleUpdateLocation}
-            onRemoveLocation={handleRemoveLocation}
-          />
-        </TabsContent>
-
-      </Tabs>
-      <div className="mt-4 space-x-2">
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <Label className="text-sm text-muted-foreground flex items-center gap-1">
+            <ShoppingCart className="h-4 w-4" />
+            Purchasable
+          </Label>
+          <div className="flex items-center h-6">
+            <Checkbox checked={product.isPurchasable} disabled />
+          </div>
+        </div>
+        <div className="space-y-1">
+          <Label className="text-sm text-muted-foreground flex items-center gap-1">
+            <DollarSign className="h-4 w-4" />
+            Sellable
+          </Label>
+          <div className="flex items-center h-6">
+            <Checkbox checked={product.isSellable} disabled />
+          </div>
+        </div>
       </div>
-    </>
-  );
-
-  const details = (
-    <>
-      <div>
-        <label className="text-muted-foreground">Description</label>
-        <p className="mt-1">{product?.description}</p>
-      </div>
-      <div>
-        <label className="text-muted-foreground">Short Description</label>
-        <p className="mt-1">{product?.shortDescription}</p>
-      </div>
-      <div>
-        <label className="text-muted-foreground">Category ID</label>
-        <p className="mt-1">{product?.categoryId} {product?.subcategoryId ? `/ ${product.subcategoryId}` : ''}</p>
-      </div>
-      <div>
-        <label className="text-muted-foreground">Base Unit</label>
-        <span className="text-sm font-medium bg-blue-50 text-blue-700 px-2 py-1 rounded mt-1 inline-block">
-          {product?.baseUnit}
-        </span>
-      </div>
-      <div className="flex items-center space-x-2">
-        <label className="text-muted-foreground">Purchasable</label>
-        <Checkbox checked={product?.isPurchasable} disabled />
-      </div>
-      <div className="flex items-center space-x-2">
-        <label className="text-muted-foreground">Sellable</label>
-        <Checkbox checked={product?.isSellable} disabled />
-      </div>
-    </>
+    </div>
   );
 
   const editableDetails = editedProduct && (
@@ -1048,56 +602,248 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
     </>
   );
 
+  const content = (
+    <>
+      <Tabs defaultValue="general" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="inventory">Inventory</TabsTrigger>
+          <TabsTrigger value="order-units">Order Units</TabsTrigger>
+          <TabsTrigger value="ingredient-units">Ingredient Units</TabsTrigger>
+          <TabsTrigger value="locations">Location Assignment</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Pricing & Tax</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label>Base Price</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter base price"
+                      value={product?.basePrice || ''}
+                      onChange={(e) => handleInputChange('basePrice', Number(e.target.value))}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Tax Rate (%)</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter tax rate"
+                      value={product?.taxRate || ''}
+                      onChange={(e) => handleInputChange('taxRate', Number(e.target.value))}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Cost Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Standard Cost</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter standard cost"
+                      value={product?.standardCost || ''}
+                      onChange={(e) => handleInputChange('standardCost', Number(e.target.value))}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Last Cost</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter last cost"
+                      value={product?.lastCost || ''}
+                      disabled
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Deviations & Thresholds</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label>Price Deviation Limit (%)</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter limit"
+                      min={0}
+                      max={100}
+                      value={product?.priceDeviationLimit || ''}
+                      onChange={(e) => handleInputChange('priceDeviationLimit', Number(e.target.value))}
+                      disabled={!isEditing}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Maximum allowed deviation from standard price
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Quantity Deviation Limit (%)</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter limit"
+                      min={0}
+                      max={100}
+                      value={product?.quantityDeviationLimit || ''}
+                      onChange={(e) => handleInputChange('quantityDeviationLimit', Number(e.target.value))}
+                      disabled={!isEditing}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Maximum allowed deviation from ordered quantity
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Quantity Decimals</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter decimal places"
+                      min={0}
+                      max={6}
+                      value={product?.quantityDecimals ?? 2}
+                      onChange={(e) => handleInputChange('quantityDecimals', Number(e.target.value))}
+                      disabled={!isEditing}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Number of decimal places for quantity values
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Minimum Stock Level</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter minimum level"
+                      value={product?.minStockLevel || ''}
+                      onChange={(e) => handleInputChange('minStockLevel', Number(e.target.value))}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Maximum Stock Level</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter maximum level"
+                      value={product?.maxStockLevel || ''}
+                      onChange={(e) => handleInputChange('maxStockLevel', Number(e.target.value))}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Additional Attribute(s)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4">
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label>Weight</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter weight in kg"
+                      defaultValue={product?.weight || 0}
+                      disabled={!isEditing}
+                      onChange={(e) => handleInputChange('weight', Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label>Shelf Life (Days)</Label>
+                    <Input
+                      type="number"
+                      placeholder="Enter shelf life in days"
+                      defaultValue={product?.shelfLifeDays || 0}
+                      disabled={!isEditing}
+                      onChange={(e) => handleInputChange('shelfLifeDays', Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label>Storage Conditions</Label>
+                    <Textarea
+                      placeholder="Enter storage conditions"
+                      defaultValue={product?.storageConditions || ''}
+                      disabled={!isEditing}
+                      onChange={(e) => handleInputChange('storageConditions', e.target.value)}
+                    />
+                  </div>
+                  {/* Size property not available in Product interface - needs to be added as ProductSpecification */}
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label>Color</Label>
+                    <Input
+                      type="text"
+                      placeholder="Enter color"
+                      defaultValue={product?.color || ''}
+                      disabled={!isEditing}
+                      onChange={(e) => handleInputChange('color', e.target.value)}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="inventory">
+          <InventoryTab isEditing={isEditing} />
+        </TabsContent>
+
+        <TabsContent value="order-units">
+          <OrderUnitTab isEditing={isEditing} />
+        </TabsContent>
+
+        <TabsContent value="ingredient-units">
+          <IngredientUnitTab isEditing={isEditing} />
+        </TabsContent>
+
+        <TabsContent value="locations">
+          <LocationsTab
+            isEditing={isEditing}
+            locations={locationAssignments}
+            onAddLocation={handleAddLocation}
+            onUpdateLocation={handleUpdateLocation}
+            onRemoveLocation={handleRemoveLocation}
+          />
+        </TabsContent>
+
+      </Tabs>
+      <div className="mt-4 space-x-2">
+      </div>
+    </>
+  );
+
   return (
     <DetailPageTemplate
       title={
-        <>
-          {(isEditing || isAddMode) ? (
-            <>
-              <div className="flex items-center gap-4">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => router.push('/product-management/products')}
-                  className="h-8 w-8"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  <span className="sr-only">Back</span>
-                </Button>
-                <EditableTitle
-                  value={editedProduct?.productName || ''}
-                  code={editedProduct?.productCode || ''}
-                  onNameChange={(value) => handleInputChange('productName', value)}
-                  onCodeChange={(value) => handleInputChange('productCode', value)}
-                />
-              </div>
-            </>
-          ) : (
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => router.push('/product-management/products')}
-                className="h-8 w-8"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                <span className="sr-only">Back</span>
-              </Button>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground">Product Code</div>
-                  <div className="text-lg font-semibold">{product?.productCode}</div>
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground">Product Name</div>
-                  <div className="text-lg font-semibold">{product?.productName}</div>
-                </div>
-              </div>
-            </div>
-          )}
-        </>
+        (isEditing || isAddMode) ? (
+          <EditableTitle
+            value={editedProduct?.productName || ''}
+            code={editedProduct?.productCode || ''}
+            onNameChange={(value) => handleInputChange('productName', value)}
+            onCodeChange={(value) => handleInputChange('productCode', value)}
+          />
+        ) : (
+          product?.productName
+        )
       }
-      subtitle={isEditing ? editedProduct?.productCode : product?.productCode}
+      subtitle={isEditing ? undefined : product?.productCode}
       status={
         <Badge variant={product?.isActive ? "default" : "destructive"}>
           {product?.isActive ? 'Active' : 'Inactive'}
@@ -1108,7 +854,75 @@ export default function ProductDetail({ params, searchParams }: ProductDetailPro
       isEditing={isEditing}
       actionButtons={actionButtons}
       content={content}
-      backLink="/products"
+      backLink="/product-management/products"
     />
   );
+}
+
+interface EditableTitleProps {
+  value: string
+  code: string
+  onNameChange: (value: string) => void
+  onCodeChange: (value: string) => void
+}
+
+function EditableTitle({ value, code, onNameChange, onCodeChange }: EditableTitleProps) {
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-muted-foreground">Product Code</label>
+          <Input
+            value={code}
+            onChange={(e) => onCodeChange(e.target.value)}
+            className="text-lg font-semibold h-auto"
+            placeholder="Enter product code"
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-muted-foreground">Product Name</label>
+          <Input
+            value={value}
+            onChange={(e) => onNameChange(e.target.value)}
+            className="text-lg font-semibold h-auto"
+            placeholder="Enter product name"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+interface ProductImageProps {
+  src: string
+  alt: string
+}
+
+function ProductImage({ src, alt }: ProductImageProps) {
+  const [error, setError] = useState(false)
+
+  return (
+    <div className="relative w-full aspect-square rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 transition-colors overflow-hidden">
+      {src && !error ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-cover rounded-lg"
+          onError={() => setError(true)}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+      ) : (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/10">
+          <ImageIcon className="h-12 w-12 text-muted-foreground/25" />
+          <span className="mt-2 text-sm text-muted-foreground">No image available</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Toast utility (mock)
+const toast = (props: any) => {
+  console.log('Toast:', props)
 }

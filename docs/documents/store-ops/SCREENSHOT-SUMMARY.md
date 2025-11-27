@@ -8,6 +8,11 @@
 
 This document provides a comprehensive visual documentation of the Store Operations module, including all major pages, states, and interactions.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. Store Operations Dashboard

@@ -207,6 +207,92 @@ export const mockCampaigns: PriceCollectionCampaign[] = [
       customInstructions: 'Focus on premium holiday items. Include presentation options and minimum order quantities.',
       priority: 'high'
     }
+  },
+  // Merged from app/(main)/vendor-management/lib/mock-data.ts
+  {
+    id: 'campaign-005',
+    name: 'Q1 2024 Office Supplies',
+    description: 'Collection campaign for office supplies for Q1 2024',
+    status: 'active',
+    campaignType: 'one-time',
+    selectedVendors: ['vendor-004', 'vendor-005', 'vendor-006'],
+    selectedCategories: ['Office Supplies'],
+    scheduledStart: new Date('2024-01-01'),
+    scheduledEnd: new Date('2024-01-31'),
+    progress: {
+      totalVendors: 3,
+      invitedVendors: 3,
+      respondedVendors: 2,
+      completedSubmissions: 1,
+      pendingSubmissions: 1,
+      failedSubmissions: 0,
+      completionRate: 50,
+      responseRate: 67,
+      averageResponseTime: 24,
+      lastUpdated: new Date('2024-01-15')
+    },
+    createdBy: 'admin',
+    createdAt: new Date('2023-12-20'),
+    updatedAt: new Date('2024-01-01'),
+    settings: {
+      portalAccessDuration: 30,
+      allowedSubmissionMethods: ['manual'],
+      requireApproval: false,
+      autoReminders: true,
+      reminderSchedule: {
+        enabled: true,
+        intervals: [7, 3, 1],
+        escalationRules: []
+      },
+      emailTemplate: 'default',
+      customInstructions: '',
+      priority: 'high'
+    }
+  },
+  {
+    id: 'campaign-006',
+    name: 'Kitchen Equipment Pricing',
+    description: 'Annual kitchen equipment pricing collection',
+    status: 'draft',
+    campaignType: 'recurring',
+    selectedVendors: ['vendor-005', 'vendor-007', 'vendor-008'],
+    selectedCategories: ['Kitchen Equipment'],
+    scheduledStart: new Date('2024-01-15'),
+    scheduledEnd: new Date('2024-12-31'),
+    recurringPattern: {
+      frequency: 'monthly',
+      interval: 1,
+      endDate: new Date('2024-12-31')
+    },
+    progress: {
+      totalVendors: 0,
+      invitedVendors: 0,
+      respondedVendors: 0,
+      completedSubmissions: 0,
+      pendingSubmissions: 0,
+      failedSubmissions: 0,
+      completionRate: 0,
+      responseRate: 0,
+      averageResponseTime: 0,
+      lastUpdated: new Date('2024-01-15')
+    },
+    createdBy: 'admin',
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-01-15'),
+    settings: {
+      portalAccessDuration: 30,
+      allowedSubmissionMethods: ['manual'],
+      requireApproval: true,
+      autoReminders: true,
+      reminderSchedule: {
+        enabled: true,
+        intervals: [7, 3, 1],
+        escalationRules: []
+      },
+      emailTemplate: 'default',
+      customInstructions: '',
+      priority: 'medium'
+    }
   }
 ]
 

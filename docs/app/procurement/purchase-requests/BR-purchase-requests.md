@@ -1,15 +1,37 @@
-# Business Requirements: Purchase Requests
-
 ## Module Information
+
 - **Module**: Procurement
 - **Sub-Module**: Purchase Requests
 - **Route**: `/procurement/purchase-requests`
 - **Version**: 1.0.0
-- **Last Updated**: 2025-01-30
+- **Last Updated**: 2025-10-30
+
+## **Document History**
+
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 1.0.0 | 2025-10-30 | System Architect | Initial Notion from Mark Down |
+| 1.0.1 | 2025-11-23 | Peak | Base on meeting requirement |
+| 1.2.0 | 2025-11-26 | Documentation Team | Added implementation status markers to track development progress |
+
+---
 
 ## Overview
 
 The Purchase Requests sub-module enables users to create, manage, and track purchase requests throughout the approval workflow. It provides comprehensive functionality for requesting goods and services with budget control and multi-level approval workflows.
+
+## Implementation Status
+
+This document serves as the **target specification** for Purchase Request functionality. Each requirement includes an implementation status marker to track development progress:
+
+| Status | Meaning |
+|--------|---------|
+| ✅ Implemented | Feature complete and functional |
+| 🔧 Partial | Frontend exists, backend development needed |
+| 🚧 Pending | Not yet implemented |
+| ⏳ Future | Post-MVP enhancement |
+
+**Current State**: Frontend prototype with mock data. Backend API and integrations pending development.
 
 ## Business Objectives
 
@@ -24,6 +46,7 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 ## Key Stakeholders
 
 ### Primary Users
+
 1. **Head Chef / Executive Chef**: Creates purchase requests for F&B operations, kitchen supplies, and ingredients
 2. **Housekeeping Manager**: Requests cleaning supplies, linens, amenities, and housekeeping equipment
 3. **Chief Engineer / Maintenance Manager**: Requests maintenance supplies, spare parts, and equipment
@@ -31,16 +54,19 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 5. **Department Managers**: Create and manage purchase requests for their respective departments
 
 ### Procurement Team
+
 1. **Purchasing Manager**: Reviews and approves purchase requests, manages vendor selection
 2. **Purchasing Staff / Buyer**: Processes approved requests, converts to purchase orders
 3. **Procurement Coordinator**: Tracks request status, coordinates with departments
 
 ### Approval Authorities
+
 1. **General Manager / Hotel Manager**: Final approval for high-value purchases
 2. **Financial Controller**: Reviews and approves budget impact, ensures fiscal compliance
 3. **Department Heads**: First-level approval for department-specific requests
 
 ### Supporting Roles
+
 1. **Budget Controller**: Monitors budget availability and compliance
 2. **Internal Auditor**: Reviews procurement compliance and audit trails
 3. **System Administrator**: Manages user access and system configuration
@@ -48,56 +74,55 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 ## Functional Requirements
 
 ### FR-PR-001: Purchase Request Creation
-**Priority**: High
+
+**Priority**: High | **Status**: 🔧 Partial
 **User Story**: As a department manager (chef, housekeeping manager, engineer), I want to create purchase requests for my department so that I can procure necessary supplies and equipment while maintaining proper approval and budget control.
 
 **Requirements**:
-- Auto-generated unique reference numbers following format PR-[YYYY]-[NNNNNN]
+- Auto-generated unique reference numbers following format PR-[YYMM]-[NNNN]
 - PR type selection (General/Market List/Asset)
 - Requestor information auto-populated from user profile
-- Department and location assignment based on user's primary department/location
-- Delivery date specification with calendar picker
+- Department and location assignment based on user’s primary department/location
 - Description field for purchase purpose
-- Justification field for business rationale (required for submission)
 - Document attachments support for quotes, specifications, or supporting documents
 
 **Acceptance Criteria**:
-- Reference number automatically generated following format PR-[YYYY]-[NNNNNN]
+- Reference number automatically generated following format PR-[YYMM]-[NNNN]
 - All required fields validated before save
 - Draft PRs can be saved without submission for later completion
 - Requestor defaults to logged-in user and cannot be changed
-- Department and location default to user's assignment
-- Delivery date must be a future date
+- Department and location default to user’s assignment
 - System prevents submission with missing required fields
 - Attachment support for common file types (PDF, DOC, DOCX, XLS, XLSX, JPG, PNG)
 
 ### FR-PR-002: Item Management
-**Priority**: High
+
+**Priority**: High | **Status**: 🔧 Partial
 **User Story**: As a department staff member, I want to add and manage multiple items in a single purchase request so that I can consolidate related purchases and streamline the approval process.
 
 **Requirements**:
 - Add multiple items to a single PR with line-by-line detail
-- Specify item details: name, description, quantity, unit of measure, estimated unit price
-- Category and subcategory assignment for proper classification and reporting
-- Delivery date per item (can differ from PR header delivery date)
+- Specify location, item details: name, local name, quantity, unit of measure, estimated unit price
+- Category and subcategory, item group assignment for proper classification and reporting
+- Delivery date per item 
 - Delivery point specification (e.g., Main Kitchen, Pastry Kitchen, Housekeeping Store)
-- Job code assignment for cost allocation to specific projects or events
-- Vendor suggestion based on price history and previous purchases
+- Dimensions: Job code assignment for cost allocation to specific projects or events
+- Vendor suggestion based on price history and previous purchases 
 - Price comparison with historical data to identify significant variances
-- Grid interface with inline editing for efficient data entry
+- inline editing for efficient data entry
 
 **Acceptance Criteria**:
 - Minimum one item required per PR
 - Quantity supports 3 decimal places (e.g., 12.500 kg)
 - Price supports 2 decimal places (e.g., $15.50)
 - Item subtotal calculated automatically (Quantity × Unit Price)
-- Grid supports inline editing with real-time validation
+- inline editing with real-time validation
 - Items can be reordered, duplicated, or removed
-- Price variance alerts when estimated price differs >15% from last purchase
 - Vendor suggestions based on best price for similar items in last 90 days
 
 ### FR-PR-003: Financial Calculations
-**Priority**: High
+
+**Priority**: High | **Status**: 🚧 Pending
 **User Story**: As a purchasing staff member, I want the system to automatically calculate all financial amounts accurately so that I can ensure correct budgeting and pricing without manual calculation errors.
 
 **Requirements**:
@@ -114,22 +139,22 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - Net amount = Round(Subtotal - Discount, 2)
 - Tax amount = Round(Net Amount × Tax Rate, 2)
 - Item total = Round(Net Amount + Tax, 2)
-- All rounding uses half-up (banker's) rounding for consistency
-- Base currency conversion applies organization's daily exchange rate
+- All rounding uses half-up (banker’s) rounding for consistency
+- Base currency conversion applies organization’s daily exchange rate
 
 **Acceptance Criteria**:
 - All monetary amounts displayed with 2 decimals
-- All quantities displayed with 3 decimals
+- All quantities displayed based on product configuration
 - Exchange rates displayed with 5 decimals
 - Real-time calculation updates as user enters data
 - Base currency totals always displayed alongside transaction currency
-- Calculation formulas visible on hover for transparency
 - Zero-value items handled correctly (e.g., FOC items)
-- Tax-inclusive and tax-exclusive pricing supported
+- Tax-exclusive pricing supported
 
 ### FR-PR-004: Budget Control
-**Priority**: High
-**User Story**: As a department manager, I want the system to check budget availability before I submit a purchase request so that I can ensure compliance with my department's budget limits and avoid over-spending.
+
+**Priority**: High | **Status**: 🚧 Pending
+**User Story**: As a department manager, I want the system to check budget availability before I submit a purchase request so that I can ensure compliance with my department’s budget limits and avoid over-spending.
 
 **Requirements**:
 - Check budget availability before submission against department budget allocation
@@ -152,55 +177,51 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - Finance team can view organization-wide budget status
 
 ### FR-PR-005: Approval Workflow
-**Priority**: High
-**User Story**: As a purchasing manager, I want purchase requests to be automatically routed through appropriate approval levels so that purchases are properly authorized based on value and department policies.
+
+**Priority**: High | **Status**: 🔧 Partial
+**User Story**: As a purchasing manager, I want purchase requests to be automatically routed through appropriate approval levels so that purchases are properly authorized based on workflow policies  and department policies.
 
 **Requirements**:
-- Automatic routing based on amount thresholds and department policies
-- Department head approval always required as first level
-- Finance review required for high-value PRs (configurable threshold)
+- Automatic routing based on workflow configuration
+- Department head approval always required 
+- Finance review required for high-value PRs 
 - General Manager approval for purchases above specified limit
 - Sequential or parallel approval stages (configurable)
 - Email notifications to approvers with PR summary and direct link
 - Approval delegation support for approvers when away
 - Rejection with mandatory comments explaining reason
-- Approval history tracking with full audit trail
-- Approval deadline tracking with escalation for overdue approvals
 
-**Approval Levels (Hospitality Operations)**:
-- Level 1: Department Head (all PRs) - Head Chef, Housekeeping Manager, Chief Engineer
-- Level 2: Purchasing Manager (< $5,000) - Review and vendor selection
-- Level 3: Financial Controller ($5,000 - $50,000) - Budget impact review
-- Level 4: General Manager (> $50,000) - Final authorization for high-value purchases
+- Return Send the PR back to previous Stages with comment
+- Approval history tracking with full audit trail
 
 **Acceptance Criteria**:
 - PR routes to correct approver(s) automatically based on rules
 - Approvers receive email notifications within 5 minutes of submission
-- Approval/rejection recorded with timestamp and approver identity
+- Approval/rejection/return recorded with timestamp and approver identity
 - Comments required (minimum 10 characters) for rejection
 - Status updated in real-time and visible to all stakeholders
 - Full approval history visible with timeline view
 - Delegation works correctly with notification to delegate
-- Overdue approvals escalate to next level after configured period
 
 ### FR-PR-006: Status Management
-**Priority**: High
+
+**Priority**: High | **Status**: ✅ Implemented
 **User Story**: As a requestor, I want to easily track the current status of my purchase requests so that I know where they are in the approval process and when I can expect them to be processed.
 
 **Requirements**:
 - Clear status tracking with standardized status values
 - Status timeline showing progression through workflow
-- Status change notifications to requestor and stakeholders
+- Status change notifications to requestor and stakeholders using workflow configuration
 - Color-coded status indicators for quick visual identification
 - Status-based filtering in list views
 
 **Status Values**:
+
 - **Draft**: Saved but not submitted (editable by requestor)
-- **Submitted**: Awaiting first approval (read-only to requestor)
-- **Under Review**: In approval process (being reviewed by approver)
+- **In-progress** : Some approvals received, others pending
+
 - **Approved**: All approvals received (ready for PO conversion)
-- **Partially Approved**: Some approvals received, others pending
-- **Rejected**: Approval denied (returned to requestor with comments)
+- **Void**: Approval denied (returned to requestor with comments)
 - **Completed**: Converted to Purchase Order(s) (read-only)
 - **Cancelled**: Manually cancelled by requestor or approver (with reason)
 
@@ -209,12 +230,13 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - Status transitions logged with timestamp, user, and reason
 - Only valid status transitions allowed (enforced by workflow rules)
 - Status filters available in list view with count indicators
-- Status indicators color-coded (Green=Approved, Yellow=Pending, Red=Rejected, Gray=Draft/Cancelled)
+- Status indicators color-coded (Green=Approved, Blue=Completed, Yellow=In-progress, Red=Void, Gray=Draft/Cancelled)
 - Status change triggers appropriate notifications
 - Status history visible with full audit trail
 
 ### FR-PR-007: Document Management
-**Priority**: Medium
+
+**Priority**: Medium | **Status**: 🚧 Pending
 **User Story**: As a requestor, I want to attach supporting documents (quotes, specifications, images) to my purchase requests so that approvers have all necessary information to make informed decisions.
 
 **Requirements**:
@@ -224,8 +246,6 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - Document preview capability for common formats (PDF, images)
 - Document download for offline review
 - Document deletion (by creator only, before PR submission)
-- Document categorization (Quote, Specification, Image, Other)
-- Scan uploaded files for viruses/malware
 - Compress images automatically to reduce storage
 
 **Acceptance Criteria**:
@@ -236,55 +256,50 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - Audit trail for all document actions (upload, download, delete)
 - Document preview works for PDF and images
 - Document list shows file name, size, type, upload date, and uploader
-- Approvers can download all documents as a ZIP file
 
 ### FR-PR-008: Comments and Collaboration
-**Priority**: Medium
+
+**Priority**: Medium | **Status**: 🚧 Pending
 **User Story**: As a team member involved in the procurement process, I want to add comments and collaborate on purchase requests so that we can clarify requirements, provide additional information, and coordinate effectively.
 
 **Requirements**:
 - Internal comments visible to organization staff only (not vendors)
-- Vendor comments visible to vendor when PR is shared (future enhancement)
 - Comment threading for organized discussions
-- @mention functionality to notify specific users
-- Comment timestamps with relative time display (e.g., "2 hours ago")
+- Comment timestamps with relative time display (e.g., “2 hours ago”)
 - Edit/delete own comments within 15 minutes of posting
-- Comment notifications to mentioned users and PR stakeholders
-- Rich text formatting (bold, italic, lists, links)
+- Rich text formatting (bold, italic, lists, links) * 
 - Attachment support in comments (images, documents)
 
 **Acceptance Criteria**:
 - Comments displayed chronologically (newest first or last, user-configurable)
 - Comment author clearly identified with name, role, and avatar
-- Email notifications sent for @mentions within 5 minutes
-- Comment edit history tracked and visible (shows "edited" indicator)
-- Comment visibility controls work correctly (internal vs. vendor comments)
 - Thread replies indented for visual hierarchy
 - Approvers can add rejection comments directly (no separate form)
-- Comment counter shows total comments on PR list view
 
 ### FR-PR-009: List View and Filtering
-**Priority**: High
+
+**Priority**: High | **Status**: ✅ Implemented
 **User Story**: As a purchasing staff member, I want to view and filter purchase requests efficiently so that I can quickly find specific requests, monitor pending approvals, and track department spending.
 
 **Requirements**:
 - Paginated list view with configurable rows per page (default 20, options: 10, 20, 50, 100)
 - Sort by: Date, PR Number, Status, Total Amount, Requestor, Department, Delivery Date
 - Multi-level filtering with instant results:
-  * **Status**: Draft, Pending Approval, Approved, Rejected, Cancelled, In Process, Complete, Partial
-  * **Date Range**: Created Date, Delivery Date (with calendar picker)
-  * **Department**: F&B, Housekeeping, Engineering, Front Office, etc.
-  * **Location**: Main Kitchen, Pastry Kitchen, Housekeeping Store, etc.
-  * **Requestor**: Filter by user name or department staff
-  * **Amount Range**: Min/Max values with preset ranges
-  * **PR Type**: General, Market List, Asset
+* **Status**: Draft, Pending Approval, Approved, Rejected, Cancelled, In Process, Complete, Partial
+* **Date Range**: Created Date, Delivery Date (with calendar picker)
+* **Department**: F&B, Housekeeping, Engineering, Front Office, etc.
+* **Location**: Main Kitchen, Pastry Kitchen, Housekeeping Store, etc.
+* **Requestor**: Filter by user name or department staff
+* **Amount Range**: Min/Max values with preset ranges
+* **PR Type**: General, Market List, Asset
 - Global search: PR Number, Item Name, Description, Vendor Name
 - Quick filters (one-click):
-  * **My PRs**: PRs created by logged-in user
-  * **Pending My Approval**: PRs awaiting current user's approval
-  * **Recently Approved**: PRs approved in last 7 days
-  * **In Process**: PRs being converted to POs
-  * **Rejected**: PRs rejected and awaiting resubmission
+* **My PRs**: PRs created by logged-in user
+* **Pending My Approval**: PRs awaiting current user’s approval
+
+* **Recently Approved**: PRs approved in last 7 days
+* **In Process**: PRs being converted to POs
+* **Rejected**: PRs rejected and awaiting resubmission
 - Export to Excel/CSV with all filtered data and columns
 - **Create button** prominently displayed in list header
 - **No** Refresh button (real-time auto-refresh)
@@ -304,56 +319,75 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - Mobile-responsive design with collapsible filters
 - Pagination controls include page jump and total count display
 
+- Primary Filter Toggle (mutually exclusive buttons):
+  * My Pending (default): Shows actionable PRs requiring user attention
+    - Filters PRs with statuses: Draft, Submitted, InProgress, Rejected
+    - Purpose: Quick access to items needing action from the user
+  * All Documents: Shows comprehensive view of all accessible PRs
+    - Displays all PRs based on user role and department permissions
+    - Purpose: Full visibility of all purchase requests in the system
+- Secondary Filters (context-sensitive dropdowns):
+  * Status Filter (available when "All Documents" selected):
+    - Options: All Status, Draft, Submitted, In Progress, Approved, Rejected, Cancelled
+    - Purpose: Further refine the comprehensive document view by specific status
+  * Stage Filter (available when "My Pending" selected):
+    - Options: All Stage, Request Creation, Department Approval, Purchasing Review, Finance Review, Final Approval, Completed
+    - Purpose: Filter actionable items by current workflow stage
+  * Requester Filter (always available for both modes):
+    - Filter by user name or department staff
+    - Purpose: View PRs created by specific users
+
 ### FR-PR-010: Detail View
-**Priority**: High
+
+**Priority**: High | **Status**: ✅ Implemented
 **User Story**: As a user, I want to view complete purchase request details in a well-organized format so that I can review all information, track progress, and make informed decisions.
 
 **Requirements**:
 - **Header Information** displayed prominently:
-  * PR Reference Number (large, bold)
-  * Creation Date and Delivery Date
-  * Requestor Name, Department, Contact Information
-  * Current Status with visual indicator (badge/chip)
-  * **Department** (clearly labeled as "Department" - the department that created the PR)
-  * Location (e.g., Main Kitchen, Housekeeping Store)
-  * PR Type (General, Market List, Fixed Asset)
+* PR Reference Number (large, bold)
+* Creation Date and Delivery Date
+* Requestor Name, Department, Contact Information
+* Current Status with visual indicator (badge/chip)
+* **Department** (clearly labeled as “Department” - the department that created the PR)
+* Location (e.g., Main Kitchen, Housekeeping Store)
+* PR Type (General, Market List, Fixed Asset)
 - **Item Details Grid** with columns:
-  * Line Number, Item Name, Description
-  * Quantity, Unit, Unit Price
-  * Subtotal, Discount, Tax, Total
-  * Delivery Date, Delivery Point
-  * Vendor (if selected)
+* Line Number, Item Name, Description
+* Quantity, Unit, Unit Price
+* Subtotal, Discount, Tax, Total
+* Delivery Date, Delivery Point
+* Vendor (if selected)
 - **Financial Summary Panel**:
-  * Subtotal (sum of all item subtotals)
-  * Total Discount
-  * Net Amount (Subtotal - Discount)
-  * Total Tax
-  * **Grand Total** (Net + Tax)
-  * Currency and Exchange Rate (if multi-currency)
+* Subtotal (sum of all item subtotals)
+* Total Discount
+* Net Amount (Subtotal - Discount)
+* Total Tax
+* **Grand Total** (Net + Tax)
+* Currency and Exchange Rate (if multi-currency)
 - **Budget Information Panel**:
-  * Budget Category, Budget Allocated
-  * Budget Committed, Budget Available
-  * Budget Impact of this PR
+* Budget Category, Budget Allocated
+* Budget Committed, Budget Available
+* Budget Impact of this PR
 - **Approval Workflow Panel**:
-  * Visual timeline of approval stages
-  * Current stage highlighted
-  * Approver names, dates, and comments
-  * Pending approvals clearly indicated
+* Visual timeline of approval stages
+* Current stage highlighted
+* Approver names, dates, and comments
+* Pending approvals clearly indicated
 - **Document Attachments Section**:
-  * List of uploaded files with preview/download
-  * File name, size, type, uploader, date
+* List of uploaded files with preview/download
+* File name, size, type, uploader, date
 - **Comments Thread**:
-  * All comments chronologically
-  * User avatars and names
-  * Timestamps
+* All comments chronologically
+* User avatars and names
+* Timestamps
 - **Activity Log**:
-  * All PR actions chronologically
-  * User who performed action
-  * Timestamp
-  * Action description
+* All PR actions chronologically
+* User who performed action
+* Timestamp
+* Action description
 - **Related Documents**:
-  * Purchase Orders created from this PR
-  * Links to PO detail pages
+* Purchase Orders created from this PR
+* Links to PO detail pages
 
 **Acceptance Criteria**:
 - All information clearly organized in logical sections
@@ -361,13 +395,14 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - Financial summary accurate with real-time calculation
 - Workflow progress visually indicated with timeline
 - Activity log chronological (newest first)
-- **Department field clearly labeled as "Department"** (identifies the department that created the PR)
-- No ambiguous labels like "Approve by" or "Approved by" for department field
+- **Department field clearly labeled as “Department”** (identifies the department that created the PR)
+- No ambiguous labels like “Approve by” or “Approved by” for department field
 - Print view well-formatted for PDF generation
 - All panels collapsible/expandable for better navigation
 
 ### FR-PR-011: Edit and Modify
-**Priority**: High
+
+**Priority**: High | **Status**: 🔧 Partial
 **User Story**: As a requestor, I want to edit my purchase requests when necessary so that I can correct errors, update quantities, or modify requirements before final approval.
 
 **Requirements**:
@@ -386,14 +421,15 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - Permission checks on all edit actions (role-based access control)
 - Audit trail for all modifications (what changed, who changed, when, why)
 - Version history maintained with ability to view previous versions
-- Concurrent edit prevention (lock PR when user is editing, show "locked by" indicator)
+- Concurrent edit prevention (lock PR when user is editing, show “locked by” indicator)
 - Approvers can adjust quantities with justification comments
 - Status reverts to Draft when rejected PR is edited
 - Auto-save draft changes every 30 seconds
 - Warning message when navigating away with unsaved changes
 
 ### FR-PR-012: Copy and Template
-**Priority**: Medium
+
+**Priority**: Medium | **Status**: 🔧 Partial
 **User Story**: As a department manager, I want to create purchase requests from templates or copy existing PRs so that I can quickly create recurring orders (like daily market lists) without re-entering the same information.
 
 **Requirements**:
@@ -417,7 +453,8 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - Template usage tracked for optimization and improvement
 
 ### FR-PR-013: Print and Export
-**Priority**: Medium
+
+**Priority**: Medium | **Status**: 🔧 Partial
 **User Story**: As a user, I want to print and export purchase requests in various formats so that I can share them with stakeholders, file physical copies, and perform offline analysis.
 
 **Requirements**:
@@ -443,29 +480,30 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - Print/export actions logged in activity log
 
 ### FR-PR-014: Notifications
-**Priority**: High
-**User Story**: As a user, I want to receive timely notifications about purchase request activities so that I can take required actions promptly and stay informed about my requests' progress.
+
+**Priority**: High | **Status**: 🚧 Pending
+**User Story**: As a user, I want to receive timely notifications about purchase request activities so that I can take required actions promptly and stay informed about my requests’ progress.
 
 **Requirements**:
 - **Email Notifications** for key events:
-  * PR Submitted: Notify designated approvers with PR summary
-  * PR Approved (Stage): Notify requestor and next approver (if multi-stage)
-  * PR Fully Approved: Notify requestor and purchasing staff
-  * PR Rejected: Notify requestor with rejection comments
-  * PR Requires Action: Daily digest to pending approvers (8:00 AM)
-  * PR Converted to PO: Notify requestor with PO number(s)
-  * @Mention in Comments: Notify mentioned user immediately
-  * PR Deadline Approaching: Notify if delivery date within 3 days and not approved
+* PR Submitted: Notify designated approvers with PR summary
+* PR Approved (Stage): Notify requestor and next approver (if multi-stage)
+* PR Fully Approved: Notify requestor and purchasing staff
+* PR Rejected: Notify requestor with rejection comments
+* PR Requires Action: Daily digest to pending approvers (8:00 AM)
+* PR Converted to PO: Notify requestor with PO number(s)
+* @Mention in Comments: Notify mentioned user immediately
+* PR Deadline Approaching: Notify if delivery date within 3 days and not approved
 - **In-App Notifications**:
-  * Bell icon with notification counter
-  * Notification panel with recent activities
-  * Mark as read/unread
-  * Direct link to related PR
+* Bell icon with notification counter
+* Notification panel with recent activities
+* Mark as read/unread
+* Direct link to related PR
 - **Notification Preferences**:
-  * User can configure which notifications to receive
-  * Email vs. in-app vs. both
-  * Frequency (immediate, daily digest, weekly digest)
-  * Quiet hours (no emails during specified times)
+* User can configure which notifications to receive
+* Email vs. in-app vs. both
+* Frequency (immediate, daily digest, weekly digest)
+* Quiet hours (no emails during specified times)
 - **Mobile Push Notifications** (future enhancement)
 
 **Acceptance Criteria**:
@@ -481,7 +519,8 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - Notification history accessible for reference
 
 ### FR-PR-015: Mobile Responsiveness
-**Priority**: Medium
+
+**Priority**: Medium | **Status**: 🔧 Partial
 **User Story**: As a hotel manager or department head, I want to review and approve purchase requests on my mobile device so that I can take action while on the move and not delay the procurement process.
 
 **Requirements**:
@@ -491,11 +530,11 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - **Mobile-Optimized Forms**: Easy data entry with appropriate input types
 - **Offline Capability**: View PRs offline, sync when online (future)
 - **Key Actions on Mobile**:
-  * View PR list and details
-  * Approve/reject PRs
-  * Add comments
-  * View approval workflow
-  * Receive notifications
+* View PR list and details
+* Approve/reject PRs
+* Add comments
+* View approval workflow
+* Receive notifications
 - **No Horizontal Scrolling**: Content fits screen width
 - **Mobile Navigation**: Hamburger menu, bottom tabs for quick access
 - **Touch Gestures**: Swipe to view details, pull-to-refresh lists
@@ -513,35 +552,36 @@ The Purchase Requests sub-module enables users to create, manage, and track purc
 - Tested on minimum screen size: 375x667 (iPhone SE)
 
 ### FR-PR-016: Real-Time Inventory Integration
-**Priority**: High
+
+**Priority**: High | **Status**: 🚧 Pending
 **User Story**: As a chef or department manager, I want to see real-time inventory levels and pricing information when creating purchase requests so that I can make informed decisions about what to order, avoid over-ordering, and ensure best pricing.
 
 **Requirements**:
 - **Real-Time Stock Information**:
-  * Display on-hand inventory quantity for user's location (e.g., Main Kitchen Store)
-  * Show inventory at other locations (summary view for potential transfers)
-  * Display available quantity (on-hand minus reserved/committed stock)
-  * Show stock status indicators (Healthy, Caution, Critical, Out of Stock, No Data)
-  * Display suggested reorder point and reorder quantity based on consumption
+* Display on-hand inventory quantity for user’s location (e.g., Main Kitchen Store)
+* Show inventory at other locations (summary view for potential transfers)
+* Display available quantity (on-hand minus reserved/committed stock)
+* Show stock status indicators (Healthy, Caution, Critical, Out of Stock, No Data)
+* Display suggested reorder point and reorder quantity based on consumption
 - **Pricing Information**:
-  * Show current average cost (weighted average)
-  * Display last purchase price and vendor
-  * Show price history trend (last 30 days)
-  * Alert on significant price variance (>15%) from last purchase
+* Show current average cost (weighted average)
+* Display last purchase price and vendor
+* Show price history trend (last 30 days)
+* Alert on significant price variance (>15%) from last purchase
 - **Consumption Analytics**:
-  * Display 30-day consumption history with daily/weekly trends
-  * Show average daily/weekly usage
-  * Forecast days of stock remaining
+* Display 30-day consumption history with daily/weekly trends
+* Show average daily/weekly usage
+* Forecast days of stock remaining
 - **Smart Suggestions**:
-  * Auto-fill quantity with reorder suggestion
-  * Suggest alternative/substitute products when out of stock
-  * Recommend inter-location transfers when stock available elsewhere
-  * Flag seasonal items or special pricing opportunities
+* Auto-fill quantity with reorder suggestion
+* Suggest alternative/substitute products when out of stock
+* Recommend inter-location transfers when stock available elsewhere
+* Flag seasonal items or special pricing opportunities
 - **Data Freshness & Caching**:
-  * Cache inventory data with 5-minute TTL for frequently accessed products
-  * Display warning when inventory data is stale (>2 hours old)
-  * Preserve inventory snapshot with PR for audit trail
-  * Real-time refresh option (manual or auto every 60 seconds)
+* Cache inventory data with 5-minute TTL for frequently accessed products
+* Display warning when inventory data is stale (>2 hours old)
+* Preserve inventory snapshot with PR for audit trail
+* Real-time refresh option (manual or auto every 60 seconds)
 
 **Acceptance Criteria**:
 - Inventory data loads within 2 seconds of product selection (95th percentile)
@@ -580,33 +620,34 @@ Integrating real-time inventory and pricing data into the PR creation process en
 ---
 
 ### FR-PR-017: Inventory Display Integration
-**Priority**: High
+
+**Priority**: High | **Status**: 🚧 Pending
 **User Story**: As a Requestor, I need to see on-hand and on-order quantities directly in the PR item row so that I can make informed ordering decisions without leaving the PR screen.
 
 **Requirements**:
 - **On-Hand Display**:
-  * Display current inventory quantity available for selected item
-  * Show as read-only field in the PR item row
-  * Real-time query to Inventory Management System API
-  * Format as integer with comma separators (e.g., "1,250")
-  * Display "N/A" if inventory system unavailable or non-stock item
-  * Update automatically when item is changed
+* Display current inventory quantity available for selected item
+* Show as read-only field in the PR item row
+* Real-time query to Inventory Management System API
+* Format as integer with comma separators (e.g., “1,250”)
+* Display “N/A” if inventory system unavailable or non-stock item
+* Update automatically when item is changed
 - **On-Order Display**:
-  * Display quantity currently on order from suppliers
-  * Show as read-only field adjacent to on-hand quantity
-  * Real-time query to Purchase Order System API
-  * Format as integer with comma separators
-  * Display "N/A" if data unavailable
-  * Include tooltip showing expected delivery dates
+* Display quantity currently on order from suppliers
+* Show as read-only field adjacent to on-hand quantity
+* Real-time query to Purchase Order System API
+* Format as integer with comma separators
+* Display “N/A” if data unavailable
+* Include tooltip showing expected delivery dates
 - **Visual Indicators**:
-  * Color-code on-hand based on stock levels (green: healthy, yellow: low, red: critical)
-  * Show icon indicator for stock status
-  * Display warning icon if on-order quantity exists but on-hand is critical
+* Color-code on-hand based on stock levels (green: healthy, yellow: low, red: critical)
+* Show icon indicator for stock status
+* Display warning icon if on-order quantity exists but on-hand is critical
 - **Performance Optimization**:
-  * Cache inventory data with 5-minute TTL
-  * Batch API calls for multiple items
-  * Load inventory data asynchronously to avoid blocking UI
-  * Display loading spinner while fetching data
+* Cache inventory data with 5-minute TTL
+* Batch API calls for multiple items
+* Load inventory data asynchronously to avoid blocking UI
+* Display loading spinner while fetching data
 
 **Acceptance Criteria**:
 - On-hand and on-order quantities load within 2 seconds of item selection
@@ -625,30 +666,31 @@ Integrating real-time inventory and pricing data into the PR creation process en
 ---
 
 ### FR-PR-018: FOC Visibility Controls
-**Priority**: Medium
+
+**Priority**: Medium | **Status**: 🚧 Pending
 **User Story**: As a Requestor, I should not see FOC (Free of Charge) fields during PR creation, as these are procurement-level decisions handled by approvers and procurement staff.
 
 **Requirements**:
 - **Role-Based Visibility**:
-  * Hide `foc_quantity` and `foc_unit` fields from Requestor role
-  * Display FOC fields for Approver, Procurement, and Finance roles
-  * FOC fields visible in view mode for authorized roles
-  * Fields remain in database regardless of visibility
+* Hide `foc_quantity` and `foc_unit` fields from Requestor role
+* Display FOC fields for Approver, Procurement, and Finance roles
+* FOC fields visible in view mode for authorized roles
+* Fields remain in database regardless of visibility
 - **UI Implementation**:
-  * Remove FOC columns from PR item grid for Requestors
-  * Remove FOC input fields from item detail forms for Requestors
-  * Display FOC information in approval screen for authorized users
-  * Show FOC indicator icon in item list for users who can see it
+* Remove FOC columns from PR item grid for Requestors
+* Remove FOC input fields from item detail forms for Requestors
+* Display FOC information in approval screen for authorized users
+* Show FOC indicator icon in item list for users who can see it
 - **Data Integrity**:
-  * FOC fields still saved to database even when hidden
-  * Validation rules apply regardless of visibility
-  * API accepts FOC data from authorized roles only
-  * Audit log records who set FOC values
+* FOC fields still saved to database even when hidden
+* Validation rules apply regardless of visibility
+* API accepts FOC data from authorized roles only
+* Audit log records who set FOC values
 - **Permission Checks**:
-  * Server-side validation of FOC field access
-  * Role-based access control on API endpoints
-  * Clear error message if unauthorized user attempts to set FOC
-  * Frontend enforcement prevents unauthorized form submission
+* Server-side validation of FOC field access
+* Role-based access control on API endpoints
+* Clear error message if unauthorized user attempts to set FOC
+* Frontend enforcement prevents unauthorized form submission
 
 **Acceptance Criteria**:
 - Requestor role cannot see FOC fields in any PR screen
@@ -666,43 +708,44 @@ Integrating real-time inventory and pricing data into the PR creation process en
 ---
 
 ### FR-PR-019: Price Visibility Controls
-**Priority**: Medium
+
+**Priority**: Medium | **Status**: 🚧 Pending
 **User Story**: As a Requestor, I want the option to hide pricing details from my PR so that I can focus on item specifications and quantities without being influenced by costs, while still allowing approvers and procurement to see full pricing.
 
 **Requirements**:
 - **Hide Price Toggle**:
-  * Add "Hide Price" checkbox/toggle at PR header level
-  * Default state: unchecked (prices visible)
-  * Setting persists with PR record
-  * Available only to Requestor role during creation/editing
-  * Not available during approval or view-only modes
+* Add “Hide Price” checkbox/toggle at PR header level
+* Default state: unchecked (prices visible)
+* Setting persists with PR record
+* Available only to Requestor role during creation/editing
+* Not available during approval or view-only modes
 - **Affected Fields When Hidden**:
-  * `vendor_name`
-  * `unit_price`
-  * `discount_amount`
-  * `net_amount`
-  * `tax_amount`
-  * `total_amount`
-  * All currency and monetary calculations
+* `vendor_name`
+* `unit_price`
+* `discount_amount`
+* `net_amount`
+* `tax_amount`
+* `total_amount`
+* All currency and monetary calculations
 - **Role-Based Override**:
-  * Approver role: always sees prices regardless of hide_price setting
-  * Procurement role: always sees prices regardless of hide_price setting
-  * Finance role: always sees prices regardless of hide_price setting
-  * Requestor: respects hide_price flag
+* Approver role: always sees prices regardless of hide_price setting
+* Procurement role: always sees prices regardless of hide_price setting
+* Finance role: always sees prices regardless of hide_price setting
+* Requestor: respects hide_price flag
 - **UI Behavior**:
-  * When hide_price = true for Requestor:
-    - Hide pricing columns from item grid
-    - Hide pricing fields from item detail form
-    - Hide PR totals and subtotals
-    - Replace with "Price Hidden" placeholder or remove entirely
-  * When hide_price = true for Approver/Procurement/Finance:
-    - Show all pricing fields normally
-    - Display indicator that Requestor chose to hide prices
+* When hide_price = true for Requestor:
+- Hide pricing columns from item grid
+- Hide pricing fields from item detail form
+- Hide PR totals and subtotals
+- Replace with “Price Hidden” placeholder or remove entirely
+* When hide_price = true for Approver/Procurement/Finance:
+- Show all pricing fields normally
+- Display indicator that Requestor chose to hide prices
 - **Data Integrity**:
-  * All pricing data still saved to database
-  * Calculations still performed server-side
-  * API returns pricing data based on user role and hide_price flag
-  * Audit log records when hide_price is toggled
+* All pricing data still saved to database
+* Calculations still performed server-side
+* API returns pricing data based on user role and hide_price flag
+* Audit log records when hide_price is toggled
 
 **Acceptance Criteria**:
 - Hide Price toggle is visible and functional for Requestor role only
@@ -722,49 +765,50 @@ Integrating real-time inventory and pricing data into the PR creation process en
 ---
 
 ### FR-PR-020: Enhanced Item Pricing Breakdown
-**Priority**: High
+
+**Priority**: High | **Status**: 🚧 Pending
 **User Story**: As a Procurement Officer and Finance Manager, I need to see detailed pricing breakdown including vendor name, net amount (after discount), and tax amount for each line item so that I can validate pricing accuracy and understand the full cost structure.
 
 **Requirements**:
 - **Vendor Name Field**:
-  * Display vendor/supplier name for each PR item
-  * Data type: VARCHAR(255)
-  * Editable field during PR creation/editing
-  * Read-only during approval workflow
-  * Auto-populate from last purchase if available
-  * Typeahead/dropdown with vendor suggestions
+* Display vendor/supplier name for each PR item
+* Data type: VARCHAR(255)
+* Editable field during PR creation/editing
+* Read-only during approval workflow
+* Auto-populate from last purchase if available
+* Typeahead/dropdown with vendor suggestions
 - **Net Amount Field**:
-  * Display amount after discount, before tax
-  * Calculation: `net_amount = (unit_price × quantity) - discount_amount`
-  * Read-only, auto-calculated field
-  * Data type: Decimal(15,2)
-  * Display with 2 decimal places
-  * Currency symbol based on transaction currency
-  * Update in real-time when unit_price, quantity, or discount changes
+* Display amount after discount, before tax
+* Calculation: `net_amount = (unit_price × quantity) - discount_amount`
+* Read-only, auto-calculated field
+* Data type: Decimal(15,2)
+* Display with 2 decimal places
+* Currency symbol based on transaction currency
+* Update in real-time when unit_price, quantity, or discount changes
 - **Tax Amount Field**:
-  * Display calculated tax for the line item
-  * Calculation: `tax_amount = net_amount × (tax_rate / 100)`
-  * Read-only, auto-calculated field
-  * Data type: Decimal(15,2)
-  * Display with 2 decimal places
-  * Update in real-time when net_amount or tax_rate changes
-  * Show tax_rate percentage in tooltip
+* Display calculated tax for the line item
+* Calculation: `tax_amount = net_amount × (tax_rate / 100)`
+* Read-only, auto-calculated field
+* Data type: Decimal(15,2)
+* Display with 2 decimal places
+* Update in real-time when net_amount or tax_rate changes
+* Show tax_rate percentage in tooltip
 - **Total Amount Per Line**:
-  * Display final line total including tax
-  * Calculation: `total_amount = net_amount + tax_amount`
-  * Read-only, auto-calculated field
-  * Bold or highlighted for emphasis
-  * Display with currency symbol
+* Display final line total including tax
+* Calculation: `total_amount = net_amount + tax_amount`
+* Read-only, auto-calculated field
+* Bold or highlighted for emphasis
+* Display with currency symbol
 - **UI Layout**:
-  * Add new columns to PR item grid: Vendor, Net Amount, Tax, Total
-  * Group pricing fields visually for clarity
-  * Mobile responsive layout (stack on small screens)
-  * Export to PDF/Excel includes all pricing breakdown fields
+* Add new columns to PR item grid: Vendor, Net Amount, Tax, Total
+* Group pricing fields visually for clarity
+* Mobile responsive layout (stack on small screens)
+* Export to PDF/Excel includes all pricing breakdown fields
 - **Validation**:
-  * Vendor name required if unit_price is entered
-  * Net amount cannot be negative (discount cannot exceed unit_price × quantity)
-  * Tax amount recalculates automatically
-  * Total amount reflects all calculation changes immediately
+* Vendor name required if unit_price is entered
+* Net amount cannot be negative (discount cannot exceed unit_price × quantity)
+* Tax amount recalculates automatically
+* Total amount reflects all calculation changes immediately
 
 **Acceptance Criteria**:
 - All pricing fields display correctly in PR item grid and detail view
@@ -785,56 +829,57 @@ Integrating real-time inventory and pricing data into the PR creation process en
 ---
 
 ### FR-PR-021: Item Metadata Enhancement
-**Priority**: Medium
+
+**Priority**: Medium | **Status**: 🔧 Partial
 **User Story**: As a Requestor, I need to add specific delivery instructions, required dates, and delivery locations for each item so that procurement and receiving teams have all necessary information for fulfillment.
 
 **Requirements**:
 - **Comment Field**:
-  * Add free-text comment field for each PR item
-  * Data type: VARCHAR(500)
-  * Maximum 500 characters
-  * Optional field (not required)
-  * Supports special instructions, notes, handling requirements
-  * Display character counter during input
-  * Multi-line text area (3-4 rows)
-  * Placeholder text: "e.g., Deliver to back kitchen entrance, handle with care"
+* Add free-text comment field for each PR item
+* Data type: VARCHAR(500)
+* Maximum 500 characters
+* Optional field (not required)
+* Supports special instructions, notes, handling requirements
+* Display character counter during input
+* Multi-line text area (3-4 rows)
+* Placeholder text: “e.g., Deliver to back kitchen entrance, handle with care”
 - **Required Date Field**:
-  * Add date picker for item-specific required date
-  * Data type: DATE
-  * Optional field (not required)
-  * Default: blank (no pre-filled date)
-  * Constraint: Must be >= current date
-  * Validation: Cannot be in the past
-  * Format: YYYY-MM-DD or locale-specific format
-  * Calendar picker with date restrictions
-  * Show days remaining if date is entered
+* Add date picker for item-specific required date
+* Data type: DATE
+* Optional field (not required)
+* Default: blank (no pre-filled date)
+* Constraint: Must be >= current date
+* Validation: Cannot be in the past
+* Format: YYYY-MM-DD or locale-specific format
+* Calendar picker with date restrictions
+* Show days remaining if date is entered
 - **Delivery Point Field**:
-  * Add dropdown selector for delivery location
-  * Data type: UUID (references delivery_points table)
-  * Optional field (not required)
-  * Options loaded from DeliveryPoint master data
-  * Display format: "Code - Name" (e.g., "DOCK-A - Main Kitchen Loading Dock")
-  * Filter by user's department or location if applicable
-  * Typeahead search within dropdown
-  * Show delivery point address in tooltip
+* Add dropdown selector for delivery location
+* Data type: UUID (references delivery_points table)
+* Optional field (not required)
+* Options loaded from DeliveryPoint master data
+* Display format: “Code - Name” (e.g., “DOCK-A - Main Kitchen Loading Dock”)
+* Filter by user’s department or location if applicable
+* Typeahead search within dropdown
+* Show delivery point address in tooltip
 - **Delivery Point Label Field**:
-  * Auto-populated from selected delivery point
-  * Data type: VARCHAR(100)
-  * Read-only field
-  * Displays human-readable location name
-  * Updates automatically when delivery point is changed
-  * Used for display in reports and approvals
+* Auto-populated from selected delivery point
+* Data type: VARCHAR(100)
+* Read-only field
+* Displays human-readable location name
+* Updates automatically when delivery point is changed
+* Used for display in reports and approvals
 - **UI Layout**:
-  * Add "Item Details" section to PR item form
-  * Group metadata fields together visually
-  * Collapse/expand panel for optional details
-  * Mobile-friendly layout
-  * Fields appear in both item grid (condensed) and detail view (full)
+* Add “Item Details” section to PR item form
+* Group metadata fields together visually
+* Collapse/expand panel for optional details
+* Mobile-friendly layout
+* Fields appear in both item grid (condensed) and detail view (full)
 - **Validation**:
-  * Comment field: max 500 characters with client-side validation
-  * Required Date: must be >= current date
-  * Delivery Point: must exist in master data
-  * Delivery Point Label: auto-populated, cannot be manually edited
+* Comment field: max 500 characters with client-side validation
+* Required Date: must be >= current date
+* Delivery Point: must exist in master data
+* Delivery Point Label: auto-populated, cannot be manually edited
 
 **Acceptance Criteria**:
 - All three metadata fields are available for each PR item
@@ -855,46 +900,47 @@ Integrating real-time inventory and pricing data into the PR creation process en
 ---
 
 ### FR-PR-022: Delivery Point Dropdown
-**Priority**: Medium
+
+**Priority**: Medium | **Status**: 🚧 Pending
 **User Story**: As a Requestor, I need to select from a list of valid delivery locations so that items are delivered to the correct receiving point without manual entry errors.
 
 **Requirements**:
 - **Master Data Integration**:
-  * Load delivery points from `delivery_points` master data table
-  * Filter to show only active delivery points (active_flag = true)
-  * Filter by user's department if applicable
-  * Cache delivery point list with appropriate TTL (e.g., 15 minutes)
+* Load delivery points from `delivery_points` master data table
+* Filter to show only active delivery points (active_flag = true)
+* Filter by user’s department if applicable
+* Cache delivery point list with appropriate TTL (e.g., 15 minutes)
 - **Dropdown Behavior**:
-  * Searchable/typeahead dropdown for easy selection
-  * Display format: "{code} - {name}" (e.g., "DOCK-A - Main Kitchen Loading Dock")
-  * Sort alphabetically by name
-  * Show delivery point description in tooltip on hover
-  * Allow clearing selection (set to NULL)
-  * Default: no pre-selected value
+* Searchable/typeahead dropdown for easy selection
+* Display format: “{code} - {name}” (e.g., “DOCK-A - Main Kitchen Loading Dock”)
+* Sort alphabetically by name
+* Show delivery point description in tooltip on hover
+* Allow clearing selection (set to NULL)
+* Default: no pre-selected value
 - **DeliveryPoint Entity Fields** (reference):
-  * `id` (UUID): Primary key
-  * `code` (VARCHAR(20)): Short location code
-  * `name` (VARCHAR(100)): Full location name
-  * `description` (TEXT): Detailed location information
-  * `address` (VARCHAR(500)): Physical address
-  * `department_id` (UUID): Owner department reference
-  * `active_flag` (BOOLEAN): Active status
-  * Created/modified audit fields
+* `id` (UUID): Primary key
+* `code` (VARCHAR(20)): Short location code
+* `name` (VARCHAR(100)): Full location name
+* `description` (TEXT): Detailed location information
+* `address` (VARCHAR(500)): Physical address
+* `department_id` (UUID): Owner department reference
+* `active_flag` (BOOLEAN): Active status
+* Created/modified audit fields
 - **Validation**:
-  * Selected delivery point must exist in master data
-  * Selected delivery point must be active
-  * User must have permission to deliver to selected location (optional, based on business rules)
+* Selected delivery point must exist in master data
+* Selected delivery point must be active
+* User must have permission to deliver to selected location (optional, based on business rules)
 - **UI Behavior**:
-  * Dropdown appears in PR item detail form
-  * Selected value displays in item grid as condensed label
-  * Mobile-friendly dropdown (native select on mobile devices)
-  * Clear button to remove selection
-  * Loading state while fetching delivery points
+* Dropdown appears in PR item detail form
+* Selected value displays in item grid as condensed label
+* Mobile-friendly dropdown (native select on mobile devices)
+* Clear button to remove selection
+* Loading state while fetching delivery points
 - **Admin Configuration**:
-  * Delivery points managed through System Administration module
-  * Add/edit/deactivate delivery points
-  * Associate delivery points with departments
-  * Set default delivery points per department (optional)
+* Delivery points managed through System Administration module
+* Add/edit/deactivate delivery points
+* Associate delivery points with departments
+* Set default delivery points per department (optional)
 
 **Acceptance Criteria**:
 - Dropdown loads all active delivery points within 1 second
@@ -915,39 +961,40 @@ Integrating real-time inventory and pricing data into the PR creation process en
 ---
 
 ### FR-PR-023: Header Total Removal
-**Priority**: Low
+
+**Priority**: Low | **Status**: 🚧 Pending
 **User Story**: As a Requestor, I do not need to see header-level totals during PR creation, as I am focused on individual line items. Totals should be calculated and visible only during approval and finalization stages.
 
 **Requirements**:
 - **Header Total Removal for Requestor**:
-  * Remove total amount display from PR header during creation/editing
-  * Remove subtotal, discount, tax, and grand total from header
-  * Remove any summary financial sections from header area
-  * Requestor focuses on line items only
+* Remove total amount display from PR header during creation/editing
+* Remove subtotal, discount, tax, and grand total from header
+* Remove any summary financial sections from header area
+* Requestor focuses on line items only
 - **Total Display for Approvers**:
-  * Display header totals during approval workflow
-  * Show: Subtotal, Total Discount, Net Amount, Total Tax, Grand Total
-  * Display in prominent summary panel
-  * Use clear visual hierarchy for financial summary
+* Display header totals during approval workflow
+* Show: Subtotal, Total Discount, Net Amount, Total Tax, Grand Total
+* Display in prominent summary panel
+* Use clear visual hierarchy for financial summary
 - **Calculation Logic**:
-  * Calculate totals server-side regardless of display
-  * Totals available via API for authorized roles
-  * Real-time calculation when line items change
-  * Totals persist in database for audit trail
+* Calculate totals server-side regardless of display
+* Totals available via API for authorized roles
+* Real-time calculation when line items change
+* Totals persist in database for audit trail
 - **UI Behavior**:
-  * Requestor view: clean header without financial summary
-  * Approver view: comprehensive financial summary in header
-  * Finance view: detailed financial breakdown with currency information
-  * Mobile view: collapsible financial summary for approvers
+* Requestor view: clean header without financial summary
+* Approver view: comprehensive financial summary in header
+* Finance view: detailed financial breakdown with currency information
+* Mobile view: collapsible financial summary for approvers
 - **Role-Based Display**:
-  * Requestor: no header totals
-  * Approver: full header totals
-  * Procurement: full header totals
-  * Finance: full header totals with additional breakdown
+* Requestor: no header totals
+* Approver: full header totals
+* Procurement: full header totals
+* Finance: full header totals with additional breakdown
 - **Backward Compatibility**:
-  * Existing PRs retain calculated totals in database
-  * Historical reports show totals regardless of creation date
-  * Export functions include totals for all roles
+* Existing PRs retain calculated totals in database
+* Historical reports show totals regardless of creation date
+* Export functions include totals for all roles
 
 **Acceptance Criteria**:
 - Requestor view has no financial summary in header
@@ -966,43 +1013,44 @@ Integrating real-time inventory and pricing data into the PR creation process en
 ---
 
 ### FR-PR-024: Amount Override Repositioning
-**Priority**: Low
+
+**Priority**: Low | **Status**: 🚧 Pending
 **User Story**: As a Requestor, I need the amount override field to be positioned logically near pricing fields so that I can easily adjust amounts when necessary without confusion.
 
 **Requirements**:
 - **Field Repositioning**:
-  * Move `override_amount` field from its current position to be adjacent to pricing fields
-  * Position after `total_amount` in the pricing breakdown
-  * Group visually with unit_price, discount, net_amount, tax, total
-  * Maintain clear visual separation with subtle border or background color
+* Move `override_amount` field from its current position to be adjacent to pricing fields
+* Position after `total_amount` in the pricing breakdown
+* Group visually with unit_price, discount, net_amount, tax, total
+* Maintain clear visual separation with subtle border or background color
 - **Field Behavior**:
-  * Optional field (not required by default)
-  * Editable by Requestor during creation/editing
-  * Read-only during approval workflow
-  * When populated, overrides calculated total_amount
-  * Clear indicator when override is active (icon, badge, or highlight)
-  * Tooltip explains purpose: "Override the calculated total amount if needed"
+* Optional field (not required by default)
+* Editable by Requestor during creation/editing
+* Read-only during approval workflow
+* When populated, overrides calculated total_amount
+* Clear indicator when override is active (icon, badge, or highlight)
+* Tooltip explains purpose: “Override the calculated total amount if needed”
 - **Visual Indicators**:
-  * Show warning icon when override_amount differs from calculated total
-  * Display calculated amount alongside override for comparison
-  * Highlight override field to indicate it's active
-  * Color-code: yellow for override active, default for no override
+* Show warning icon when override_amount differs from calculated total
+* Display calculated amount alongside override for comparison
+* Highlight override field to indicate it’s active
+* Color-code: yellow for override active, default for no override
 - **Validation**:
-  * Override amount must be > 0
-  * Override amount can be less than or greater than calculated amount
-  * Warning message if override is significantly different from calculated amount (e.g., >20% variance)
-  * Approval workflow flags items with override for review
+* Override amount must be > 0
+* Override amount can be less than or greater than calculated amount
+* Warning message if override is significantly different from calculated amount (e.g., >20% variance)
+* Approval workflow flags items with override for review
 - **UI Layout**:
-  * Position in pricing breakdown section
-  * Label: "Override Amount (Optional)"
-  * Show calculated amount for reference: "Calculated: $XXX.XX"
-  * Mobile layout stacks fields vertically
-  * Clear "Remove Override" button to revert to calculated amount
+* Position in pricing breakdown section
+* Label: “Override Amount (Optional)”
+* Show calculated amount for reference: “Calculated: $XXX.XX”
+* Mobile layout stacks fields vertically
+* Clear “Remove Override” button to revert to calculated amount
 - **Audit Trail**:
-  * Log when override is set, modified, or removed
-  * Capture user who set override
-  * Capture timestamp of override action
-  * Display override reason if provided (optional comment field)
+* Log when override is set, modified, or removed
+* Capture user who set override
+* Capture timestamp of override action
+* Display override reason if provided (optional comment field)
 
 **Acceptance Criteria**:
 - Override amount field is positioned in pricing breakdown section
@@ -1013,7 +1061,7 @@ Integrating real-time inventory and pricing data into the PR creation process en
 - Approval workflow highlights overridden items
 - Audit trail captures all override actions
 - Mobile layout maintains usability
-- "Remove Override" function works correctly
+- “Remove Override” function works correctly
 
 **User Experience**:
 - Logical field positioning reduces confusion
@@ -1024,53 +1072,54 @@ Integrating real-time inventory and pricing data into the PR creation process en
 ---
 
 ### FR-PR-025: Monetary Amount Formatting Standards
-**Priority**: Medium
+
+**Priority**: Medium | **Status**: 🔧 Partial
 **User Story**: As a user of the PR system, I need all monetary amounts to be formatted consistently with proper currency symbols, thousands separators, and decimal places so that financial data is easy to read and understand.
 
 **Requirements**:
 - **Format Standards**:
-  * All monetary amounts display with 2 decimal places
-  * Use comma as thousands separator (e.g., 1,234.56)
-  * Currency symbol positioned based on locale (e.g., $1,234.56 or 1.234,56 €)
-  * Negative amounts displayed with minus sign or parentheses (configurable)
-  * Zero amounts displayed as "0.00" not "-" or blank
+* All monetary amounts display with 2 decimal places
+* Use comma as thousands separator (e.g., 1,234.56)
+* Currency symbol positioned based on locale (e.g., $1,234.56 or 1.234,56 €)
+* Negative amounts displayed with minus sign or parentheses (configurable)
+* Zero amounts displayed as “0.00” not “-” or blank
 - **Affected Fields**:
-  * `unit_price`
-  * `discount_amount`
-  * `net_amount`
-  * `tax_amount`
-  * `total_amount`
-  * `override_amount`
-  * All header totals (subtotal, grand total, etc.)
+* `unit_price`
+* `discount_amount`
+* `net_amount`
+* `tax_amount`
+* `total_amount`
+* `override_amount`
+* All header totals (subtotal, grand total, etc.)
 - **Multi-Currency Support**:
-  * Display amounts in transaction currency by default
-  * Show base currency equivalent in parentheses or tooltip
-  * Currency code displayed alongside amount (e.g., "1,234.56 USD")
-  * Exchange rate displayed when viewing foreign currency amounts
-  * Consistent formatting across all currencies
+* Display amounts in transaction currency by default
+* Show base currency equivalent in parentheses or tooltip
+* Currency code displayed alongside amount (e.g., “1,234.56 USD”)
+* Exchange rate displayed when viewing foreign currency amounts
+* Consistent formatting across all currencies
 - **Locale-Specific Formatting**:
-  * Respect user's locale settings for number formatting
-  * Support different decimal separators (. vs ,)
-  * Support different thousands separators (, vs . vs space)
-  * Currency symbol positioning varies by locale
-  * Date format varies by locale
+* Respect user’s locale settings for number formatting
+* Support different decimal separators (. vs ,)
+* Support different thousands separators (, vs . vs space)
+* Currency symbol positioning varies by locale
+* Date format varies by locale
 - **Visual Presentation**:
-  * Right-align monetary amounts in tables for easy comparison
-  * Use tabular/monospace numbers for alignment
-  * Bold or highlight total amounts
-  * Subtle background color for calculated fields
-  * Different color for negative amounts (red) vs positive (default)
+* Right-align monetary amounts in tables for easy comparison
+* Use tabular/monospace numbers for alignment
+* Bold or highlight total amounts
+* Subtle background color for calculated fields
+* Different color for negative amounts (red) vs positive (default)
 - **Input Formatting**:
-  * Auto-format as user types (add commas, fix decimals)
-  * Accept input with or without currency symbols
-  * Accept input with or without commas
-  * Round to 2 decimal places automatically
-  * Validate numeric input only
+* Auto-format as user types (add commas, fix decimals)
+* Accept input with or without currency symbols
+* Accept input with or without commas
+* Round to 2 decimal places automatically
+* Validate numeric input only
 - **Export Formatting**:
-  * PDF exports: maintain visual formatting
-  * Excel exports: numeric format with 2 decimals
-  * CSV exports: unformatted numbers for data processing
-  * Print view: formatted for readability
+* PDF exports: maintain visual formatting
+* Excel exports: numeric format with 2 decimals
+* CSV exports: unformatted numbers for data processing
+* Print view: formatted for readability
 
 **Acceptance Criteria**:
 - All monetary fields display with consistent 2-decimal formatting
@@ -1082,7 +1131,7 @@ Integrating real-time inventory and pricing data into the PR creation process en
 - Input fields auto-format as user types
 - Locale settings are respected throughout application
 - Exports maintain appropriate formatting for each format type
-- Zero amounts display as "0.00"
+- Zero amounts display as “0.00”
 - Tabular numbers align properly in tables
 
 **Integration Points**:
@@ -1101,21 +1150,26 @@ Integrating real-time inventory and pricing data into the PR creation process en
 
 ## Business Rules
 
-### Required Fields
+> **Status Summary**: 🔧 Partial - Frontend validation exists; backend enforcement and integration pending
+
+### Required Fields (🔧 Partial - frontend validation only)
+
 - **BR-PR-001**: Reference number must be unique and auto-generated
 - **BR-PR-002**: Requestor, department, delivery date are mandatory
 - **BR-PR-003**: At least one item required with quantity > 0
 - **BR-PR-004**: Item unit price must be > 0
 - **BR-PR-005**: Description and justification required for submission
 
-### Budget Rules
+### Budget Rules (🚧 Pending - no budget system)
+
 - **BR-PR-006**: Budget availability must be checked before submission
 - **BR-PR-007**: Soft commitment created on submission, not approval
 - **BR-PR-008**: Budget category must be valid and active
 - **BR-PR-009**: Amount thresholds determine approval levels
 - **BR-PR-010**: Budget must be available in base currency
 
-### Workflow Rules
+### Workflow Rules (🔧 Partial - display only)
+
 - **BR-PR-011**: Department head approval always required
 - **BR-PR-012**: Finance review required for amounts > threshold
 - **BR-PR-013**: All approvals required before status = Approved
@@ -1123,25 +1177,28 @@ Integrating real-time inventory and pricing data into the PR creation process en
 - **BR-PR-015**: Approver cannot approve own PR
 - **BR-PR-027**: PR rejection allowed during approval workflow (UC-PR-006) by any approver
 - **BR-PR-028**: PR splitting allowed during PO conversion (UC-PR-011 Alternative Flow A1)
-- **BR-PR-029**: Rejected PRs return to "Rejected" status and can be edited and resubmitted
+- **BR-PR-029**: Rejected PRs return to “Rejected” status and can be edited and resubmitted
 - **BR-PR-030**: Split PRs can be divided into multiple POs by vendor or delivery date
 
-### Data Validation Rules
+### Data Validation Rules (🔧 Partial - client-side only)
+
 - **BR-PR-016**: Delivery date must be future date
 - **BR-PR-017**: Currency must be valid and active
 - **BR-PR-018**: Exchange rates updated daily (if multi-currency)
 - **BR-PR-019**: Tax rates must be current and valid
 - **BR-PR-020**: Item categories must be from approved list
 
-### Display Rules
+### Display Rules (✅ Implemented)
+
 - **BR-PR-021**: All dates displayed in user's timezone
 - **BR-PR-022**: All amounts displayed with 2 decimal places
 - **BR-PR-023**: All quantities displayed with 3 decimal places
 - **BR-PR-024**: Currency symbol displayed based on PR currency
 - **BR-PR-025**: Numeric values right-aligned in grids
-- **BR-PR-026**: Department field must be labeled as "Department" (not "Approve by" or "Approved by")
+- **BR-PR-026**: Department field must be labeled as “Department” (not “Approve by” or “Approved by”)
 
-### Inventory Integration Rules
+### Inventory Integration Rules (🚧 Pending)
+
 - **BR-PR-039**: Inventory data must be displayed within 2 seconds of product selection
 - **BR-PR-040**: Stock level indicators update in real-time as user modifies quantities
 - **BR-PR-041**: Inventory snapshot preserved with PR for audit trail
@@ -1151,7 +1208,8 @@ Integrating real-time inventory and pricing data into the PR creation process en
 - **BR-PR-045**: Alternative product suggestions limited to same category and similar price range (±30%)
 - **BR-PR-046**: Historical consumption data limited to 90 days for performance
 
-### Template Management Rules
+### Template Management Rules (🚧 Pending)
+
 - **BR-PR-047**: Template names must be unique within department scope
 - **BR-PR-048**: Templates can be department-specific or organization-wide
 - **BR-PR-049**: Organization-wide templates require purchasing manager approval
@@ -1161,7 +1219,8 @@ Integrating real-time inventory and pricing data into the PR creation process en
 - **BR-PR-053**: Templates can have tags for easier discovery (max 10 tags)
 - **BR-PR-054**: Template items retain product references for automatic price updates
 
-### FOC (Free of Charge) Rules
+### FOC (Free of Charge) Rules (🚧 Pending)
+
 - **BR-PR-055**: Item is considered FOC if focQuantity > 0 (no separate boolean flag needed)
 - **BR-PR-056**: If focQuantity > 0, then focUnit is required and must be specified
 - **BR-PR-057**: FOC unit may differ from order unit and must be converted to inventory unit
@@ -1169,138 +1228,40 @@ Integrating real-time inventory and pricing data into the PR creation process en
 - **BR-PR-059**: FOC unit conversions must use product unit conversion table
 - **BR-PR-060**: FOC quantity must be displayed in price comparison table (not Yes/No)
 
-### Tax Rate Assignment Rules
+### Tax Rate Assignment Rules (🚧 Pending)
+
 - **BR-PR-061**: When product manually selected from catalog, tax rate defaults from product table
 - **BR-PR-062**: When auto-allocate triggered, tax rate comes from price list
 - **BR-PR-063**: When manual allocate, tax rate assigned from price list
-- **BR-PR-064**: "Adjust" checkbox prevents automatic price updates when checked
+- **BR-PR-064**: “Adjust” checkbox prevents automatic price updates when checked
 - **BR-PR-065**: Tax rate can be overridden by user with appropriate permissions
 
 ## Data Model
 
 ### Purchase Request Entity
-```typescript
+
+```tsx
 interface PurchaseRequest {
-  id: string                      // UUID
-  refNumber: string               // PR-YYYY-NNNNNN
-  date: Date                      // Creation date
-  type: 'General' | 'Market List' | 'Asset'
-  deliveryDate: Date              // Required delivery date
-  description: string             // Purpose description
-  justification?: string          // Business justification
-  requestorId: string             // User ID
-  requestor: {
-    name: string
-    id: string
-    department: string
-    email: string
-  }
-  status: PRStatus                // Current status
-  workflowStatus: WorkflowStatus  // Approval status
-  location: string                // Location code
-  department: string              // Department code
-  jobCode?: string                // Project/job code
-  currency: string                // Transaction currency
-  baseCurrency: string            // Organization base currency
-  exchangeRate: number            // Currency exchange rate
-
-  // Financial amounts in transaction currency
-  subTotalPrice: number
-  discountAmount: number
-  netAmount: number
-  taxAmount: number
-  totalAmount: number
-
-  // Financial amounts in base currency
-  baseSubTotalPrice: number
-  baseDiscAmount: number
-  baseNetAmount: number
-  baseTaxAmount: number
-  baseTotalAmount: number
-
-  // Relationships
-  items: PurchaseRequestItem[]
+  id: string                      // UUID  refNumber: string               // PR-YYYY-NNNNNN  date: Date                      // Creation date  type: 'General' | 'Market List' | 'Asset'  deliveryDate: Date              // Required delivery date  description: string             // Purpose description  justification?: string          // Business justification  requestorId: string             // User ID  requestor: {
+    name: string    id: string    department: string    email: string  }
+  status: PRStatus                // Current status  workflowStatus: WorkflowStatus  // Approval status  location: string                // Location code  department: string              // Department code  jobCode?: string                // Project/job code  currency: string                // Transaction currency  baseCurrency: string            // Organization base currency  exchangeRate: number            // Currency exchange rate  // Financial amounts in transaction currency  subTotalPrice: number  discountAmount: number  netAmount: number  taxAmount: number  totalAmount: number  // Financial amounts in base currency  baseSubTotalPrice: number  baseDiscAmount: number  baseNetAmount: number  baseTaxAmount: number  baseTotalAmount: number  // Relationships  items: PurchaseRequestItem[]
   attachments: Attachment[]
   comments: Comment[]
   approvalHistory: ApprovalRecord[]
-
-  // Audit fields
-  createdDate: Date
-  createdBy: string
-  updatedDate: Date
-  updatedBy: string
-}
+  // Audit fields  createdDate: Date  createdBy: string  updatedDate: Date  updatedBy: string}
 ```
 
 ### Purchase Request Item Entity
-```typescript
+
+```tsx
 interface PurchaseRequestItem {
-  id: string
-  prId: string                    // Parent PR ID
-  lineNumber: number              // Sequence number
-
-  // Item details
-  itemCode?: string               // Product code (if catalog item)
-  name: string                    // Item name/description
-  description?: string            // Additional description
-  specification?: string          // Technical specifications
-
-  // Quantity and units
-  quantityRequested: number       // Requested quantity (3 decimals)
-  quantityApproved?: number       // Approved quantity (3 decimals)
-  unit: string                    // Unit of measure
-
-  // Location and delivery
-  location: string                // Storage location
-  deliveryDate: Date              // Required delivery date
-  deliveryPoint: string           // Delivery location
-
-  // Pricing and financial
-  currency: string
-  price: number                   // Unit price (2 decimals)
-  subtotal: number                // Quantity × Price
-  discountRate: number            // Discount percentage
-  discountAmount: number          // Calculated discount
-  netAmount: number               // Subtotal - Discount
-  taxRate: number                 // Tax percentage
-  taxAmount: number               // Calculated tax
-  totalAmount: number             // Net + Tax
-
-  // Base currency amounts
-  baseSubtotal: number
-  baseDiscAmount: number
-  baseNetAmount: number
-  baseTaxAmount: number
-  baseTotalAmount: number
-
-  // Classification
-  itemCategory: string
-  itemSubcategory?: string
-  accountCode?: string            // GL account code
-  jobCode?: string                // Project/job code
-
-  // Vendor information
-  vendorId?: number
-  vendorName?: string
-  pricelistNumber?: string
-
-  // Additional fields
-  focQuantity?: number            // FOC quantity (if FOC item). Item is FOC if focQuantity > 0
-  focUnit?: string                // FOC unit of measure (may differ from order unit, required if focQuantity > 0)
-  taxIncluded: boolean            // Tax inclusive flag
-  comment?: string                // Line item notes
-
-  // Audit fields
-  createdDate: Date
-  createdBy: string
-  updatedDate: Date
-  updatedBy: string
-}
+  id: string  prId: string                    // Parent PR ID  lineNumber: number              // Sequence number  // Item details  itemCode?: string               // Product code (if catalog item)  name: string                    // Item name/description  description?: string            // Additional description  specification?: string          // Technical specifications  // Quantity and units  quantityRequested: number       // Requested quantity (3 decimals)  quantityApproved?: number       // Approved quantity (3 decimals)  unit: string                    // Unit of measure  // Location and delivery  location: string                // Storage location  deliveryDate: Date              // Required delivery date  deliveryPoint: string           // Delivery location  // Pricing and financial  currency: string  price: number                   // Unit price (2 decimals)  subtotal: number                // Quantity × Price  discountRate: number            // Discount percentage  discountAmount: number          // Calculated discount  netAmount: number               // Subtotal - Discount  taxRate: number                 // Tax percentage  taxAmount: number               // Calculated tax  totalAmount: number             // Net + Tax  // Base currency amounts  baseSubtotal: number  baseDiscAmount: number  baseNetAmount: number  baseTaxAmount: number  baseTotalAmount: number  // Classification  itemCategory: string  itemSubcategory?: string  accountCode?: string            // GL account code  jobCode?: string                // Project/job code  // Vendor information  vendorId?: number  vendorName?: string  pricelistNumber?: string  // Additional fields  focQuantity?: number            // FOC quantity (if FOC item). Item is FOC if focQuantity > 0  focUnit?: string                // FOC unit of measure (may differ from order unit, required if focQuantity > 0)  taxIncluded: boolean            // Tax inclusive flag  comment?: string                // Line item notes  // Audit fields  createdDate: Date  createdBy: string  updatedDate: Date  updatedBy: string}
 ```
 
 ## Integration Points
 
 ### Internal Systems
+
 - **Budget Management**: Real-time budget availability checks
 - **User Management**: User authentication and authorization
 - **Department Management**: Department and location data
@@ -1310,6 +1271,7 @@ interface PurchaseRequestItem {
 - **Accounting**: GL code validation and posting
 
 ### External Systems (Future)
+
 - **Email Service**: Notification delivery
 - **Document Storage**: Attachment management
 - **ERP Integration**: Sync with external ERP systems
@@ -1317,35 +1279,42 @@ interface PurchaseRequestItem {
 
 ## Non-Functional Requirements
 
-### Performance
+> **Status Summary**: 🚧 Pending - Requires backend implementation for measurement and enforcement
+
+### Performance (🚧 Pending - no backend to measure)
+
 - **NFR-PR-001**: List page load time < 2 seconds for 1000 records
 - **NFR-PR-002**: Detail page load time < 1 second
 - **NFR-PR-003**: Save operation completes < 3 seconds
 - **NFR-PR-004**: Budget check completes < 1 second
 - **NFR-PR-005**: Support 100 concurrent users
 
-### Security
+### Security (🚧 Pending - mock auth only)
+
 - **NFR-PR-006**: All data transmitted over HTTPS/TLS
 - **NFR-PR-007**: Role-based access control enforced
 - **NFR-PR-008**: Audit trail for all data modifications
 - **NFR-PR-009**: Session timeout after 30 minutes inactivity
 - **NFR-PR-010**: Password-protected PDF exports
 
-### Usability
+### Usability (🔧 Partial - UI exists)
+
 - **NFR-PR-011**: Interface follows organization design system
 - **NFR-PR-012**: Help text available for all fields
 - **NFR-PR-013**: Error messages clear and actionable
 - **NFR-PR-014**: Keyboard shortcuts for common actions
 - **NFR-PR-015**: Accessibility WCAG 2.1 AA compliant
 
-### Reliability
+### Reliability (🚧 Pending - no backend)
+
 - **NFR-PR-016**: System availability 99.5% during business hours
 - **NFR-PR-017**: Data backup every 4 hours
 - **NFR-PR-018**: Disaster recovery RTO 4 hours
 - **NFR-PR-019**: Automatic session recovery on network failure
 - **NFR-PR-020**: Graceful degradation on service unavailability
 
-### Scalability
+### Scalability (🚧 Pending - mock data)
+
 - **NFR-PR-021**: Support 10,000 PRs per year
 - **NFR-PR-022**: Support 50,000 PR items per year
 - **NFR-PR-023**: Database query optimization for large datasets
@@ -1355,18 +1324,21 @@ interface PurchaseRequestItem {
 ## Success Metrics
 
 ### Efficiency Metrics
+
 - Average time to create PR: < 5 minutes
 - Average approval cycle time: < 24 hours for standard PRs
 - PR resubmission rate: < 10%
 - Budget check failures: < 5%
 
 ### Quality Metrics
+
 - PR data accuracy: > 98%
 - User satisfaction score: > 4.0/5.0
 - System uptime: > 99.5%
 - Audit compliance: 100%
 
 ### Adoption Metrics
+
 - User adoption rate: > 90% of target users
 - Mobile usage: > 30% of total usage
 - Self-service rate: > 80% (users completing without support)
@@ -1384,6 +1356,7 @@ interface PurchaseRequestItem {
 ## Assumptions and Constraints
 
 ### Assumptions
+
 - Users have basic computer literacy
 - Internet connection available
 - Modern web browser (Chrome, Firefox, Safari, Edge)
@@ -1391,6 +1364,7 @@ interface PurchaseRequestItem {
 - Budget data maintained and current
 
 ### Constraints
+
 - Must integrate with existing ERP system
 - Must comply with financial approval policies
 - Must support multiple currencies
@@ -1409,11 +1383,54 @@ interface PurchaseRequestItem {
 - Blockchain for audit trail
 - Machine learning for approval routing
 
+## Implementation Summary
+
+This section provides a high-level overview of implementation progress across all requirement categories.
+
+| Category | Total | ✅ Implemented | 🔧 Partial | 🚧 Pending | ⏳ Future |
+|----------|-------|----------------|------------|------------|-----------|
+| Functional Requirements | 25 | 3 | 10 | 12 | 0 |
+| Business Rules | ~65 | 6 | 15 | 44 | 0 |
+| Non-Functional Requirements | 25 | 0 | 5 | 20 | 0 |
+
+### Implementation Progress by Category
+
+**Functional Requirements (25 total)**:
+- ✅ Implemented (3): Status Management, List View & Filtering, Detail View
+- 🔧 Partial (10): PR Creation, Item Management, Approval Workflow, Edit/Modify, Copy/Template, Print/Export, Mobile Responsiveness, Item Metadata, Monetary Formatting, Enhanced Pricing fields
+- 🚧 Pending (12): Financial Calculations, Budget Control, Document Management, Comments/Collaboration, Notifications, Real-Time Inventory, Inventory Display, FOC Visibility, Price Visibility, Delivery Point Dropdown, Header Total Removal, Amount Override
+
+**Business Rules (~65 total)**:
+- ✅ Implemented (6): Display Rules - date formatting, currency display, status indicators
+- 🔧 Partial (15): Required Fields (frontend validation), Workflow Rules (display only), Data Validation Rules (client-side)
+- 🚧 Pending (44): Budget Rules, Inventory Integration Rules, Template Management Rules, FOC Rules, Tax Rate Assignment Rules
+
+**Non-Functional Requirements (25 total)**:
+- 🔧 Partial (5): Usability requirements - UI exists but not fully optimized
+- 🚧 Pending (20): Performance, Security, Reliability, Scalability - require backend implementation
+
+### Development Priority Recommendations
+
+1. **High Priority - Enable Core Functionality**:
+   - Backend API development for PR CRUD operations
+   - Workflow engine integration for approvals
+   - Budget system integration
+
+2. **Medium Priority - Enhanced Features**:
+   - Document upload functionality
+   - Real-time inventory integration
+   - Email notification system
+
+3. **Lower Priority - Advanced Features**:
+   - Template management system
+   - FOC and tax visibility rules
+   - Advanced reporting
+
 ## Approval
 
 | Role | Name | Date | Signature |
-|------|------|------|-----------|
-| Business Owner | | | |
-| Procurement Manager | | | |
-| Finance Manager | | | |
-| IT Manager | | | |
+| --- | --- | --- | --- |
+| Business Owner |  |  |  |
+| Procurement Manager |  |  |  |
+| Finance Manager |  |  |  |
+| IT Manager |  |  |  |

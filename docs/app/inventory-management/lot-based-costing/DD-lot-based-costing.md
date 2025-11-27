@@ -2,6 +2,11 @@
 
 **Document Version**: 1.0
 **Last Updated**: 2025-11-07
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Module**: Inventory Management
 **Feature**: Lot-Based Costing with Automatic Lot Creation
 

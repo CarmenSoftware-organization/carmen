@@ -4,6 +4,11 @@
 **Last Updated**: January 2025  
 **Status**: Current Implementation Reflected
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document outlines the product requirements, UI/UX design, and functional specifications for the Purchase Request (PR) List page, reflecting the current implementation state and recent enhancements.
 
 ## 1. Product Overview

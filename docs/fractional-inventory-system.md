@@ -1,5 +1,10 @@
 # Fractional Inventory Management System
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 The Fractional Inventory Management System is a comprehensive solution designed specifically for hospitality businesses that need to track and manage items that can be sold in portions or fractions. This system is particularly valuable for restaurants, cafes, and catering businesses that deal with items like pizzas, cakes, bulk containers, and other divisible products.

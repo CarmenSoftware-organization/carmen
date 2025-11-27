@@ -6,6 +6,12 @@
 - **Version**: 1.0
 - **Last Updated**: 2024-01-15
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2024-01-15 | System | Initial use cases document created with 16 comprehensive use cases |
+
 ---
 
 ## Use Case Index
@@ -3302,9 +3308,3 @@ Several times per week
 - [ ] All formats meet performance requirements
 
 ---
-
-## Document History
-
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2024-01-15 | System | Initial use cases document created with 16 comprehensive use cases |

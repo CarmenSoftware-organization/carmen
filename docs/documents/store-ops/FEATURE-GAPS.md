@@ -31,6 +31,11 @@ This document tracks incomplete features, missing functionality, and future deve
 
 #### 1. Comments Tab (P1)
 **Status**: Not Implemented
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Current**: Tab does not exist in detail page
 **Expected**:
 - Comments tab in requisition detail page

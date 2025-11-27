@@ -1,5 +1,10 @@
 # Dashboard Module Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 The Dashboard module serves as the primary landing page and command center for the Carmen ERP system. It provides a comprehensive overview of key metrics, recent activities, and actionable insights across procurement, inventory, and operational domains.

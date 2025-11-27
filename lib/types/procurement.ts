@@ -15,20 +15,39 @@ import { AuditTimestamp, DocumentStatus, Money, WorkflowStatus, ApprovalRecord }
 export type PurchaseRequestPriority = 'low' | 'normal' | 'high' | 'urgent' | 'emergency';
 
 /**
- * Purchase request types (enum for consistency with existing code)
+ * Purchase request types (BR-aligned)
+ * - General: Standard purchase requests for goods and services
+ * - MarketList: Daily/recurring F&B purchases (market list orders)
+ * - Asset: Fixed asset and capital expenditure purchases
  */
 export enum PRType {
-  GeneralPurchase = 'GeneralPurchase',
-  ServiceRequest = 'ServiceRequest',
-  CapitalExpenditure = 'CapitalExpenditure',
-  Maintenance = 'Maintenance',
-  Emergency = 'Emergency'
+  General = 'General',
+  MarketList = 'MarketList',
+  Asset = 'Asset'
 }
 
 /**
- * Purchase request types (legacy type, prefer using PRType enum)
+ * Purchase request types (string union for flexibility)
  */
-export type PurchaseRequestType = 'goods' | 'services' | 'capital' | 'maintenance' | 'emergency';
+export type PurchaseRequestType = 'General' | 'MarketList' | 'Asset';
+
+/**
+ * Purchase request status values (BR-aligned)
+ * - Draft: Saved but not submitted (editable by requestor)
+ * - InProgress: Some approvals received, others pending
+ * - Approved: All approvals received (ready for PO conversion)
+ * - Void: Approval denied (returned to requestor with comments)
+ * - Completed: Converted to Purchase Order(s) (read-only)
+ * - Cancelled: Manually cancelled by requestor or approver (with reason)
+ */
+export enum PRStatus {
+  Draft = 'Draft',
+  InProgress = 'InProgress',
+  Approved = 'Approved',
+  Void = 'Void',
+  Completed = 'Completed',
+  Cancelled = 'Cancelled'
+}
 
 /**
  * Workflow stages for purchase requests
@@ -54,64 +73,138 @@ export interface Requestor {
 }
 
 /**
- * Purchase request header
+ * Purchase request header (BR-aligned)
  */
 export interface PurchaseRequest {
   id: string;
-  requestNumber?: string;
-  requestDate: Date;
-  requiredDate: Date;
-  requestType: PurchaseRequestType;
+  requestNumber?: string;                    // Auto-generated: PR-[YYMM]-[NNNN]
+  requestDate: Date;                         // Creation date
+  requiredDate: Date;                        // Required delivery date
+  requestType: PurchaseRequestType;          // General | MarketList | Asset
   priority: PurchaseRequestPriority;
-  status: DocumentStatus;
+  status: PRStatus;                          // BR-aligned status (Draft, InProgress, etc.)
   departmentId: string;
+  department?: string;                       // Department name/code
   locationId: string;
+  location?: string;                         // Location name/code
   requestedBy: string;
+  requestor?: Requestor;                     // Full requestor details
   approvedBy?: string;
   approvedAt?: Date;
   rejectedBy?: string;
   rejectedAt?: Date;
   rejectionReason?: string;
+  cancelledBy?: string;                      // User who cancelled (BR: Cancelled status)
+  cancelledAt?: Date;
+  cancellationReason?: string;               // Reason for cancellation
   totalItems: number;
-  estimatedTotal: Money;
+  description?: string;                      // Purpose description (BR: FR-PR-001)
+  justification?: string;                    // Business justification
+  // Currency settings (BR: FR-PR-003)
+  currency: string;                          // Transaction currency (e.g., 'THB', 'USD')
+  baseCurrency?: string;                     // Organization base currency
+  exchangeRate?: number;                     // Currency exchange rate
+  // Financial breakdown in transaction currency (BR: FR-PR-003)
+  subTotalPrice?: number;                    // Sum of item subtotals
+  discountAmount?: number;                   // Total discount
+  netAmount?: number;                        // Subtotal - Discount
+  taxAmount?: number;                        // Total tax
+  totalAmount?: number;                      // Net + Tax (Grand Total)
+  // Financial breakdown in base currency
+  baseSubTotalPrice?: number;
+  baseDiscountAmount?: number;
+  baseNetAmount?: number;
+  baseTaxAmount?: number;
+  baseTotalAmount?: number;
+  // Legacy fields (kept for backward compatibility)
+  estimatedTotal?: Money;
   actualTotal?: Money;
+  // Budget and cost allocation
   budgetCode?: string;
   projectCode?: string;
+  jobCode?: string;                          // Project/job code (BR: FR-PR-002)
   costCenter?: string;
-  justification?: string;
+  // Attachments and workflow
   attachments?: string[];
   workflowStages: ApprovalRecord[];
   currentStage?: string;
   notes?: string;
-  items?: PurchaseRequestItem[]; // Line items for the request
+  items?: PurchaseRequestItem[];             // Line items for the request
+  // Audit fields
+  createdAt?: Date;
+  createdBy?: string;
+  updatedAt?: Date;
+  updatedBy?: string;
 }
 
 /**
- * Purchase request line item
+ * Purchase request line item (BR-aligned)
  */
 export interface PurchaseRequestItem {
   id: string;
-  requestId: string;
-  itemId?: string; // Optional for non-catalog items
-  itemCode?: string;
-  itemName: string;
-  description: string;
-  specification?: string;
-  requestedQuantity: number;
-  unit: string;
+  requestId: string;                         // Parent PR ID
+  lineNumber?: number;                       // Sequence number
+  // Item details
+  itemId?: string;                           // Product ID (if catalog item)
+  itemCode?: string;                         // Product code
+  itemName: string;                          // Item name/description
+  localName?: string;                        // Local name (BR: FR-PR-002)
+  description: string;                       // Additional description
+  specification?: string;                    // Technical specifications
+  // Category classification (BR: FR-PR-002)
+  itemCategory?: string;                     // Category code
+  itemSubcategory?: string;                  // Subcategory code
+  itemGroup?: string;                        // Item group
+  // Quantity and units (BR: quantities to 3 decimal places)
+  requestedQuantity: number;                 // Requested quantity (3 decimals)
+  approvedQuantity?: number;                 // Approved quantity (3 decimals)
+  unit: string;                              // Unit of measure
+  // Location and delivery (BR: FR-PR-002, FR-PR-021)
+  location?: string;                         // Storage location code
+  deliveryLocationId: string;                // Delivery location ID
+  deliveryPoint?: string;                    // Delivery point ID (BR: FR-PR-022)
+  deliveryPointLabel?: string;               // Delivery point display name
+  requiredDate: Date;                        // Item-specific required date
+  // Pricing in transaction currency (BR: FR-PR-003, FR-PR-020)
+  currency?: string;                         // Transaction currency
+  unitPrice?: number;                        // Unit price (2 decimals)
+  subtotal?: number;                         // Quantity × Price
+  discountRate?: number;                     // Discount percentage
+  discountAmount?: number;                   // Calculated discount
+  netAmount?: number;                        // Subtotal - Discount
+  taxRate?: number;                          // Tax percentage
+  taxAmount?: number;                        // Calculated tax
+  totalAmount?: number;                      // Net + Tax
+  // Base currency amounts (BR: FR-PR-003)
+  baseSubtotal?: number;
+  baseDiscountAmount?: number;
+  baseNetAmount?: number;
+  baseTaxAmount?: number;
+  baseTotalAmount?: number;
+  // Legacy pricing fields (kept for backward compatibility)
   estimatedUnitPrice?: Money;
   estimatedTotal?: Money;
+  // Vendor information (BR: FR-PR-020)
+  vendorId?: string;                         // Vendor ID
+  vendorName?: string;                       // Vendor name for line item
+  vendorSuggestion?: string;                 // Suggested vendor based on history
+  pricelistNumber?: string;                  // Price list reference
+  // FOC (Free of Charge) fields (BR: BR-PR-055 to BR-PR-060)
+  focQuantity?: number;                      // FOC quantity (item is FOC if > 0)
+  focUnit?: string;                          // FOC unit (required if focQuantity > 0)
+  // Tax configuration (BR: BR-PR-061 to BR-PR-065)
+  taxIncluded?: boolean;                     // Tax inclusive flag
+  // Budget and cost allocation
   budgetCode?: string;
-  accountCode?: string;
-  deliveryLocationId: string;
-  requiredDate: Date;
-  priority: PurchaseRequestPriority;
-  status: DocumentStatus;
-  vendorSuggestion?: string;
-  notes?: string;
+  accountCode?: string;                      // GL account code
+  jobCode?: string;                          // Project/job code
+  // Additional metadata (BR: FR-PR-021)
+  comment?: string;                          // Line item notes (max 500 chars)
+  notes?: string;                            // Internal notes
   attachments?: string[];
+  priority: PurchaseRequestPriority;
+  status: PRStatus;                          // BR-aligned status
   // Workflow tracking
-  approvedQuantity?: number;
   approvedUnitPrice?: Money;
   approvedTotal?: Money;
   approvedVendor?: string;
@@ -120,6 +213,11 @@ export interface PurchaseRequestItem {
   purchaseOrderId?: string;
   convertedQuantity?: number;
   remainingQuantity?: number;
+  // Audit fields
+  createdAt?: Date;
+  createdBy?: string;
+  updatedAt?: Date;
+  updatedBy?: string;
 }
 
 // ====== PURCHASE ORDER ======

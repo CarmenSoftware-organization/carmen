@@ -1,5 +1,10 @@
 # Purchase Request Detail Screen Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ```yaml
 Title: Purchase Request Detail Screen Specification
 Module: Procurement Management

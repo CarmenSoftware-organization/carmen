@@ -1,5 +1,10 @@
 # Purchase Request List Page: Action Flow
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document outlines the user and system action flows for the Purchase Request (PR) List page interactions.
 
 ## 1. Page Load and Initial Display

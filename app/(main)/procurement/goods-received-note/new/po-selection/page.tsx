@@ -9,8 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from "@/components/ui/checkbox"
 import { Search, ChevronLeft } from 'lucide-react';
-import { PurchaseOrder, PurchaseOrderItem, PurchaseOrderStatus, Money } from '@/lib/types'; // Import correct types
-import { Vendor } from '@/app/(main)/vendor-management/manage-vendors/[id]/types'; // Keep Vendor for selectedVendor prop type
+import { PurchaseOrder, PurchaseOrderItem, PurchaseOrderStatus, Money, Vendor } from '@/lib/types';
 import { format } from 'date-fns';
 
 // Mock data aligned with actual types - using 'as any' to bypass strict type checking for mock data

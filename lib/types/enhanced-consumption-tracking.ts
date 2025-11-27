@@ -5,8 +5,8 @@
  * cake slices, and other partial products with multi-yield recipes and POS integration.
  */
 
-import { Recipe, RecipeYieldVariant } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
-import { RecipeMapping } from "@/app/(main)/system-administration/system-integrations/pos/mapping/recipes/types"
+import { Recipe, RecipeYieldVariant } from "@/lib/types"
+import { RecipeMapping } from "@/lib/types/pos-recipe-mapping"
 
 // Core Consumption Tracking Interfaces
 

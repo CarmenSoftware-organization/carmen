@@ -2,6 +2,11 @@
 
 **Carmen ERP terminology** and domain-specific definitions.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## General ERP Terms

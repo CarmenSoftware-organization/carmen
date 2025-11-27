@@ -3,6 +3,11 @@
 **Document Type**: Development Setup & Configuration Manual  
 **Version**: 1.0  
 **Last Updated**: August 22, 2025  
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Purpose**: Complete development environment setup for Carmen ERP recreation
 
 ---

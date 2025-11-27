@@ -4,6 +4,11 @@
 **Last Updated:** April 18, 2025  
 **Previous Version:** March 27, 2024
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Table of Contents
 
 1. [Introduction](#1-introduction)

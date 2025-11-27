@@ -5,7 +5,7 @@
  * dynamic pricing optimization, and profitability analysis for fractional sales.
  */
 
-import { Recipe, RecipeYieldVariant, Ingredient } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
+import { Recipe, RecipeYieldVariant, Ingredient } from "@/lib/types"
 import { 
   FractionalSalesTransaction, 
   ConsumptionPeriod, 
@@ -341,7 +341,7 @@ export class EnhancedCostingEngine {
     
     // Analyze volume impact
     const volumeImpact = await this.predictVolumeImpact(
-      variant.sellingPrice || 0,
+      variant.sellingPrice?.amount || 0,
       optimalPrice.recommendedPrice,
       demandElasticity
     )
@@ -359,11 +359,11 @@ export class EnhancedCostingEngine {
       optimizationId: `opt_${Date.now()}`,
       calculatedAt: new Date(),
       
-      currentPrice: variant.sellingPrice || 0,
+      currentPrice: variant.sellingPrice?.amount || 0,
       recommendedPrice: optimalPrice.recommendedPrice,
-      priceChange: optimalPrice.recommendedPrice - (variant.sellingPrice || 0),
-      priceChangePercentage: variant.sellingPrice ? 
-        ((optimalPrice.recommendedPrice - variant.sellingPrice) / variant.sellingPrice) * 100 : 0,
+      priceChange: optimalPrice.recommendedPrice - (variant.sellingPrice?.amount || 0),
+      priceChangePercentage: variant.sellingPrice?.amount ?
+        ((optimalPrice.recommendedPrice - variant.sellingPrice.amount) / variant.sellingPrice.amount) * 100 : 0,
       
       projectedMargin: optimalPrice.recommendedPrice - costBreakdown.totalCost,
       projectedMarginPercentage: ((optimalPrice.recommendedPrice - costBreakdown.totalCost) / optimalPrice.recommendedPrice) * 100,

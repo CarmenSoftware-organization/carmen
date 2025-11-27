@@ -1,5 +1,10 @@
 # Purchase Request Module - Troubleshooting Guide
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document provides solutions for common issues encountered in the Purchase Request (PR) module. It's designed to help users, administrators, and developers quickly diagnose and resolve problems.
 
 ## 1. User Interface Issues

@@ -12,7 +12,7 @@ import {
   createMockUser,
   createMockVendor
 } from './index'
-import { DocumentStatus } from '../types'
+import { PRStatus } from '../types'
 
 /**
  * Test scenario: Complete procurement workflow
@@ -42,7 +42,7 @@ export const procurementWorkflowScenario = {
       justification: 'Kitchen supplies for workflow test',
       requestedBy: 'user-requester',
       departmentId: 'kitchen',
-      status: DocumentStatus.InProgress
+      status: PRStatus.InProgress
     })
   }
 }

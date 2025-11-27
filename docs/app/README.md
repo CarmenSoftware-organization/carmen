@@ -2,6 +2,12 @@
 
 Welcome to the Carmen ERP documentation system. This directory contains comprehensive documentation for all modules and sub-modules organized by functional area.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+
 ## 📁 Documentation Structure
 
 ```

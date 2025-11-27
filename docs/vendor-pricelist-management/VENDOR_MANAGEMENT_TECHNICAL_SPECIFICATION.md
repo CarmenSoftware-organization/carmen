@@ -1,5 +1,10 @@
 # Vendor Management Module - Technical Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 The Vendor Management module is a comprehensive vendor pricelist management system built with Next.js 14, TypeScript, and Shadcn/ui components. It provides full CRUD operations for vendors, pricelist template management, automated price collection campaigns, and an intelligent vendor portal for price submissions.

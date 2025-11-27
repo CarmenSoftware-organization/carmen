@@ -1,5 +1,10 @@
 # Purchase Request Module - Development Tasks
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 Based on: `docs/purchase-request-management/purchase-request-module-prd.md` and `docs/purchase-request-management/PR-API-Specifications.md`
 
 ## Frontend Tasks

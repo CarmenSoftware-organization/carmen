@@ -11,6 +11,11 @@
 - [Fractional Inventory System](../../inventory-management/fractional-inventory/TS-fractional-inventory.md)
 - [Inventory Valuation Service](../inventory-valuation/SM-inventory-valuation.md)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. Purpose

@@ -3,9 +3,16 @@
 **Module**: Procurement
 **Sub-Module**: Purchase Requests
 **Document Type**: Validations (VAL)
-**Version**: 1.0.0
-**Last Updated**: 2025-01-30
+**Version**: 1.1.0
+**Last Updated**: 2025-11-26
 **Status**: Active
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+| 1.1.0 | 2025-11-26 | Documentation Team | Synced with BR - updated status values, added implementation markers |
 
 ---
 
@@ -42,6 +49,32 @@ Data Stored
 3. Use clear, actionable error messages in plain language
 4. Prevent security vulnerabilities (SQL injection, XSS, unauthorized access)
 5. Enforce business rules consistently across all operations
+
+### 1.4 Implementation Status
+
+This document serves as the target specification for Purchase Request validation. Each validation rule includes an implementation status marker:
+
+| Status | Meaning |
+|--------|---------|
+| ✅ Implemented | Validation complete and functional |
+| 🔧 Partial | Client-side validation exists, server-side needed |
+| 🚧 Pending | Not yet implemented |
+| ⏳ Future | Post-MVP enhancement |
+
+**Current State**: Frontend prototype with client-side Zod validation. Server-side validation and database constraints pending backend development.
+
+### 1.5 BR-Defined Status Values
+
+Per BR-purchase-requests.md, the following are the only valid status values:
+
+| Status | Description |
+|--------|-------------|
+| Draft | Initial state, PR being created/edited |
+| In-progress | PR submitted and in approval workflow |
+| Approved | All required approvals obtained |
+| Void | PR rejected during approval process |
+| Completed | PR converted to Purchase Order |
+| Cancelled | PR cancelled by user or admin |
 
 ---
 
@@ -1113,25 +1146,25 @@ Data Stored
 **Valid Status Transitions**:
 
 **From Draft**:
-- → Submitted (user submits)
+- → In-progress (user submits)
 - → Cancelled (user cancels)
 - → Deleted (user deletes)
 
-**From Submitted**:
+**From In-progress**:
 - → Approved (all approvals complete)
-- → Rejected (any approval rejected)
+- → Void (any approval rejected)
 - → Draft (user recalls)
 - → Cancelled (user cancels)
 
 **From Approved**:
-- → Converted (purchasing staff converts to PO)
+- → Completed (purchasing staff converts to PO)
 - → Cancelled (admin cancels)
 
-**From Rejected**:
+**From Void**:
 - → Draft (user edits to resubmit)
 - → Cancelled (user cancels)
 
-**From Converted**:
+**From Completed**:
 - → (No transitions - terminal state)
 
 **From Cancelled**:
@@ -1554,7 +1587,7 @@ All validation rules must have test coverage for:
 
 **Expected Result**: ✅
 - No validation errors displayed
-- PR created with status "Submitted"
+- PR created with status "In-progress"
 - Approval records created
 - Success message shown
 - PR reference number assigned (e.g., PR-2025-0042)
@@ -1601,7 +1634,7 @@ All validation rules must have test coverage for:
 
 **Expected Result**: ✅
 - No validation errors (boundary value is acceptable)
-- PR created successfully with status "Submitted"
+- PR created successfully with status "In-progress"
 - Success message shown
 
 ---
@@ -1649,7 +1682,25 @@ All validation rules must have test coverage for:
 
 ---
 
-## 9. Related Documents
+## 9. Implementation Summary
+
+| Category | Total | ✅ | 🔧 | 🚧 | ⏳ |
+|----------|-------|----|----|----|-----|
+| Field Validations (001-099) | 14 | 0 | 12 | 2 | 0 |
+| Business Rules (101-199) | 8 | 0 | 2 | 6 | 0 |
+| Cross-Field Validations (201-299) | 3 | 0 | 2 | 1 | 0 |
+| Security Validations (301-399) | 6 | 0 | 0 | 6 | 0 |
+| **Total** | **31** | **0** | **16** | **15** | **0** |
+
+**Implementation Notes**:
+- All field validations have client-side Zod schemas implemented
+- Server-side validation pending backend API development
+- Database constraints pending schema implementation
+- Security validations require authentication system integration
+
+---
+
+## 10. Related Documents
 
 - **Business Requirements**: [BR-purchase-requests.md](./BR-purchase-requests.md)
 - **Use Cases**: [UC-purchase-requests.md](./UC-purchase-requests.md)

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Building, Calendar, User, Package, Check, X } from 'lucide-react'
-import { itemsToCount } from '@/lib/mockData'
+import { itemsToCount } from '@/lib/mock-data/legacy-simple'
 
 interface CountDetailFormProps {
   onClose: () => void;

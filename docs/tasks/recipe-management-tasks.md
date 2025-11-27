@@ -1,5 +1,10 @@
 # Recipe Management Module - Development Tasks
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 Based on: `docs/recipe-module/RECIPE-PRD.md` and `docs/recipe-module/RECIPE-API-Endpoints-Core.md`
 
 ## Frontend Tasks

@@ -4,6 +4,11 @@
 **Created**: January 2025  
 **Based on**: Purchase Request RBAC Production Implementation  
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document extracts proven Role-Based Access Control (RBAC) patterns from the Purchase Request module to serve as a blueprint for implementing consistent, secure, and scalable permission systems across all Carmen ERP modules.
 
 ## 1. RBAC Architecture Overview

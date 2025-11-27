@@ -2,6 +2,12 @@
 
 **Welcome to the Carmen ERP Documentation Hub** - Your comprehensive guide to understanding, developing, and extending the Carmen hospitality ERP system.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+
 ---
 
 ## 🚀 Quick Start

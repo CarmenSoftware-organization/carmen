@@ -13,6 +13,11 @@ This document outlines the requirements for building an AI-powered content manag
 - **Workflow Automation**: n8n
 - **Storage**: Markdown files + Database
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 1. Problem Statement

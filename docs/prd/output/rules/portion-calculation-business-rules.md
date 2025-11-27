@@ -6,6 +6,11 @@
 **Date**: January 15, 2025  
 **Status**: Active  
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 This document defines business rules for calculating, sizing, and converting portions within the Carmen ERP system. These rules ensure accurate portion calculations, consistent sizing standards, cost allocation precision, and optimal yield management for fractional food items.

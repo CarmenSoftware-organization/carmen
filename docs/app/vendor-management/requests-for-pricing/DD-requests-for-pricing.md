@@ -1,399 +1,245 @@
-# Data Definition: Requests for Pricing (RFP)
+# Data Definition: Requests for Pricing (Price Collection Campaigns)
 
 ## Module Information
 - **Module**: Vendor Management
-- **Sub-module**: Requests for Pricing (RFP)
-- **Version**: 1.0.0
+- **Sub-module**: Requests for Pricing (Price Collection Campaigns)
+- **Version**: 2.0.0
 - **Status**: Active
-- **Last Updated**: 2025-11-15
+- **Last Updated**: 2025-11-26
 
 ## Document History
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0.0 | 2025-11-15 | Documentation Team | Initial DD document created from schema.prisma |
+| 2.0.0 | 2025-11-26 | System | Complete rewrite to match BR v2.0.0 and actual code implementation; Removed fictional RFQ features (evaluation scoring, awards, contracts); Updated to reflect Price Collection Campaign functionality |
+| 1.2.0 | 2025-11-18 | Documentation Team | Updated Change Request reference |
+| 1.1.0 | 2025-11-17 | Documentation Team | Previous version with RFQ features |
+| 1.0.0 | 2025-11-15 | Documentation Team | Initial DD document |
 
-**⚠️ IMPORTANT: This is a Data Definition Document - TEXT FORMAT ONLY**
-
-This document describes data structures, entities, relationships, and constraints in TEXT FORMAT.
-It does NOT contain executable SQL code, database scripts, or implementation code.
-For database implementation details, refer to the Technical Specification document.
-
-**⚠️ SCHEMA COVERAGE**: 40% - Partial coverage from `data-struc/schema.prisma`
-
-**Existing Tables**: `tb_request_for_pricing`, `tb_request_for_pricing_detail`
-**Missing Tables**: Vendor response tracking, comparison analysis, award management (likely stored in JSONB fields)
+**Note**: This document describes data structures for the Price Collection Campaign system as implemented in the actual code.
 
 ---
 
 ## Overview
 
-The Requests for Pricing (RFP) module manages the procurement process of soliciting price quotes from multiple vendors. RFPs are created from pricelist templates, sent to selected vendors, and vendor responses are collected and compared to support purchasing decisions.
+The Requests for Pricing module manages campaign-based price collection from vendors. Campaigns are created from pricelist templates, vendors are invited to submit pricing, and submission progress is tracked. This module focuses on collecting pricing information rather than competitive bidding or award processes.
 
 ### Key Features
-- RFP creation from templates
-- Multi-vendor solicitation
-- Vendor response tracking
-- Price comparison analysis
-- Award management
-- Deadline tracking
-- Automated notifications
-- Response history
+- Campaign creation from pricelist templates
+- Multi-vendor invitation and selection
+- Submission progress tracking
+- Recurring campaign scheduling
+- Reminder and escalation management
+- Campaign settings configuration
 
 ---
 
 ## Entity Relationship Overview
 
 ```
-tb_pricelist_template (1) ──── (N) tb_request_for_pricing
-tb_request_for_pricing (1) ──── (N) tb_request_for_pricing_detail
-tb_vendor (1) ──── (N) tb_request_for_pricing_detail
-tb_pricelist (1) ──── (0..1) tb_request_for_pricing_detail
+PricelistTemplate (1) ──── (N) PriceCollectionCampaign
+PriceCollectionCampaign (1) ──── (N) CampaignVendorInvitation
+Vendor (1) ──── (N) CampaignVendorInvitation
 ```
 
 ---
 
-## Core Entities (Existing in Schema)
+## Core Entities
 
-### 1. RFP Header (tb_request_for_pricing)
+### 1. PriceCollectionCampaign
 
-**Source**: `schema.prisma` lines 2196-2220
-
-**Purpose**: Stores RFP header information including template reference, timeline, and overall RFP metadata.
-
-**Table Name**: `tb_request_for_pricing`
-
-**Primary Key**: `id` (UUID)
+**Purpose**: Stores campaign header information including template reference, schedule, settings, and progress tracking.
 
 #### Fields
 
 | Field Name | Data Type | Constraints | Description |
 |-----------|-----------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique identifier |
-| `pricelist_template_id` | UUID | FOREIGN KEY → tb_pricelist_template.id, NOT NULL | Source template |
-| `start_date` | TIMESTAMPTZ | | RFP open date |
-| `end_date` | TIMESTAMPTZ | | RFP submission deadline |
-| `info` | JSON | | Additional metadata (status, vendor responses, comparison data) |
-| `dimension` | JSON | | Multi-dimensional attributes |
-| `doc_version` | DECIMAL | DEFAULT 0 | Document version for optimistic locking |
-| `created_at` | TIMESTAMPTZ | DEFAULT now() | Record creation timestamp |
-| `created_by_id` | UUID | | User who created the record |
-| `updated_at` | TIMESTAMPTZ | DEFAULT now() | Last update timestamp |
-| `updated_by_id` | UUID | | User who last updated |
-| `deleted_at` | TIMESTAMPTZ | | Soft delete timestamp |
-| `deleted_by_id` | UUID | | User who deleted |
+| `id` | string (UUID) | PRIMARY KEY | Unique identifier |
+| `name` | string | NOT NULL | Campaign name |
+| `description` | string | | Campaign description |
+| `status` | enum | NOT NULL | draft, active, paused, completed, cancelled |
+| `campaignType` | enum | NOT NULL | one-time, recurring, event-based |
+| `selectedVendors` | string[] | NOT NULL | Array of vendor IDs |
+| `selectedCategories` | string[] | | Array of category names |
+| `scheduledStart` | Date | NOT NULL | Campaign start date |
+| `scheduledEnd` | Date | | Campaign end date (optional) |
+| `recurringPattern` | object | | Recurring schedule configuration |
+| `progress` | object | NOT NULL | Progress metrics |
+| `settings` | object | NOT NULL | Campaign settings |
+| `template` | object | | Associated pricelist template |
+| `createdBy` | string | NOT NULL | Creator email/ID |
+| `createdAt` | Date | DEFAULT now() | Creation timestamp |
+| `updatedAt` | Date | DEFAULT now() | Last update timestamp |
 
-#### Relationships
-- **tb_pricelist_template**: Many-to-One (RFP created from template)
-- **tb_request_for_pricing_detail**: One-to-Many (RFP sent to multiple vendors)
+#### Status Values
+
+| Status | Description | Color Code |
+|--------|-------------|------------|
+| `draft` | Campaign created but not launched | Gray |
+| `active` | Campaign is live, accepting submissions | Green |
+| `paused` | Campaign temporarily suspended | Yellow |
+| `completed` | Campaign finished successfully | Blue |
+| `cancelled` | Campaign terminated | Red |
+
+#### Campaign Type Values
+
+| Type | Description |
+|------|-------------|
+| `one-time` | Single pricing collection event |
+| `recurring` | Repeated at scheduled intervals |
+| `event-based` | Triggered by specific events |
 
 #### Business Rules
-1. **Timeline**: `end_date` must be after `start_date`
-2. **Template Reference**: Cannot be deleted if template is deleted (preserve history)
-3. **Immutability**: Once vendors respond, RFP details become read-only
-4. **Status Tracking**: Status stored in `info.status` field
-
-#### JSON Field Structures
-
-**info field** - RFP metadata and status:
-```json
-{
-  "status": "open|closed|awarded|cancelled",
-  "rfp_number": "RFP-2025-000001",
-  "title": "Q1 2025 Food & Beverage Pricing",
-  "description": "Quarterly pricing request for F&B items",
-  "evaluation_criteria": {
-    "price_weight": 60,
-    "quality_weight": 25,
-    "delivery_weight": 15
-  },
-  "response_summary": {
-    "total_vendors": 5,
-    "responses_received": 3,
-    "pending": 2,
-    "response_rate": 60
-  },
-  "comparison_results": {
-    "lowest_bidder": "vendor_id",
-    "average_price": 1250.00,
-    "price_range": {
-      "min": 1100.00,
-      "max": 1400.00
-    }
-  },
-  "award": {
-    "awarded_vendor_id": "uuid",
-    "awarded_vendor_name": "ABC Suppliers",
-    "award_date": "2025-01-15",
-    "award_reason": "Best combination of price and quality",
-    "total_award_value": 15000.00
-  },
-  "notifications": {
-    "sent_date": "2025-01-01",
-    "reminder_dates": ["2025-01-10", "2025-01-13"],
-    "escalation_date": "2025-01-20"
-  }
-}
-```
-
-**dimension field** - Multi-dimensional attributes:
-```json
-{
-  "department_id": "uuid",
-  "location_id": "uuid",
-  "cost_center_id": "uuid",
-  "project_id": "uuid",
-  "procurement_category": "food-beverage"
-}
-```
+1. **Timeline**: `scheduledEnd` must be after `scheduledStart` when provided
+2. **Status Transitions**: draft → active → paused ↔ active → completed/cancelled
+3. **Vendor Selection**: At least one vendor must be selected
+4. **Template Requirement**: Campaign must have associated template
 
 ---
 
-### 2. RFP Vendor Invitations (tb_request_for_pricing_detail)
+### 2. CampaignProgress
 
-**Source**: `schema.prisma` lines 2222-2253
-
-**Purpose**: Stores vendor-specific RFP information including invited vendors, contact details, and their submitted pricelists.
-
-**Table Name**: `tb_request_for_pricing_detail`
-
-**Primary Key**: `id` (UUID)
+**Purpose**: Tracks campaign progress metrics embedded in PriceCollectionCampaign.
 
 #### Fields
 
-| Field Name | Data Type | Constraints | Description |
-|-----------|-----------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY, DEFAULT gen_random_uuid() | Unique identifier |
-| `request_for_pricing_id` | UUID | FOREIGN KEY → tb_request_for_pricing.id, NOT NULL | Parent RFP |
-| `sequence_no` | INTEGER | DEFAULT 1 | Vendor invitation order |
-| `vendor_id` | UUID | FOREIGN KEY → tb_vendor.id, NOT NULL | Invited vendor |
-| `vendor_name` | VARCHAR | DENORMALIZED | Vendor name for quick reference |
-| `contact_person` | VARCHAR | | Vendor contact person name |
-| `contact_phone` | VARCHAR | | Contact phone number |
-| `contact_email` | VARCHAR | | Contact email address |
-| `pricelist_id` | UUID | FOREIGN KEY → tb_pricelist.id | Submitted pricelist (if responded) |
-| `pricelist_name` | VARCHAR | DENORMALIZED | Pricelist name for quick reference |
-| `info` | JSON | | Vendor response tracking and evaluation data |
-| `dimension` | JSON | | Multi-dimensional attributes |
-| `doc_version` | DECIMAL | DEFAULT 0 | Version for optimistic locking |
-| `created_at` | TIMESTAMPTZ | DEFAULT now() | Record creation timestamp |
-| `created_by_id` | UUID | | User who created |
-| `updated_at` | TIMESTAMPTZ | DEFAULT now() | Last update timestamp |
-| `updated_by_id` | UUID | | User who last updated |
-| `deleted_at` | TIMESTAMPTZ | | Soft delete timestamp |
-| `deleted_by_id` | UUID | | User who deleted |
+| Field Name | Data Type | Description |
+|-----------|-----------|-------------|
+| `totalVendors` | number | Total invited vendors |
+| `invitedVendors` | number | Vendors who received invitation |
+| `respondedVendors` | number | Vendors who accessed portal |
+| `completedSubmissions` | number | Completed submissions |
+| `pendingSubmissions` | number | In-progress submissions |
+| `failedSubmissions` | number | Failed submissions |
+| `completionRate` | number | Percentage completed (0-100) |
+| `responseRate` | number | Percentage responded (0-100) |
+| `averageResponseTime` | number | Average response time in hours |
+| `lastUpdated` | Date | Last metrics update timestamp |
 
-#### Relationships
-- **tb_request_for_pricing**: Many-to-One (details belong to one RFP)
-- **tb_vendor**: Many-to-One (multiple RFPs can invite same vendor)
-- **tb_pricelist**: Many-to-One (vendor's response stored as pricelist)
-
-#### Business Rules
-1. **Vendor Uniqueness**: Same vendor cannot be invited twice in same RFP
-2. **Response Link**: `pricelist_id` populated when vendor submits response
-3. **Contact Information**: Copied from vendor master at time of RFP creation
-4. **Response Status**: Tracked via `info.response_status`
-
-#### Indexes
-```
-INDEX request_for_pricing_detail_request_for_pricing_id_vendor_id_u
-  ON tb_request_for_pricing_detail(request_for_pricing_id, vendor_id)
-```
-
-#### JSON Field Structures
-
-**info field** - Vendor response and evaluation:
-```json
-{
-  "response_status": "pending|submitted|declined|expired",
-  "invitation_sent": "2025-01-01T10:00:00Z",
-  "response_submitted": "2025-01-10T15:30:00Z",
-  "portal_access_token": "secure-token-abc123",
-  "portal_last_viewed": "2025-01-08T14:20:00Z",
-  "vendor_notes": "Requesting 2-day extension due to inventory count",
-  "evaluation_scores": {
-    "price_score": 85,
-    "quality_score": 90,
-    "delivery_score": 75,
-    "total_score": 83,
-    "rank": 2
-  },
-  "price_comparison": {
-    "total_quoted": 14500.00,
-    "vs_average": -5.2,
-    "vs_lowest": 8.3,
-    "competitive_items": 45,
-    "non_competitive_items": 5
-  },
-  "compliance_check": {
-    "all_items_quoted": true,
-    "valid_certifications": true,
-    "delivery_acceptable": true,
-    "payment_terms_acceptable": true
-  },
-  "decision": {
-    "recommended": false,
-    "reason": "Higher price than competitor, similar quality"
-  }
-}
-```
+#### Calculation Rules
+- **Completion Rate**: `(completedSubmissions / totalVendors) × 100`
+- **Response Rate**: `(respondedVendors / totalVendors) × 100`
 
 ---
 
-## ⚠️ Analysis: Missing Functionality in Existing Schema
+### 3. CampaignSettings
 
-### Current Implementation Pattern
+**Purpose**: Stores campaign configuration settings embedded in PriceCollectionCampaign.
 
-The existing schema uses a **JSONB-based approach** for vendor responses, comparison, and awards:
+#### Fields
 
-1. **Vendor Responses**: Linked via `pricelist_id` field + tracked in `info.response_status`
-2. **Price Comparison**: Stored in `info.price_comparison` at detail level
-3. **Evaluation Scores**: Stored in `info.evaluation_scores` at detail level
-4. **Award Information**: Stored in `info.award` at RFP header level
+| Field Name | Data Type | Default | Description |
+|-----------|-----------|---------|-------------|
+| `portalAccessDuration` | number | 30 | Days vendor can access portal |
+| `allowedSubmissionMethods` | string[] | ['manual', 'upload'] | Submission methods |
+| `requireApproval` | boolean | false | Require manager approval |
+| `autoReminders` | boolean | true | Enable automatic reminders |
+| `reminderSchedule` | object | | Reminder configuration |
+| `emailTemplate` | string | | Email template name |
+| `customInstructions` | string | | Additional vendor instructions |
+| `priority` | enum | 'medium' | low, medium, high, urgent |
 
-### Advantages of Current Approach
-✅ Flexible schema - can adapt to different evaluation criteria
-✅ No additional tables needed
-✅ Fast queries - all data in single table
-✅ Historical responses preserved in JSONB
+#### Reminder Schedule Structure
 
-### Limitations of Current Approach
-⚠️ **Querying Complexity**: Cannot easily query/filter by response status without JSONB operations
-⚠️ **Index Performance**: Cannot create indexes on JSONB sub-fields efficiently
-⚠️ **Type Safety**: No database-level validation of JSONB structure
-⚠️ **Relational Integrity**: No foreign key constraints for data within JSONB
+| Field Name | Data Type | Description |
+|-----------|-----------|-------------|
+| `enabled` | boolean | Enable/disable reminders |
+| `intervals` | number[] | Days before deadline (e.g., [7, 3, 1]) |
+| `escalation` | object | Escalation configuration |
 
-### Recommendation
+#### Escalation Structure
 
-**For Current Implementation**: ✅ **Keep JSONB approach** - Works well for current scale
-
-**For Future Enhancement**: Consider separate tables if:
-- Need to query vendor responses across multiple RFPs efficiently
-- Require complex reporting on evaluation scores
-- Need strict data validation on response fields
-- Scale increases significantly (>1000 RFPs/month)
+| Field Name | Data Type | Description |
+|-----------|-----------|-------------|
+| `enabled` | boolean | Enable/disable escalation |
+| `overdueThreshold` | number | Days overdue before escalation |
+| `recipients` | string[] | Escalation recipient emails |
 
 ---
 
-## ⚠️ Proposed Enhancement Tables (Future)
+### 4. RecurringPattern
 
-### If Separate Tables Are Needed
+**Purpose**: Defines recurring campaign schedule embedded in PriceCollectionCampaign.
 
-#### RFP Vendor Response Table
-```
-Table Name: tb_rfp_vendor_response
+#### Fields
 
-Purpose: Dedicated table for tracking vendor responses
+| Field Name | Data Type | Description |
+|-----------|-----------|-------------|
+| `frequency` | enum | weekly, monthly, quarterly, annually |
+| `interval` | number | Interval between occurrences |
+| `endDate` | Date | Pattern end date (optional) |
+| `maxOccurrences` | number | Maximum occurrences (optional) |
+| `daysOfWeek` | number[] | Days for weekly pattern (0-6, 0=Sunday) |
+| `dayOfMonth` | number | Day for monthly pattern (1-31) |
+| `monthOfYear` | number | Month for annual pattern (1-12) |
 
-Fields:
-- id (UUID, PRIMARY KEY)
-- request_for_pricing_detail_id (UUID, FK)
-- response_status (ENUM: pending|submitted|declined|expired)
-- submitted_at (TIMESTAMPTZ)
-- portal_access_token (VARCHAR)
-- portal_last_viewed (TIMESTAMPTZ)
-- vendor_notes (TEXT)
-- created_at, updated_at, deleted_at
-- created_by_id, updated_by_id, deleted_by_id
+#### Frequency Options
 
-Benefits:
-- Easy filtering by response status
-- Indexable response dates
-- Clear audit trail
+| Frequency | Description | Configuration Fields |
+|-----------|-------------|---------------------|
+| `weekly` | Every N weeks | daysOfWeek required |
+| `monthly` | Every N months | dayOfMonth required |
+| `quarterly` | Every N quarters | dayOfMonth required |
+| `annually` | Every N years | dayOfMonth, monthOfYear required |
 
-Current Workaround:
-- Use info.response_status in tb_request_for_pricing_detail
-```
+---
 
-#### RFP Evaluation Scores Table
-```
-Table Name: tb_rfp_evaluation
+### 5. CampaignVendorStatus
 
-Purpose: Store vendor evaluation scores separately
+**Purpose**: Tracks individual vendor status within a campaign.
 
-Fields:
-- id (UUID, PRIMARY KEY)
-- request_for_pricing_detail_id (UUID, FK)
-- price_score (DECIMAL)
-- quality_score (DECIMAL)
-- delivery_score (DECIMAL)
-- total_score (DECIMAL)
-- rank (INTEGER)
-- evaluator_id (UUID)
-- evaluated_at (TIMESTAMPTZ)
+#### Fields
 
-Benefits:
-- Easy ranking queries
-- Clear evaluation history
-- Multiple evaluators support
+| Field Name | Data Type | Description |
+|-----------|-----------|-------------|
+| `vendorId` | string | Vendor identifier |
+| `vendorName` | string | Vendor display name |
+| `status` | enum | pending, in_progress, completed |
+| `progress` | number | Completion percentage (0-100) |
+| `lastActivity` | Date | Last vendor activity timestamp |
+| `remindersSent` | number | Count of reminders sent |
+| `lastReminderDate` | Date | Last reminder timestamp |
 
-Current Workaround:
-- Use info.evaluation_scores in tb_request_for_pricing_detail
-```
+#### Vendor Status Values
 
-#### RFP Award Table
-```
-Table Name: tb_rfp_award
-
-Purpose: Track RFP awards separately
-
-Fields:
-- id (UUID, PRIMARY KEY)
-- request_for_pricing_id (UUID, FK)
-- awarded_vendor_id (UUID, FK → tb_vendor)
-- awarded_detail_id (UUID, FK → tb_request_for_pricing_detail)
-- award_date (TIMESTAMPTZ)
-- award_reason (TEXT)
-- total_award_value (DECIMAL)
-- purchase_order_id (UUID, FK → tb_purchase_order)
-
-Benefits:
-- Track awards across RFPs
-- Link to purchase orders
-- Award analytics
-
-Current Workaround:
-- Use info.award in tb_request_for_pricing
-```
+| Status | Description |
+|--------|-------------|
+| `pending` | Invitation sent, no activity |
+| `in_progress` | Vendor has started submission |
+| `completed` | Submission completed |
 
 ---
 
 ## Data Validation Rules
 
-### RFP Header Validation
+### Campaign Header Validation
 
-1. **VAL-RFP-001**: Timeline consistency
-   - Rule: `end_date > start_date`
-   - Error: "End date must be after start date"
+| Rule ID | Rule | Error Message |
+|---------|------|---------------|
+| VAL-CAM-001 | `name` is required and non-empty | "Campaign name is required" |
+| VAL-CAM-002 | `description` is required | "Campaign description is required" |
+| VAL-CAM-003 | `scheduledStart` must be provided | "Start date is required" |
+| VAL-CAM-004 | `scheduledEnd > scheduledStart` when end date provided | "End date must be after start date" |
+| VAL-CAM-005 | `selectedVendors.length >= 1` | "At least one vendor must be selected" |
+| VAL-CAM-006 | `template` must be selected | "Template is required" |
+| VAL-CAM-007 | `priority` must be valid enum value | "Invalid priority value" |
 
-2. **VAL-RFP-002**: Minimum duration
-   - Rule: `(end_date - start_date) >= 3 days`
-   - Error: "RFP must be open for at least 3 days"
+### Status Transition Validation
 
-3. **VAL-RFP-003**: Status workflow
-   - Rule: Valid transitions: open → closed → awarded/cancelled
-   - Error: "Invalid status transition"
+| Rule ID | Current Status | Allowed Transitions |
+|---------|----------------|---------------------|
+| VAL-STS-001 | draft | active, cancelled |
+| VAL-STS-002 | active | paused, completed, cancelled |
+| VAL-STS-003 | paused | active, cancelled |
+| VAL-STS-004 | completed | (none - final state) |
+| VAL-STS-005 | cancelled | (none - final state) |
 
-4. **VAL-RFP-004**: Award validation
-   - Rule: Cannot award if `info.response_summary.responses_received = 0`
-   - Error: "Cannot award RFP with no responses"
+### Settings Validation
 
-### RFP Detail Validation
-
-5. **VAL-RFP-101**: Vendor uniqueness
-   - Rule: Same vendor cannot appear twice in same RFP
-   - Error: "Vendor already invited to this RFP"
-
-6. **VAL-RFP-102**: Contact information
-   - Rule: Valid email format for `contact_email`
-   - Error: "Invalid email address"
-
-7. **VAL-RFP-103**: Response linkage
-   - Rule: If `pricelist_id` is set, `info.response_status` must be 'submitted'
-   - Error: "Response status inconsistent with pricelist"
-
-8. **VAL-RFP-104**: Evaluation completeness
-   - Rule: If `info.evaluation_scores` exists, all required score fields must be present
-   - Error: "Incomplete evaluation scores"
+| Rule ID | Rule | Error Message |
+|---------|------|---------------|
+| VAL-SET-001 | `portalAccessDuration > 0` | "Portal access duration must be positive" |
+| VAL-SET-002 | `reminderSchedule.intervals` in descending order | "Reminder intervals must be in descending order" |
+| VAL-SET-003 | `escalation.overdueThreshold > 0` when enabled | "Overdue threshold must be positive" |
 
 ---
 
@@ -401,273 +247,212 @@ Current Workaround:
 
 ### 1. Pricelist Template Integration
 - **Direction**: Inbound
-- **Purpose**: RFPs created from templates
-- **Key Fields**: `pricelist_template_id`
-- **Process**: Template structure copied to RFP at creation
+- **Purpose**: Campaigns created from templates
+- **Key Fields**: `template.id`, `template.name`
+- **Process**: Template selected during campaign creation (Step 2)
 
-### 2. Vendor Management Integration
+### 2. Vendor Directory Integration
 - **Direction**: Inbound
 - **Purpose**: Select vendors to invite
-- **Key Fields**: `vendor_id`, `vendor_name`, contact fields
-- **Process**: Vendor contact info copied at RFP creation time
+- **Key Fields**: `selectedVendors`, vendor search/filter
+- **Process**: Vendors selected during campaign creation (Step 3)
 
-### 3. Price List Integration
-- **Direction**: Inbound/Outbound
-- **Purpose**: Vendors submit responses as pricelists
-- **Key Fields**: `pricelist_id`, `pricelist_name`
-- **Process**: Vendor creates pricelist, system links to RFP detail
-
-### 4. Purchase Order Creation
-- **Direction**: Outbound
-- **Purpose**: Award leads to PO generation
-- **Key Fields**: `info.award.awarded_vendor_id`, pricelist data
-- **Process**: Winning vendor's pricelist used to create PO
-
-### 5. Notification System
-- **Direction**: Outbound
-- **Purpose**: Automated vendor notifications
-- **Triggers**: RFP creation, reminders, deadline, award
-- **Recipients**: Vendors (detail-level), purchasing staff (header-level)
-
-### 6. Vendor Portal
-- **Direction**: Bidirectional
-- **Purpose**: Vendors access RFP and submit responses
-- **Key Fields**: `info.portal_access_token`
-- **Security**: Token-based secure access per vendor
+### 3. Campaign List Navigation
+- **Entry Points**:
+  - Sidebar: Vendor Management > Requests for Pricing
+  - Direct URL: `/vendor-management/campaigns`
+  - Template link: `/vendor-management/campaigns/new?templateId={id}`
 
 ---
 
-## RFP Workflow & State Management
+## Campaign Lifecycle
 
-### RFP Lifecycle
+### State Machine
 
 ```
-┌──────┐    vendors    ┌────────┐   evaluate   ┌──────────┐
-│ OPEN │    invited   │ CLOSED │───────────────►│ AWARDED  │
-└──────┘──────────────►└────────┘              └──────────┘
-   │                       │                         │
-   │                       │    no award            │
-   │    cancel            └───────────────►┌──────────────┐
-   └────────────────────────────────────────►│  CANCELLED   │
-                                            └──────────────┘
+           ┌──────────┐
+           │  DRAFT   │
+           └────┬─────┘
+                │ launch
+                ▼
+           ┌──────────┐
+     ┌─────│  ACTIVE  │─────┐
+     │     └────┬─────┘     │
+pause│          │           │cancel
+     │          │complete   │
+     ▼          ▼           ▼
+┌──────────┐ ┌──────────┐ ┌──────────┐
+│  PAUSED  │ │COMPLETED │ │CANCELLED │
+└────┬─────┘ └──────────┘ └──────────┘
+     │ resume
+     └───────►┌──────────┐
+              │  ACTIVE  │
+              └──────────┘
 ```
 
 ### Status Descriptions
 
-**OPEN** (`info.status = "open"`):
-- RFP active and accepting responses
-- Vendors can submit/modify responses
-- Reminders sent based on schedule
-- Before `end_date`
+**DRAFT**:
+- Campaign created but not launched
+- All fields can be edited
+- No invitations sent
 
-**CLOSED** (`info.status = "closed"`):
-- RFP past deadline
-- No more responses accepted
-- Ready for evaluation
-- After `end_date`
+**ACTIVE**:
+- Campaign is live
+- Invitations sent to vendors
+- Accepting submissions
+- Limited editing (cannot change vendors/template)
 
-**AWARDED** (`info.status = "awarded"`):
-- Winning vendor selected
-- Award information populated in `info.award`
-- Purchase order may be generated
-- Final state (successful)
+**PAUSED**:
+- Campaign temporarily suspended
+- No reminders sent
+- Can be resumed
 
-**CANCELLED** (`info.status = "cancelled"`):
-- RFP terminated without award
-- May occur at any stage
-- Reason documented
-- Final state (unsuccessful)
+**COMPLETED**:
+- Campaign finished successfully
+- Read-only state
+- Progress metrics finalized
 
-### Vendor Response States
+**CANCELLED**:
+- Campaign terminated
+- Read-only state
+- May occur from any state
 
-**PENDING** (`info.response_status = "pending"`):
-- Invitation sent, no response yet
-- Portal access available
-- Reminders active
+---
 
-**SUBMITTED** (`info.response_status = "submitted"`):
-- Vendor submitted pricelist
-- `pricelist_id` populated
-- Ready for evaluation
+## UI Data Mapping
 
-**DECLINED** (`info.response_status = "declined"`):
-- Vendor actively declined to participate
-- Reason may be documented
-- No further reminders
+### Campaign List Page
+- **Route**: `/vendor-management/campaigns`
+- **Data Source**: Array of PriceCollectionCampaign
+- **Display Fields**: name, status, description, scheduledStart, progress
 
-**EXPIRED** (`info.response_status = "expired"`):
-- Deadline passed with no response
-- Considered non-responsive
-- Excluded from evaluation
+### Campaign Create Page
+- **Route**: `/vendor-management/campaigns/new`
+- **Step 1**: name, description, priority, scheduledStart, scheduledEnd
+- **Step 2**: template selection from available templates
+- **Step 3**: vendor selection with search/filter
+- **Step 4**: Review all selections, launch campaign
+
+### Campaign Detail Page
+- **Route**: `/vendor-management/campaigns/[id]`
+- **Overview Tab**: Campaign details, performance summary
+- **Vendors Tab**: Vendor list with individual status and actions
+- **Settings Tab**: Campaign configuration display
 
 ---
 
 ## Performance Considerations
 
-### Indexing Strategy
-1. **RFP Lookup**: `request_for_pricing_id` (composite index exists)
-2. **Vendor Lookup**: `vendor_id` (composite index exists)
-3. **Timeline Queries**: `start_date`, `end_date` - **NEEDS INDEX**
-4. **Status Filtering**: JSONB index on `info.status` - **NEEDS INDEX**
+### Indexing Recommendations
+1. **Campaign Status**: Index on `status` for filtering
+2. **Timeline**: Composite index on `scheduledStart, scheduledEnd`
+3. **Creator**: Index on `createdBy` for user-specific queries
 
-### Recommended Additional Indexes
+### Query Patterns
+
+**Active Campaigns**:
 ```
-CREATE INDEX idx_rfp_timeline
-  ON tb_request_for_pricing(start_date, end_date)
-  WHERE deleted_at IS NULL;
-
-CREATE INDEX idx_rfp_status
-  ON tb_request_for_pricing((info->>'status'))
-  WHERE deleted_at IS NULL;
-
-CREATE INDEX idx_rfp_detail_response_status
-  ON tb_request_for_pricing_detail((info->>'response_status'))
-  WHERE deleted_at IS NULL;
+Filter: status = 'active' AND scheduledEnd > now()
+Sort: scheduledEnd ASC (soonest deadline first)
 ```
 
-### Query Optimization
-
-**Active RFPs**:
-```sql
-SELECT *
-FROM tb_request_for_pricing
-WHERE info->>'status' = 'open'
-  AND deleted_at IS NULL
-  AND end_date > CURRENT_TIMESTAMP
-ORDER BY end_date;
+**User's Campaigns**:
+```
+Filter: createdBy = currentUser
+Sort: createdAt DESC (most recent first)
 ```
 
-**Vendor Response Rate**:
-```sql
-SELECT
-  r.id,
-  COUNT(d.id) as total_vendors,
-  COUNT(d.pricelist_id) as responses_received,
-  ROUND(COUNT(d.pricelist_id)::numeric / COUNT(d.id) * 100, 2) as response_rate
-FROM tb_request_for_pricing r
-JOIN tb_request_for_pricing_detail d ON r.id = d.request_for_pricing_id
-WHERE r.deleted_at IS NULL AND d.deleted_at IS NULL
-GROUP BY r.id;
+**Campaign Progress**:
+```
+Aggregation: Calculate completionRate and responseRate
+Update: On each vendor submission
 ```
 
 ---
 
 ## Security & Access Control
 
-### Field-Level Security
-- **Public (via portal)**: RFP title, description, timeline, product requirements
-- **Vendor-specific**: Contact info, portal token, own response data
-- **Internal Only**: Evaluation scores, comparison data, award decisions
+### Role-Based Access
 
-### Row-Level Security
-- **Vendor Portal**: Vendors can only view/edit their own RFP detail row
-- **Department Access**: Filtered by `dimension.department_id`
-- **Role-Based**:
-  - Purchasing Staff: Create RFPs, view all responses
-  - Purchasing Manager: Evaluate, compare, award
-  - Finance: View awarded RFPs and values
-  - Vendors: View invited RFPs via portal token only
+| Role | Permissions |
+|------|-------------|
+| Procurement Staff | Create, edit drafts, view all, invite vendors, send reminders |
+| Procurement Manager | All staff permissions + delete, approve, modify active |
 
-### Portal Security
-- **Token-Based Access**: Unique `portal_access_token` per vendor per RFP
-- **Token Expiration**: Tokens expire after RFP end_date
-- **Activity Tracking**: `portal_last_viewed` tracks vendor engagement
-- **IP Restriction**: Optional IP whitelist per vendor
+### Data Access Rules
+- Campaigns visible based on user's department/location context
+- Vendor pricing data confidential
+- Progress metrics visible to campaign creators and managers
 
 ---
 
-## Audit & Compliance
+## Sample Data Structure
 
-### Change Tracking
-- **Version Control**: `doc_version` incremented on each update
-- **User Tracking**: Full audit trail of creators and editors
-- **Response Tracking**: Submission timestamps preserved
-- **Award Tracking**: Complete history of award decisions
+### Campaign Example
 
-### Compliance Requirements
-- **Fair Competition**: All vendors receive same information and deadline
-- **Transparency**: Evaluation criteria documented before opening RFP
-- **Audit Trail**: Complete history of communications and decisions
-- **Data Retention**: Preserve all RFP data for audit periods (typically 7 years)
-
----
-
-## Sample Data Scenarios
-
-### Scenario 1: Simple RFP Flow
-
-```
-RFP Header:
-- pricelist_template_id: "uuid-template-123"
-- start_date: 2025-01-01
-- end_date: 2025-01-15
-- info.status: "open"
-- info.rfp_number: "RFP-2025-000001"
-
-RFP Details (3 vendors invited):
-1. Vendor A: status "submitted", pricelist_id set, evaluation_scores populated
-2. Vendor B: status "submitted", pricelist_id set, evaluation_scores populated
-3. Vendor C: status "pending", no response
-
-Award:
-- info.award.awarded_vendor_id: Vendor A
-- info.award.award_reason: "Best price-quality combination"
-- info.award.total_award_value: 15000.00
-```
-
-### Scenario 2: Complex Evaluation
-
-```
-RFP Detail (Vendor A):
-- info.response_status: "submitted"
-- info.evaluation_scores: {
-    price_score: 85,      (60% weight)
-    quality_score: 90,    (25% weight)
-    delivery_score: 75,   (15% weight)
-    total_score: 84.25,
-    rank: 1
-  }
-- info.price_comparison: {
-    total_quoted: 14200.00,
-    vs_average: -8.5%,
-    vs_lowest: 0% (this is lowest),
-    competitive_items: 48/50
-  }
-- info.compliance_check: {
-    all_items_quoted: true,
-    valid_certifications: true,
-    delivery_acceptable: true,
-    payment_terms_acceptable: true
-  }
+```json
+{
+  "id": "camp-001",
+  "name": "Q1 2025 Kitchen Supplies Pricing",
+  "description": "Quarterly pricing collection for kitchen supplies",
+  "status": "active",
+  "campaignType": "recurring",
+  "selectedVendors": ["vendor-001", "vendor-002", "vendor-003"],
+  "selectedCategories": ["Kitchen Equipment", "Utensils"],
+  "scheduledStart": "2025-01-01T00:00:00Z",
+  "scheduledEnd": "2025-01-15T23:59:59Z",
+  "recurringPattern": {
+    "frequency": "quarterly",
+    "interval": 1,
+    "dayOfMonth": 1
+  },
+  "progress": {
+    "totalVendors": 3,
+    "invitedVendors": 3,
+    "respondedVendors": 2,
+    "completedSubmissions": 1,
+    "pendingSubmissions": 1,
+    "failedSubmissions": 0,
+    "completionRate": 33,
+    "responseRate": 67,
+    "averageResponseTime": 48,
+    "lastUpdated": "2025-01-10T14:30:00Z"
+  },
+  "settings": {
+    "portalAccessDuration": 30,
+    "allowedSubmissionMethods": ["manual", "upload"],
+    "requireApproval": false,
+    "autoReminders": true,
+    "reminderSchedule": {
+      "enabled": true,
+      "intervals": [7, 3, 1],
+      "escalation": {
+        "enabled": true,
+        "overdueThreshold": 3,
+        "recipients": ["manager@example.com"]
+      }
+    },
+    "priority": "medium"
+  },
+  "template": {
+    "id": "template-001",
+    "name": "Kitchen Supplies Template"
+  },
+  "createdBy": "user@example.com",
+  "createdAt": "2024-12-20T10:00:00Z",
+  "updatedAt": "2025-01-10T14:30:00Z"
+}
 ```
 
 ---
 
-## Migration Notes
-
-### From DS to DD
-- **Date**: 2025-11-15
-- **Schema Source**: `data-struc/schema.prisma` lines 2196-2253
-- **Coverage**: ⚠️ 40% - Core tables exist, functionality in JSONB
-- **Existing**: RFP header and detail tables
-- **JSONB Usage**: Response tracking, evaluation, comparison, awards
-
-### Future Enhancements
-1. **Separate Response Table**: If query performance becomes issue
-2. **Separate Evaluation Table**: For multi-evaluator support
-3. **Separate Award Table**: For award analytics
-4. **Response Versioning**: Track vendor response changes
-5. **Collaborative Evaluation**: Multiple evaluators with weighted scores
-
----
-
-## Document Metadata
-
-**Created**: 2025-11-15
-**Schema Version**: As of schema.prisma commit 9fbc771
-**Coverage**: 2 entities from schema.prisma + JSONB analysis
-**Status**: Active - Current JSONB approach is sufficient
-**Enhancement Status**: Proposed tables documented for future consideration
+## Related Documents
+- [BR-requests-for-pricing.md](./BR-requests-for-pricing.md) - Business Requirements v2.0.0
+- [FD-requests-for-pricing.md](./FD-requests-for-pricing.md) - Flow Diagrams
+- [TS-requests-for-pricing.md](./TS-requests-for-pricing.md) - Technical Specification
+- [UC-requests-for-pricing.md](./UC-requests-for-pricing.md) - Use Cases
+- [VAL-requests-for-pricing.md](./VAL-requests-for-pricing.md) - Validations
 
 ---
 

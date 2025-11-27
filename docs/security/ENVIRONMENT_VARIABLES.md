@@ -1,5 +1,10 @@
 # Environment Variables Reference
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 Complete reference for all environment variables used in Carmen ERP security and configuration.
 
 ## Table of Contents

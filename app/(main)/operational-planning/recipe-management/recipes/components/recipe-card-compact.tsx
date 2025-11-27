@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Recipe } from "@/app/(main)/operational-planning/recipe-management/recipes/data/mock-recipes"
+import { Recipe } from '@/lib/types'
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -51,30 +51,32 @@ export function RecipeCardCompact({ recipe }: RecipeCardCompactProps) {
         <div className="mt-2 text-sm text-muted-foreground">
           <div className="flex justify-between">
             <span>Cost/Portion</span>
-            <span className="font-medium">${recipe.costPerPortion.toFixed(2)}</span>
+            <span className="font-medium">${recipe.costPerPortion.amount.toFixed(2)}</span>
           </div>
           <div className="flex justify-between">
             <span>Selling Price</span>
-            <span className="font-medium">${recipe.sellingPrice.toFixed(2)}</span>
+            <span className="font-medium">
+              {recipe.yieldVariants[0]?.sellingPrice
+                ? `$${recipe.yieldVariants[0].sellingPrice.amount.toFixed(2)}`
+                : 'N/A'}
+            </span>
           </div>
           <div className="flex justify-between">
             <span>Margin</span>
-            <span className="font-medium">{recipe.grossMargin.toFixed(1)}%</span>
-          </div>
-          <div className="text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <span>CO₂eq per Portion:</span>
-              <span className="font-medium">{recipe.carbonFootprint} kg</span>
-            </div>
+            <span className="font-medium">
+              {recipe.yieldVariants[0]?.marginPercentage
+                ? `${recipe.yieldVariants[0].marginPercentage.toFixed(1)}%`
+                : 'N/A'}
+            </span>
           </div>
         </div>
         <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
           <Badge variant="secondary" className="font-normal">
-            {recipe.category}
+            {recipe.categoryId}
           </Badge>
-          {recipe.cuisine && (
+          {recipe.cuisineTypeId && (
             <Badge variant="secondary" className="font-normal">
-              {recipe.cuisine}
+              {recipe.cuisineTypeId}
             </Badge>
           )}
         </div>

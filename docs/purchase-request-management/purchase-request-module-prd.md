@@ -1,4 +1,9 @@
 # Product Requirements Document (PRD)
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 # Carmen Hospitality Supply Chain System
 # Purchase Request Module
 

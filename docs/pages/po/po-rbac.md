@@ -1,5 +1,10 @@
 # Purchase Order Module: RBAC (Role-Based Access Control) Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## 1. Overview
 
 This document defines the comprehensive Role-Based Access Control (RBAC) implementation for the Purchase Order module, including role definitions, permission matrices, field-level security, and dynamic access control rules.

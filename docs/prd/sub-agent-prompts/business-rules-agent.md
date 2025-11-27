@@ -1,5 +1,10 @@
 # Business Rules Agent Prompt
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Agent Purpose
 Create comprehensive business rules documentation based on actual source code implementation and observable system behavior using the business-rules-prompt-template.md methodology.
 

@@ -23,7 +23,7 @@ This document describes all use cases for the Unit Management sub-module within 
 **Related Documents**:
 - [Business Requirements](./BR-units.md)
 - [Technical Specification](./TS-units.md)
-- [Data Schema](./DS-units.md)
+- [Data Dictionary](./DD-units.md)
 - [Flow Diagrams](./FD-units.md)
 - [Validations](./VAL-units.md)
 

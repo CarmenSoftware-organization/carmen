@@ -1,5 +1,10 @@
 # Carmen - F&B Management System Overview
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Introduction
 
 Carmen is a comprehensive enterprise resource planning (ERP) system designed specifically for food service operations. Built with Next.js 13+ App Router architecture, the system provides end-to-end management of F&B operations, from procurement to inventory management and financial control.

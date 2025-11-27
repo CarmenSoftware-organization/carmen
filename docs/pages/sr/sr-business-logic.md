@@ -1,5 +1,10 @@
 # Store Requisition: Business Logic
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document outlines the business logic, rules, and constraints for the Store Requisition (SR) module.
 
 ## 1. SR Creation and Submission

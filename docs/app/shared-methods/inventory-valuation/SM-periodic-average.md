@@ -2,6 +2,12 @@
 
 **📌 Schema Reference**: Data structures defined in `/app/data-struc/schema.prisma`
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+
 ## Overview
 
 Periodic Average (database value: **AVG**) is a simplified inventory costing method that calculates a **single average unit cost per period** and applies it uniformly to all transactions within that period. This document provides comprehensive details on implementation, calculation, and usage.

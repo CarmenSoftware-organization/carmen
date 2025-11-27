@@ -6,6 +6,11 @@
 - **Last Updated**: 2025-01-16
 - **Status**: Active
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 The Workflow Management module provides a comprehensive system for configuring and managing approval workflows for hospitality business processes. It enables administrators to define multi-stage approval workflows with dynamic routing, SLA management, user assignments, and automated notifications to streamline procurement and operational processes.
@@ -40,8 +45,6 @@ The Workflow Management system aims to:
 4. Support role-based assignments with department and location context
 5. Maintain comprehensive audit trails for all workflow activities
 6. Integrate with procurement and operational modules
-
----
 
 ## Functional Requirements
 

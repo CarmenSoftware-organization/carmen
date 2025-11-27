@@ -8,6 +8,11 @@
 **Last Updated**: 2024-12-23
 **Status**: Active Development
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ### Purpose
 The Purchase Request Module is a comprehensive procurement initiation system that allows users to create, submit, approve, and track purchase requests throughout the organization's approval workflow.
 

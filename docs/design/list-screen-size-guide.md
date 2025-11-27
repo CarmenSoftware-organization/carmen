@@ -4,6 +4,11 @@
 
 This guide establishes the consistent sizing and spacing standards for all list/table screens in the Carmen ERP system, based on the optimized Categories page implementation.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## 🎯 Core Principles

@@ -2,6 +2,12 @@
 
 **📌 Schema Reference**: Data structures defined in `/app/data-struc/schema.prisma`
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+
 ## Overview
 
 This document provides the technical API reference for the centralized Inventory Valuation Service and related services.

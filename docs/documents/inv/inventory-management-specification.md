@@ -154,6 +154,11 @@ The Stock Overview module provides comprehensive inventory reporting and analysi
 
 ### Overview Dashboard (`/inventory-management/stock-overview/`)
 **Status**: Coming Soon placeholder page
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Future Features**:
 - Summary cards with key metrics
 - Quick access to all sub-modules

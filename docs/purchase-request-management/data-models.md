@@ -1,5 +1,10 @@
 # Purchase Request Module - Data Models
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document provides a comprehensive overview of the data models used in the Purchase Request (PR) module. It includes detailed information about the interfaces, their relationships, and usage guidelines.
 
 ## 1. Core Interfaces

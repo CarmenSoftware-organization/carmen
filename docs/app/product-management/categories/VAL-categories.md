@@ -2,10 +2,11 @@
 
 **Module**: Product Management
 **Sub-Module**: Product Categories
+**Route**: `/product-management/categories`
 **Document Type**: Validations (VAL)
 **Version**: 1.0.0
-**Last Updated**: 2025-02-11
-**Status**: Draft
+**Last Updated**: 2025-11-26
+**Status**: Approved
 
 ---
 
@@ -1608,7 +1609,7 @@ Legend:
 - **Business Requirements**: [BR-categories.md](./BR-categories.md) - Business rules and functional requirements
 - **Use Cases**: [UC-categories.md](./UC-categories.md) - Detailed use case scenarios
 - **Technical Specification**: [TS-categories.md](./TS-categories.md) - Technical implementation details
-- **Data Definition**: [DS-categories.md](./DS-categories.md) - Complete database schema
+- **Data Dictionary**: [DD-categories.md](./DD-categories.md) - Complete database schema
 - **Flow Diagrams**: [FD-categories.md](./FD-categories.md) - Visual process flows and workflows
 
 ---

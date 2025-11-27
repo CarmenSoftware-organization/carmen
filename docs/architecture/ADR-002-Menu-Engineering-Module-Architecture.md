@@ -1,6 +1,11 @@
 # ADR-002: Menu Engineering Module Architecture
 
 **Status**: Implemented  
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 **Date**: December 2024  
 **Decision Makers**: Carmen ERP Architecture Team  
 **Stakeholders**: Restaurant Operations, Finance, IT Operations

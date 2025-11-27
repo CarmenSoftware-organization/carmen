@@ -1,5 +1,10 @@
 # FIFO Inventory Calculation Business Logic
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 
 This document visualizes the comprehensive business logic for inventory management using the First-In, First-Out (FIFO) costing method. The system is built on three core pillars:

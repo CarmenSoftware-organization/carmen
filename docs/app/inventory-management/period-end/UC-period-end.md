@@ -17,6 +17,11 @@
 5. [System Use Cases](#system-use-cases)
 6. [Integration Use Cases](#integration-use-cases)
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Overview

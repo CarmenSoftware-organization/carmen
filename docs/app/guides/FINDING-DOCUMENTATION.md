@@ -2,6 +2,11 @@
 
 **Master the Carmen documentation system** to quickly find what you need from 247 files.
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
 ## Documentation System Overview

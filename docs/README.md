@@ -1,5 +1,10 @@
 # Carmen F&B Management System Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This directory contains comprehensive documentation for the Carmen F&B Management System, including business requirements, technical specifications, and design documents.
 
 ## Documentation Structure

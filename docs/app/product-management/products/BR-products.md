@@ -14,8 +14,6 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-02-11 | System | Initial business requirements documentation |
 
----
-
 ## Overview
 
 The Products sub-module serves as the central repository for all product information within the CARMEN hospitality ERP system. It provides comprehensive product master data management capabilities that are utilized across all operational modules including Procurement, Inventory Management, Recipe Management, Store Operations, Sales, and Finance.

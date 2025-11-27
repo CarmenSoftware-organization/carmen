@@ -1,5 +1,10 @@
 # Purchase Request (PR) Details UI/UX Specification
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 This document defines the user experience goals, information architecture, user flows, and visual design specifications for the Purchase Request Details interface. It serves as the foundation for visual design and frontend development, ensuring a cohesive and user-centered experience.
 
 ## Overall UX Goals & Principles

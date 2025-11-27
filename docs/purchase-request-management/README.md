@@ -1,5 +1,10 @@
 # Purchase Request (PR) Module Documentation
 
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ## Overview
 This directory contains comprehensive documentation for the Purchase Request (PR) module of the Carmen F&B Management System. The PR module enables users to create, manage, and process purchase requests throughout their lifecycle.
 

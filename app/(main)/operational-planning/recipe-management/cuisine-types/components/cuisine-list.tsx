@@ -58,7 +58,8 @@ import {
   LayoutGrid,
   LayoutList,
 } from "lucide-react"
-import { RecipeCuisine, mockCuisines } from "../data/mock-cuisines"
+import { CuisineType } from "@/lib/types"
+import { mockCuisines } from "@/lib/mock-data"
 import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AlertCircle } from "lucide-react"
@@ -69,6 +70,16 @@ interface FilterCondition {
   field: string
   operator: string
   value: string
+}
+
+// Extended cuisine type with UI-specific properties
+interface CuisineFormData extends Omit<Partial<CuisineType>, 'id'> {
+  id: string; // id is required
+  recipeCount?: number;
+  activeRecipeCount?: number;
+  lastUpdated?: string;
+  popularDishes?: string[];
+  keyIngredients?: string[];
 }
 
 const FILTER_FIELDS = [
@@ -101,24 +112,24 @@ const REGIONS = [
 ]
 
 export function CuisineList() {
-  const [cuisines] = useState<RecipeCuisine[]>(mockCuisines)
+  const [cuisines] = useState<CuisineFormData[]>(mockCuisines as CuisineFormData[])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([])
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [selectedCuisine, setSelectedCuisine] = useState<RecipeCuisine | null>(null)
+  const [selectedCuisine, setSelectedCuisine] = useState<CuisineFormData | null>(null)
   const [isAdvancedFilterOpen, setIsAdvancedFilterOpen] = useState(false)
   const [filterConditions, setFilterConditions] = useState<FilterCondition[]>([])
   const [quickFilters, setQuickFilters] = useState<string[]>([])
-  const [formData, setFormData] = useState<Partial<RecipeCuisine>>({
+  const [formData, setFormData] = useState<CuisineFormData>({
+    id: "",
     name: "",
     code: "",
     description: "",
     region: "",
-    status: "active",
-    popularDishes: [],
-    keyIngredients: [],
+    isActive: true,
+    displayOrder: 0,
   })
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const [isLoading, setIsLoading] = useState(false)
@@ -175,7 +186,7 @@ export function CuisineList() {
     }
   }
 
-  const handleEdit = (cuisine: RecipeCuisine) => {
+  const handleEdit = (cuisine: CuisineFormData) => {
     setSelectedCuisine(cuisine)
     setFormData({
       ...cuisine,
@@ -183,20 +194,20 @@ export function CuisineList() {
     setIsEditDialogOpen(true)
   }
 
-  const handleDelete = (cuisine: RecipeCuisine) => {
+  const handleDelete = (cuisine: CuisineFormData) => {
     setSelectedCuisine(cuisine)
     setIsDeleteDialogOpen(true)
   }
 
   const handleCreate = () => {
     setFormData({
+      id: "",
       name: "",
       code: "",
       description: "",
       region: "",
-      status: "active",
-      popularDishes: [],
-      keyIngredients: [],
+      isActive: true,
+      displayOrder: 0,
     })
     setIsCreateDialogOpen(true)
   }
@@ -213,13 +224,13 @@ export function CuisineList() {
     
     // Reset form
     setFormData({
+      id: "",
       name: "",
       code: "",
       description: "",
       region: "",
-      status: "active",
-      popularDishes: [],
-      keyIngredients: [],
+      isActive: true,
+      displayOrder: 0,
     })
   }
 
@@ -259,18 +270,18 @@ export function CuisineList() {
     }
   }
 
-  const applyFilters = (cuisine: RecipeCuisine) => {
+  const applyFilters = (cuisine: CuisineFormData) => {
     // Quick filters
     if (quickFilters.length > 0) {
-      if (quickFilters.includes('noRecipes') && cuisine.recipeCount > 0) return false
-      if (quickFilters.includes('hasRecipes') && cuisine.recipeCount === 0) return false
+      if (quickFilters.includes('noRecipes') && (cuisine.recipeCount ?? 0) > 0) return false
+      if (quickFilters.includes('hasRecipes') && (cuisine.recipeCount ?? 0) === 0) return false
       if (quickFilters.includes('asian') && cuisine.region !== 'Asia') return false
       if (quickFilters.includes('european') && cuisine.region !== 'Europe') return false
     }
 
     // Advanced filters
     return filterConditions.every((condition) => {
-      const fieldValue = cuisine[condition.field as keyof RecipeCuisine]
+      const fieldValue = cuisine[condition.field as keyof CuisineFormData]
       
       switch (condition.operator) {
         case "contains":
@@ -300,9 +311,9 @@ export function CuisineList() {
     setQuickFilters([])
   }
 
-  const filteredCuisines = cuisines.filter(cuisine => 
-    (cuisine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     cuisine.code.toLowerCase().includes(searchTerm.toLowerCase())) &&
+  const filteredCuisines = cuisines.filter(cuisine =>
+    (cuisine.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     cuisine.code?.toLowerCase().includes(searchTerm.toLowerCase())) &&
     applyFilters(cuisine)
   )
 
@@ -706,8 +717,8 @@ export function CuisineList() {
                         <TableCell className="max-w-[300px] truncate">{cuisine.description}</TableCell>
                         <TableCell>{cuisine.region}</TableCell>
                         <TableCell>
-                          <Badge variant={cuisine.status === "active" ? "default" : "secondary"}>
-                            {cuisine.status}
+                          <Badge variant={cuisine.isActive ? "default" : "secondary"}>
+                            {cuisine.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">{cuisine.recipeCount}</TableCell>
@@ -811,8 +822,8 @@ export function CuisineList() {
                       <p className="text-sm text-muted-foreground truncate">{cuisine.code}</p>
                       <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{cuisine.description}</p>
                       <div className="mt-4 flex items-center justify-between">
-                        <Badge variant={cuisine.status === "active" ? "default" : "secondary"}>
-                          {cuisine.status}
+                        <Badge variant={cuisine.isActive ? "default" : "secondary"}>
+                          {cuisine.isActive ? "Active" : "Inactive"}
                         </Badge>
                         <span className="text-sm text-muted-foreground">{cuisine.region}</span>
                       </div>
@@ -892,17 +903,17 @@ export function CuisineList() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
+                <Label htmlFor="isActive">Status</Label>
                 <Select
-                  value={formData.status}
-                  onValueChange={(value: 'active' | 'inactive') => setFormData({ ...formData, status: value })}
+                  value={formData.isActive ? "true" : "false"}
+                  onValueChange={(value: string) => setFormData({ ...formData, isActive: value === "true" })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="true">Active</SelectItem>
+                    <SelectItem value="false">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
