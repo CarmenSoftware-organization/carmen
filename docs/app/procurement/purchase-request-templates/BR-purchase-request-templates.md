@@ -397,7 +397,7 @@ interface TemplateItem {
 }
 ```
 
-### Department Entity (Reference)
+### Department Data Definition (Reference)
 
 ```typescript
 interface Department {

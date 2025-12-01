@@ -16,7 +16,6 @@ import {
   Layers,
   Users,
   Package,
-  Truck,
 } from "lucide-react"
 import {
   AlertDialog,
@@ -33,7 +32,6 @@ import {
   getShelvesForLocation,
   getUserAssignmentsForLocation,
   getProductAssignmentsForLocation,
-  getDeliveryPointsForLocation,
 } from "@/lib/mock-data/inventory-locations"
 import {
   LOCATION_TYPE_LABELS,
@@ -43,7 +41,6 @@ import { GeneralTab } from "../components/tabs/general-tab"
 import { ShelvesTab } from "../components/tabs/shelves-tab"
 import { UsersTab } from "../components/tabs/users-tab"
 import { ProductsTab } from "../components/tabs/products-tab"
-import { DeliveryPointsTab } from "../components/tabs/delivery-points-tab"
 
 export default function LocationDetailPage() {
   const params = useParams()
@@ -61,7 +58,6 @@ export default function LocationDetailPage() {
   const shelves = useMemo(() => getShelvesForLocation(locationId), [locationId])
   const userAssignments = useMemo(() => getUserAssignmentsForLocation(locationId), [locationId])
   const productAssignments = useMemo(() => getProductAssignmentsForLocation(locationId), [locationId])
-  const deliveryPoints = useMemo(() => getDeliveryPointsForLocation(locationId), [locationId])
 
   if (!location) {
     return (
@@ -192,7 +188,7 @@ export default function LocationDetailPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="p-4 rounded-lg border bg-card">
           <div className="flex items-center gap-2 text-muted-foreground mb-1">
             <Layers className="h-4 w-4" />
@@ -214,13 +210,6 @@ export default function LocationDetailPage() {
           </div>
           <p className="text-2xl font-semibold">{location.assignedUsersCount}</p>
         </div>
-        <div className="p-4 rounded-lg border bg-card">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <Truck className="h-4 w-4" />
-            <span className="text-sm">Delivery Points</span>
-          </div>
-          <p className="text-2xl font-semibold">{deliveryPoints.length}</p>
-        </div>
       </div>
 
       {/* Tabs */}
@@ -241,10 +230,6 @@ export default function LocationDetailPage() {
           <TabsTrigger value="products" className="gap-2">
             <Package className="h-4 w-4" />
             Products ({productAssignments.length})
-          </TabsTrigger>
-          <TabsTrigger value="delivery-points" className="gap-2">
-            <Truck className="h-4 w-4" />
-            Delivery Points ({deliveryPoints.length})
           </TabsTrigger>
         </TabsList>
 
@@ -273,14 +258,6 @@ export default function LocationDetailPage() {
             locationId={locationId}
             assignments={productAssignments}
             shelves={shelves}
-            isEditing={isEditing}
-          />
-        </TabsContent>
-
-        <TabsContent value="delivery-points">
-          <DeliveryPointsTab
-            locationId={locationId}
-            deliveryPoints={deliveryPoints}
             isEditing={isEditing}
           />
         </TabsContent>

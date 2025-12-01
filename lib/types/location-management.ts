@@ -144,6 +144,10 @@ export interface InventoryLocation {
   consignmentVendorId?: string
   consignmentVendorName?: string
 
+  // Delivery point reference
+  deliveryPointId?: string
+  deliveryPointName?: string
+
   // Counts for summary display
   shelvesCount: number
   assignedUsersCount: number

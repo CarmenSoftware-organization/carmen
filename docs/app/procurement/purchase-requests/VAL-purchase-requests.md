@@ -3,8 +3,8 @@
 **Module**: Procurement
 **Sub-Module**: Purchase Requests
 **Document Type**: Validations (VAL)
-**Version**: 1.1.0
-**Last Updated**: 2025-11-26
+**Version**: 1.6.0
+**Last Updated**: 2025-11-28
 **Status**: Active
 
 ## Document History
@@ -13,6 +13,11 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 | 1.1.0 | 2025-11-26 | Documentation Team | Synced with BR - updated status values, added implementation markers |
+| 1.2.0 | 2025-11-28 | Documentation Team | Added purchasing staff edit mode validation rules (VAL-PR-044 to VAL-PR-052) |
+| 1.3.0 | 2025-11-28 | Development Team | Added Returned status, workflow action button validations (VAL-PR-108A to 108D) |
+| 1.4.0 | 2025-11-28 | Development Team | Added VAL-PR-304A: Status-Based Edit Permission with Editable Status Matrix |
+| 1.5.0 | 2025-11-28 | Development Team | Added VAL-PR-400 series: Bulk Item Action validations for selection, permissions, and action-specific rules |
+| 1.6.0 | 2025-11-28 | Development Team | Added VAL-PR-500 series: Budget Tab CRUD validations for budget allocation management |
 
 ---
 
@@ -71,6 +76,7 @@ Per BR-purchase-requests.md, the following are the only valid status values:
 |--------|-------------|
 | Draft | Initial state, PR being created/edited |
 | In-progress | PR submitted and in approval workflow |
+| Returned | PR returned for revision by approver or purchasing staff |
 | Approved | All required approvals obtained |
 | Void | PR rejected during approval process |
 | Completed | PR converted to Purchase Order |
@@ -857,6 +863,366 @@ Per BR-purchase-requests.md, the following are the only valid status values:
 
 ---
 
+### VAL-PR-044: Tax Profile Selection Validation
+
+**Field**: `tax_profile`
+**Database Column**: `purchase_request_items.tax_profile`
+**Data Type**: VARCHAR(20) / string
+
+**Validation Rule**: Tax profile must be one of the predefined tax profiles: VAT, GST, SST, WHT, or None.
+
+**Rationale**: Ensures tax calculations follow predefined rates and comply with regional tax requirements.
+
+**Implementation Requirements**:
+- **Client-Side**: Dropdown with predefined tax profiles only. Default to "VAT".
+- **Server-Side**: Verify value is one of the allowed profiles.
+- **Database**: CHECK constraint ensuring value IN ('VAT', 'GST', 'SST', 'WHT', 'None').
+
+**Tax Profile Rates**:
+| Profile | Label | Rate |
+|---------|-------|------|
+| VAT | VAT (7%) | 0.07 |
+| GST | GST (10%) | 0.10 |
+| SST | SST (6%) | 0.06 |
+| WHT | WHT (3%) | 0.03 |
+| None | No Tax (0%) | 0.00 |
+
+**Error Code**: VAL-PR-044
+**Error Message**: "Invalid tax profile. Must be VAT, GST, SST, WHT, or None"
+**User Action**: User must select one of the valid tax profiles from the dropdown.
+
+**Role Restrictions**: Only Purchasing Staff, Purchaser, and Procurement Manager can modify this field.
+
+**Test Cases**:
+- ✅ Valid: "VAT"
+- ✅ Valid: "GST"
+- ✅ Valid: "SST"
+- ✅ Valid: "WHT"
+- ✅ Valid: "None"
+- ❌ Invalid: "SALES_TAX" (not in allowed values)
+- ❌ Invalid: null when required for submission
+- ❌ Invalid: Requestor attempts to edit → Permission denied
+
+---
+
+### VAL-PR-045: Tax Rate Auto-Population Validation
+
+**Field**: `tax_rate`
+**Database Column**: `purchase_request_items.tax_rate`
+**Data Type**: DECIMAL(5,4) / number
+
+**Validation Rule**: Tax rate must be auto-populated from the selected tax profile and cannot be manually edited. The rate must match the profile's predefined rate.
+
+**Rationale**: Ensures consistency between tax profile selection and applied tax rate, preventing manual entry errors.
+
+**Implementation Requirements**:
+- **Client-Side**: Tax rate field is read-only. Display "From profile" label. Auto-update when tax profile changes.
+- **Server-Side**: Verify tax_rate matches the rate for selected tax_profile. Reject if mismatch.
+- **Database**: Store as DECIMAL(5,4). Trigger auto-updates rate when profile changes.
+
+**Auto-Population Logic**:
+```
+When tax_profile changes:
+  1. Look up rate from Tax Profile Rates table
+  2. Set tax_rate = profile.rate
+  3. Recalculate tax_amount = subtotal × tax_rate
+```
+
+**Error Code**: VAL-PR-045
+**Error Message**:
+- If mismatch: "Tax rate must match the selected tax profile rate"
+- If manual edit attempted: "Tax rate cannot be manually edited. Change the tax profile instead."
+
+**User Action**: Select appropriate tax profile; rate will auto-populate.
+
+**Test Cases**:
+- ✅ Valid: tax_profile = "VAT" → tax_rate = 0.07
+- ✅ Valid: tax_profile = "GST" → tax_rate = 0.10
+- ✅ Valid: tax_profile = "None" → tax_rate = 0.00
+- ❌ Invalid: tax_profile = "VAT" AND tax_rate = 0.10 → Mismatch error
+- ❌ Invalid: Manual entry of tax_rate → Field is read-only
+
+---
+
+### VAL-PR-046: Tax Amount Override Validation
+
+**Field**: `tax_amount_override`
+**Database Column**: `purchase_request_items.tax_amount_override`
+**Data Type**: DECIMAL(15,2) / number
+
+**Validation Rule**: Tax amount override, if specified, must be a non-negative number with exactly 2 decimal places. When provided, it overrides the calculated tax amount.
+
+**Rationale**: Allows purchasers to override calculated tax for special circumstances (exemptions, negotiated rates, rounding adjustments).
+
+**Implementation Requirements**:
+- **Client-Side**: Optional number input. Show calculated amount vs override. Validate non-negative with 2 decimals.
+- **Server-Side**: If provided, use override instead of calculated. Verify non-negative and precision.
+- **Database**: Store as DECIMAL(15,2). Nullable field (NULL = use calculated).
+
+**Override Logic**:
+```
+effective_tax_amount =
+  IF tax_amount_override IS NOT NULL THEN
+    tax_amount_override
+  ELSE
+    subtotal × tax_rate
+```
+
+**Error Code**: VAL-PR-046
+**Error Message**:
+- If negative: "Tax amount override cannot be negative"
+- If too many decimals: "Tax amount override must have exactly 2 decimal places"
+
+**User Action**: Enter valid override amount or leave empty to use calculated value.
+
+**Role Restrictions**: Only Purchasing Staff, Purchaser, and Procurement Manager can set override values.
+
+**Test Cases**:
+- ✅ Valid: tax_amount_override = 50.00 (overrides calculated)
+- ✅ Valid: tax_amount_override = 0.00 (tax exempt)
+- ✅ Valid: tax_amount_override = NULL (use calculated)
+- ❌ Invalid: tax_amount_override = -10.00 → Negative error
+- ❌ Invalid: tax_amount_override = 50.555 → Precision error
+- ❌ Invalid: Requestor attempts to set override → Permission denied
+
+---
+
+### VAL-PR-047: Discount Amount Override Validation
+
+**Field**: `discount_amount_override`
+**Database Column**: `purchase_request_items.discount_amount_override`
+**Data Type**: DECIMAL(15,2) / number
+
+**Validation Rule**: Discount amount override, if specified, must be a non-negative number with exactly 2 decimal places. The override cannot exceed the line item subtotal.
+
+**Rationale**: Allows purchasers to apply negotiated discounts or promotional rates that differ from percentage-based calculations.
+
+**Implementation Requirements**:
+- **Client-Side**: Optional number input. Validate non-negative, 2 decimals, and not exceeding subtotal.
+- **Server-Side**: Verify constraints. If provided, use override instead of calculated.
+- **Database**: Store as DECIMAL(15,2). Nullable field (NULL = use calculated).
+
+**Override Logic**:
+```
+effective_discount =
+  IF discount_amount_override IS NOT NULL THEN
+    MIN(discount_amount_override, subtotal)  // Cap at subtotal
+  ELSE
+    subtotal × discount_rate
+```
+
+**Error Code**: VAL-PR-047
+**Error Message**:
+- If negative: "Discount amount override cannot be negative"
+- If exceeds subtotal: "Discount amount cannot exceed item subtotal of {subtotal}"
+- If too many decimals: "Discount amount override must have exactly 2 decimal places"
+
+**User Action**: Enter valid override amount within subtotal limit or leave empty.
+
+**Role Restrictions**: Only Purchasing Staff, Purchaser, and Procurement Manager can set override values.
+
+**Test Cases**:
+- ✅ Valid: subtotal = 100.00, discount_amount_override = 25.00
+- ✅ Valid: discount_amount_override = 0.00 (no discount)
+- ✅ Valid: discount_amount_override = NULL (use calculated)
+- ❌ Invalid: discount_amount_override = -5.00 → Negative error
+- ❌ Invalid: subtotal = 100.00, discount_amount_override = 150.00 → Exceeds subtotal
+- ❌ Invalid: Requestor attempts to set override → Permission denied
+
+---
+
+### VAL-PR-048: Purchaser Currency Selection Validation
+
+**Field**: `currency_code` (at line item level)
+**Database Column**: `purchase_request_items.currency_code`
+**Data Type**: VARCHAR(3) / string
+
+**Validation Rule**: Currency code for line items must be a valid 3-letter ISO 4217 currency code. Must match an active currency in the system.
+
+**Rationale**: Enables multi-currency purchasing with proper conversion tracking at the line item level.
+
+**Implementation Requirements**:
+- **Client-Side**: Dropdown showing only active currencies. Default to vendor's preferred currency or system default.
+- **Server-Side**: Verify currency exists and is active in currencies master table.
+- **Database**: Foreign key to currencies table.
+
+**Error Code**: VAL-PR-048
+**Error Message**:
+- If invalid: "Invalid currency code. Must be a valid 3-letter ISO code"
+- If inactive: "Selected currency is not active. Please select an active currency"
+
+**User Action**: Select valid active currency from dropdown.
+
+**Role Restrictions**: Only Purchasing Staff, Purchaser, and Procurement Manager can modify currency.
+
+**Test Cases**:
+- ✅ Valid: "USD" (active currency)
+- ✅ Valid: "EUR" (active currency)
+- ✅ Valid: "THB" (active currency)
+- ❌ Invalid: "US" (not 3 letters)
+- ❌ Invalid: "XYZ" (not valid ISO code)
+- ❌ Invalid: "ABC" where ABC is inactive → Inactive error
+- ❌ Invalid: Requestor attempts to change currency → Permission denied
+
+---
+
+### VAL-PR-049: Purchaser Exchange Rate Validation
+
+**Field**: `exchange_rate` (at line item level)
+**Database Column**: `purchase_request_items.exchange_rate`
+**Data Type**: DECIMAL(15,6) / number
+
+**Validation Rule**: Exchange rate must be a positive number with up to 6 decimal places. Auto-populated from currency master but can be overridden by authorized roles.
+
+**Rationale**: Allows accurate currency conversion with flexibility for negotiated or spot rates.
+
+**Implementation Requirements**:
+- **Client-Side**: Auto-populate from currency master on currency selection. Allow manual override with validation.
+- **Server-Side**: Verify rate > 0. Log all manual overrides for audit.
+- **Database**: Store as DECIMAL(15,6). Default from currency master.
+
+**Error Code**: VAL-PR-049
+**Error Message**:
+- If ≤ 0: "Exchange rate must be a positive number"
+- If too many decimals: "Exchange rate can have at most 6 decimal places"
+
+**User Action**: Accept system rate or enter valid override rate.
+
+**Role Restrictions**: Only Purchasing Staff, Purchaser, and Procurement Manager can modify exchange rate.
+
+**Test Cases**:
+- ✅ Valid: 1.000000 (same currency as base)
+- ✅ Valid: 0.028571 (THB to USD)
+- ✅ Valid: 1.185432 (EUR to USD)
+- ❌ Invalid: 0 → Must be positive
+- ❌ Invalid: -1.5 → Must be positive
+- ❌ Invalid: 1.1234567 → Too many decimals (7)
+- ❌ Invalid: Requestor attempts to change rate → Permission denied
+
+---
+
+### VAL-PR-050: Unit Price Entry Validation (Purchaser Context)
+
+**Field**: `unit_price`
+**Database Column**: `purchase_request_items.unit_price`
+**Data Type**: DECIMAL(15,2) / number
+
+**Validation Rule**: In purchaser edit mode, unit price must be a positive number with exactly 2 decimal places. Required for submission.
+
+**Rationale**: Purchasers must enter accurate pricing from vendor quotes or negotiations.
+
+**Implementation Requirements**:
+- **Client-Side**: Number input with 2 decimal formatting. Show validation error if empty or invalid on submission.
+- **Server-Side**: Verify price > 0 for submission. Allow 0 in draft for placeholder.
+- **Database**: Store as DECIMAL(15,2). NOT NULL for submitted PRs.
+
+**Error Code**: VAL-PR-050
+**Error Message**:
+- If empty/zero on submission: "Unit price is required"
+- If negative: "Unit price cannot be negative"
+- If too many decimals: "Unit price must have exactly 2 decimal places"
+
+**User Action**: Enter valid unit price before submission.
+
+**Role Restrictions**: Only Purchasing Staff, Purchaser, and Procurement Manager can edit unit prices.
+
+**Test Cases**:
+- ✅ Valid: 10.50
+- ✅ Valid: 0.01
+- ✅ Valid: 9999999.99
+- ❌ Invalid: 0.00 on submission → Price required
+- ❌ Invalid: -5.00 → Negative error
+- ❌ Invalid: 10.505 → Precision error
+- ❌ Invalid: Requestor attempts to edit price → Permission denied
+
+---
+
+### VAL-PR-051: Vendor Selection Validation (Purchaser Context)
+
+**Field**: `vendor_id`
+**Database Column**: `purchase_request_items.vendor_id`
+**Data Type**: UUID / string
+
+**Validation Rule**: Vendor must be selected from active vendors in the system. Required when unit price is specified.
+
+**Rationale**: Links pricing to specific vendors for procurement tracking and vendor management.
+
+**Implementation Requirements**:
+- **Client-Side**: Dropdown showing only active vendors. Auto-filter by product category if available.
+- **Server-Side**: Verify vendor exists and is active. Required when unit_price > 0.
+- **Database**: Foreign key to vendors table. Nullable for draft items.
+
+**Vendor-Price Dependency**:
+```
+IF unit_price > 0 THEN
+  vendor_id IS REQUIRED
+```
+
+**Error Code**: VAL-PR-051
+**Error Message**:
+- If missing with price: "Vendor is required when unit price is specified"
+- If inactive: "Selected vendor is not active"
+- If not found: "Selected vendor not found in system"
+
+**User Action**: Select valid active vendor from dropdown when entering prices.
+
+**Role Restrictions**: Only Purchasing Staff, Purchaser, and Procurement Manager can select/change vendor.
+
+**Test Cases**:
+- ✅ Valid: vendor_id = UUID of active vendor, unit_price = 10.50
+- ✅ Valid: vendor_id = NULL, unit_price = 0.00 (draft)
+- ❌ Invalid: vendor_id = NULL, unit_price = 10.50 → Vendor required
+- ❌ Invalid: vendor_id of inactive vendor → Inactive error
+- ❌ Invalid: vendor_id not in vendors table → Not found error
+- ❌ Invalid: Requestor attempts to select vendor → Permission denied
+
+---
+
+### VAL-PR-052: Role-Based Field Edit Permission Validation
+
+**Fields**: Multiple (vendor, currency, pricing, tax, discount fields)
+**Database Columns**: Various in `purchase_request_items` table
+**Data Type**: Multiple
+
+**Validation Rule**: Certain fields can only be edited by specific roles. Unauthorized edits must be rejected.
+
+**Rationale**: Enforces separation of duties between requestors and purchasers in the procurement process.
+
+**Role Permissions Matrix**:
+
+| Field | Requestor | Purchasing Staff | Purchaser | Procurement Manager |
+|-------|-----------|------------------|-----------|---------------------|
+| vendor_id | ❌ | ✅ | ✅ | ✅ |
+| currency_code | ❌ | ✅ | ✅ | ✅ |
+| exchange_rate | ❌ | ✅ | ✅ | ✅ |
+| unit_price | ❌ | ✅ | ✅ | ✅ |
+| tax_profile | ❌ | ✅ | ✅ | ✅ |
+| tax_amount_override | ❌ | ✅ | ✅ | ✅ |
+| discount_rate | ❌ | ✅ | ✅ | ✅ |
+| discount_amount_override | ❌ | ✅ | ✅ | ✅ |
+| quantity | ✅ | ✅ | ✅ | ✅ |
+| description | ✅ | ✅ | ✅ | ✅ |
+| specifications | ✅ | ✅ | ✅ | ✅ |
+
+**Implementation Requirements**:
+- **Client-Side**: Hide or disable fields based on user role. Show "Purchaser only" tooltip for restricted fields.
+- **Server-Side**: Check user role before allowing field updates. Reject unauthorized changes with 403.
+- **Database**: RLS policies enforce role-based restrictions.
+
+**Error Code**: VAL-PR-052
+**Error Message**: "You do not have permission to edit {field_name}. This field can only be edited by purchasing staff."
+**User Action**: Contact purchasing staff to update restricted fields, or wait for PR to reach appropriate stage.
+
+**Test Cases**:
+- ✅ Valid: Purchasing Staff edits vendor_id → Allowed
+- ✅ Valid: Requestor edits quantity → Allowed
+- ✅ Valid: Procurement Manager edits tax_profile → Allowed
+- ❌ Invalid: Requestor edits unit_price → 403 Permission denied
+- ❌ Invalid: Requestor edits vendor_id → 403 Permission denied
+- ❌ Invalid: Requestor edits tax_amount_override → 403 Permission denied
+
+---
+
 ## 3. Business Rule Validations (VAL-PR-101 to 199)
 
 ### VAL-PR-101: Minimum Line Items for Submission
@@ -1152,9 +1518,15 @@ Per BR-purchase-requests.md, the following are the only valid status values:
 
 **From In-progress**:
 - → Approved (all approvals complete)
-- → Void (any approval rejected)
+- → Void (any approver or purchasing staff rejects)
+- → Returned (any approver or purchasing staff returns for revision)
 - → Draft (user recalls)
 - → Cancelled (user cancels)
+
+**From Returned**:
+- → In-progress (requestor resubmits)
+- → Cancelled (user cancels)
+- → Draft (user continues editing without submission)
 
 **From Approved**:
 - → Completed (purchasing staff converts to PO)
@@ -1181,7 +1553,142 @@ Per BR-purchase-requests.md, the following are the only valid status values:
 **Error Message**: "Cannot change status from {current_status} to {new_status}. Invalid transition."
 **User Action**: User can only perform allowed actions for current status.
 
-**Related Business Requirements**: BR-PR-005, BR-PR-020
+**Related Business Requirements**: BR-PR-005, BR-PR-005A, BR-PR-020
+
+---
+
+### VAL-PR-108A: Workflow Action Button Validation (Reject)
+
+**Implementation Status**: ✅ Implemented
+
+**Rule Description**: Reject action requires a reason and validates user has permission to reject.
+
+**Business Justification**: Ensures all rejections are documented and only authorized users can reject.
+
+**Validation Logic**:
+1. Verify user role is Approver OR Purchasing Staff
+2. Verify PR status is In-progress (for approver) or processable (for purchaser)
+3. Verify rejection_reason is provided
+4. Verify rejection_reason is at least 10 characters
+
+**When Validated**: On reject button click and confirmation
+
+**Implementation Requirements**:
+- **Client-Side**: Disable reject button if reason < 10 chars. Show character count.
+- **Server-Side**: Verify user role and reason length. Return 403 if unauthorized, 400 if invalid reason.
+- **Database**: rejection_reason field required when status = Void.
+
+**Error Code**: VAL-PR-108A
+**Error Messages**:
+- "Rejection reason is required"
+- "Rejection reason must be at least 10 characters"
+- "You do not have permission to reject this purchase request"
+
+**Related Business Requirements**: BR-PR-005A, BR-PR-010
+
+---
+
+### VAL-PR-108B: Workflow Action Button Validation (Return)
+
+**Implementation Status**: ✅ Implemented
+
+**Rule Description**: Return action requires a reason and validates user has permission to return PR for revision.
+
+**Business Justification**: Ensures all returns are documented and only authorized users can return PRs.
+
+**Validation Logic**:
+1. Verify user role is Approver OR Purchasing Staff
+2. Verify PR status is In-progress
+3. Verify return_reason is provided
+4. Verify return_reason is at least 10 characters
+
+**When Validated**: On return button click and confirmation
+
+**Implementation Requirements**:
+- **Client-Side**: Disable return button if reason < 10 chars. Show character count.
+- **Server-Side**: Verify user role and reason length. Return 403 if unauthorized, 400 if invalid reason.
+- **Database**: return_reason field required when status = Returned.
+
+**Error Code**: VAL-PR-108B
+**Error Messages**:
+- "Return reason is required"
+- "Return reason must be at least 10 characters"
+- "You do not have permission to return this purchase request"
+
+**Related Business Requirements**: BR-PR-005A
+
+---
+
+### VAL-PR-108C: Workflow Action Button Validation (Submit)
+
+**Implementation Status**: ✅ Implemented
+
+**Rule Description**: Submit action validates user has Purchasing Staff role and all items have required pricing information.
+
+**Business Justification**: Ensures PRs cannot be advanced without complete vendor allocations.
+
+**Validation Logic**:
+1. Verify user role is Purchasing Staff, Purchaser, or Procurement Manager
+2. Verify PR status allows submission (In-progress or Approved)
+3. Verify ALL items have vendor allocated
+4. Verify ALL items have unit price entered
+5. Verify ALL items have currency selected
+6. Verify ALL items have tax profile selected
+
+**When Validated**: On submit button click
+
+**Implementation Requirements**:
+- **Client-Side**: Disable submit button if any items incomplete. Show list of incomplete items.
+- **Server-Side**: Verify all items have required fields. Return 400 with list of incomplete items.
+- **Database**: No direct constraint (validated at application level).
+
+**Error Code**: VAL-PR-108C
+**Error Messages**:
+- "All items must have vendor allocated before submit"
+- "All items must have unit price entered before submit"
+- "Items missing required fields: {item_list}"
+- "You do not have permission to submit this purchase request"
+
+**Incomplete Items Display**:
+```
+The following items are incomplete:
+- Item 1: Fresh Salmon - Missing vendor
+- Item 3: Olive Oil - Missing unit price
+- Item 5: Kitchen Towels - Missing tax profile
+```
+
+**Related Business Requirements**: BR-PR-005A, BR-PR-011A
+
+---
+
+### VAL-PR-108D: Workflow Action Button Validation (Approve)
+
+**Implementation Status**: ✅ Implemented
+
+**Rule Description**: Approve action validates user has Approver role and has pending approval task for the PR.
+
+**Business Justification**: Ensures only authorized approvers can approve at their designated stage.
+
+**Validation Logic**:
+1. Verify user role is Department Manager, Finance Manager, General Manager, or Asset Manager
+2. Verify PR status is In-progress
+3. Verify user has pending approval task for this PR
+4. Verify all previous approval stages are complete (for sequential workflows)
+
+**When Validated**: On approve button click
+
+**Implementation Requirements**:
+- **Client-Side**: Show approve button only to users with pending approval task.
+- **Server-Side**: Verify user has pending approval record. Return 403 if unauthorized.
+- **Database**: Check pr_approvals table for pending record for user.
+
+**Error Code**: VAL-PR-108D
+**Error Messages**:
+- "You do not have permission to approve this purchase request"
+- "This purchase request has already been processed"
+- "Previous approval stages must be completed first"
+
+**Related Business Requirements**: BR-PR-005A, BR-PR-007
 
 ---
 
@@ -1465,6 +1972,47 @@ Per BR-purchase-requests.md, the following are the only valid status values:
 
 ---
 
+### VAL-PR-304A: Status-Based Edit Permission
+
+**Validation Rule**: PRs can only be edited when in specific editable statuses. The editable statuses for Requestors are: Draft, Void, and Returned.
+
+**Editable Status Matrix**:
+
+| Status | Requestor | Approver | Purchasing Staff | Notes |
+|--------|-----------|----------|------------------|-------|
+| Draft | ✅ Edit | ❌ View | ❌ View | Initial state |
+| Void | ✅ Edit | ❌ View | ❌ View | Rejected, can revise |
+| Returned | ✅ Edit | ❌ View | ❌ View | Returned for revision |
+| In-progress | ❌ View | 👁️ Limited* | ✅ Edit | *Approver can adjust quantities |
+| Approved | ❌ View | ❌ View | ❌ View | Read-only |
+| Completed | ❌ View | ❌ View | ❌ View | Converted to PO |
+| Cancelled | ❌ View | ❌ View | ❌ View | Cancelled |
+
+**When Validated**: Before displaying edit form, before enabling edit buttons, before saving updates
+
+**Implementation Requirements**:
+- **Client-Side**: Disable edit button and form fields for non-editable statuses. Show appropriate message.
+- **Server-Side**: Verify status is in [Draft, Void, Returned] for Requestor edit operations.
+- **Database**: Check constraints on status-based updates.
+
+**Error Code**: VAL-PR-304A
+**Error Message**:
+- "Purchase requests with status '{status}' cannot be edited"
+- "You can only edit purchase requests in Draft, Void, or Returned status"
+
+**User Action**: User must wait for PR to be returned/rejected, or contact approver to return the PR for revision.
+
+**Test Cases**:
+- ✅ Valid: Requestor edits Draft PR → Allowed
+- ✅ Valid: Requestor edits Void PR → Allowed
+- ✅ Valid: Requestor edits Returned PR → Allowed
+- ✅ Valid: Purchasing Staff edits In-progress PR → Allowed
+- ❌ Invalid: Requestor edits In-progress PR → 403 Permission denied
+- ❌ Invalid: Requestor edits Approved PR → 403 Permission denied
+- ❌ Invalid: Any user edits Completed PR → 403 Permission denied
+
+---
+
 ### VAL-PR-305: Approver Authorization
 
 **Validation Rule**: User can only approve/reject PRs where they are the designated approver for the current approval stage.
@@ -1639,7 +2187,539 @@ All validation rules must have test coverage for:
 
 ---
 
-## 8. Validation Matrix Summary
+## 7. Bulk Item Action Validations (VAL-PR-400 to 499)
+
+This section defines validation rules for bulk item actions within a purchase request.
+
+### VAL-PR-401: Item Selection Validation
+
+**Validation Rule**: At least one item must be selected before any bulk action can be performed.
+
+**When Validated**: Before displaying bulk action toolbar, before executing any bulk action
+
+**Implementation Requirements**:
+- **Client-Side**: Bulk action toolbar hidden when no items selected. Action buttons disabled when selection invalid for that action.
+- **Server-Side**: Verify request contains at least one valid item ID.
+- **Database**: N/A - no persistence of selection state.
+
+**Error Code**: VAL-PR-401
+**Error Message**: "Please select at least one item to perform this action"
+**User Action**: User must select one or more items using checkboxes.
+
+**Test Cases**:
+- ✅ Valid: 1 item selected → Toolbar visible, actions enabled
+- ✅ Valid: 10 items selected → Toolbar visible with count "10 items selected"
+- ❌ Invalid: 0 items selected → Toolbar hidden
+- ❌ Invalid: All items deselected → Toolbar hides
+
+---
+
+### VAL-PR-402: Bulk Approve Permission
+
+**Validation Rule**: User must have Approver or Purchasing Staff role to perform bulk approve action.
+
+**When Validated**: Before showing Approve Selected button, before processing bulk approve
+
+**Implementation Requirements**:
+- **Client-Side**: Hide Approve Selected button for Requestor role.
+- **Server-Side**: Verify user role is 'Approver', 'Department Manager', 'Finance Manager', 'Purchasing Staff', 'Purchaser', or 'Procurement Manager'.
+- **Database**: RLS policy on item status updates.
+
+**Valid Item Statuses for Approval**: Pending, In-progress
+
+**Error Code**: VAL-PR-402
+**Error Message**: "You do not have permission to approve items"
+**User Action**: Contact an approver or purchasing staff to perform approval.
+
+**Test Cases**:
+- ✅ Valid: Approver bulk approves Pending items → Allowed
+- ✅ Valid: Purchasing Staff bulk approves In-progress items → Allowed
+- ❌ Invalid: Requestor attempts bulk approve → 403 Permission denied
+- ❌ Invalid: Approver approves already Approved items → Items skipped with notification
+
+---
+
+### VAL-PR-403: Bulk Reject Permission and Comment
+
+**Validation Rule**: User must have Approver or Purchasing Staff role. Rejection reason must be at least 10 characters.
+
+**When Validated**: Before showing Reject Selected button, before processing bulk reject
+
+**Implementation Requirements**:
+- **Client-Side**: Hide Reject Selected button for Requestor role. Validate comment length on dialog submit.
+- **Server-Side**: Verify user role and comment length >= 10 characters.
+- **Database**: rejection_reason NOT NULL constraint, MIN LENGTH check.
+
+**Valid Item Statuses for Rejection**: Pending, In-progress
+
+**Error Code**: VAL-PR-403A (Permission), VAL-PR-403B (Comment)
+**Error Messages**:
+- VAL-PR-403A: "You do not have permission to reject items"
+- VAL-PR-403B: "Rejection reason must be at least 10 characters"
+**User Action**:
+- VAL-PR-403A: Contact an approver or purchasing staff
+- VAL-PR-403B: Provide a more detailed rejection reason
+
+**Test Cases**:
+- ✅ Valid: Approver rejects with 15-char comment → Allowed
+- ✅ Valid: Purchasing Staff rejects 5 items with shared comment → All rejected
+- ❌ Invalid: Requestor attempts bulk reject → 403 Permission denied
+- ❌ Invalid: Comment is 5 characters → "Rejection reason must be at least 10 characters"
+- ❌ Invalid: Empty comment → "Rejection reason must be at least 10 characters"
+
+---
+
+### VAL-PR-404: Bulk Return Permission and Comment
+
+**Validation Rule**: User must have Approver or Purchasing Staff role. Return reason must be at least 10 characters.
+
+**When Validated**: Before showing Return Selected button, before processing bulk return
+
+**Implementation Requirements**:
+- **Client-Side**: Hide Return Selected button for Requestor role. Validate comment length on dialog submit.
+- **Server-Side**: Verify user role and comment length >= 10 characters.
+- **Database**: return_reason NOT NULL constraint, MIN LENGTH check.
+
+**Valid Item Statuses for Return**: Pending, In-progress, Approved
+
+**Error Code**: VAL-PR-404A (Permission), VAL-PR-404B (Comment)
+**Error Messages**:
+- VAL-PR-404A: "You do not have permission to return items"
+- VAL-PR-404B: "Return reason must be at least 10 characters"
+**User Action**:
+- VAL-PR-404A: Contact an approver or purchasing staff
+- VAL-PR-404B: Provide a more detailed return reason
+
+**Test Cases**:
+- ✅ Valid: Approver returns Approved items with reason → Items returned
+- ✅ Valid: Purchasing Staff returns mixed status items → Valid items returned
+- ❌ Invalid: Requestor attempts bulk return → 403 Permission denied
+- ❌ Invalid: Comment is 8 characters → "Return reason must be at least 10 characters"
+
+---
+
+### VAL-PR-405: Split Items Validation
+
+**Validation Rule**: User must have Purchasing Staff role. At least 2 items must be selected.
+
+**When Validated**: Before showing Split button, before processing split action
+
+**Implementation Requirements**:
+- **Client-Side**: Hide Split button for non-Purchasing Staff roles. Disable Split button when < 2 items selected.
+- **Server-Side**: Verify user role and selected item count >= 2.
+- **Database**: Transaction ensures atomicity of split operation.
+
+**Valid Item Statuses for Split**: Pending, In-progress, Approved, Returned
+
+**Error Code**: VAL-PR-405A (Permission), VAL-PR-405B (Minimum Items)
+**Error Messages**:
+- VAL-PR-405A: "Only Purchasing Staff can split items"
+- VAL-PR-405B: "At least 2 items must be selected to split"
+**User Action**:
+- VAL-PR-405A: Contact purchasing staff
+- VAL-PR-405B: Select at least 2 items before splitting
+
+**Test Cases**:
+- ✅ Valid: Purchasing Staff splits 5 items by vendor → New PRs created
+- ✅ Valid: Purchasing Staff splits 2 items by date → 2 new PRs created
+- ❌ Invalid: Approver attempts split → 403 Permission denied
+- ❌ Invalid: Only 1 item selected → "At least 2 items must be selected to split"
+
+---
+
+### VAL-PR-406: Set Date Required Validation
+
+**Validation Rule**: Selected date must be today or in the future. All roles can set date (Requestor only in Draft/Void/Returned status).
+
+**When Validated**: Before date selection, before processing date update
+
+**Implementation Requirements**:
+- **Client-Side**: Date picker min date = today. Disable dates in the past.
+- **Server-Side**: Verify date >= current date (server timezone).
+- **Database**: delivery_date >= CURRENT_DATE constraint.
+
+**Valid Item Statuses for Set Date**: Pending, In-progress, Approved, Returned (Requestor: only in Draft/Void/Returned PR status)
+
+**Error Code**: VAL-PR-406A (Permission), VAL-PR-406B (Past Date)
+**Error Messages**:
+- VAL-PR-406A: "You do not have permission to change item dates in this PR status"
+- VAL-PR-406B: "Date must be today or later"
+**User Action**:
+- VAL-PR-406A: Wait for PR to be returned or contact approver
+- VAL-PR-406B: Select today's date or a future date
+
+**Test Cases**:
+- ✅ Valid: Requestor sets date in Draft PR → Allowed
+- ✅ Valid: Approver sets date for 10 items → All dates updated
+- ✅ Valid: Date is today → Allowed (boundary value)
+- ❌ Invalid: Requestor sets date in In-progress PR → 403 Permission denied
+- ❌ Invalid: Date is yesterday → "Date must be today or later"
+
+---
+
+### VAL-PR-407: Invalid Items in Bulk Action
+
+**Validation Rule**: When some selected items are not valid for the action (wrong status), user must be warned and can choose to proceed with valid items only.
+
+**When Validated**: Before processing any bulk action
+
+**Implementation Requirements**:
+- **Client-Side**: Show warning dialog: "X of Y items cannot be {action}ed. Proceed with valid items?"
+- **Server-Side**: Process only valid items, return summary of skipped items.
+- **Database**: N/A
+
+**Warning Message Format**: "{invalidCount} of {totalCount} items cannot be {action}ed"
+
+**User Options**:
+- "Proceed with valid items" → Process valid items, skip invalid
+- "Cancel" → No changes made
+
+**Test Cases**:
+- ✅ Valid: 3 of 5 items are Pending, approve action → Warning shown, 3 approved if user proceeds
+- ✅ Valid: All items already Approved, approve action → "No items can be approved" (action blocked)
+- ✅ Valid: User clicks Cancel on warning → No changes made
+
+---
+
+### VAL-PR-408: Concurrent Modification Detection
+
+**Validation Rule**: Items must not have been modified by another user since selection.
+
+**When Validated**: Before committing bulk action transaction
+
+**Implementation Requirements**:
+- **Client-Side**: N/A
+- **Server-Side**: Compare item `updated_at` timestamps with expected values. Rollback if mismatch.
+- **Database**: Optimistic locking using `updated_at` column.
+
+**Error Code**: VAL-PR-408
+**Error Message**: "Some items were modified by another user. Please refresh and try again."
+**User Action**: Refresh the page to get latest data, reselect items, and try again.
+
+**Test Cases**:
+- ✅ Valid: No concurrent modifications → Action completes
+- ❌ Invalid: Item updated by another user during action → Transaction rolled back, error shown
+- ❌ Invalid: Item deleted by another user → Transaction rolled back, error shown
+
+---
+
+### VAL-PR-409: Bulk Action Performance
+
+**Validation Rule**: Bulk actions must complete within 3 seconds for up to 50 items.
+
+**When Validated**: During bulk action execution
+
+**Implementation Requirements**:
+- **Client-Side**: Show loading spinner during action. Display progress for large batches.
+- **Server-Side**: Batch database operations. Use transactions efficiently.
+- **Database**: Indexed columns for item lookups. Batch updates.
+
+**Performance Thresholds**:
+- 1-10 items: < 1 second
+- 11-25 items: < 2 seconds
+- 26-50 items: < 3 seconds
+- > 50 items: Show progress indicator
+
+**Warning Message**: "Processing {count} items, please wait..."
+
+**Test Cases**:
+- ✅ Valid: 10 items approved in 0.5s → Performance target met
+- ✅ Valid: 50 items approved in 2.8s → Performance target met
+- ⚠️ Warning: 100 items → Progress indicator shown
+
+---
+
+### Bulk Action Validation Summary
+
+| Code | Rule Name | Fields | Type | Client | Server | DB | Priority |
+|------|-----------|--------|------|--------|--------|----|----------|
+| VAL-PR-401 | Item Selection | selectedIds | Selection | ✅ | ✅ | ❌ | High |
+| VAL-PR-402 | Bulk Approve Permission | role, item_status | Permission | ✅ | ✅ | ✅ | Critical |
+| VAL-PR-403 | Bulk Reject Permission/Comment | role, reason | Permission | ✅ | ✅ | ✅ | Critical |
+| VAL-PR-404 | Bulk Return Permission/Comment | role, reason | Permission | ✅ | ✅ | ✅ | Critical |
+| VAL-PR-405 | Split Items | role, item_count | Permission | ✅ | ✅ | ✅ | High |
+| VAL-PR-406 | Set Date Required | date, pr_status | Field | ✅ | ✅ | ✅ | High |
+| VAL-PR-407 | Invalid Items Warning | item_status | Business | ✅ | ✅ | ❌ | Medium |
+| VAL-PR-408 | Concurrent Modification | updated_at | Integrity | ❌ | ✅ | ✅ | Critical |
+| VAL-PR-409 | Performance | response_time | Performance | ✅ | ✅ | ✅ | Medium |
+
+---
+
+## 8. Budget Tab CRUD Validations (VAL-PR-500 to 599)
+
+This section defines validation rules for budget allocation CRUD operations within the Budget tab.
+
+### VAL-PR-501: Budget Location Required
+
+**Validation Rule**: Location field is required when adding or editing a budget allocation.
+
+**Field**: `location`
+**Data Type**: VARCHAR / string
+
+**When Validated**: Before saving budget allocation (add/edit)
+
+**Implementation Requirements**:
+- **Client-Side**: Show error message when location is empty. Prevent form submission.
+- **Server-Side**: Verify location is not null or empty string.
+- **Database**: NOT NULL constraint on budget_allocations.location column.
+
+**Error Code**: VAL-PR-501
+**Error Message**: "Location is required"
+**User Action**: Select a location from the dropdown.
+
+**Test Cases**:
+- ✅ Valid: "Kitchen" selected → Passes validation
+- ✅ Valid: "Front Office" selected → Passes validation
+- ❌ Invalid: No location selected → "Location is required"
+- ❌ Invalid: Empty string submitted → "Location is required"
+
+---
+
+### VAL-PR-502: Budget Category Required
+
+**Validation Rule**: Category field is required when adding or editing a budget allocation.
+
+**Field**: `category`
+**Data Type**: VARCHAR / string
+
+**When Validated**: Before saving budget allocation (add/edit)
+
+**Implementation Requirements**:
+- **Client-Side**: Show error message when category is empty. Prevent form submission.
+- **Server-Side**: Verify category is not null or empty string.
+- **Database**: NOT NULL constraint on budget_allocations.category column.
+
+**Error Code**: VAL-PR-502
+**Error Message**: "Category is required"
+**User Action**: Select a category from the dropdown.
+
+**Test Cases**:
+- ✅ Valid: "F&B" selected → Passes validation
+- ✅ Valid: "Operating Supplies" selected → Passes validation
+- ❌ Invalid: No category selected → "Category is required"
+- ❌ Invalid: Empty string submitted → "Category is required"
+
+---
+
+### VAL-PR-503: Budget Total Required
+
+**Validation Rule**: Total Budget field is required and must be a valid number greater than or equal to 0.
+
+**Field**: `totalBudget`
+**Data Type**: DECIMAL / number
+
+**When Validated**: Before saving budget allocation (add/edit)
+
+**Implementation Requirements**:
+- **Client-Side**: Show error for empty, non-numeric, or negative values.
+- **Server-Side**: Verify total_budget is numeric and >= 0.
+- **Database**: DECIMAL(15,2), NOT NULL, CHECK (total_budget >= 0).
+
+**Error Code**: VAL-PR-503
+**Error Message**: "Total Budget is required" or "Must be a valid number >= 0"
+**User Action**: Enter a valid positive number for total budget.
+
+**Test Cases**:
+- ✅ Valid: 50000 → Passes validation
+- ✅ Valid: 0 → Passes validation (boundary value)
+- ❌ Invalid: Empty → "Total Budget is required"
+- ❌ Invalid: "abc" → "Must be a valid number >= 0"
+- ❌ Invalid: -1000 → "Must be a valid number >= 0"
+
+---
+
+### VAL-PR-504: Numeric Fields Validation
+
+**Validation Rule**: All numeric budget fields must be valid numbers greater than or equal to 0.
+
+**Fields**: `softCommitmentDeptHead`, `softCommitmentPO`, `hardCommitment`, `currentPRAmount`
+**Data Type**: DECIMAL / number
+
+**When Validated**: Before saving budget allocation (add/edit)
+
+**Implementation Requirements**:
+- **Client-Side**: Show error for non-numeric or negative values.
+- **Server-Side**: Verify all numeric fields are >= 0.
+- **Database**: DECIMAL(15,2), DEFAULT 0, CHECK (field >= 0) for each field.
+
+**Error Code**: VAL-PR-504
+**Error Message**: "Must be a valid number >= 0"
+**User Action**: Enter a valid positive number or 0.
+
+**Test Cases**:
+- ✅ Valid: All fields are 0 → Passes validation
+- ✅ Valid: Soft Commitment DH = 10000, others = 0 → Passes validation
+- ❌ Invalid: Soft Commitment PO = "abc" → "Must be a valid number >= 0"
+- ❌ Invalid: Hard Commitment = -500 → "Must be a valid number >= 0"
+
+---
+
+### VAL-PR-505: Duplicate Budget Allocation
+
+**Validation Rule**: Location + Category combination must be unique within a purchase request.
+
+**Fields**: `location`, `category`
+**Data Type**: Composite
+
+**When Validated**: Before saving budget allocation (add/edit)
+
+**Implementation Requirements**:
+- **Client-Side**: Check existing entries for duplicate combination. Show error if found.
+- **Server-Side**: Verify no existing budget allocation with same location + category (excluding current item on edit).
+- **Database**: UNIQUE constraint on (pr_id, location, category).
+
+**Error Code**: VAL-PR-505
+**Error Message**: "Budget allocation for this Location and Category already exists"
+**User Action**: Select a different location or category combination.
+
+**Test Cases**:
+- ✅ Valid: New combination "Kitchen" + "F&B" → Passes validation
+- ✅ Valid: Edit existing entry without changing location/category → Passes validation
+- ❌ Invalid: Add "Kitchen" + "F&B" when it already exists → Duplicate error
+- ❌ Invalid: Edit to match another existing entry → Duplicate error
+
+---
+
+### VAL-PR-506: Budget CRUD Permission
+
+**Validation Rule**: Only users with Purchasing Staff or Finance Manager role can add, edit, or delete budget allocations.
+
+**Fields**: N/A (role-based)
+**Data Type**: Permission
+
+**When Validated**: Before showing add button, before opening edit dialog, before delete
+
+**Implementation Requirements**:
+- **Client-Side**: Hide Add Budget button for unauthorized roles. Hide row actions menu for unauthorized roles.
+- **Server-Side**: Verify user has 'Purchasing Staff', 'Purchaser', 'Procurement Manager', or 'Finance Manager' role.
+- **Database**: RLS policy on budget_allocations table.
+
+**Error Code**: VAL-PR-506
+**Error Message**: "You do not have permission to manage budget allocations"
+**User Action**: Contact a Purchasing Staff or Finance Manager to make changes.
+
+**Role Permissions**:
+| Role | View | Add | Edit | Delete |
+|------|------|-----|------|--------|
+| Requestor | ✅ | ❌ | ❌ | ❌ |
+| Approver | ✅ | ❌ | ❌ | ❌ |
+| Purchasing Staff | ✅ | ✅ | ✅ | ✅ |
+| Finance Manager | ✅ | ✅ | ✅ | ✅ |
+
+**Test Cases**:
+- ✅ Valid: Purchasing Staff adds budget → Allowed
+- ✅ Valid: Finance Manager edits budget → Allowed
+- ❌ Invalid: Requestor attempts add → 403 Permission denied
+- ❌ Invalid: Approver attempts delete → 403 Permission denied
+
+---
+
+### VAL-PR-507: Delete Confirmation Required
+
+**Validation Rule**: Budget allocation deletion must be confirmed via dialog before execution.
+
+**Fields**: N/A
+**Data Type**: UX
+
+**When Validated**: Before processing delete action
+
+**Implementation Requirements**:
+- **Client-Side**: Display AlertDialog with budget details. Require explicit confirmation click.
+- **Server-Side**: N/A (handled client-side before API call)
+- **Database**: N/A
+
+**Confirmation Dialog Content**:
+- Title: "Delete Budget Allocation"
+- Message: "Are you sure you want to delete the budget allocation for {Location} - {Category}? This action cannot be undone."
+- Buttons: "Cancel" (outline), "Delete" (destructive red)
+
+**Error Code**: N/A (UX validation)
+**User Action**: Confirm or cancel the deletion.
+
+**Test Cases**:
+- ✅ Valid: User clicks Delete in menu, confirms in dialog → Budget deleted
+- ✅ Valid: User clicks Delete in menu, clicks Cancel → No changes made
+- ❌ Invalid: Attempt to bypass confirmation → Not possible (dialog required)
+
+---
+
+### VAL-PR-508: Available Budget Calculation
+
+**Validation Rule**: Available Budget must be correctly calculated as: Total Budget - Soft Commitment (Dept Head) - Soft Commitment (PO) - Hard Commitment.
+
+**Fields**: `availableBudget` (calculated)
+**Data Type**: DECIMAL / number
+
+**When Validated**: On every form field change, on save
+
+**Implementation Requirements**:
+- **Client-Side**: Real-time calculation preview in form. Display warning if negative.
+- **Server-Side**: Recalculate on save to prevent client-side manipulation.
+- **Database**: Can be stored or computed column.
+
+**Calculation Formula**:
+```
+availableBudget = totalBudget - softCommitmentDeptHead - softCommitmentPO - hardCommitment
+```
+
+**Test Cases**:
+- ✅ Valid: 50000 - 10000 - 5000 - 8000 = 27000 → Correct calculation
+- ✅ Valid: 10000 - 0 - 0 - 0 = 10000 → Full budget available
+- ✅ Valid: 10000 - 5000 - 5000 - 5000 = -5000 → Negative (Over Budget) - valid but flagged
+
+---
+
+### VAL-PR-509: Status Calculation
+
+**Validation Rule**: Status must be correctly derived from budget utilization.
+
+**Fields**: `status` (calculated)
+**Data Type**: ENUM
+
+**When Validated**: On save, after available budget calculation
+
+**Implementation Requirements**:
+- **Client-Side**: Calculate and display status badge with correct color.
+- **Server-Side**: Recalculate on save.
+- **Database**: Can be stored or computed column.
+
+**Status Rules**:
+| Condition | Status | Badge Color |
+|-----------|--------|-------------|
+| Available Budget < 0 | Over Budget | Red (destructive) |
+| Available Budget <= 20% of Total Budget | Near Limit | Yellow (warning) |
+| Available Budget > 20% of Total Budget | Within Budget | Green (success) |
+
+**Edge Cases**:
+- If Total Budget = 0 and Available = 0 → "Within Budget" (no allocation to exceed)
+- If Total Budget = 1000 and Available = 200 → "Near Limit" (exactly 20%)
+- If Total Budget = 1000 and Available = 201 → "Within Budget" (just over 20%)
+
+**Test Cases**:
+- ✅ Valid: Available = -500 → "Over Budget" (red)
+- ✅ Valid: Total = 10000, Available = 1500 → "Near Limit" (15% remaining)
+- ✅ Valid: Total = 10000, Available = 5000 → "Within Budget" (50% remaining)
+- ✅ Valid: Total = 10000, Available = 2000 → "Near Limit" (exactly 20%)
+
+---
+
+### Budget Tab CRUD Validation Summary
+
+| Code | Rule Name | Fields | Type | Client | Server | DB | Priority | Status |
+|------|-----------|--------|------|--------|--------|----|----------|--------|
+| VAL-PR-501 | Location Required | location | Field | ✅ | ✅ | ✅ | Critical | ✅ |
+| VAL-PR-502 | Category Required | category | Field | ✅ | ✅ | ✅ | Critical | ✅ |
+| VAL-PR-503 | Total Budget Required | totalBudget | Field | ✅ | ✅ | ✅ | Critical | ✅ |
+| VAL-PR-504 | Numeric Fields Valid | commitment fields | Field | ✅ | ✅ | ✅ | High | ✅ |
+| VAL-PR-505 | Duplicate Prevention | location + category | Business | ✅ | ✅ | ✅ | High | ✅ |
+| VAL-PR-506 | CRUD Permission | role | Security | ✅ | ✅ | ✅ | Critical | ✅ |
+| VAL-PR-507 | Delete Confirmation | N/A | UX | ✅ | ❌ | ❌ | Medium | ✅ |
+| VAL-PR-508 | Available Budget Calc | calculated | Calculation | ✅ | ✅ | ⚠️ | High | ✅ |
+| VAL-PR-509 | Status Calculation | calculated | Calculation | ✅ | ✅ | ⚠️ | Medium | ✅ |
+
+---
+
+## 9. Validation Matrix Summary
 
 | Code | Rule Name | Fields | Type | Client | Server | DB | Priority |
 |------|-----------|--------|------|--------|--------|----|----------|
@@ -1657,6 +2737,15 @@ All validation rules must have test coverage for:
 | VAL-PR-012 | Item Quantity | quantity | Field | ✅ | ✅ | ✅ | Critical |
 | VAL-PR-013 | Item Price | unit_price | Field | ✅ | ✅ | ✅ | Critical |
 | VAL-PR-014 | Item UOM | unit_of_measure | Field | ✅ | ✅ | ✅ | High |
+| VAL-PR-044 | Tax Profile Selection | tax_profile | Field | ✅ | ✅ | ✅ | High |
+| VAL-PR-045 | Tax Rate Auto-Population | tax_rate | Field | ✅ | ✅ | ✅ | High |
+| VAL-PR-046 | Tax Amount Override | tax_amount_override | Field | ✅ | ✅ | ✅ | Medium |
+| VAL-PR-047 | Discount Amount Override | discount_amount_override | Field | ✅ | ✅ | ✅ | Medium |
+| VAL-PR-048 | Purchaser Currency | currency_code (item) | Field | ✅ | ✅ | ✅ | High |
+| VAL-PR-049 | Purchaser Exchange Rate | exchange_rate (item) | Field | ✅ | ✅ | ✅ | Medium |
+| VAL-PR-050 | Unit Price (Purchaser) | unit_price | Field | ✅ | ✅ | ✅ | Critical |
+| VAL-PR-051 | Vendor Selection | vendor_id | Field | ✅ | ✅ | ✅ | Critical |
+| VAL-PR-052 | Role-Based Permissions | multiple | Security | ✅ | ✅ | ✅ | Critical |
 | VAL-PR-101 | Min Line Items | items | Business | ✅ | ✅ | ❌ | Critical |
 | VAL-PR-102 | Prices Required | items | Business | ✅ | ✅ | ❌ | Critical |
 | VAL-PR-103 | Budget Check | budget, amounts | Business | ⚠️ | ✅ | ❌ | High |
@@ -1686,11 +2775,11 @@ All validation rules must have test coverage for:
 
 | Category | Total | ✅ | 🔧 | 🚧 | ⏳ |
 |----------|-------|----|----|----|-----|
-| Field Validations (001-099) | 14 | 0 | 12 | 2 | 0 |
+| Field Validations (001-099) | 23 | 0 | 21 | 2 | 0 |
 | Business Rules (101-199) | 8 | 0 | 2 | 6 | 0 |
 | Cross-Field Validations (201-299) | 3 | 0 | 2 | 1 | 0 |
-| Security Validations (301-399) | 6 | 0 | 0 | 6 | 0 |
-| **Total** | **31** | **0** | **16** | **15** | **0** |
+| Security Validations (301-399) | 7 | 0 | 1 | 6 | 0 |
+| **Total** | **41** | **0** | **26** | **15** | **0** |
 
 **Implementation Notes**:
 - All field validations have client-side Zod schemas implemented
@@ -1723,8 +2812,23 @@ All validation rules must have test coverage for:
 
 | Range | Category | Count | Example |
 |-------|----------|-------|---------|
-| VAL-PR-001 to 099 | Field Validations | 14 | VAL-PR-001: Reference Number Format |
+| VAL-PR-001 to 043 | Field Validations (General) | 14 | VAL-PR-001: Reference Number Format |
+| VAL-PR-044 to 052 | Field Validations (Purchaser Edit) | 9 | VAL-PR-044: Tax Profile Selection |
 | VAL-PR-101 to 199 | Business Rules | 8 | VAL-PR-104: Approval Chain Determination |
 | VAL-PR-201 to 299 | Cross-Field | 3 | VAL-PR-201: Date Range Validation |
-| VAL-PR-301 to 399 | Security | 6 | VAL-PR-301: Create Permission Check |
-| **Total** | **All Categories** | **31** | **Complete validation coverage** |
+| VAL-PR-301 to 399 | Security | 7 | VAL-PR-301: Create Permission Check |
+| **Total** | **All Categories** | **41** | **Complete validation coverage** |
+
+### Purchaser Edit Mode Validations (VAL-PR-044 to 052)
+
+| Code | Rule Name | Priority |
+|------|-----------|----------|
+| VAL-PR-044 | Tax Profile Selection | High |
+| VAL-PR-045 | Tax Rate Auto-Population | High |
+| VAL-PR-046 | Tax Amount Override | Medium |
+| VAL-PR-047 | Discount Amount Override | Medium |
+| VAL-PR-048 | Purchaser Currency Selection | High |
+| VAL-PR-049 | Purchaser Exchange Rate | Medium |
+| VAL-PR-050 | Unit Price Entry (Purchaser) | Critical |
+| VAL-PR-051 | Vendor Selection (Purchaser) | Critical |
+| VAL-PR-052 | Role-Based Field Permissions | Critical |

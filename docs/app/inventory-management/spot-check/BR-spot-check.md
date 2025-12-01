@@ -398,7 +398,7 @@ interface SpotCheckDetailInfo {
 }
 ```
 
-### Spot Check Template Entity (Future Enhancement)
+### Spot Check Template Data Definition (Future Enhancement)
 
 **Purpose**: Reusable product groupings for frequent spot checks. Not yet implemented in database schema.
 

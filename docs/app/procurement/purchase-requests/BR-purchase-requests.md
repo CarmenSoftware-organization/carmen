@@ -3,8 +3,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Requests
 - **Route**: `/procurement/purchase-requests`
-- **Version**: 1.0.0
-- **Last Updated**: 2025-10-30
+- **Version**: 1.6.0
+- **Last Updated**: 2025-11-28
 
 ## **Document History**
 
@@ -13,6 +13,10 @@
 | 1.0.0 | 2025-10-30 | System Architect | Initial Notion from Mark Down |
 | 1.0.1 | 2025-11-23 | Peak | Base on meeting requirement |
 | 1.2.0 | 2025-11-26 | Documentation Team | Added implementation status markers to track development progress |
+| 1.3.0 | 2025-11-28 | Development Team | Added FR-PR-011A: Purchasing Staff Edit Mode Capabilities for vendor pricing, tax profiles, and override functionality |
+| 1.4.0 | 2025-11-28 | Development Team | Updated FR-PR-011 with Returned status as editable, added Editable Status Matrix by Role, added Requestor Editable Fields by Status matrix |
+| 1.5.0 | 2025-11-28 | Development Team | Added FR-PR-026: Bulk Item Actions for line-item level bulk operations (Approve Selected, Reject Selected, Return Selected, Split, Set Date Required) |
+| 1.6.0 | 2025-11-28 | Development Team | Added FR-PR-027: Budget Tab CRUD Operations for budget allocation management within Purchase Requests |
 
 ---
 
@@ -56,7 +60,7 @@ This document serves as the **target specification** for Purchase Request functi
 ### Procurement Team
 
 1. **Purchasing Manager**: Reviews and approves purchase requests, manages vendor selection
-2. **Purchasing Staff / Buyer**: Processes approved requests, converts to purchase orders
+2. **Purchasing Staff / Buyer**: Processes approved requests, converts to purchase orders, manages vendor pricing and allocations in edit mode
 3. **Procurement Coordinator**: Tracks request status, coordinates with departments
 
 ### Approval Authorities
@@ -183,25 +187,105 @@ This document serves as the **target specification** for Purchase Request functi
 
 **Requirements**:
 - Automatic routing based on workflow configuration
-- Department head approval always required 
-- Finance review required for high-value PRs 
+- Department head approval always required
+- Finance review required for high-value PRs
 - General Manager approval for purchases above specified limit
 - Sequential or parallel approval stages (configurable)
 - Email notifications to approvers with PR summary and direct link
 - Approval delegation support for approvers when away
 - Rejection with mandatory comments explaining reason
-
-- Return Send the PR back to previous Stages with comment
+- Return: Send the PR back to previous stage with comment
 - Approval history tracking with full audit trail
 
 **Acceptance Criteria**:
 - PR routes to correct approver(s) automatically based on rules
 - Approvers receive email notifications within 5 minutes of submission
 - Approval/rejection/return recorded with timestamp and approver identity
-- Comments required (minimum 10 characters) for rejection
+- Comments required (minimum 10 characters) for rejection and return
 - Status updated in real-time and visible to all stakeholders
 - Full approval history visible with timeline view
 - Delegation works correctly with notification to delegate
+
+### FR-PR-005A: Workflow Actions by Role
+
+**Priority**: High | **Status**: ✅ Implemented
+**User Story**: As a user with specific role permissions, I want clear workflow actions available to me so that I can appropriately progress, reject, or return purchase requests based on my authority level.
+
+#### Requestor Actions (Staff, Store Staff, Chef, Counter Staff, Executive Chef, Warehouse Staff)
+
+| Action | Description | PR Status Before | PR Status After | Comment Required |
+|--------|-------------|------------------|-----------------|------------------|
+| **Submit** | Submit PR for approval | Draft | In-progress | No |
+| **Delete** | Delete draft PR | Draft | Deleted | No |
+| **Edit** | Modify draft or rejected PR | Draft, Void | Draft | No |
+| **Recall** | Withdraw submitted PR | In-progress | Draft | Yes (reason) |
+
+**Button Display**:
+- **Draft Status**: Delete (red), Submit (blue/primary)
+- **Void Status**: Edit button to modify and resubmit
+
+#### Approver Actions (Department Manager, Financial Manager, General Manager, Finance Director)
+
+| Action | Description | PR Status Before | PR Status After | Comment Required |
+|--------|-------------|------------------|-----------------|------------------|
+| **Reject** | Deny PR permanently | In-progress | Void | Yes (min 10 chars) |
+| **Return** | Send back for revision | In-progress | In-progress (previous stage) | Yes (min 10 chars) |
+| **Approve** | Approve and advance to next stage | In-progress | In-progress or Approved | No (optional) |
+
+**Button Display**: Reject (red/destructive), Return (outline), Approve (green)
+
+**Approval Logic**:
+- If more approval stages pending → PR remains "In-progress", routes to next approver
+- If final approval stage → PR status changes to "Approved"
+
+#### Purchasing Staff Actions (Purchasing Staff, Purchaser, Procurement Manager, Purchasing Agent)
+
+| Action | Description | PR Status Before | PR Status After | Comment Required |
+|--------|-------------|------------------|-----------------|------------------|
+| **Reject** | Deny PR (pricing/vendor issues) | In-progress | Void | Yes (min 10 chars) |
+| **Return** | Send back for revision | In-progress | In-progress (previous stage) | Yes (min 10 chars) |
+| **Submit** | Submit to next workflow stage | In-progress | In-progress or Approved | No |
+
+**Button Display**: Reject (red/destructive), Return (outline), Submit (blue)
+
+**Edit Capabilities** (in Edit Mode):
+- Vendor selection and allocation
+- Currency and exchange rate
+- Unit price entry
+- Discount rate/amount override
+- Tax profile selection and override
+- FOC quantity entry
+
+#### Workflow Action Matrix
+
+| Role Category | View | Edit | Submit | Approve | Reject | Return | Delete |
+|--------------|------|------|--------|---------|--------|--------|--------|
+| Requestor | ✅ | ✅ (Draft/Void) | ✅ | ❌ | ❌ | ❌ | ✅ (Draft) |
+| Approver | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ |
+| Purchasing Staff | ✅ | ✅ (Edit Mode) | ✅ | ❌ | ✅ | ✅ | ❌ |
+
+#### Return Flow Details
+
+When **Return** action is selected:
+1. User selects return destination (previous workflow stage)
+2. User enters return comment (required, min 10 characters)
+3. System moves PR to selected previous stage
+4. System notifies the user responsible for that stage
+5. PR remains in "In-progress" status but at earlier workflow stage
+6. Activity log records return action with timestamp, user, and comment
+
+**Return Destinations**:
+- Request Creation (Requestor)
+- Department Approval (Department Manager)
+- Purchasing Review (Purchasing Staff)
+- Finance Review (Financial Manager)
+
+**Acceptance Criteria**:
+- All three action buttons (Reject, Return, Submit/Approve) visible simultaneously for Approvers and Purchasing Staff
+- Actions disabled when workflow decision engine indicates user cannot act
+- Return action allows selection of destination stage
+- All actions logged in activity trail with user, timestamp, and comments
+- Notifications sent to appropriate users upon action completion
 
 ### FR-PR-006: Status Management
 
@@ -408,24 +492,114 @@ This document serves as the **target specification** for Purchase Request functi
 **Requirements**:
 - **Draft PRs**: Full editing capability (all fields, items, attachments)
 - **Submitted PRs**: No editing until returned or rejected
-- **Rejected PRs**: Full editing capability to address rejection comments and resubmit
-- **Under Review**: No editing by requestor (read-only)
+- **Rejected PRs (Void)**: Full editing capability to address rejection comments and resubmit
+- **Returned PRs**: Full editing capability to address feedback and resubmit
+- **Under Review (In-progress)**: No editing by requestor (read-only)
 - **Approved PRs**: No editing (read-only for all users)
 - **Approver Adjustments**: Approvers can adjust item quantities during approval
 - Edit locking to prevent concurrent modifications
 - Change tracking for audit purposes
 - Version history to track all modifications
 
+**Editable Status Matrix by Role**:
+
+| Status | Requestor | Approver | Purchasing Staff | Notes |
+|--------|-----------|----------|------------------|-------|
+| Draft | ✅ Full Edit | ❌ View Only | ❌ View Only | Initial state, can add/edit/remove items |
+| Void (Rejected) | ✅ Full Edit | ❌ View Only | ❌ View Only | Can revise and resubmit |
+| Returned | ✅ Full Edit | ❌ View Only | ❌ View Only | Address feedback and resubmit |
+| In-progress | ❌ View Only | 👁️ Limited* | ✅ Edit Mode | *Approvers can adjust quantities |
+| Approved | ❌ View Only | ❌ View Only | ❌ View Only | Read-only for all |
+| Completed | ❌ View Only | ❌ View Only | ❌ View Only | Converted to PO |
+| Cancelled | ❌ View Only | ❌ View Only | ❌ View Only | Cancelled PR |
+
 **Acceptance Criteria**:
-- Edit restrictions enforced by status (Draft, Rejected = editable; others = read-only)
+- Edit restrictions enforced by status (Draft, Void, Returned = editable by Requestor; others = read-only)
 - Permission checks on all edit actions (role-based access control)
 - Audit trail for all modifications (what changed, who changed, when, why)
 - Version history maintained with ability to view previous versions
-- Concurrent edit prevention (lock PR when user is editing, show “locked by” indicator)
+- Concurrent edit prevention (lock PR when user is editing, show "locked by" indicator)
 - Approvers can adjust quantities with justification comments
-- Status reverts to Draft when rejected PR is edited
+- Returned PR status remains Returned during editing (changes to In-progress on resubmit)
+- Void PR status remains Void during editing (changes to In-progress on resubmit)
 - Auto-save draft changes every 30 seconds
 - Warning message when navigating away with unsaved changes
+
+### FR-PR-011A: Purchasing Staff Edit Mode Capabilities
+
+**Priority**: High | **Status**: ✅ Implemented
+**User Story**: As a purchasing staff member, I want to edit vendor pricing information, perform vendor allocations, manage tax profiles, and override financial calculations when editing a PR so that I can accurately process procurement requests with current pricing and vendor information.
+
+**Requirements**:
+- **Vendor Selection**: Select or change vendor for each line item from approved vendor list
+- **Currency Management**: Select transaction currency and set exchange rate for items
+- **Unit Price Entry**: Enter or modify unit price for each item
+- **Discount Override**:
+  - Set discount rate percentage
+  - Override calculated discount amount with manual entry
+- **Tax Profile Management**:
+  - Select tax profile (VAT, GST, SST, WHT, None) for each item
+  - Tax rate automatically set from selected tax profile
+  - Override calculated tax amount with manual entry
+- **Price Calculation**: System auto-calculates subtotal, net amount, and total based on inputs
+
+**Tax Profile Defaults**:
+| Tax Profile | Default Rate |
+|-------------|--------------|
+| VAT | 7% |
+| GST | 10% |
+| SST | 6% |
+| WHT | 3% |
+| None | 0% |
+
+**Acceptance Criteria**:
+- Purchasing staff role has access to all pricing fields in edit mode
+- Vendor dropdown shows only approved vendors for the item category
+- Currency selection updates exchange rate lookup
+- Tax rate field displays rate from selected tax profile (read-only)
+- Tax profile selection automatically updates tax rate
+- Override fields allow manual entry that bypasses calculation
+- All calculations update in real-time as values change
+- Changes are tracked in audit log with before/after values
+- Non-purchaser roles cannot edit vendor/pricing fields
+- FOC items automatically set unit price to 0
+
+**Field Availability by Role**:
+
+| Field | Requestor | Approver | Purchasing Staff |
+|-------|-----------|----------|------------------|
+| Vendor Selection | ❌ | ❌ | ✅ |
+| Currency | ❌ | ❌ | ✅ |
+| Exchange Rate | ❌ | ❌ | ✅ |
+| Unit Price | ❌ | ❌ | ✅ |
+| Discount Rate | ❌ | ❌ | ✅ |
+| Discount Override | ❌ | ❌ | ✅ |
+| Tax Profile | ❌ | ❌ | ✅ |
+| Tax Rate | ❌ | ❌ | 👁️ (Read-only) |
+| Tax Override | ❌ | ❌ | ✅ |
+| FOC Quantity | ❌ | ❌ | ✅ |
+| Approved Quantity | ❌ | ✅ | ✅ |
+| Delivery Point | ✅ | ✅ | ✅ |
+
+**Requestor Editable Fields by Status**:
+
+| Field | Draft | Void | Returned | In-progress | Notes |
+|-------|-------|------|----------|-------------|-------|
+| Delivery Date | ✅ | ✅ | ✅ | ❌ | Header level |
+| Description | ✅ | ✅ | ✅ | ❌ | PR purpose |
+| Item Name | ✅ | ✅ | ✅ | ❌ | Line item |
+| Item Quantity | ✅ | ✅ | ✅ | ❌ | Line item |
+| Unit of Measure | ✅ | ✅ | ✅ | ❌ | Line item |
+| Requested Delivery Date | ✅ | ✅ | ✅ | ❌ | Per item |
+| Delivery Point | ✅ | ✅ | ✅ | ❌ | Per item |
+| Item Notes | ✅ | ✅ | ✅ | ❌ | Line item |
+| Attachments | ✅ | ✅ | ✅ | ❌ | Add/remove |
+| Add New Items | ✅ | ✅ | ✅ | ❌ | Line item management |
+| Remove Items | ✅ | ✅ | ✅ | ❌ | Line item management |
+| Vendor | ❌ | ❌ | ❌ | ❌ | Purchasing only |
+| Unit Price | ❌ | ❌ | ❌ | ❌ | Purchasing only |
+| Discount | ❌ | ❌ | ❌ | ❌ | Purchasing only |
+| Tax | ❌ | ❌ | ❌ | ❌ | Purchasing only |
 
 ### FR-PR-012: Copy and Template
 
@@ -1148,6 +1322,279 @@ Integrating real-time inventory and pricing data into the PR creation process en
 
 ---
 
+### FR-PR-026: Bulk Item Actions
+
+**Priority**: High | **Status**: 🔧 Partial
+**User Story**: As an Approver or Purchasing Staff member, I want to select multiple line items and perform bulk actions (approve, reject, return, split, set date) so that I can efficiently process purchase requests with many items without having to action each item individually.
+
+**Requirements**:
+
+- **Item Selection**:
+  * Checkbox on each line item row for individual selection
+  * "Select All" checkbox in header to select all visible items
+  * Selected item count displayed in bulk action toolbar
+  * Status summary of selected items (e.g., "10 items selected: 3 Approved, 5 Pending, 2 Rejected")
+  * Selection persists during page scrolling (for paginated lists)
+  * Clear selection button to deselect all items
+
+- **Bulk Action Toolbar**:
+  * Appears when one or more items are selected
+  * Fixed position at top of item grid for visibility
+  * Shows selection summary: "{n} items selected: {status breakdown}"
+  * Action buttons displayed based on user role and item statuses
+  * Toolbar dismisses when selection cleared
+
+- **Approve Selected**:
+  * Available to: Approvers, Purchasing Staff
+  * Applies to items in "Pending" or "In-progress" status
+  * Sets item status to "Approved"
+  * Updates `approved_quantity` to match `requested_quantity` (unless modified)
+  * Records approval timestamp and approver for each item
+  * Skips items already approved (with notification)
+
+- **Reject Selected**:
+  * Available to: Approvers, Purchasing Staff
+  * Applies to items in "Pending" or "In-progress" status
+  * Opens rejection comment dialog (single comment applies to all selected items)
+  * Comment required (minimum 10 characters)
+  * Sets item status to "Rejected"
+  * Records rejection timestamp, user, and comment for each item
+  * Skips items already rejected (with notification)
+
+- **Return Selected**:
+  * Available to: Approvers, Purchasing Staff
+  * Applies to items in "Pending", "In-progress", or "Approved" status
+  * Opens return comment dialog (single comment applies to all selected items)
+  * Comment required (minimum 10 characters)
+  * Sets item status to "Returned"
+  * Item returns to requestor for revision
+  * Records return timestamp, user, and comment for each item
+
+- **Split**:
+  * Available to: Purchasing Staff
+  * Minimum 2 items must be selected
+  * Opens split configuration dialog
+  * Split options:
+    - By Vendor: Group selected items by assigned vendor
+    - By Delivery Date: Group selected items by required delivery date
+    - Manual Split: User defines item groupings
+  * Creates new PR(s) with split items
+  * Original PR updated to reflect remaining items
+  * Maintains audit trail linking original and split PRs
+
+- **Set Date Required**:
+  * Available to: Requestor (Draft/Void/Returned), Approvers, Purchasing Staff
+  * Opens date picker dialog
+  * Single date applies to all selected items
+  * Date must be >= current date
+  * Updates `delivery_date` field for all selected items
+  * Records date change in item audit trail
+
+**Role-Based Action Availability**:
+
+| Action | Requestor | Approver | Purchasing Staff | Notes |
+|--------|-----------|----------|------------------|-------|
+| Select Items | ✅ (Draft/Void/Returned) | ✅ | ✅ | Selection available based on edit permissions |
+| Approve Selected | ❌ | ✅ | ✅ | For pending/in-progress items |
+| Reject Selected | ❌ | ✅ | ✅ | Requires comment |
+| Return Selected | ❌ | ✅ | ✅ | Requires comment |
+| Split | ❌ | ❌ | ✅ | Minimum 2 items |
+| Set Date Required | ✅ (Draft/Void/Returned) | ✅ | ✅ | Date >= today |
+
+**UI Specifications**:
+
+- **Selection Checkbox Column**:
+  * Position: First column in item grid
+  * Width: 40px fixed
+  * Header: Checkbox for "Select All"
+  * Row: Checkbox for item selection
+  * Indeterminate state when some items selected
+
+- **Bulk Action Toolbar Layout**:
+  ```
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ ☑ 10 items selected: 3 Approved                                        │
+  │ [Approve Selected] [Reject Selected] [Return Selected] [Split] [Set Date Required] │
+  └─────────────────────────────────────────────────────────────────────────┘
+  ```
+
+- **Button Styling**:
+  * Approve Selected: Primary/Green
+  * Reject Selected: Destructive/Red
+  * Return Selected: Outline/Gray
+  * Split: Secondary/Blue
+  * Set Date Required: Secondary/Blue
+
+**Validation Rules**:
+
+- **Pre-Action Validation**:
+  * Minimum 1 item selected for all actions (except Split requires 2)
+  * User has permission for the action
+  * Items in valid status for the action
+  * Comment provided for reject/return actions
+
+- **Action Conflict Handling**:
+  * If some selected items are not valid for action:
+    - Display warning: "X of Y items cannot be {action}ed"
+    - Options: "Proceed with valid items" or "Cancel"
+  * If all selected items are invalid:
+    - Display error: "No items can be {action}ed"
+    - Action button disabled
+
+**Acceptance Criteria**:
+- Checkbox selection works on individual items and "Select All"
+- Bulk action toolbar appears when items are selected
+- Selection count and status summary updates in real-time
+- All bulk actions process correctly for valid items
+- Invalid items are skipped with appropriate notification
+- Comment dialogs enforce minimum character requirement
+- Date picker enforces future date requirement
+- Split action creates new PR(s) with correct item grouping
+- All actions logged in activity trail with bulk operation indicator
+- Performance: Bulk actions complete within 3 seconds for up to 50 items
+- Mobile: Bulk actions accessible via long-press or action menu
+
+**Integration Points**:
+- Workflow Engine for status updates
+- Notification Service for action confirmations
+- Audit Service for activity logging
+- PR Management for split operations
+
+---
+
+### FR-PR-027: Budget Tab CRUD Operations
+
+**Priority**: High | **Status**: ✅ Implemented
+**User Story**: As a Finance Manager or Purchasing Staff member, I want to manage budget allocations directly within the Purchase Request detail view so that I can add, edit, and remove budget entries to accurately track departmental spending and commitments.
+
+**Requirements**:
+
+- **Budget Allocation Display**:
+  * Display budget allocations in a tabular format within the Budget tab
+  * Show columns: Location, Category, Total Budget, Soft Commitment (Dept Head), Soft Commitment (PO), Hard Commitment, Available Budget, Current PR Amount, Status
+  * Support both desktop table view and mobile card view
+  * Real-time calculation of totals and available budget
+
+- **Add Budget Allocation**:
+  * "Add Budget" button opens a dialog form
+  * Required fields: Location (dropdown), Category (dropdown), Total Budget (currency)
+  * Optional fields: Soft Commitment (Dept Head), Soft Commitment (PO), Hard Commitment, Current PR Amount
+  * Available budget calculated automatically: Total Budget - Soft Commitments - Hard Commitment
+  * Status calculated automatically based on budget utilization
+  * Duplicate check: Cannot add same Location + Category combination twice
+
+- **Edit Budget Allocation**:
+  * Edit action available via row dropdown menu (desktop) or card menu (mobile)
+  * Opens same dialog form pre-populated with existing values
+  * All fields editable except calculated fields (Available Budget, Status)
+  * Real-time preview of available budget as values change
+  * Validation before save
+
+- **Delete Budget Allocation**:
+  * Delete action available via row dropdown menu
+  * Confirmation dialog before deletion (AlertDialog)
+  * Shows budget details in confirmation to prevent accidental deletion
+  * Toast notification on successful deletion
+
+- **Status Calculation**:
+  * **Over Budget**: Available budget < 0
+  * **Near Limit**: Budget utilization >= 80% (Available Budget <= 20% of Total Budget)
+  * **Within Budget**: Available budget >= 20% of Total Budget
+
+- **Totals Calculation**:
+  * Dynamic footer showing totals for all numeric columns
+  * Totals update in real-time as budget items are added, edited, or deleted
+  * Currency formatting with proper locale settings
+
+**Location Options**:
+- Front Office, Accounting, HouseKeeping, Kitchen, Restaurant, Engineering, IT, HR, Sales, Marketing
+
+**Category Options**:
+- F&B, Operating Supplies, Maintenance, Equipment, Services
+
+**BudgetItem Interface**:
+```typescript
+interface BudgetItem {
+  id: string;
+  location: string;
+  category: string;
+  totalBudget: number;
+  softCommitmentDeptHead: number;
+  softCommitmentPO: number;
+  hardCommitment: number;
+  availableBudget: number;        // Calculated
+  currentPRAmount: number;
+  status: 'Over Budget' | 'Within Budget' | 'Near Limit';  // Calculated
+}
+```
+
+**Role-Based Access**:
+
+| Action | Requestor | Approver | Purchasing Staff | Finance Manager |
+|--------|-----------|----------|------------------|-----------------|
+| View Budget Tab | ✅ | ✅ | ✅ | ✅ |
+| Add Budget | ❌ | ❌ | ✅ | ✅ |
+| Edit Budget | ❌ | ❌ | ✅ | ✅ |
+| Delete Budget | ❌ | ❌ | ✅ | ✅ |
+
+**UI Specifications**:
+
+- **Add Budget Button**:
+  * Position: Top-right of Budget tab content area
+  * Icon: Plus icon
+  * Style: Primary/default button variant
+
+- **Dialog Form Layout**:
+  * Two-column grid for desktop, single column for mobile
+  * Location and Category as dropdown selectors
+  * Numeric fields with currency formatting
+  * Real-time Available Budget preview section
+  * Cancel and Save buttons in footer
+
+- **Row Actions Dropdown**:
+  * Trigger: MoreHorizontal icon button
+  * Menu items: Edit (with Pencil icon), Delete (with Trash2 icon, destructive style)
+  * Separator between Edit and Delete
+
+- **Delete Confirmation Dialog**:
+  * AlertDialog component for accessibility
+  * Shows Location and Category of item being deleted
+  * Warning message about irreversibility
+  * Cancel (outline) and Delete (destructive) buttons
+
+**Validation Rules**:
+
+- **Required Fields**: Location, Category, Total Budget
+- **Numeric Validation**: All amount fields must be >= 0
+- **Duplicate Prevention**: Location + Category combination must be unique
+- **Format Validation**: Numeric fields accept only valid numbers
+
+**Error Messages**:
+- Location required: "Location is required"
+- Category required: "Category is required"
+- Total Budget required: "Total Budget is required"
+- Invalid number: "Must be a valid number >= 0"
+- Duplicate entry: "Budget allocation for this Location and Category already exists"
+
+**Acceptance Criteria**:
+- Add Budget button visible and functional for authorized roles
+- Dialog form validates all required fields before submission
+- Edit pre-populates form with existing data correctly
+- Delete confirmation prevents accidental deletions
+- Totals row updates dynamically on any data change
+- Available Budget calculates correctly: Total - Soft (Dept Head) - Soft (PO) - Hard Commitment
+- Status indicators show correct color coding (red for Over Budget, yellow for Near Limit, green for Within Budget)
+- Toast notifications confirm successful operations
+- Mobile view displays budget data in card format with same functionality
+- All actions logged for audit trail
+
+**Integration Points**:
+- Budget Management System for budget validation
+- User Role Service for permission checking
+- Audit Service for activity logging
+
+---
+
 ## Business Rules
 
 > **Status Summary**: 🔧 Partial - Frontend validation exists; backend enforcement and integration pending
@@ -1233,30 +1680,193 @@ Integrating real-time inventory and pricing data into the PR creation process en
 - **BR-PR-061**: When product manually selected from catalog, tax rate defaults from product table
 - **BR-PR-062**: When auto-allocate triggered, tax rate comes from price list
 - **BR-PR-063**: When manual allocate, tax rate assigned from price list
-- **BR-PR-064**: “Adjust” checkbox prevents automatic price updates when checked
+- **BR-PR-064**: "Adjust" checkbox prevents automatic price updates when checked
 - **BR-PR-065**: Tax rate can be overridden by user with appropriate permissions
+
+### Budget Tab CRUD Rules (✅ Implemented)
+
+- **BR-PR-066**: Budget allocations must have unique Location + Category combinations per PR
+- **BR-PR-067**: Available Budget = Total Budget - Soft Commitment (Dept Head) - Soft Commitment (PO) - Hard Commitment
+- **BR-PR-068**: Status "Over Budget" when Available Budget < 0
+- **BR-PR-069**: Status "Near Limit" when Available Budget <= 20% of Total Budget
+- **BR-PR-070**: Status "Within Budget" when Available Budget > 20% of Total Budget
+- **BR-PR-071**: Only Purchasing Staff and Finance Manager can add/edit/delete budget allocations
+- **BR-PR-072**: All numeric budget fields must be >= 0
+- **BR-PR-073**: Location and Category are required fields for budget allocation
+- **BR-PR-074**: Total Budget is a required field and must be > 0
+- **BR-PR-075**: Budget deletion requires confirmation dialog
+- **BR-PR-076**: Budget totals recalculate dynamically on any CRUD operation
 
 ## Data Model
 
 ### Purchase Request Entity
 
-```tsx
-interface PurchaseRequest {
-  id: string                      // UUID  refNumber: string               // PR-YYYY-NNNNNN  date: Date                      // Creation date  type: 'General' | 'Market List' | 'Asset'  deliveryDate: Date              // Required delivery date  description: string             // Purpose description  justification?: string          // Business justification  requestorId: string             // User ID  requestor: {
-    name: string    id: string    department: string    email: string  }
-  status: PRStatus                // Current status  workflowStatus: WorkflowStatus  // Approval status  location: string                // Location code  department: string              // Department code  jobCode?: string                // Project/job code  currency: string                // Transaction currency  baseCurrency: string            // Organization base currency  exchangeRate: number            // Currency exchange rate  // Financial amounts in transaction currency  subTotalPrice: number  discountAmount: number  netAmount: number  taxAmount: number  totalAmount: number  // Financial amounts in base currency  baseSubTotalPrice: number  baseDiscAmount: number  baseNetAmount: number  baseTaxAmount: number  baseTotalAmount: number  // Relationships  items: PurchaseRequestItem[]
-  attachments: Attachment[]
-  comments: Comment[]
-  approvalHistory: ApprovalRecord[]
-  // Audit fields  createdDate: Date  createdBy: string  updatedDate: Date  updatedBy: string}
-```
+**Purpose**: Represents a purchase request document containing header information, financial totals, and relationships to line items, attachments, comments, and approval history.
+
+#### Primary Key
+- **id**: Unique identifier (UUID format)
+
+#### Core Fields
+| Field | Type | Description |
+|-------|------|-------------|
+| refNumber | Text | Reference number in format PR-YYYY-NNNNNN |
+| date | Date | Creation date of the purchase request |
+| type | Enum | Type of request: General, Market List, or Asset |
+| deliveryDate | Date | Required delivery date for all items |
+| description | Text | Purpose or description of the purchase request |
+| justification | Text (optional) | Business justification for the request |
+
+#### Requestor Information
+| Field | Type | Description |
+|-------|------|-------------|
+| requestorId | Text | User ID of the person creating the request |
+| requestor.name | Text | Display name of the requestor |
+| requestor.department | Text | Department of the requestor |
+| requestor.email | Text | Email address of the requestor |
+
+#### Status and Workflow
+| Field | Type | Description |
+|-------|------|-------------|
+| status | Enum | Current status: Draft, In-progress, Approved, Void, Completed, Cancelled |
+| workflowStatus | Enum | Approval workflow status |
+| location | Text | Location code where items are needed |
+| department | Text | Department code for the request |
+| jobCode | Text (optional) | Project or job code for cost allocation |
+
+#### Currency and Exchange
+| Field | Type | Description |
+|-------|------|-------------|
+| currency | Text | Transaction currency code |
+| baseCurrency | Text | Organization base currency code |
+| exchangeRate | Number | Exchange rate from transaction to base currency |
+
+#### Financial Totals (Transaction Currency)
+| Field | Type | Description |
+|-------|------|-------------|
+| subTotalPrice | Number | Sum of all line item subtotals (2 decimals) |
+| discountAmount | Number | Total discount amount (2 decimals) |
+| netAmount | Number | Subtotal minus discount (2 decimals) |
+| taxAmount | Number | Total tax amount (2 decimals) |
+| totalAmount | Number | Net amount plus tax (2 decimals) |
+
+#### Financial Totals (Base Currency)
+| Field | Type | Description |
+|-------|------|-------------|
+| baseSubTotalPrice | Number | Subtotal converted to base currency |
+| baseDiscAmount | Number | Discount converted to base currency |
+| baseNetAmount | Number | Net amount converted to base currency |
+| baseTaxAmount | Number | Tax converted to base currency |
+| baseTotalAmount | Number | Total converted to base currency |
+
+#### Relationships
+| Field | Type | Description |
+|-------|------|-------------|
+| items | Collection | List of Purchase Request Item records |
+| attachments | Collection | List of file attachments |
+| comments | Collection | List of comments and notes |
+| approvalHistory | Collection | List of approval action records |
+
+#### Audit Fields
+| Field | Type | Description |
+|-------|------|-------------|
+| createdDate | DateTime | Timestamp when record was created |
+| createdBy | Text | User ID who created the record |
+| updatedDate | DateTime | Timestamp of last modification |
+| updatedBy | Text | User ID who last modified the record |
+
+---
 
 ### Purchase Request Item Entity
 
-```tsx
-interface PurchaseRequestItem {
-  id: string  prId: string                    // Parent PR ID  lineNumber: number              // Sequence number  // Item details  itemCode?: string               // Product code (if catalog item)  name: string                    // Item name/description  description?: string            // Additional description  specification?: string          // Technical specifications  // Quantity and units  quantityRequested: number       // Requested quantity (3 decimals)  quantityApproved?: number       // Approved quantity (3 decimals)  unit: string                    // Unit of measure  // Location and delivery  location: string                // Storage location  deliveryDate: Date              // Required delivery date  deliveryPoint: string           // Delivery location  // Pricing and financial  currency: string  price: number                   // Unit price (2 decimals)  subtotal: number                // Quantity × Price  discountRate: number            // Discount percentage  discountAmount: number          // Calculated discount  netAmount: number               // Subtotal - Discount  taxRate: number                 // Tax percentage  taxAmount: number               // Calculated tax  totalAmount: number             // Net + Tax  // Base currency amounts  baseSubtotal: number  baseDiscAmount: number  baseNetAmount: number  baseTaxAmount: number  baseTotalAmount: number  // Classification  itemCategory: string  itemSubcategory?: string  accountCode?: string            // GL account code  jobCode?: string                // Project/job code  // Vendor information  vendorId?: number  vendorName?: string  pricelistNumber?: string  // Additional fields  focQuantity?: number            // FOC quantity (if FOC item). Item is FOC if focQuantity > 0  focUnit?: string                // FOC unit of measure (may differ from order unit, required if focQuantity > 0)  taxIncluded: boolean            // Tax inclusive flag  comment?: string                // Line item notes  // Audit fields  createdDate: Date  createdBy: string  updatedDate: Date  updatedBy: string}
-```
+**Purpose**: Represents an individual line item within a purchase request, containing product details, quantities, pricing, vendor information, and delivery specifications.
+
+#### Primary Key
+- **id**: Unique identifier (UUID format)
+
+#### Parent Relationship
+| Field | Type | Description |
+|-------|------|-------------|
+| prId | Text | Foreign key to parent Purchase Request |
+| lineNumber | Number | Sequence number for display ordering |
+
+#### Item Details
+| Field | Type | Description |
+|-------|------|-------------|
+| itemCode | Text (optional) | Product code if selecting from catalog |
+| name | Text | Item name or description |
+| description | Text (optional) | Additional description or notes |
+| specification | Text (optional) | Technical specifications |
+
+#### Quantity and Units
+| Field | Type | Description |
+|-------|------|-------------|
+| quantityRequested | Number | Requested quantity (3 decimal places) |
+| quantityApproved | Number (optional) | Approved quantity after review (3 decimal places) |
+| unit | Text | Unit of measure code |
+
+#### Location and Delivery
+| Field | Type | Description |
+|-------|------|-------------|
+| location | Text | Storage location code |
+| deliveryDate | Date | Required delivery date for this item |
+| deliveryPoint | Text | Delivery point or receiving location |
+
+#### Pricing (Transaction Currency)
+| Field | Type | Description |
+|-------|------|-------------|
+| currency | Text | Currency code for pricing |
+| price | Number | Unit price (2 decimal places) |
+| subtotal | Number | Quantity multiplied by unit price |
+| discountRate | Number | Discount percentage (0-100) |
+| discountAmount | Number | Calculated discount amount |
+| netAmount | Number | Subtotal minus discount |
+| taxRate | Number | Tax percentage |
+| taxAmount | Number | Calculated tax amount |
+| totalAmount | Number | Net amount plus tax |
+
+#### Pricing (Base Currency)
+| Field | Type | Description |
+|-------|------|-------------|
+| baseSubtotal | Number | Subtotal converted to base currency |
+| baseDiscAmount | Number | Discount converted to base currency |
+| baseNetAmount | Number | Net amount converted to base currency |
+| baseTaxAmount | Number | Tax converted to base currency |
+| baseTotalAmount | Number | Total converted to base currency |
+
+#### Classification
+| Field | Type | Description |
+|-------|------|-------------|
+| itemCategory | Text | Primary category for the item |
+| itemSubcategory | Text (optional) | Subcategory for the item |
+| accountCode | Text (optional) | General ledger account code |
+| jobCode | Text (optional) | Project or job code for cost allocation |
+
+#### Vendor Information
+| Field | Type | Description |
+|-------|------|-------------|
+| vendorId | Number (optional) | Vendor identifier |
+| vendorName | Text (optional) | Vendor display name |
+| pricelistNumber | Text (optional) | Reference to vendor price list |
+
+#### FOC (Free of Charge) Fields
+| Field | Type | Description |
+|-------|------|-------------|
+| focQuantity | Number (optional) | FOC quantity if item includes free goods |
+| focUnit | Text (optional) | Unit of measure for FOC quantity |
+| taxIncluded | Boolean | Whether price includes tax |
+
+#### Additional Fields
+| Field | Type | Description |
+|-------|------|-------------|
+| comment | Text (optional) | Line item notes or comments |
+
+#### Audit Fields
+| Field | Type | Description |
+|-------|------|-------------|
+| createdDate | DateTime | Timestamp when record was created |
+| createdBy | Text | User ID who created the record |
+| updatedDate | DateTime | Timestamp of last modification |
+| updatedBy | Text | User ID who last modified the record |
 
 ## Integration Points
 
@@ -1389,15 +1999,15 @@ This section provides a high-level overview of implementation progress across al
 
 | Category | Total | ✅ Implemented | 🔧 Partial | 🚧 Pending | ⏳ Future |
 |----------|-------|----------------|------------|------------|-----------|
-| Functional Requirements | 25 | 3 | 10 | 12 | 0 |
+| Functional Requirements | 26 | 3 | 11 | 12 | 0 |
 | Business Rules | ~65 | 6 | 15 | 44 | 0 |
 | Non-Functional Requirements | 25 | 0 | 5 | 20 | 0 |
 
 ### Implementation Progress by Category
 
-**Functional Requirements (25 total)**:
+**Functional Requirements (26 total)**:
 - ✅ Implemented (3): Status Management, List View & Filtering, Detail View
-- 🔧 Partial (10): PR Creation, Item Management, Approval Workflow, Edit/Modify, Copy/Template, Print/Export, Mobile Responsiveness, Item Metadata, Monetary Formatting, Enhanced Pricing fields
+- 🔧 Partial (11): PR Creation, Item Management, Approval Workflow, Edit/Modify, Copy/Template, Print/Export, Mobile Responsiveness, Item Metadata, Monetary Formatting, Enhanced Pricing fields, Bulk Item Actions
 - 🚧 Pending (12): Financial Calculations, Budget Control, Document Management, Comments/Collaboration, Notifications, Real-Time Inventory, Inventory Display, FOC Visibility, Price Visibility, Delivery Point Dropdown, Header Total Removal, Amount Override
 
 **Business Rules (~65 total)**:

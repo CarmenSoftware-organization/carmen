@@ -2,8 +2,8 @@
 
 ## Document Information
 - **Module**: System Administration / Location Management
-- **Version**: 1.1
-- **Last Updated**: 2025-11-26
+- **Version**: 1.2
+- **Last Updated**: 2025-11-28
 - **Status**: Active
 
 ## Document History
@@ -12,6 +12,7 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 | 1.1.0 | 2025-11-26 | Documentation Team | Code compliance review - removed fictional features, added missing features |
+| 1.2.0 | 2025-11-28 | Documentation Team | Delivery Points moved to separate maintenance page, Users Tab updated with checkboxes |
 
 ## Overview
 
@@ -82,49 +83,46 @@ Location Management enables operations managers to define and manage physical an
 
 ---
 
-### FR-LOC-004: Delivery Points Management
+### FR-LOC-004: Delivery Point Reference
 **Priority**: Medium
-**User Story**: As a Purchasing Manager, I want to configure delivery points for locations so that vendors know where to deliver goods.
+**User Story**: As a Purchasing Manager, I want to assign a delivery point to a location so that vendors know where to deliver goods.
 
 **Requirements**:
-- Create multiple delivery points per location
-- Configure delivery point details: name, code, address, contact info
-- Set delivery instructions and access instructions
-- Configure logistics: max vehicle size, dock leveler availability, forklift availability
-- Set operating hours
-- Mark one delivery point as primary
+- Select delivery point from centralized Delivery Points list (see FR-DP-001 in Delivery Points BR)
+- Display assigned delivery point name in view mode
+- Dropdown selector showing active delivery points in edit mode
 
 **Acceptance Criteria**:
-- Add/Edit/Delete delivery points from location detail page
-- Primary delivery point displayed with star badge
-- Active/Inactive status per delivery point
-- Full address with city, postal code, country
+- Delivery Point dropdown field in General tab under Organization section
+- Shows delivery point name and code with city in dropdown options
+- Display "Not assigned" when no delivery point selected
+- Only active delivery points shown in dropdown
+
+**Note**: Delivery Points are now managed in a separate Delivery Points maintenance page under System Administration. See `/docs/app/system-administration/delivery-points/BR-delivery-points.md` for full requirements.
 
 ---
 
 ### FR-LOC-005: User Assignment
 **Priority**: High
-**User Story**: As a System Administrator, I want to assign users to locations with specific roles so that they can perform authorized operations.
+**User Story**: As a System Administrator, I want to assign users to locations so that they can perform authorized operations.
 
 **Requirements**:
-- Assign users to locations with role selection
-- Available roles: Location Manager, Inventory Controller, Receiver, Picker, Counter, Viewer
-- Configure granular permissions per assignment
-- Mark one assignment as primary location
-- Remove user assignments
-
-**Available Permissions**:
-- location:view, location:edit
-- inventory:view, inventory:receive, inventory:issue, inventory:adjust, inventory:transfer
-- count:view, count:participate, count:finalize
-- shelf:manage
+- Dual-panel transfer list interface for user assignment
+- Left panel: Available users (not assigned to location)
+- Right panel: Assigned users (currently assigned to location)
+- Checkbox selection for individual users
+- Bulk selection with "Select All" checkbox (includes indeterminate state)
+- Transfer buttons to move users between panels
+- Search users by name, email, or department
 
 **Acceptance Criteria**:
-- User selection from available users list
-- Role dropdown with all location roles
-- Permission checkboxes with descriptions
-- Primary location indicator (star icon)
-- Edit and Remove actions per assignment
+- Checkbox next to each user for selection
+- "Select All" checkbox in each panel header with indeterminate state when partially selected
+- Transfer buttons (chevron right/left) between panels
+- Buttons disabled when no users selected or not in edit mode
+- Selection summary showing count of users selected to assign/remove
+- Search filters both panels simultaneously
+- User display shows email (primary) and name with department (secondary)
 
 ---
 
@@ -272,11 +270,11 @@ Consignment type locations should have a vendor assigned for proper ownership tr
 ### BR-004: Shelf Code Uniqueness
 Shelf codes should be unique within a location.
 
-### BR-005: One Primary Delivery Point
-Each location should have at most one delivery point marked as primary.
+### BR-005: Delivery Point Reference
+Delivery points are managed centrally and referenced by locations. A location can have one assigned delivery point.
 
-### BR-006: One Primary User Assignment
-Each user's assignments can have at most one location marked as primary.
+### BR-006: User Assignment via Transfer List
+Users are assigned to locations using a dual-panel transfer list with checkbox selection and bulk operations.
 
 ---
 
@@ -285,6 +283,7 @@ Each user's assignments can have at most one location marked as primary.
 - **Product Management**: Provides product catalog for product assignments
 - **User Management**: Provides user list for user assignments
 - **Vendor Management**: Provides vendor list for consignment locations
+- **Delivery Points**: Provides delivery point list for location assignment (see Delivery Points module)
 
 ---
 
@@ -307,6 +306,7 @@ Each user's assignments can have at most one location marked as primary.
 - departmentId, departmentName
 - costCenterId, costCenterName
 - consignmentVendorId, consignmentVendorName
+- deliveryPointId, deliveryPointName
 - shelvesCount, assignedUsersCount, assignedProductsCount
 - address (optional)
 - createdAt, createdBy, updatedAt, updatedBy
@@ -329,10 +329,12 @@ Each user's assignments can have at most one location marked as primary.
 - currentQuantity, isActive, isStocked
 - assignedAt, assignedBy
 
-### DeliveryPoint
-- id, locationId, name, code
+### DeliveryPoint (Reference Only - See Delivery Points Module)
+- id, name, code
 - address, contactName, contactPhone, contactEmail
 - deliveryInstructions, operatingHours
 - maxVehicleSize, hasDockLeveler, hasForklift
-- isPrimary, isActive
+- isActive
 - createdAt, createdBy
+
+**Note**: DeliveryPoint entity is now managed in the standalone Delivery Points maintenance page. Locations reference delivery points via deliveryPointId field.

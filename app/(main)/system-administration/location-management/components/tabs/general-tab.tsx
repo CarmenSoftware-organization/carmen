@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -21,6 +21,7 @@ import {
   LOCATION_TYPE_LABELS,
   LOCATION_TYPE_DESCRIPTIONS,
 } from "@/lib/types/location-management"
+import { getActiveDeliveryPoints } from "@/lib/mock-data/inventory-locations"
 
 interface GeneralTabProps {
   location: InventoryLocation
@@ -28,6 +29,9 @@ interface GeneralTabProps {
 }
 
 export function GeneralTab({ location, isEditing }: GeneralTabProps) {
+  // Get all active delivery points for the lookup
+  const deliveryPoints = useMemo(() => getActiveDeliveryPoints(), [])
+
   return (
     <div className="space-y-6">
       {/* Basic Information */}
@@ -219,6 +223,33 @@ export function GeneralTab({ location, isEditing }: GeneralTabProps) {
               ) : (
                 <p className="text-sm p-2 bg-muted rounded-md">
                   {location.costCenterName || 'Not assigned'}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="deliveryPoint">Delivery Point</Label>
+              {isEditing ? (
+                <Select defaultValue={location.deliveryPointId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select delivery point" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {deliveryPoints.map((dp) => (
+                      <SelectItem key={dp.id} value={dp.id}>
+                        <div>
+                          <div className="font-medium">{dp.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {dp.code} - {dp.address.city}
+                          </div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="text-sm p-2 bg-muted rounded-md">
+                  {location.deliveryPointName || 'Not assigned'}
                 </p>
               )}
             </div>

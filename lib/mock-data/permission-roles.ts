@@ -128,6 +128,19 @@ export const mockRoles: Role[] = [
     isSystem: false
   },
   {
+    id: 'role-009b',
+    name: 'Purchasing Staff',
+    description: 'Purchase request processing, vendor selection, and price assignment',
+    permissions: [
+      'purchase_request:view', 'purchase_request:update', 'purchase_request:assign_vendor',
+      'purchase_order:create', 'purchase_order:update', 'purchase_order:send',
+      'vendor:view', 'vendor_quotation:create', 'goods_receipt_note:create',
+      'settings:user-preferences:*'
+    ],
+    hierarchy: 6,
+    isSystem: false
+  },
+  {
     id: 'role-010',
     name: 'Inventory Supervisor',
     description: 'Inventory control and stock management oversight',

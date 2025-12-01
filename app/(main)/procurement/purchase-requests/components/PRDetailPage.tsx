@@ -749,7 +749,7 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
                 );
               }
 
-              // For Approvers - show smart workflow buttons
+              // For Approvers - show all workflow buttons (Reject, Return, Approve)
               const approverRoles = ['Department Manager', 'Financial Manager', 'Approver', 'General Manager', 'Finance Director'];
               if (approverRoles.includes(userRoleName)) {
                 if (workflowDecision.action === 'blocked') {
@@ -768,50 +768,44 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
 
                 return (
                   <>
-                    {workflowDecision.action === 'reject' && (
-                      <Button
-                        onClick={handleReject}
-                        variant={workflowDecision.buttonVariant}
-                        size="sm"
-                        className="h-9"
-                        disabled={!workflowDecision.canSubmit}
-                      >
-                        <XCircleIcon className="mr-2 h-4 w-4" />
-                        {workflowDecision.buttonText}
-                      </Button>
-                    )}
+                    <Button
+                      onClick={handleReject}
+                      variant="destructive"
+                      size="sm"
+                      className="h-9"
+                      disabled={!workflowDecision.canSubmit}
+                    >
+                      <XCircleIcon className="mr-2 h-4 w-4" />
+                      Reject
+                    </Button>
 
-                    {workflowDecision.action === 'return' && (
-                      <Button
-                        onClick={handleSendBack}
-                        variant={workflowDecision.buttonVariant}
-                        size="sm"
-                        className={`h-9 ${workflowDecision.buttonColor || ''}`}
-                        disabled={!workflowDecision.canSubmit}
-                      >
-                        <RotateCcwIcon className="mr-2 h-4 w-4" />
-                        {workflowDecision.buttonText}
-                      </Button>
-                    )}
+                    <Button
+                      onClick={handleSendBack}
+                      variant="outline"
+                      size="sm"
+                      className="h-9"
+                      disabled={!workflowDecision.canSubmit}
+                    >
+                      <RotateCcwIcon className="mr-2 h-4 w-4" />
+                      Return
+                    </Button>
 
-                    {workflowDecision.action === 'approve' && (
-                      <Button
-                        onClick={handleApprove}
-                        variant={workflowDecision.buttonVariant}
-                        size="sm"
-                        className={`h-9 ${workflowDecision.buttonColor || 'bg-green-600 hover:bg-green-700'}`}
-                        disabled={!workflowDecision.canSubmit}
-                      >
-                        <CheckCircleIcon className="mr-2 h-4 w-4" />
-                        {workflowDecision.buttonText}
-                      </Button>
-                    )}
+                    <Button
+                      onClick={handleApprove}
+                      variant="default"
+                      size="sm"
+                      className="h-9 bg-green-600 hover:bg-green-700"
+                      disabled={!workflowDecision.canSubmit}
+                    >
+                      <CheckCircleIcon className="mr-2 h-4 w-4" />
+                      Approve
+                    </Button>
                   </>
                 );
               }
 
-              // For Purchasing Staff - show smart workflow buttons
-              const purchaserRoles = ['Purchasing Staff', 'Purchaser', 'Procurement Manager'];
+              // For Purchasing Staff - show all workflow buttons (Reject, Return, Submit)
+              const purchaserRoles = ['Purchasing Staff', 'Purchaser', 'Procurement Manager', 'Purchasing Agent'];
               if (purchaserRoles.includes(userRoleName)) {
                 if (workflowDecision.action === 'blocked') {
                   return (
@@ -829,44 +823,38 @@ export default function PRDetailPage({ prId: propPrId }: PRDetailPageProps) {
 
                 return (
                   <>
-                    {workflowDecision.action === 'reject' && (
-                      <Button
-                        onClick={handleReject}
-                        variant={workflowDecision.buttonVariant}
-                        size="sm"
-                        className="h-9"
-                        disabled={!workflowDecision.canSubmit}
-                      >
-                        <XCircleIcon className="mr-2 h-4 w-4" />
-                        {workflowDecision.buttonText}
-                      </Button>
-                    )}
+                    <Button
+                      onClick={handleReject}
+                      variant="destructive"
+                      size="sm"
+                      className="h-9"
+                      disabled={!workflowDecision.canSubmit}
+                    >
+                      <XCircleIcon className="mr-2 h-4 w-4" />
+                      Reject
+                    </Button>
 
-                    {workflowDecision.action === 'return' && (
-                      <Button
-                        onClick={handleSendBack}
-                        variant={workflowDecision.buttonVariant}
-                        size="sm"
-                        className={`h-9 ${workflowDecision.buttonColor || ''}`}
-                        disabled={!workflowDecision.canSubmit}
-                      >
-                        <RotateCcwIcon className="mr-2 h-4 w-4" />
-                        {workflowDecision.buttonText}
-                      </Button>
-                    )}
+                    <Button
+                      onClick={handleSendBack}
+                      variant="outline"
+                      size="sm"
+                      className="h-9"
+                      disabled={!workflowDecision.canSubmit}
+                    >
+                      <RotateCcwIcon className="mr-2 h-4 w-4" />
+                      Return
+                    </Button>
 
-                    {workflowDecision.action === 'approve' && (
-                      <Button
-                        onClick={handleSubmitForApproval}
-                        variant={workflowDecision.buttonVariant}
-                        size="sm"
-                        className={`h-9 ${workflowDecision.buttonColor || 'bg-green-600 hover:bg-green-700'}`}
-                        disabled={!workflowDecision.canSubmit}
-                      >
-                        <CheckCircle className="mr-2 h-4 w-4" />
-                        Submit & {workflowDecision.buttonText.replace('Submit & ', '')}
-                      </Button>
-                    )}
+                    <Button
+                      onClick={handleSubmitForApproval}
+                      variant="default"
+                      size="sm"
+                      className="h-9 bg-blue-600 hover:bg-blue-700"
+                      disabled={!workflowDecision.canSubmit}
+                    >
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Submit
+                    </Button>
                   </>
                 );
               }

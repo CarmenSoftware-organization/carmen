@@ -3,8 +3,8 @@
 **Module**: Procurement
 **Sub-Module**: Purchase Requests
 **Document Type**: Use Cases (UC)
-**Version**: 1.1.0
-**Last Updated**: 2025-11-26
+**Version**: 1.6.0
+**Last Updated**: 2025-11-28
 **Status**: Active
 
 ## Document History
@@ -13,6 +13,11 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 | 1.1.0 | 2025-11-26 | Documentation Team | Synchronized with BR - updated status values, added implementation status markers |
+| 1.2.0 | 2025-11-28 | Development Team | Added UC-PR-017: Purchasing Staff Edit Mode - Vendor Pricing and Allocations |
+| 1.3.0 | 2025-11-28 | Development Team | Added UC-PR-018: Return PR for Revision, UC-PR-019: Submit PR to Next Stage, UC-PR-020: Purchasing Staff Reject PR |
+| 1.4.0 | 2025-11-28 | Development Team | Enhanced UC-PR-002 with Returned status as editable, added detailed sub-flows for Add/Edit/Remove line items, added Requestor Editable Fields matrix |
+| 1.5.0 | 2025-11-28 | Development Team | Added UC-PR-021: Bulk Item Actions for line-item level bulk operations (Approve Selected, Reject Selected, Return Selected, Split, Set Date Required) |
+| 1.6.0 | 2025-11-28 | Development Team | Added UC-PR-022: Budget Tab CRUD Operations for managing budget allocations within Purchase Requests |
 
 ## Implementation Status
 
@@ -395,9 +400,9 @@ Allows staff to create a new purchase request by entering header information and
 
 ---
 
-### UC-PR-002: Edit Draft Purchase Request
+### UC-PR-002: Edit Purchase Request (Requestor)
 
-**Priority**: High | **Status**: 🔧 Partial
+**Priority**: High | **Status**: ✅ Implemented
 **Frequency**: Daily (30-50 per day)
 **Actors**: Requestor
 
@@ -408,13 +413,19 @@ graph LR
     Requestor([👤 Requestor])
 
     subgraph PRS["Purchase Request System"]
-        UC002((Edit Draft PR))
+        UC002((Edit PR))
         UC102((Calculate<br/>Totals))
         UC004((View PR<br/>Status))
+        UC002A((Add Item))
+        UC002B((Edit Item))
+        UC002C((Remove Item))
     end
 
     Requestor --- UC002
     UC002 -.->|include| UC102
+    UC002 -.->|include| UC002A
+    UC002 -.->|include| UC002B
+    UC002 -.->|include| UC002C
     UC004 -.->|extend| UC002
 
     classDef actor fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
@@ -422,60 +433,149 @@ graph LR
     classDef system fill:#f0f0f0,stroke:#666666,stroke-width:2px
 
     class Requestor actor
-    class UC002,UC004 usecase
+    class UC002,UC004,UC002A,UC002B,UC002C usecase
     class UC102 system
 
     style PRS fill:#ffffff,stroke:#333333,stroke-width:3px
 ```
 
 #### Description
-Allows requestor to modify a purchase request that is in Draft or Void status.
+Allows requestor to modify a purchase request that is in Draft, Void, or Returned status. The requestor can edit header information, add/edit/remove line items, and save or submit the PR.
 
 #### Preconditions
 - User must be authenticated
 - PR must exist
-- PR status must be "Draft" or "Void"
+- PR status must be "Draft", "Void", or "Returned"
 - User must be the creator of the PR
 
 #### Postconditions
 - **Success**: PR updated with new values, version incremented
 - **Failure**: Error message displayed, PR unchanged
 
+#### Editable Statuses
+
+| Status | Can Edit | Can Submit | Notes |
+|--------|----------|------------|-------|
+| Draft | ✅ | ✅ | Initial state, full editing |
+| Void | ✅ | ✅ | Rejected PR, can revise and resubmit |
+| Returned | ✅ | ✅ | Returned for revision, address feedback |
+| In-progress | ❌ | ❌ | Under approval, read-only |
+| Approved | ❌ | ❌ | Approved, read-only |
+| Completed | ❌ | ❌ | Converted to PO, read-only |
+| Cancelled | ❌ | ❌ | Cancelled, read-only |
+
 #### Main Flow
 1. User opens PR from list or search
 2. System checks PR status and ownership
-3. System displays editable PR form with current values
-4. User modifies header fields as needed
-5. User modifies existing line items:
-   - Edit quantity, price, description
-   - Delete items by clicking "Remove"
-6. User adds new line items (same as UC-PR-001 step 6)
-7. System recalculates totals automatically
-8. User clicks "Save"
-9. System validates changes (see VAL-PR-001)
-10. System checks for version conflicts
-11. System updates PR in database
-12. System increments version number
-13. System logs activity with old/new values
-14. System displays success message
-15. System refreshes PR detail page
+3. System verifies status is editable (Draft, Void, or Returned)
+4. System displays editable PR form with current values
+5. System shows return/rejection reason if status is Returned or Void
+6. User modifies header fields as needed:
+   - Delivery Date
+   - Notes/Description
+   - Priority (if applicable)
+7. User manages line items (see sub-flows below)
+8. System recalculates totals automatically after each change
+9. User chooses action:
+   - **Save Draft**: Save without submitting
+   - **Submit**: Submit for approval
+10. System validates all fields (see VAL-PR-001)
+11. System checks for version conflicts
+12. System updates PR in database
+13. System increments version number
+14. If submitted: System changes status to "In-progress" and creates approval records
+15. System logs activity with old/new values
+16. System displays success message
+17. System refreshes PR detail page
+
+#### Sub-Flow: Add Line Item
+
+**Trigger**: User clicks "Add Item" button
+
+1. System displays item entry form/dialog
+2. User searches for or selects product:
+   - Search by name, SKU, or category
+   - Browse product catalog
+   - Enter free-text description (if allowed)
+3. System displays product details and inventory info:
+   - On-hand quantity
+   - On-order quantity
+   - Reorder point
+   - Last purchase price (if visible to role)
+4. User enters item details:
+   - **Quantity** (required): Number of units needed
+   - **Unit of Measure** (required): Selected from product's allowed UOMs
+   - **Requested Delivery Date** (optional): Item-specific date
+   - **Delivery Point** (optional): Specific delivery location
+   - **Notes** (optional): Special instructions
+5. System validates item fields:
+   - Quantity > 0
+   - Valid UOM for product
+   - Delivery date >= PR date (if specified)
+6. User clicks "Add" or "Add & Continue"
+7. System adds item to PR item list
+8. System recalculates PR totals
+9. If "Add & Continue": Return to step 1
+10. If "Add": Close dialog, return to main form
+
+#### Sub-Flow: Edit Line Item
+
+**Trigger**: User clicks on existing item row or "Edit" button
+
+1. System displays item edit form with current values
+2. User modifies allowed fields:
+   - Quantity
+   - Unit of Measure
+   - Requested Delivery Date
+   - Delivery Point
+   - Notes
+3. System validates changes
+4. User clicks "Save" or "Cancel"
+5. If Save: System updates item and recalculates totals
+6. If Cancel: System discards changes
+
+#### Sub-Flow: Remove Line Item
+
+**Trigger**: User clicks "Remove" or delete icon on item row
+
+1. System displays confirmation dialog:
+   "Are you sure you want to remove [Item Name] from this PR?"
+2. User confirms or cancels
+3. If confirmed:
+   - System removes item from PR
+   - System recalculates totals
+   - System logs removal
+4. If cancelled: No action taken
 
 #### Alternative Flows
 
-**A1: Version Conflict** (Step 10)
-10a. System detects version mismatch
-11a. System displays "This PR was modified by another user"
-12a. System shows option to:
+**A1: Version Conflict** (Step 11)
+11a. System detects version mismatch
+12a. System displays "This PR was modified by another user"
+13a. System shows option to:
    - View latest version and discard changes
    - Overwrite with user's changes (if admin)
-13a. User selects option
-14a. System processes accordingly
+14a. User selects option
+15a. System processes accordingly
 
 **A2: Cancel Editing** (Any step)
 1. User clicks "Cancel"
 2. System prompts for confirmation if changes made
 3. If confirmed, system discards changes and shows read-only view
 4. If not confirmed, resume editing
+
+**A3: Edit Returned PR** (Step 5)
+5a. System displays return reason prominently at top of form
+5b. System highlights fields mentioned in return reason (if identifiable)
+5c. User addresses feedback and makes corrections
+5d. Resume at step 6
+
+**A4: Edit Void PR** (Step 5)
+5a. System displays rejection reason prominently at top of form
+5b. User reviews rejection feedback
+5c. User decides to revise or abandon PR
+5d. If revising: Resume at step 6
+5e. If abandoning: User cancels PR (separate use case)
 
 #### Exception Flows
 
@@ -491,13 +591,47 @@ Allows requestor to modify a purchase request that is in Draft or Void status.
 3. System shows read-only view
 4. Use case ends
 
+**E3: Minimum Items Required** (Step 10)
+1. System detects PR has no items
+2. System displays "At least one item is required"
+3. User must add at least one item before saving/submitting
+4. Resume at step 7
+
+**E4: Product No Longer Available** (Sub-Flow Add Item, Step 2)
+1. System detects selected product is discontinued or inactive
+2. System displays warning "This product is no longer available"
+3. User must select different product
+4. Resume at step 2
+
+#### Requestor Editable Fields
+
+| Field | Draft | Void | Returned | Notes |
+|-------|-------|------|----------|-------|
+| Delivery Date | ✅ | ✅ | ✅ | Header level |
+| Notes/Description | ✅ | ✅ | ✅ | Header level |
+| Priority | ✅ | ✅ | ✅ | If enabled |
+| Item Quantity | ✅ | ✅ | ✅ | Line item |
+| Item UOM | ✅ | ✅ | ✅ | Line item |
+| Item Delivery Date | ✅ | ✅ | ✅ | Line item |
+| Item Delivery Point | ✅ | ✅ | ✅ | Line item |
+| Item Notes | ✅ | ✅ | ✅ | Line item |
+| Add Items | ✅ | ✅ | ✅ | Can add new |
+| Remove Items | ✅ | ✅ | ✅ | Can remove |
+| Vendor | ❌ | ❌ | ❌ | Purchasing only |
+| Unit Price | ❌ | ❌ | ❌ | Purchasing only |
+| Tax Profile | ❌ | ❌ | ❌ | Purchasing only |
+| Discount | ❌ | ❌ | ❌ | Purchasing only |
+
 #### Business Rules
-- BR-PR-005: Only Draft and Void PRs can be edited
+- BR-PR-005: Draft, Void, and Returned PRs can be edited by requestor
+- BR-PR-005B: Returned PR allows editing of all requestor fields
 - BR-PR-006: Only creator can edit their PRs
 - BR-PR-015: Version control prevents concurrent edit conflicts
+- BR-PR-ITEM-001: At least one item required to save/submit
 
 #### Related Requirements
 - FR-PR-003: Edit purchase request
+- FR-PR-002: Item Management
 - FR-PR-015: Version control
 
 ---
@@ -2654,6 +2788,1142 @@ Approver reviews purchase request with full visibility of FOC fields, complete p
 - Summary panel sticky/fixed for easy reference
 - Approval buttons prominent and clearly labeled
 - Rejection requires confirmation modal
+
+---
+
+### UC-PR-017: Purchasing Staff Edit Mode - Vendor Pricing and Allocations
+
+**Priority**: High | **Status**: ✅ Implemented
+**Frequency**: Daily (20-40 per day)
+**Actors**: Purchasing Staff, Procurement Manager
+
+#### Use Case Diagram
+
+```mermaid
+graph LR
+    Purchasing([🛒 Purchasing Staff])
+
+    subgraph PRS["Purchase Request System"]
+        UC017((Edit PR<br/>Pricing))
+        UC102((Calculate<br/>Totals))
+        UC103((Tax Profile<br/>Lookup))
+    end
+
+    Purchasing --- UC017
+    UC017 -.->|include| UC102
+    UC017 -.->|include| UC103
+
+    classDef actor fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
+    classDef usecase fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    classDef system fill:#f0f0f0,stroke:#666666,stroke-width:2px
+
+    class Purchasing actor
+    class UC017 usecase
+    class UC102,UC103 system
+
+    style PRS fill:#ffffff,stroke:#333333,stroke-width:3px
+```
+
+#### Description
+Allows purchasing staff to edit vendor pricing information, perform vendor allocations, manage tax profiles, and override financial calculations when processing a purchase request in edit mode.
+
+#### Preconditions
+- User must be authenticated
+- User must have Purchasing Staff, Purchaser, or Procurement Manager role
+- PR must exist and be in an editable status (Draft, In-progress, or other status allowing purchaser edits)
+- PR must be accessed in edit mode
+
+#### Postconditions
+- **Success**: PR item pricing updated with vendor, currency, prices, tax, and discount information
+- **Failure**: Error message displayed, PR item unchanged
+
+#### Main Flow
+1. Purchasing Staff opens PR detail page and enters edit mode
+2. System verifies user has purchasing staff role
+3. System displays item details with editable pricing fields:
+   - Vendor selection dropdown
+   - Currency selection dropdown
+   - Exchange rate input
+   - Unit price input
+   - Tax profile selection
+   - Tax rate display (read-only, from profile)
+   - Tax amount override input
+   - Discount rate input
+   - Discount amount override input
+4. Purchasing Staff selects vendor from dropdown
+   - System shows approved vendors for item category
+5. Purchasing Staff selects currency
+   - System looks up current exchange rate
+   - System updates exchange rate field
+6. Purchasing Staff enters unit price
+   - System calculates subtotal (quantity × unit price)
+7. Purchasing Staff selects tax profile
+   - System retrieves tax rate from profile configuration
+   - System displays tax rate (read-only)
+   - System calculates tax amount (net amount × tax rate)
+8. Optionally, Purchasing Staff overrides tax amount
+   - User enters manual tax amount
+   - System uses override instead of calculated value
+9. Purchasing Staff enters discount rate
+   - System calculates discount amount (subtotal × discount rate)
+10. Optionally, Purchasing Staff overrides discount amount
+    - User enters manual discount amount
+    - System uses override instead of calculated value
+11. System recalculates all financial totals in real-time:
+    - Subtotal = quantity × unit price
+    - Discount = subtotal × discount rate (or override)
+    - Net Amount = subtotal - discount
+    - Tax = net amount × tax rate (or override)
+    - Total = net amount + tax
+12. Purchasing Staff clicks "Save"
+13. System validates all pricing fields
+14. System updates PR item with new pricing information
+15. System logs all changes in audit trail
+16. System displays success message
+
+#### Alternative Flows
+
+**A1: Vendor Not in Approved List** (Step 4)
+4a. Required vendor not in dropdown
+5a. Purchasing Staff can request vendor addition through vendor management
+6a. Resume at step 4 after vendor approved
+
+**A2: Currency Conversion Required** (Step 5)
+5a. System displays base currency equivalent
+6a. System shows converted amounts in both currencies
+7a. Resume at step 6
+
+**A3: FOC Item Detected** (Step 6)
+6a. System detects FOC quantity > 0
+7a. System automatically sets unit price to 0
+8a. System displays FOC indicator
+9a. Resume at step 7
+
+**A4: Tax Profile Not Found** (Step 7)
+7a. System displays "Select tax profile" prompt
+8a. User must select valid tax profile before saving
+9a. Resume at step 7
+
+#### Exception Flows
+
+**E1: Permission Denied** (Step 2)
+1. System detects user does not have purchasing staff role
+2. System displays pricing fields as read-only
+3. System shows message: "Pricing fields are only editable by purchasing staff"
+4. Use case ends
+
+**E2: Validation Error** (Step 13)
+1. System detects invalid values (negative price, invalid tax rate, etc.)
+2. System displays specific validation errors inline
+3. User corrects errors
+4. Resume at step 12
+
+**E3: Concurrent Edit Conflict** (Step 14)
+1. System detects PR was modified by another user
+2. System displays conflict warning
+3. User can reload and re-enter changes
+4. Resume at step 3
+
+#### Business Rules
+- BR-PR-011A: Only Purchasing Staff, Purchaser, and Procurement Manager roles can edit pricing fields
+- BR-PR-TAX-001: Tax rate is determined by selected tax profile and cannot be manually edited
+- BR-PR-TAX-002: Tax profiles have default rates: VAT (7%), GST (10%), SST (6%), WHT (3%), None (0%)
+- BR-PR-FOC-001: FOC items automatically set unit price to 0
+- BR-PR-OVERRIDE-001: Override amounts take precedence over calculated amounts
+- FR-PR-011A: Purchasing Staff Edit Mode Capabilities
+
+#### Tax Profile Configuration
+
+| Profile | Default Rate | Description |
+|---------|--------------|-------------|
+| VAT | 7% | Value Added Tax |
+| GST | 10% | Goods and Services Tax |
+| SST | 6% | Sales and Service Tax |
+| WHT | 3% | Withholding Tax |
+| None | 0% | No Tax Applied |
+
+#### Field Permissions
+
+| Field | Requestor | Approver | Purchasing Staff |
+|-------|-----------|----------|------------------|
+| Vendor | Read-only | Read-only | Editable |
+| Currency | Read-only | Read-only | Editable |
+| Exchange Rate | Read-only | Read-only | Editable |
+| Unit Price | Read-only | Read-only | Editable |
+| Discount Rate | Read-only | Read-only | Editable |
+| Discount Override | Hidden | Hidden | Editable |
+| Tax Profile | Read-only | Read-only | Editable |
+| Tax Rate | Read-only | Read-only | Read-only (from profile) |
+| Tax Override | Hidden | Hidden | Editable |
+
+#### Integration Points
+- **Vendor Management**: Retrieve approved vendor list
+- **Currency Service**: Exchange rate lookup
+- **Tax Configuration**: Tax profile and rate retrieval
+- **Audit Service**: Log all pricing changes
+
+#### UI/UX Notes
+- Pricing fields displayed in organized grid layout (4 columns)
+- Tax rate field shows "From profile" label to indicate auto-population
+- Override fields have placeholder "Override" to indicate optional
+- Currency symbol displayed with amounts
+- Real-time calculation updates as user types
+- Validation errors shown inline with red border and message
+- Save button disabled until all required fields valid
+
+---
+
+### UC-PR-018: Return Purchase Request for Revision
+
+**Priority**: High | **Status**: ✅ Implemented
+**Frequency**: Daily (10-20 per day)
+**Actors**: Department Manager, Finance Manager, General Manager, Asset Manager, Purchasing Staff
+
+#### Use Case Diagram
+
+```mermaid
+graph LR
+    DeptMgr([👔 Dept Manager])
+    FinMgr([💼 Finance Manager])
+    GenMgr([🎩 General Manager])
+    AssetMgr([📊 Asset Manager])
+    Purchasing([🛒 Purchasing Staff])
+
+    subgraph PRS["Purchase Request System"]
+        UC018((Return PR))
+        UC105((Send<br/>Notifications))
+    end
+
+    DeptMgr --- UC018
+    FinMgr --- UC018
+    GenMgr --- UC018
+    AssetMgr --- UC018
+    Purchasing --- UC018
+    UC018 -.->|include| UC105
+
+    classDef actor fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
+    classDef usecase fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    classDef system fill:#f0f0f0,stroke:#666666,stroke-width:2px
+
+    class DeptMgr,FinMgr,GenMgr,AssetMgr,Purchasing actor
+    class UC018 usecase
+    class UC105 system
+
+    style PRS fill:#ffffff,stroke:#333333,stroke-width:3px
+```
+
+#### Description
+Allows approvers or purchasing staff to return a purchase request to the previous stage for revision, enabling corrections without full rejection. The PR is returned to the requestor or previous approver for editing while maintaining workflow continuity.
+
+#### Preconditions
+- User must be authenticated
+- User must have Approver role OR Purchasing Staff role
+- PR must be in "In-progress" status
+- PR must be at the current user's workflow stage
+- User must have pending approval task for this PR
+
+#### Postconditions
+- **Success**: PR status set to "Returned", returned to previous stage, requestor/previous approver notified
+- **Failure**: Error message displayed, PR unchanged
+
+#### Main Flow
+1. Approver/Purchasing Staff opens PR detail page
+2. System displays PR with current approval status
+3. Approver identifies issues requiring revision
+4. Approver clicks "Return" button
+5. System displays return dialog
+6. System prompts for return reason (required, minimum 10 characters)
+7. Approver enters detailed reason for return
+8. Approver clicks "Confirm Return"
+9. System validates comments length
+10. System begins transaction
+11. System updates current approval record:
+    - Status = "Returned"
+    - Timestamp = current time
+    - Comments saved
+12. System updates PR status to "Returned"
+13. System determines return target:
+    - If Purchasing Staff returning → Return to Requestor
+    - If First Approver returning → Return to Requestor
+    - If Subsequent Approver returning → Return to Previous Approver
+14. System commits transaction
+15. System sends return notification with comments to appropriate party
+16. System logs return activity
+17. System displays confirmation message
+18. System updates PR detail page
+
+#### Alternative Flows
+
+**A1: Cancel Return** (Step 8)
+8a. Approver clicks "Cancel"
+9a. System closes dialog
+10a. PR remains in current state
+11a. Use case ends
+
+**A2: Return to Specific Stage** (Step 13)
+13a. System displays stage selection dropdown
+14a. Approver selects specific stage to return to
+15a. System validates selection
+16a. Resume at step 14
+
+#### Exception Flows
+
+**E1: Insufficient Comments** (Step 9)
+1. System detects comments < 10 characters
+2. System displays "Please provide detailed reason (minimum 10 characters)"
+3. System keeps dialog open
+4. Resume at step 7
+
+**E2: Already Processed** (Step 10)
+1. System detects approval already approved/rejected
+2. System displays "This approval was already processed"
+3. Use case ends
+
+**E3: PR Already at First Stage** (Step 13)
+1. System detects PR at initial stage with no previous approver
+2. System returns to Requestor only
+3. Resume at step 14
+
+#### Business Rules
+- BR-PR-005A: Return action requires comment (min 10 chars)
+- BR-PR-005B: Returned PR allows editing of all fields by recipient
+- BR-PR-005C: Return preserves PR reference number
+- BR-PR-005D: Return resets current approval stage
+
+#### Return Flow Matrix
+
+| Returning Role | PR Stage | Return Target |
+|---------------|----------|---------------|
+| Department Manager | First Approval | Requestor |
+| Finance Manager | Second Approval | Department Manager |
+| General Manager | Third Approval | Finance Manager |
+| Purchasing Staff | Processing | Requestor |
+| Purchasing Staff | After Approval | Last Approver |
+
+#### Related Requirements
+- FR-PR-005A: Workflow Actions by Role
+- FR-PR-011: Rejection/Return handling
+- FR-PR-006: Notifications
+
+---
+
+### UC-PR-019: Submit Purchase Request to Next Stage
+
+**Priority**: High | **Status**: ✅ Implemented
+**Frequency**: Daily (30-50 per day)
+**Actors**: Purchasing Staff
+
+#### Use Case Diagram
+
+```mermaid
+graph LR
+    Purchasing([🛒 Purchasing Staff])
+
+    subgraph PRS["Purchase Request System"]
+        UC019((Submit to<br/>Next Stage))
+        UC105((Send<br/>Notifications))
+        UC103((Determine<br/>Approval Chain))
+    end
+
+    Purchasing --- UC019
+    UC019 -.->|include| UC105
+    UC019 -.->|include| UC103
+
+    classDef actor fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
+    classDef usecase fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    classDef system fill:#f0f0f0,stroke:#666666,stroke-width:2px
+
+    class Purchasing actor
+    class UC019 usecase
+    class UC105,UC103 system
+
+    style PRS fill:#ffffff,stroke:#333333,stroke-width:3px
+```
+
+#### Description
+Allows purchasing staff to submit a purchase request to the next workflow stage after completing vendor allocation and pricing. This forwards the PR for final approval or PO conversion.
+
+#### Preconditions
+- User must be authenticated
+- User must have Purchasing Staff, Purchaser, or Procurement Manager role
+- PR must be in "In-progress" or "Approved" status
+- All required pricing fields must be completed
+- At least one item must have vendor allocated
+
+#### Postconditions
+- **Success**: PR forwarded to next stage, appropriate party notified
+- **Failure**: Error message displayed, PR unchanged
+
+#### Main Flow
+1. Purchasing Staff opens PR detail page
+2. System verifies user has purchasing staff role
+3. Purchasing Staff reviews completed vendor allocations
+4. Purchasing Staff clicks "Submit" button
+5. System validates all items have required pricing:
+   - Vendor selected
+   - Unit price entered
+   - Currency selected
+   - Tax profile selected
+6. System displays confirmation dialog
+7. System shows summary of next stage/recipient
+8. Purchasing Staff clicks "Confirm Submit"
+9. System begins transaction
+10. System updates PR record:
+    - Advances workflow stage
+    - Updates timestamp
+    - Records submitter
+11. System determines next stage:
+    - If pricing approval required → Route to Finance Manager
+    - If final approval required → Route to designated approver
+    - If ready for PO → Mark as "Ready for Conversion"
+12. System commits transaction
+13. System sends notification to next stage recipient
+14. System logs submit activity
+15. System displays success message
+16. System updates PR detail page with new status
+
+#### Alternative Flows
+
+**A1: Cancel Submit** (Step 8)
+8a. Purchasing Staff clicks "Cancel"
+9a. System closes dialog
+10a. PR remains in current state
+11a. Use case ends
+
+**A2: Save as Draft First** (Step 4)
+4a. Purchasing Staff clicks "Save Draft"
+5a. System saves current changes without advancing
+6a. Resume at step 3 when ready
+
+#### Exception Flows
+
+**E1: Missing Vendor Allocation** (Step 5)
+1. System detects items without vendor
+2. System displays "All items must have vendor allocated before submit"
+3. System highlights incomplete items
+4. Use case ends - user must complete allocations
+
+**E2: Missing Required Fields** (Step 5)
+1. System detects missing required pricing fields
+2. System displays specific validation errors
+3. System shows list of incomplete items
+4. Use case ends - user must complete fields
+
+**E3: Budget Exceeded** (Step 10)
+1. System detects total exceeds budget allocation
+2. System displays budget warning
+3. System allows override with justification
+4. If justified, resume at step 11
+5. If not justified, use case ends
+
+#### Business Rules
+- BR-PR-005A: Submit requires all pricing fields complete
+- BR-PR-011A: Only Purchasing Staff can submit after vendor allocation
+- BR-PR-SUBMIT-001: Submit advances PR to next workflow stage
+- BR-PR-SUBMIT-002: Submit triggers notification to next recipient
+
+#### Related Requirements
+- FR-PR-005A: Workflow Actions by Role
+- FR-PR-005: Approval workflow
+- FR-PR-006: Notifications
+
+---
+
+### UC-PR-020: Purchasing Staff Reject Purchase Request
+
+**Priority**: High | **Status**: ✅ Implemented
+**Frequency**: Weekly (5-10 per week)
+**Actors**: Purchasing Staff
+
+#### Use Case Diagram
+
+```mermaid
+graph LR
+    Purchasing([🛒 Purchasing Staff])
+
+    subgraph PRS["Purchase Request System"]
+        UC020((Purchaser<br/>Reject PR))
+        UC105((Send<br/>Notifications))
+    end
+
+    Purchasing --- UC020
+    UC020 -.->|include| UC105
+
+    classDef actor fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
+    classDef usecase fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    classDef system fill:#f0f0f0,stroke:#666666,stroke-width:2px
+
+    class Purchasing actor
+    class UC020 usecase
+    class UC105 system
+
+    style PRS fill:#ffffff,stroke:#333333,stroke-width:3px
+```
+
+#### Description
+Allows purchasing staff to reject a purchase request when it cannot be fulfilled (e.g., no vendors available, items discontinued, budget constraints). This terminates the PR workflow.
+
+#### Preconditions
+- User must be authenticated
+- User must have Purchasing Staff, Purchaser, or Procurement Manager role
+- PR must be in "In-progress" or "Approved" status
+- PR must be assigned to purchasing staff for processing
+
+#### Postconditions
+- **Success**: PR status changed to "Void", requestor notified
+- **Failure**: Error message displayed, PR unchanged
+
+#### Main Flow
+1. Purchasing Staff opens PR detail page
+2. System verifies user has purchasing staff role
+3. Purchasing Staff identifies reason for rejection
+4. Purchasing Staff clicks "Reject" button
+5. System displays rejection dialog
+6. System prompts for rejection reason (required, minimum 10 characters)
+7. Purchasing Staff enters detailed reason:
+   - No vendors available
+   - Items discontinued
+   - Budget constraints
+   - Other business reason
+8. Purchasing Staff clicks "Confirm Rejection"
+9. System validates comments length
+10. System begins transaction
+11. System updates PR record:
+    - Status = "Void"
+    - Rejection timestamp = current time
+    - Rejection reason saved
+    - Rejector = current user
+12. System cancels any pending workflow tasks
+13. System commits transaction
+14. System sends rejection notification to:
+    - PR creator (Requestor)
+    - Previous approvers (for visibility)
+15. System logs rejection activity
+16. System displays confirmation message
+17. System updates PR detail page
+
+#### Alternative Flows
+
+**A1: Cancel Rejection** (Step 8)
+8a. Purchasing Staff clicks "Cancel"
+9a. System closes dialog
+10a. PR remains in current state
+11a. Use case ends
+
+#### Exception Flows
+
+**E1: Insufficient Comments** (Step 9)
+1. System detects comments < 10 characters
+2. System displays "Please provide detailed reason (minimum 10 characters)"
+3. System keeps dialog open
+4. Resume at step 7
+
+**E2: PR Already Processed** (Step 10)
+1. System detects PR already voided or completed
+2. System displays "This PR was already processed"
+3. Use case ends
+
+#### Business Rules
+- BR-PR-010: Rejection comments required (min 10 chars)
+- BR-PR-REJECT-001: Purchasing Staff rejection voids the PR
+- BR-PR-REJECT-002: Voided PR cannot be edited or resubmitted
+- BR-PR-REJECT-003: All stakeholders notified on rejection
+
+#### Rejection Reason Categories
+
+| Category | Description | Example |
+|----------|-------------|---------|
+| No Vendors | No approved vendors for items | "No suppliers for specialty equipment" |
+| Discontinued | Items no longer available | "Product EOL by manufacturer" |
+| Budget | Exceeds available budget | "Exceeds department allocation by 50%" |
+| Compliance | Does not meet requirements | "Items don't meet safety standards" |
+| Duplicate | Duplicate request exists | "Same items in PR-2024-001234" |
+| Other | Other business reason | "Project cancelled" |
+
+#### Related Requirements
+- FR-PR-005A: Workflow Actions by Role
+- FR-PR-011: Rejection handling
+- FR-PR-006: Notifications
+
+---
+
+### UC-PR-021: Bulk Item Actions
+
+**Priority**: High | **Status**: 🔧 Partial
+**Frequency**: Daily (20-50 per day during approval)
+**Actors**: Approver, Purchasing Staff, Requestor (limited)
+
+#### Use Case Diagram
+
+```mermaid
+graph LR
+    Approver([👔 Approver])
+    Purchasing([🛒 Purchasing Staff])
+    Requestor([👤 Requestor])
+
+    subgraph PRS["Purchase Request System"]
+        UC021((Bulk Item<br/>Actions))
+        UC021A((Approve<br/>Selected))
+        UC021B((Reject<br/>Selected))
+        UC021C((Return<br/>Selected))
+        UC021D((Split<br/>Items))
+        UC021E((Set Date<br/>Required))
+        UC105((Send<br/>Notifications))
+        UC108((Log<br/>Activity))
+    end
+
+    Approver --- UC021
+    Purchasing --- UC021
+    Requestor -.->|limited| UC021
+
+    UC021 -.->|extends| UC021A
+    UC021 -.->|extends| UC021B
+    UC021 -.->|extends| UC021C
+    UC021 -.->|extends| UC021D
+    UC021 -.->|extends| UC021E
+    UC021 -.->|include| UC105
+    UC021 -.->|include| UC108
+
+    classDef actor fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
+    classDef usecase fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    classDef system fill:#f0f0f0,stroke:#666666,stroke-width:2px
+    classDef extension fill:#fff0e6,stroke:#cc6600,stroke-width:2px
+
+    class Approver,Purchasing,Requestor actor
+    class UC021 usecase
+    class UC021A,UC021B,UC021C,UC021D,UC021E extension
+    class UC105,UC108 system
+
+    style PRS fill:#ffffff,stroke:#333333,stroke-width:3px
+```
+
+#### Description
+Allows authorized users to select multiple line items within a purchase request and perform bulk actions (approve, reject, return, split, set date required) on them simultaneously, improving efficiency when processing PRs with many items.
+
+#### Preconditions
+- User must be authenticated
+- User must have appropriate role (Approver, Purchasing Staff, or Requestor for limited actions)
+- PR must be in appropriate status for the action
+- At least one item must be selected for action
+- For Split action: minimum 2 items must be selected
+
+#### Postconditions
+- **Success**: Selected items updated, activity logged, notifications sent
+- **Failure**: Error message displayed, items unchanged
+
+#### Main Flow: Item Selection
+
+1. User opens PR detail page with Items tab
+2. System displays item grid with selection checkboxes
+3. User selects individual items via checkboxes OR uses "Select All" checkbox
+4. System updates selection count in toolbar
+5. System displays bulk action toolbar with:
+   - Selection summary: "{n} items selected: {status breakdown}"
+   - Available action buttons based on user role and item statuses
+6. User clicks desired action button
+7. System proceeds to appropriate sub-flow (A through E)
+
+#### Sub-Flow A: Approve Selected Items
+
+**Actors**: Approver, Purchasing Staff
+**Preconditions**: Items in "Pending" or "In-progress" status
+
+1. User clicks "Approve Selected" button
+2. System validates user has approval permission
+3. System identifies valid items (Pending/In-progress status)
+4. If some items invalid:
+   - System displays: "X of Y items cannot be approved"
+   - User chooses "Proceed with valid items" or "Cancel"
+5. System displays confirmation dialog:
+   - "Approve {n} items?"
+   - Optional comment field
+6. User confirms approval
+7. System begins transaction
+8. For each valid item:
+   - Updates item status to "Approved"
+   - Sets approved_quantity = requested_quantity
+   - Records approval timestamp
+   - Records approver user ID
+9. System commits transaction
+10. System logs bulk approval activity
+11. System sends notification to requestor
+12. System refreshes item grid with updated statuses
+13. System displays success: "{n} items approved"
+
+#### Sub-Flow B: Reject Selected Items
+
+**Actors**: Approver, Purchasing Staff
+**Preconditions**: Items in "Pending" or "In-progress" status
+
+1. User clicks "Reject Selected" button
+2. System validates user has rejection permission
+3. System identifies valid items (Pending/In-progress status)
+4. If some items invalid:
+   - System displays: "X of Y items cannot be rejected"
+   - User chooses "Proceed with valid items" or "Cancel"
+5. System displays rejection dialog:
+   - Rejection reason field (required, min 10 characters)
+   - Comment applies to all selected items
+6. User enters rejection reason
+7. User confirms rejection
+8. System validates comment length
+9. System begins transaction
+10. For each valid item:
+    - Updates item status to "Rejected"
+    - Records rejection timestamp
+    - Records rejection reason
+    - Records rejector user ID
+11. System commits transaction
+12. System logs bulk rejection activity
+13. System sends notification to requestor
+14. System refreshes item grid with updated statuses
+15. System displays success: "{n} items rejected"
+
+#### Sub-Flow C: Return Selected Items
+
+**Actors**: Approver, Purchasing Staff
+**Preconditions**: Items in "Pending", "In-progress", or "Approved" status
+
+1. User clicks "Return Selected" button
+2. System validates user has return permission
+3. System identifies valid items
+4. If some items invalid:
+   - System displays: "X of Y items cannot be returned"
+   - User chooses "Proceed with valid items" or "Cancel"
+5. System displays return dialog:
+   - Return reason field (required, min 10 characters)
+   - Comment applies to all selected items
+6. User enters return reason
+7. User confirms return
+8. System validates comment length
+9. System begins transaction
+10. For each valid item:
+    - Updates item status to "Returned"
+    - Records return timestamp
+    - Records return reason
+    - Records returning user ID
+11. System commits transaction
+12. System logs bulk return activity
+13. System sends notification to requestor
+14. System refreshes item grid with updated statuses
+15. System displays success: "{n} items returned for revision"
+
+#### Sub-Flow D: Split Selected Items
+
+**Actors**: Purchasing Staff only
+**Preconditions**: Minimum 2 items selected, PR in "In-progress" or "Approved" status
+
+1. User clicks "Split" button
+2. System validates user has purchasing staff role
+3. System validates minimum 2 items selected
+4. System displays split configuration dialog:
+   - Split options:
+     * By Vendor: Group by assigned vendor
+     * By Delivery Date: Group by required date
+     * Manual Split: User-defined groupings
+   - Preview of resulting PR groups
+5. User selects split method
+6. System generates split preview:
+   - Shows items grouped by selected criteria
+   - Displays new PR count
+7. User reviews and confirms split
+8. System begins transaction
+9. System creates new PR(s) for split item groups:
+   - Copies header information from original PR
+   - Assigns new reference numbers (PR-YYYY-NNNN-A, -B, etc.)
+   - Links to original PR for audit trail
+10. System updates original PR:
+    - Removes split items
+    - Recalculates totals
+    - Adds split reference note
+11. System commits transaction
+12. System logs split activity
+13. System sends notifications:
+    - Requestor: PR split notification
+    - Purchasing Staff: New PRs created
+14. System displays success with links to new PRs
+
+#### Sub-Flow E: Set Date Required
+
+**Actors**: Requestor (Draft/Void/Returned), Approver, Purchasing Staff
+**Preconditions**: User has edit permission for items
+
+1. User clicks "Set Date Required" button
+2. System validates user has permission
+3. System displays date picker dialog:
+   - Calendar with date >= today restriction
+   - Shows currently selected items count
+4. User selects new required date
+5. User confirms date change
+6. System validates date is not in the past
+7. System begins transaction
+8. For each selected item:
+   - Updates delivery_date field
+   - Records date change in audit trail
+9. System commits transaction
+10. System logs bulk date change activity
+11. System refreshes item grid with updated dates
+12. System displays success: "Required date updated for {n} items"
+
+#### Alternative Flows
+
+**A1: Cancel Action** (Any sub-flow)
+1. User clicks "Cancel" in confirmation dialog
+2. System closes dialog
+3. Items remain unchanged
+4. Use case ends
+
+**A2: Clear Selection** (Main Flow)
+1. User clicks "Clear Selection" or deselects all items
+2. System hides bulk action toolbar
+3. Use case ends
+
+**A3: No Valid Items** (Any sub-flow)
+1. System determines all selected items are invalid for action
+2. System displays: "No items can be {action}ed"
+3. Action button disabled
+4. User must adjust selection
+5. Use case ends
+
+#### Exception Flows
+
+**E1: Concurrent Modification** (Any sub-flow)
+1. System detects item was modified by another user
+2. System displays: "Some items were modified. Please refresh and try again."
+3. System rolls back transaction
+4. Use case ends
+
+**E2: Insufficient Comments** (Sub-flow B, C)
+1. System detects comment < 10 characters
+2. System displays: "Please provide detailed reason (minimum 10 characters)"
+3. System keeps dialog open
+4. Resume at comment entry step
+
+**E3: Invalid Date** (Sub-Flow E)
+1. System detects date is in the past
+2. System displays: "Date must be today or later"
+3. System keeps dialog open
+4. Resume at date selection step
+
+**E4: Split Minimum Not Met** (Sub-Flow D)
+1. System detects fewer than 2 items selected
+2. System displays: "Minimum 2 items required for split"
+3. Split button disabled
+4. Use case ends
+
+#### Business Rules
+
+- BR-PR-BULK-001: Bulk actions apply same comment/date to all selected items
+- BR-PR-BULK-002: Invalid items are skipped during bulk processing
+- BR-PR-BULK-003: User notified of skipped items count
+- BR-PR-BULK-004: All bulk actions logged with operation identifier
+- BR-PR-BULK-005: Split maintains audit trail linking original and new PRs
+- BR-PR-BULK-006: Performance target: 50 items processed within 3 seconds
+
+#### Role-Based Action Availability
+
+| Action | Requestor | Approver | Purchasing Staff | Conditions |
+|--------|-----------|----------|------------------|------------|
+| Select Items | ✅ (limited) | ✅ | ✅ | Based on edit permissions |
+| Approve Selected | ❌ | ✅ | ✅ | Items: Pending/In-progress |
+| Reject Selected | ❌ | ✅ | ✅ | Items: Pending/In-progress |
+| Return Selected | ❌ | ✅ | ✅ | Items: Pending/In-progress/Approved |
+| Split | ❌ | ❌ | ✅ | Min 2 items, PR: In-progress/Approved |
+| Set Date Required | ✅ (Draft/Void/Returned) | ✅ | ✅ | Date >= today |
+
+#### UI Specifications
+
+**Bulk Action Toolbar**:
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│ ☑ 10 items selected: 3 Approved, 5 Pending, 2 Returned                 │
+│ [Approve Selected] [Reject Selected] [Return Selected] [Split] [Set Date Required] │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**Button States**:
+- Enabled: User has permission AND valid items exist for action
+- Disabled: No permission OR no valid items OR conditions not met
+- Hidden: User role cannot perform action
+
+#### Related Requirements
+- FR-PR-026: Bulk Item Actions
+- FR-PR-005A: Workflow Actions by Role
+- FR-PR-011: Edit and Modify
+- FR-PR-006: Notifications
+
+---
+
+### UC-PR-022: Budget Tab CRUD Operations
+
+**Priority**: High | **Status**: ✅ Implemented
+**Frequency**: Daily (10-30 per day during PR processing)
+**Actors**: Finance Manager, Purchasing Staff
+
+#### Use Case Diagram
+
+```mermaid
+graph LR
+    FinMgr([💼 Finance Manager])
+    Purchasing([🛒 Purchasing Staff])
+    Requestor([👤 Requestor])
+
+    subgraph PRS["Purchase Request System"]
+        UC022((Budget Tab<br/>CRUD))
+        UC022A((Add Budget<br/>Allocation))
+        UC022B((Edit Budget<br/>Allocation))
+        UC022C((Delete Budget<br/>Allocation))
+        UC022D((View Budget<br/>Summary))
+        UC102((Calculate<br/>Totals))
+        UC108((Log<br/>Activity))
+    end
+
+    FinMgr --- UC022
+    Purchasing --- UC022
+    Requestor -.->|view only| UC022D
+
+    UC022 -.->|extends| UC022A
+    UC022 -.->|extends| UC022B
+    UC022 -.->|extends| UC022C
+    UC022 -.->|extends| UC022D
+    UC022 -.->|include| UC102
+    UC022 -.->|include| UC108
+
+    classDef actor fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
+    classDef usecase fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    classDef system fill:#f0f0f0,stroke:#666666,stroke-width:2px
+    classDef extension fill:#fff0e6,stroke:#cc6600,stroke-width:2px
+
+    class FinMgr,Purchasing,Requestor actor
+    class UC022 usecase
+    class UC022A,UC022B,UC022C,UC022D extension
+    class UC102,UC108 system
+
+    style PRS fill:#ffffff,stroke:#333333,stroke-width:3px
+```
+
+#### Description
+Allows authorized users (Finance Manager, Purchasing Staff) to manage budget allocations within a Purchase Request's Budget tab, including adding new allocations, editing existing ones, and deleting entries, with real-time calculation of available budget and status indicators.
+
+#### Preconditions
+- User must be authenticated
+- User must have Finance Manager or Purchasing Staff role (for CRUD operations)
+- PR must exist and user has access to view it
+- Budget tab is accessible on the PR detail page
+
+#### Postconditions
+- **Success**: Budget allocation created/updated/deleted, totals recalculated, activity logged
+- **Failure**: Error message displayed, data unchanged
+
+#### Main Flow: View Budget Tab
+
+1. User opens PR detail page
+2. User navigates to Budget tab
+3. System displays budget allocation table with columns:
+   - Location, Category, Total Budget
+   - Soft Commitment (Dept Head), Soft Commitment (PO), Hard Commitment
+   - Available Budget (calculated), Current PR Amount, Status (calculated)
+4. System displays totals row with sum of all numeric columns
+5. System shows "Add Budget" button (if user has permission)
+6. System displays row actions menu for each entry (if user has permission)
+
+#### Sub-Flow A: Add Budget Allocation
+
+**Actors**: Finance Manager, Purchasing Staff
+**Preconditions**: User has add permission
+
+1. User clicks "Add Budget" button
+2. System displays Add Budget dialog with form fields:
+   - Location (dropdown, required)
+   - Category (dropdown, required)
+   - Total Budget (currency input, required)
+   - Soft Commitment - Dept Head (currency input, optional, default 0)
+   - Soft Commitment - PO (currency input, optional, default 0)
+   - Hard Commitment (currency input, optional, default 0)
+   - Current PR Amount (currency input, optional, default 0)
+3. System displays real-time Available Budget preview:
+   - Formula: Total Budget - Soft (DH) - Soft (PO) - Hard Commitment
+4. User fills in required and optional fields
+5. User clicks "Save" button
+6. System validates form:
+   - Location is required
+   - Category is required
+   - Total Budget is required and >= 0
+   - All numeric fields are valid numbers >= 0
+   - Location + Category combination is unique
+7. If validation fails:
+   - System displays error messages for invalid fields
+   - User corrects errors and retries
+8. System calculates:
+   - Available Budget = Total - Soft (DH) - Soft (PO) - Hard
+   - Status based on utilization:
+     * "Over Budget" if Available < 0
+     * "Near Limit" if Available <= 20% of Total
+     * "Within Budget" otherwise
+9. System creates new budget allocation record
+10. System updates table with new entry
+11. System recalculates totals row
+12. System logs add activity
+13. System displays success toast: "Budget allocation added successfully"
+14. System closes dialog
+
+#### Sub-Flow B: Edit Budget Allocation
+
+**Actors**: Finance Manager, Purchasing Staff
+**Preconditions**: User has edit permission, budget allocation exists
+
+1. User clicks row actions menu (MoreHorizontal icon)
+2. User selects "Edit" option
+3. System displays Edit Budget dialog pre-populated with current values
+4. User modifies fields as needed
+5. System updates Available Budget preview in real-time
+6. User clicks "Save" button
+7. System validates form (same rules as Add)
+8. If validation fails:
+   - System displays error messages
+   - User corrects errors and retries
+9. System recalculates Available Budget and Status
+10. System updates budget allocation record
+11. System updates table with modified entry
+12. System recalculates totals row
+13. System logs edit activity
+14. System displays success toast: "Budget allocation updated successfully"
+15. System closes dialog
+
+#### Sub-Flow C: Delete Budget Allocation
+
+**Actors**: Finance Manager, Purchasing Staff
+**Preconditions**: User has delete permission, budget allocation exists
+
+1. User clicks row actions menu (MoreHorizontal icon)
+2. User selects "Delete" option (destructive styling)
+3. System displays AlertDialog confirmation:
+   - Title: "Delete Budget Allocation"
+   - Message: "Are you sure you want to delete the budget allocation for {Location} - {Category}? This action cannot be undone."
+   - Buttons: "Cancel" (outline), "Delete" (destructive red)
+4. User clicks "Delete" to confirm
+5. System removes budget allocation record
+6. System updates table (removes row)
+7. System recalculates totals row
+8. System logs delete activity
+9. System displays success toast: "Budget allocation deleted"
+10. System closes dialog
+
+#### Sub-Flow D: View Budget Summary
+
+**Actors**: All users with PR view access
+**Preconditions**: PR exists, user has view permission
+
+1. User views Budget tab (read-only for Requestor/Approver)
+2. System displays all budget allocations in table format
+3. System shows calculated fields:
+   - Available Budget per row
+   - Status with color-coded badge:
+     * Red: "Over Budget"
+     * Yellow: "Near Limit"
+     * Green: "Within Budget"
+4. System displays totals row
+5. Mobile view: System displays data in card format
+
+#### Alternative Flows
+
+**A1: Cancel Add/Edit** (Sub-flow A, B)
+1. User clicks "Cancel" in dialog
+2. System closes dialog without saving
+3. Data remains unchanged
+4. Use case ends
+
+**A2: Cancel Delete** (Sub-flow C)
+1. User clicks "Cancel" in AlertDialog
+2. System closes dialog
+3. Budget allocation remains unchanged
+4. Use case ends
+
+**A3: Duplicate Entry Attempt** (Sub-flow A)
+1. User attempts to add Location + Category that already exists
+2. System displays error: "Budget allocation for this Location and Category already exists"
+3. User must select different Location or Category
+4. Resume at step 4
+
+#### Exception Flows
+
+**E1: Invalid Numeric Input** (Sub-flow A, B)
+1. User enters non-numeric or negative value
+2. System displays error: "Must be a valid number >= 0"
+3. System keeps dialog open
+4. Resume at data entry step
+
+**E2: Missing Required Field** (Sub-flow A, B)
+1. User leaves required field empty
+2. System displays error: "{Field} is required"
+3. System keeps dialog open
+4. Resume at data entry step
+
+**E3: Concurrent Modification** (Sub-flow B, C)
+1. Another user modified/deleted the budget allocation
+2. System detects stale data
+3. System displays: "This budget allocation was modified. Please refresh and try again."
+4. System refreshes table data
+5. Use case ends
+
+#### Business Rules
+
+- BR-PR-066: Budget allocations must have unique Location + Category combinations per PR
+- BR-PR-067: Available Budget = Total Budget - Soft Commitment (DH) - Soft Commitment (PO) - Hard Commitment
+- BR-PR-068: Status "Over Budget" when Available Budget < 0
+- BR-PR-069: Status "Near Limit" when Available Budget <= 20% of Total Budget
+- BR-PR-070: Status "Within Budget" when Available Budget > 20% of Total Budget
+- BR-PR-071: Only Purchasing Staff and Finance Manager can add/edit/delete budget allocations
+- BR-PR-072: All numeric budget fields must be >= 0
+- BR-PR-073: Location and Category are required fields
+- BR-PR-074: Total Budget is required and must be > 0
+- BR-PR-075: Budget deletion requires confirmation dialog
+- BR-PR-076: Budget totals recalculate dynamically on any CRUD operation
+
+#### Role-Based Access
+
+| Action | Requestor | Approver | Purchasing Staff | Finance Manager |
+|--------|-----------|----------|------------------|-----------------|
+| View Budget Tab | ✅ | ✅ | ✅ | ✅ |
+| Add Budget | ❌ | ❌ | ✅ | ✅ |
+| Edit Budget | ❌ | ❌ | ✅ | ✅ |
+| Delete Budget | ❌ | ❌ | ✅ | ✅ |
+
+#### UI Specifications
+
+**Budget Tab Layout**:
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ Budget Allocation                                                    [+ Add Budget]    │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ Location    │ Category │ Total    │ Soft(DH) │ Soft(PO) │ Hard    │ Available │ Status │ ⋮ │
+├─────────────┼──────────┼──────────┼──────────┼──────────┼─────────┼───────────┼────────┼───┤
+│ Kitchen     │ F&B      │ $50,000  │ $10,000  │ $5,000   │ $8,000  │ $27,000   │ ✅     │ ⋮ │
+│ Front Office│ Supplies │ $15,000  │ $3,000   │ $2,000   │ $9,500  │ $500      │ ⚠️     │ ⋮ │
+│ Engineering │ Equipment│ $25,000  │ $8,000   │ $10,000  │ $10,000 │ -$3,000   │ ❌     │ ⋮ │
+├─────────────┴──────────┴──────────┴──────────┴──────────┴─────────┴───────────┴────────┴───┤
+│ TOTAL                  │ $90,000  │ $21,000  │ $17,000  │ $27,500 │ $24,500   │            │
+└────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Status Badges**:
+- ✅ "Within Budget" - Green badge
+- ⚠️ "Near Limit" - Yellow/Warning badge
+- ❌ "Over Budget" - Red/Destructive badge
+
+**Row Actions Menu**:
+```
+┌──────────────┐
+│ ✏️ Edit      │
+│ ─────────────│
+│ 🗑️ Delete    │  (red text)
+└──────────────┘
+```
+
+#### Related Requirements
+- FR-PR-027: Budget Tab CRUD Operations
+- FR-PR-004: Budget Control
+- BR-PR-066 to BR-PR-076: Budget Tab CRUD Rules
 
 ---
 

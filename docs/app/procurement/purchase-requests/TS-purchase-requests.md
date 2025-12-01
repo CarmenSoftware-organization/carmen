@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Requests
 - **Route**: `/procurement/purchase-requests`
-- **Version**: 1.1.0
-- **Last Updated**: 2025-11-26
+- **Version**: 1.6.0
+- **Last Updated**: 2025-11-28
 - **Owner**: Development Team
 - **Status**: Active
 
@@ -14,6 +14,11 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-10-30 | Development Team | Initial technical specification |
 | 1.1.0 | 2025-11-26 | Documentation Team | Synchronized with BR - updated status values, added implementation status markers |
+| 1.2.0 | 2025-11-28 | Development Team | Added 4.1: Purchasing Staff Edit Mode (Vendor Pricing Section) with props interface, tax profiles, and calculation logic |
+| 1.3.0 | 2025-11-28 | Development Team | Added Workflow Action Buttons Component specification with role detection and action handlers |
+| 1.4.0 | 2025-11-28 | Development Team | Updated Edit PR page to include Returned status, added Resubmit and Return action buttons |
+| 1.5.0 | 2025-11-28 | Development Team | Added 4.2: Bulk Item Actions Component with selection, toolbar, and action handlers |
+| 1.6.0 | 2025-11-28 | Development Team | Added 4.3: Budget Tab CRUD Component with add/edit/delete dialogs, validation, and calculations |
 
 ## Implementation Status
 
@@ -269,10 +274,12 @@ graph TD
    - Links to converted from PRs (if created from template)
 
 9. **Context Action Buttons** (status-dependent)
-   - Edit (Draft, Void status only)
+   - Edit (Draft, Void, Returned status only)
    - Submit for Approval (Draft only)
+   - Resubmit (Void, Returned status only)
    - Approve (In-progress, for approvers)
    - Void (In-progress, for approvers)
+   - Return (In-progress, for approvers/purchasing staff)
    - Recall (In-progress, for requestor)
    - Convert to PO (Approved, for purchasing staff)
    - Cancel (Draft, In-progress)
@@ -284,9 +291,14 @@ graph TD
 #### 4. Edit Purchase Request Page
 **Route**: `/procurement/purchase-requests/[id]/edit`
 
-**Purpose**: Modify existing draft or rejected PR
+**Purpose**: Modify existing draft, rejected, or returned PR
 
 **Layout**: Same as Create PR Page, but pre-filled with existing data
+
+**Editable Statuses**:
+- **Draft**: Initial state, full editing capability
+- **Void**: Rejected PR, can revise and resubmit
+- **Returned**: Returned for revision by approver/purchasing staff, can revise and resubmit
 
 **Additional Features**:
 - Version conflict detection
@@ -294,8 +306,630 @@ graph TD
 - Restore original values option
 - Save changes button
 - Discard changes button
+- Return/Rejection reason banner (displayed for Void and Returned statuses)
 
-**Access Control**: Only accessible when PR status is "Draft" or "Void" and user is the requestor
+**Access Control**: Only accessible when PR status is "Draft", "Void", or "Returned" and user is the requestor
+
+---
+
+#### 4.1 Purchasing Staff Edit Mode (Vendor Pricing Section)
+
+**Implementation Status**: ✅ Implemented
+
+**Purpose**: Allow purchasing staff to edit vendor pricing information, perform vendor allocations, manage tax profiles, and override financial calculations
+
+**Access Control**: Only available to users with Purchasing Staff, Purchaser, or Procurement Manager role in edit mode
+
+**Component Location**: `ConsolidatedItemDetailsCard` in `ItemDetailCards.tsx`
+
+**Editable Fields Layout** (4-column grid):
+
+**Row 1: Vendor Information**
+| Field | Type | Description |
+|-------|------|-------------|
+| Vendor | Select Dropdown | Approved vendors for item category |
+| Pricelist | Read-only | Auto-populated from vendor selection |
+
+**Row 2: Currency and Price**
+| Field | Type | Description |
+|-------|------|-------------|
+| Currency | Select Dropdown | USD, EUR, GBP, THB, JPY, CNY |
+| Exchange Rate | Number Input | Decimal (6 places) |
+| Unit Price | Number Input | Decimal (2 places) |
+| Subtotal | Calculated | Quantity × Unit Price |
+
+**Row 3: Tax Configuration**
+| Field | Type | Description |
+|-------|------|-------------|
+| Tax Profile | Select Dropdown | VAT (7%), GST (10%), SST (6%), WHT (3%), None (0%) |
+| Tax Rate | Read-only | Auto-set from Tax Profile |
+| Tax Override | Number Input | Manual tax amount override |
+| Tax (Calculated) | Calculated | Net Amount × Tax Rate or Override |
+
+**Row 4: Discount Configuration**
+| Field | Type | Description |
+|-------|------|-------------|
+| Discount Rate | Number Input | Percentage (2 decimal places) |
+| Discount Override | Number Input | Manual discount amount override |
+| Net Amount | Calculated | Subtotal - Discount |
+| Total | Calculated | Net Amount + Tax |
+
+**Props Interface**:
+```typescript
+interface PurchaserEditingProps {
+  isPurchaserEditable?: boolean;
+  onVendorChange?: (vendor: string) => void;
+  onCurrencyChange?: (currency: string) => void;
+  onCurrencyRateChange?: (rate: number) => void;
+  onUnitPriceChange?: (price: number) => void;
+  onDiscountRateChange?: (rate: number) => void;
+  onDiscountAmountChange?: (amount: number) => void;
+  onTaxTypeChange?: (taxType: string) => void;
+  onTaxRateChange?: (rate: number) => void;
+  onTaxAmountChange?: (amount: number) => void;
+  vendorOptions?: Array<{ value: string; label: string }>;
+  currencyOptions?: Array<{ value: string; label: string }>;
+  taxTypeOptions?: Array<{ value: string; label: string; rate?: number }>;
+}
+```
+
+**Tax Profile Configuration**:
+```typescript
+const taxTypeOptions = [
+  { value: 'VAT', label: 'VAT (7%)', rate: 0.07 },
+  { value: 'GST', label: 'GST (10%)', rate: 0.10 },
+  { value: 'SST', label: 'SST (6%)', rate: 0.06 },
+  { value: 'WHT', label: 'WHT (3%)', rate: 0.03 },
+  { value: 'None', label: 'No Tax (0%)', rate: 0 },
+];
+```
+
+**Role Detection Logic**:
+```typescript
+const isPurchaser = ["Purchasing Staff", "Purchaser", "Procurement Manager"]
+  .some(role => userRole?.toLowerCase().includes(role.toLowerCase()));
+
+const isPurchaserEditable = isPurchaser && formMode === "edit";
+```
+
+**Calculation Logic**:
+```typescript
+// Calculate financials
+const subtotal = quantity * unitPrice;
+const discountAmount = discountOverride || (subtotal * discountRate);
+const netAmount = subtotal - discountAmount;
+const taxAmount = taxOverride || (netAmount * taxRate);
+const total = netAmount + taxAmount;
+```
+
+**UI/UX Requirements**:
+- Tax rate field shows "From profile" label indicating auto-population
+- Override fields use placeholder "Override" to indicate optional
+- Real-time calculation updates as user types
+- Currency symbol displayed with amounts
+- Validation errors shown inline with red border
+
+---
+
+#### 4.2 Bulk Item Actions Component
+
+**Status**: 🔧 Partial
+**Related BR**: FR-PR-026
+**Location**: Items tab within PR Detail/Edit page
+
+This component provides multi-select functionality for line items and bulk action operations.
+
+**Component Structure**:
+```
+BulkItemActions/
+├── BulkActionToolbar.tsx        # Floating toolbar with action buttons
+├── ItemSelectionContext.tsx     # Selection state management
+├── SelectableItemRow.tsx        # Row with selection checkbox
+├── BulkApproveDialog.tsx        # Confirm approval dialog
+├── BulkRejectDialog.tsx         # Rejection reason dialog
+├── BulkReturnDialog.tsx         # Return reason dialog
+├── SplitConfigDialog.tsx        # Split configuration dialog
+├── SetDateDialog.tsx            # Date picker dialog
+└── hooks/
+    ├── useBulkSelection.ts      # Selection management hook
+    └── useBulkActions.ts        # Action execution hook
+```
+
+**Props Interface**:
+```typescript
+interface BulkItemActionsProps {
+  items: PurchaseRequestItem[];
+  userRole: UserRole;
+  prStatus: PRStatus;
+  onBulkApprove?: (itemIds: string[], comment?: string) => Promise<void>;
+  onBulkReject?: (itemIds: string[], reason: string) => Promise<void>;
+  onBulkReturn?: (itemIds: string[], reason: string) => Promise<void>;
+  onSplit?: (itemGroups: ItemGroup[]) => Promise<void>;
+  onSetDate?: (itemIds: string[], date: Date) => Promise<void>;
+  onSelectionChange?: (selectedIds: string[]) => void;
+}
+
+interface PurchaseRequestItem {
+  id: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  status: ItemStatus;
+  deliveryDate?: Date;
+  vendorId?: string;
+  // ... other item fields
+}
+
+type ItemStatus = 'Pending' | 'In-progress' | 'Approved' | 'Rejected' | 'Returned';
+
+interface ItemGroup {
+  groupId: string;
+  groupName: string;
+  itemIds: string[];
+  groupBy: 'vendor' | 'date' | 'manual';
+}
+```
+
+**Selection State Management**:
+```typescript
+interface SelectionState {
+  selectedIds: Set<string>;
+  isAllSelected: boolean;
+  isIndeterminate: boolean;
+  selectionSummary: SelectionSummary;
+}
+
+interface SelectionSummary {
+  total: number;
+  byStatus: Record<ItemStatus, number>;
+}
+
+const useBulkSelection = (items: PurchaseRequestItem[]) => {
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const toggleItem = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    setSelectedIds(new Set(items.map(item => item.id)));
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  const selectionSummary = useMemo(() => {
+    const selected = items.filter(item => selectedIds.has(item.id));
+    const byStatus = selected.reduce((acc, item) => {
+      acc[item.status] = (acc[item.status] || 0) + 1;
+      return acc;
+    }, {} as Record<ItemStatus, number>);
+    return { total: selected.length, byStatus };
+  }, [items, selectedIds]);
+
+  return {
+    selectedIds,
+    toggleItem,
+    selectAll,
+    clearSelection,
+    isAllSelected: selectedIds.size === items.length && items.length > 0,
+    isIndeterminate: selectedIds.size > 0 && selectedIds.size < items.length,
+    selectionSummary,
+  };
+};
+```
+
+**Bulk Action Toolbar Component**:
+```typescript
+interface BulkActionToolbarProps {
+  selectionSummary: SelectionSummary;
+  userRole: UserRole;
+  onApprove: () => void;
+  onReject: () => void;
+  onReturn: () => void;
+  onSplit: () => void;
+  onSetDate: () => void;
+  onClearSelection: () => void;
+}
+
+const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
+  selectionSummary,
+  userRole,
+  onApprove,
+  onReject,
+  onReturn,
+  onSplit,
+  onSetDate,
+  onClearSelection,
+}) => {
+  if (selectionSummary.total === 0) return null;
+
+  const canApprove = ['Approver', 'Purchasing Staff'].includes(userRole);
+  const canReject = ['Approver', 'Purchasing Staff'].includes(userRole);
+  const canReturn = ['Approver', 'Purchasing Staff'].includes(userRole);
+  const canSplit = userRole === 'Purchasing Staff' && selectionSummary.total >= 2;
+  const canSetDate = true; // All roles can set date
+
+  return (
+    <div className="sticky top-0 z-10 bg-background border rounded-lg p-3 shadow-md">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Checkbox checked indeterminate={false} />
+          <span className="text-sm font-medium">
+            {selectionSummary.total} items selected
+            {selectionSummary.byStatus.Approved && (
+              <span className="text-muted-foreground ml-1">
+                : {selectionSummary.byStatus.Approved} Approved
+              </span>
+            )}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {canApprove && (
+            <Button variant="default" size="sm" onClick={onApprove}
+              className="bg-green-600 hover:bg-green-700">
+              <CheckCircle className="h-4 w-4 mr-1" />
+              Approve Selected
+            </Button>
+          )}
+          {canReject && (
+            <Button variant="destructive" size="sm" onClick={onReject}>
+              <XCircle className="h-4 w-4 mr-1" />
+              Reject Selected
+            </Button>
+          )}
+          {canReturn && (
+            <Button variant="outline" size="sm" onClick={onReturn}>
+              <RotateCcw className="h-4 w-4 mr-1" />
+              Return Selected
+            </Button>
+          )}
+          {canSplit && (
+            <Button variant="secondary" size="sm" onClick={onSplit}>
+              <Split className="h-4 w-4 mr-1" />
+              Split
+            </Button>
+          )}
+          {canSetDate && (
+            <Button variant="secondary" size="sm" onClick={onSetDate}>
+              <Calendar className="h-4 w-4 mr-1" />
+              Set Date Required
+            </Button>
+          )}
+          <Button variant="ghost" size="sm" onClick={onClearSelection}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+**Bulk Action Handlers**:
+```typescript
+const useBulkActions = (prId: string) => {
+  const queryClient = useQueryClient();
+
+  const bulkApprove = async (itemIds: string[], comment?: string) => {
+    const response = await api.post(`/api/purchase-requests/${prId}/items/bulk-approve`, {
+      itemIds,
+      comment,
+    });
+    if (response.success) {
+      queryClient.invalidateQueries(['purchase-request', prId]);
+      toast.success(`${itemIds.length} items approved`);
+    }
+    return response;
+  };
+
+  const bulkReject = async (itemIds: string[], reason: string) => {
+    const response = await api.post(`/api/purchase-requests/${prId}/items/bulk-reject`, {
+      itemIds,
+      reason,
+    });
+    if (response.success) {
+      queryClient.invalidateQueries(['purchase-request', prId]);
+      toast.success(`${itemIds.length} items rejected`);
+    }
+    return response;
+  };
+
+  const bulkReturn = async (itemIds: string[], reason: string) => {
+    const response = await api.post(`/api/purchase-requests/${prId}/items/bulk-return`, {
+      itemIds,
+      reason,
+    });
+    if (response.success) {
+      queryClient.invalidateQueries(['purchase-request', prId]);
+      toast.success(`${itemIds.length} items returned for revision`);
+    }
+    return response;
+  };
+
+  const splitItems = async (itemGroups: ItemGroup[]) => {
+    const response = await api.post(`/api/purchase-requests/${prId}/items/split`, {
+      groups: itemGroups,
+    });
+    if (response.success) {
+      queryClient.invalidateQueries(['purchase-requests']);
+      toast.success(`PR split into ${itemGroups.length} new PRs`);
+    }
+    return response;
+  };
+
+  const setItemsDate = async (itemIds: string[], date: Date) => {
+    const response = await api.post(`/api/purchase-requests/${prId}/items/set-date`, {
+      itemIds,
+      deliveryDate: date.toISOString(),
+    });
+    if (response.success) {
+      queryClient.invalidateQueries(['purchase-request', prId]);
+      toast.success(`Date updated for ${itemIds.length} items`);
+    }
+    return response;
+  };
+
+  return { bulkApprove, bulkReject, bulkReturn, splitItems, setItemsDate };
+};
+```
+
+**Role-Based Button Visibility**:
+```typescript
+const getVisibleActions = (userRole: UserRole, prStatus: PRStatus): ActionType[] => {
+  const actions: ActionType[] = [];
+
+  // Requestor (limited - only in Draft/Void/Returned)
+  if (userRole === 'Requestor') {
+    if (['Draft', 'Void', 'Returned'].includes(prStatus)) {
+      actions.push('setDate');
+    }
+    return actions;
+  }
+
+  // Approver
+  if (['Approver', 'Department Manager', 'Finance Manager'].includes(userRole)) {
+    actions.push('approve', 'reject', 'return', 'setDate');
+    return actions;
+  }
+
+  // Purchasing Staff - all actions
+  if (['Purchasing Staff', 'Purchaser', 'Procurement Manager'].includes(userRole)) {
+    actions.push('approve', 'reject', 'return', 'split', 'setDate');
+    return actions;
+  }
+
+  return actions;
+};
+```
+
+**Validation Before Action**:
+```typescript
+const validateBulkAction = (
+  action: ActionType,
+  items: PurchaseRequestItem[],
+  selectedIds: string[]
+): ValidationResult => {
+  const selectedItems = items.filter(item => selectedIds.includes(item.id));
+  const validStatuses = getValidStatusesForAction(action);
+
+  const validItems = selectedItems.filter(item => validStatuses.includes(item.status));
+  const invalidItems = selectedItems.filter(item => !validStatuses.includes(item.status));
+
+  if (action === 'split' && validItems.length < 2) {
+    return { valid: false, error: 'Minimum 2 items required for split' };
+  }
+
+  if (validItems.length === 0) {
+    return { valid: false, error: `No items can be ${action}ed` };
+  }
+
+  return {
+    valid: true,
+    validItems,
+    invalidItems,
+    warning: invalidItems.length > 0
+      ? `${invalidItems.length} of ${selectedItems.length} items cannot be ${action}ed`
+      : undefined,
+  };
+};
+
+const getValidStatusesForAction = (action: ActionType): ItemStatus[] => {
+  switch (action) {
+    case 'approve':
+    case 'reject':
+      return ['Pending', 'In-progress'];
+    case 'return':
+      return ['Pending', 'In-progress', 'Approved'];
+    case 'split':
+    case 'setDate':
+      return ['Pending', 'In-progress', 'Approved', 'Returned'];
+    default:
+      return [];
+  }
+};
+```
+
+**UI/UX Requirements**:
+- Checkbox column fixed at 40px width, first column position
+- "Select All" checkbox in header with indeterminate state support
+- Bulk action toolbar appears with slide-down animation when items selected
+- Toolbar uses sticky positioning to remain visible during scroll
+- Selection count updates in real-time with status breakdown
+- Action buttons show loading state during API calls
+- Toast notifications confirm successful/failed operations
+- Dialog forms validate before submission
+- Split preview shows item groupings before confirmation
+
+**Button Styling**:
+| Button | Variant | Color | Icon |
+|--------|---------|-------|------|
+| Approve Selected | default | green-600 | CheckCircle |
+| Reject Selected | destructive | red | XCircle |
+| Return Selected | outline | gray | RotateCcw |
+| Split | secondary | blue | Split |
+| Set Date Required | secondary | blue | Calendar |
+| Clear Selection | ghost | gray | X |
+
+---
+
+#### 4.3 Budget Tab CRUD Component
+
+**Status**: ✅ Implemented
+**Related BR**: FR-PR-027
+**Location**: Budget tab within PR Detail page
+
+This component provides full CRUD functionality for managing budget allocations within a Purchase Request.
+
+##### Component Structure
+
+The Budget Tab component is organized as follows:
+- **budget-tab.tsx**: Main component containing the table display and all dialog modals
+- **Types**: BudgetItem interface for data structure, BudgetFormData interface for form state
+- **Hooks**: useBudgetCalculations for calculation logic
+
+##### Data Model
+
+**BudgetItem Properties**:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| id | string | Unique identifier for the budget allocation |
+| location | string | Department/location name (e.g., Kitchen, Front Office) |
+| category | string | Budget category (e.g., F&B, Operating Supplies) |
+| totalBudget | number | Total allocated budget amount |
+| softCommitmentDeptHead | number | Soft commitment from department head approval |
+| softCommitmentPO | number | Soft commitment from purchase orders |
+| hardCommitment | number | Hard commitment (confirmed expenditure) |
+| availableBudget | number | Calculated: Total minus all commitments |
+| currentPRAmount | number | Amount allocated to current PR |
+| status | enum | Calculated: "Over Budget", "Within Budget", or "Near Limit" |
+
+**Form Data Properties**:
+All form fields are stored as strings for input handling, with numeric conversion on save. Fields include: location, category, totalBudget, softCommitmentDeptHead, softCommitmentPO, hardCommitment, currentPRAmount.
+
+##### State Management
+
+The component maintains several state variables:
+- **budgetData**: Array of BudgetItem objects representing all budget allocations
+- **isAddEditDialogOpen**: Boolean controlling the add/edit dialog visibility
+- **isDeleteDialogOpen**: Boolean controlling the delete confirmation dialog
+- **editingItem**: The BudgetItem currently being edited (null for add mode)
+- **deletingItem**: The BudgetItem pending deletion confirmation
+- **formData**: Current form field values
+- **formErrors**: Validation error messages keyed by field name
+- **totals**: Memoized calculation of column totals for all numeric fields
+
+##### Calculation Logic
+
+**Available Budget Calculation**:
+Available Budget = Total Budget - Soft Commitment (Dept Head) - Soft Commitment (PO) - Hard Commitment
+
+**Status Determination**:
+
+| Condition | Status | Display |
+|-----------|--------|---------|
+| Available Budget < 0 | Over Budget | Red destructive badge |
+| Available Budget ≤ 20% of Total Budget | Near Limit | Yellow warning badge |
+| Available Budget > 20% of Total Budget | Within Budget | Green success badge |
+
+**Real-time Preview**: The form displays a live preview of the calculated available budget as the user types, updating on each field change.
+
+##### Form Validation Rules
+
+The form validates the following before submission:
+
+1. **Required Fields**: Location, Category, and Total Budget must not be empty
+2. **Numeric Validation**: All amount fields must be valid numbers greater than or equal to zero
+3. **Duplicate Prevention**: The combination of Location + Category must be unique within the PR (excluding the current item when editing)
+
+**Error Messages**:
+- "Location is required"
+- "Category is required"
+- "Total Budget is required"
+- "Must be a valid number >= 0"
+- "Budget allocation for this Location and Category already exists"
+
+##### CRUD Operations
+
+**Add Operation**:
+1. User clicks "Add Budget" button
+2. System opens dialog with empty form
+3. User fills required fields
+4. System validates and calculates available budget/status
+5. On success, new item added to table and toast notification displayed
+
+**Edit Operation**:
+1. User clicks Edit in row dropdown menu
+2. System opens dialog pre-populated with existing values
+3. User modifies fields as needed
+4. System validates (including duplicate check excluding current item)
+5. On success, item updated in table and toast notification displayed
+
+**Delete Operation**:
+1. User clicks Delete in row dropdown menu
+2. System displays AlertDialog confirmation with item details
+3. User confirms or cancels
+4. On confirm, item removed from table and toast notification displayed
+
+##### Location and Category Options
+
+**Available Locations**: Front Office, Accounting, HouseKeeping, Kitchen, Restaurant, Engineering, IT, HR, Sales, Marketing
+
+**Available Categories**: F&B, Operating Supplies, Maintenance, Equipment, Services
+
+##### Role-Based Access Control
+
+| Role | View | Add | Edit | Delete |
+|------|------|-----|------|--------|
+| Requestor | ✅ | ❌ | ❌ | ❌ |
+| Approver | ✅ | ❌ | ❌ | ❌ |
+| Purchasing Staff | ✅ | ✅ | ✅ | ✅ |
+| Purchaser | ✅ | ✅ | ✅ | ✅ |
+| Procurement Manager | ✅ | ✅ | ✅ | ✅ |
+| Finance Manager | ✅ | ✅ | ✅ | ✅ |
+
+The Add Budget button and row action menus are conditionally rendered based on user role. Users without edit permission see a read-only view of the budget data.
+
+##### UI Components
+
+| Component | Purpose |
+|-----------|---------|
+| Dialog | Add/Edit form modal |
+| AlertDialog | Delete confirmation modal |
+| DropdownMenu | Row actions (Edit, Delete) |
+| Select | Location and Category dropdowns |
+| Input | Numeric input fields |
+| Label | Form field labels |
+| Button | Action buttons (Add Budget, Save, Cancel, Delete) |
+| Table | Budget data display (desktop) |
+| Card | Budget data display (mobile) |
+| Badge | Status indicators with color coding |
+| toast (sonner) | Success/error notifications |
+
+##### Currency Formatting
+
+All currency values are formatted using Intl.NumberFormat with USD currency, displaying whole numbers without decimal places (e.g., "$50,000").
+
+##### Responsive Design
+
+- **Desktop View**: Full table layout with all columns visible, row actions in dropdown menu
+- **Mobile View**: Card-based layout showing key information (Location, Category, Total, Available, Status), actions accessible via card menu
+
+##### Accessibility Features
+
+- ARIA labels on all interactive elements
+- Keyboard navigation support for dialogs and dropdown menus
+- Focus trap in AlertDialog for delete confirmation
+- Error messages associated with form fields using aria-describedby
+- Semantic HTML structure for screen reader compatibility
 
 ---
 
@@ -1367,6 +2001,150 @@ flowchart TD
 - Show approve/reject only to current approver
 - Display read-only history to others
 - Validate approver permissions server-side
+
+---
+
+#### Workflow Action Buttons Component
+
+**Implementation Status**: ✅ Implemented
+
+**Responsibility**: Display role-appropriate workflow action buttons (Reject, Return, Submit, Approve) in PR detail page header.
+
+**Location**: `app/(main)/procurement/purchase-requests/components/PRDetailPage.tsx`
+
+**Features**:
+- Role-based button visibility
+- All applicable buttons displayed simultaneously
+- Consistent button styling across roles
+- Dialog confirmation for destructive actions
+- Required comment input for Reject/Return actions
+- Validation before Submit action
+
+**Props Interface**:
+```typescript
+interface WorkflowButtonsProps {
+  pr: PurchaseRequest;
+  userRole: string;
+  isPurchaser: boolean;
+  isApprover: boolean;
+  isRequestor: boolean;
+  canSubmit: boolean;
+  onReject: (reason: string) => void;
+  onReturn: (reason: string) => void;
+  onSubmit: () => void;
+  onApprove: () => void;
+}
+```
+
+**Button Configuration by Role**:
+
+| Role | Buttons Displayed | Order | Conditions |
+|------|-------------------|-------|------------|
+| Requestor | Recall | Right | PR status = In-progress, user is creator |
+| Approver | Reject, Return, Approve | Left → Right | PR status = In-progress, has pending task |
+| Purchasing Staff | Reject, Return, Submit | Left → Right | Has purchaser role, PR editable |
+
+**Button Styling**:
+```typescript
+const buttonConfig = {
+  reject: {
+    variant: 'destructive',
+    icon: XCircleIcon,
+    className: 'h-9',
+    label: 'Reject'
+  },
+  return: {
+    variant: 'outline',
+    icon: RotateCcwIcon,
+    className: 'h-9',
+    label: 'Return'
+  },
+  approve: {
+    variant: 'default',
+    icon: CheckCircleIcon,
+    className: 'h-9 bg-green-600 hover:bg-green-700',
+    label: 'Approve'
+  },
+  submit: {
+    variant: 'default',
+    icon: SendIcon,
+    className: 'h-9',
+    label: 'Submit'
+  }
+};
+```
+
+**Role Detection Logic**:
+```typescript
+// Approver roles
+const approverRoles = [
+  'Department Manager',
+  'Finance Manager',
+  'General Manager',
+  'Asset Manager'
+];
+
+// Purchasing staff roles
+const purchaserRoles = [
+  'Purchasing Staff',
+  'Purchaser',
+  'Procurement Manager',
+  'Purchasing Agent'
+];
+
+const isApprover = approverRoles.includes(userRoleName);
+const isPurchaser = purchaserRoles.includes(userRoleName);
+```
+
+**Action Handlers**:
+```typescript
+// Reject action - requires confirmation dialog with reason
+const handleReject = async (reason: string) => {
+  if (reason.length < 10) {
+    toast.error('Rejection reason must be at least 10 characters');
+    return;
+  }
+  await updatePRStatus(pr.id, 'Void', { rejectionReason: reason });
+  toast.success('Purchase request rejected');
+};
+
+// Return action - requires confirmation dialog with reason
+const handleReturn = async (reason: string) => {
+  if (reason.length < 10) {
+    toast.error('Return reason must be at least 10 characters');
+    return;
+  }
+  await returnPRToPreviousStage(pr.id, { returnReason: reason });
+  toast.success('Purchase request returned for revision');
+};
+
+// Submit action - validates items before submission
+const handleSubmit = async () => {
+  const incompleteItems = pr.items.filter(
+    item => !item.vendor || !item.unitPrice
+  );
+  if (incompleteItems.length > 0) {
+    toast.error('All items must have vendor and price allocated');
+    return;
+  }
+  await advancePRToNextStage(pr.id);
+  toast.success('Purchase request submitted to next stage');
+};
+
+// Approve action - advances workflow
+const handleApprove = async () => {
+  await approvePR(pr.id);
+  toast.success('Purchase request approved');
+};
+```
+
+**State Management**:
+```typescript
+const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+const [isReturnDialogOpen, setIsReturnDialogOpen] = useState(false);
+const [rejectReason, setRejectReason] = useState('');
+const [returnReason, setReturnReason] = useState('');
+```
 
 ---
 

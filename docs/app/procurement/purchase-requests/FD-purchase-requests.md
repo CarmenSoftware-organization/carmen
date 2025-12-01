@@ -3,8 +3,8 @@
 **Module**: Procurement
 **Sub-Module**: Purchase Requests
 **Document Type**: Flow Diagrams (FD)
-**Version**: 1.1.0
-**Last Updated**: 2025-11-26
+**Version**: 1.6.0
+**Last Updated**: 2025-11-28
 **Status**: Active
 
 ## Document History
@@ -13,6 +13,11 @@
 |---------|------|--------|---------|
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 | 1.1.0 | 2025-11-26 | Documentation Team | Synchronized with BR - updated status values, added implementation status markers |
+| 1.2.0 | 2025-11-28 | Development Team | Added 2.7: Purchasing Staff Edit Mode - Vendor Pricing Flow with calculation detail |
+| 1.3.0 | 2025-11-28 | Development Team | Added 2.8: Workflow Action Buttons Flow with role-based button matrix |
+| 1.4.0 | 2025-11-28 | Development Team | Updated 2.3: Edit Purchase Request flow to include Returned status as editable |
+| 1.5.0 | 2025-11-28 | Development Team | Added 2.9: Bulk Item Actions Flow for line-item level bulk operations |
+| 1.6.0 | 2025-11-28 | Development Team | Added 2.10: Budget Tab CRUD Flow for budget allocation management |
 
 ## Implementation Status
 
@@ -143,13 +148,15 @@ flowchart TD
 
 **Implementation Status**: 🔧 Partial
 
+**Editable Statuses**: Draft, Void (Rejected), Returned
+
 ```mermaid
 flowchart TD
     Start([User opens PR]) --> CheckStatus{Status check}
-    CheckStatus -->|In-progress/Approved| ShowReadOnly[Display read-only view]
+    CheckStatus -->|In-progress/Approved/Completed/Cancelled| ShowReadOnly[Display read-only view]
     ShowReadOnly --> End1([End])
 
-    CheckStatus -->|Draft/Void| CheckOwner{Is owner?}
+    CheckStatus -->|Draft/Void/Returned| CheckOwner{Is owner?}
     CheckOwner -->|No| ShowReadOnly
 
     CheckOwner -->|Yes| LoadPR[(Load PR data)]
@@ -342,6 +349,761 @@ flowchart TD
     UpdateStatus2 --> LogAction
 
     LogAction --> End6([End])
+```
+
+---
+
+### 2.7 Purchasing Staff Edit Mode - Vendor Pricing Flow
+
+**Implementation Status**: ✅ Implemented
+
+**Description**: Workflow for purchasing staff to edit vendor pricing information, perform vendor allocations, manage tax profiles, and override financial calculations.
+
+```mermaid
+flowchart TD
+    Start([Purchasing Staff opens PR]) --> CheckRole{Has Purchaser<br/>Role?}
+    CheckRole -->|No| ReadOnly[Display pricing fields<br/>as read-only]
+    ReadOnly --> End1([End])
+
+    CheckRole -->|Yes| CheckMode{Edit Mode?}
+    CheckMode -->|No| ViewOnly[Display pricing fields<br/>view only]
+    ViewOnly --> End2([End])
+
+    CheckMode -->|Yes| LoadPricing[Load editable pricing form]
+    LoadPricing --> DisplayFields[Display editable fields:<br/>- Vendor dropdown<br/>- Currency dropdown<br/>- Exchange rate<br/>- Unit price<br/>- Tax profile<br/>- Discount rate/override<br/>- Tax override]
+
+    DisplayFields --> SelectVendor{Select<br/>Vendor?}
+    SelectVendor -->|Yes| LoadVendors[Load approved vendors<br/>for item category]
+    LoadVendors --> UpdateVendor[Update vendor field]
+    UpdateVendor --> SelectCurrency
+
+    SelectVendor -->|No| SelectCurrency{Select<br/>Currency?}
+    SelectCurrency -->|Yes| LoadCurrencies[Load active currencies]
+    LoadCurrencies --> LookupRate[Lookup exchange rate]
+    LookupRate --> UpdateCurrency[Update currency<br/>and exchange rate]
+    UpdateCurrency --> EnterPrice
+
+    SelectCurrency -->|No| EnterPrice{Enter<br/>Unit Price?}
+    EnterPrice -->|Yes| CalcSubtotal[Calculate subtotal<br/>qty × unit price]
+    CalcSubtotal --> SelectTax
+
+    EnterPrice -->|No| SelectTax{Select<br/>Tax Profile?}
+    SelectTax -->|Yes| LoadTaxProfile[Load tax profile config]
+    LoadTaxProfile --> SetTaxRate[Auto-set tax rate<br/>from profile]
+
+    subgraph TaxProfiles[Tax Profile Defaults]
+        VAT[VAT: 7%]
+        GST[GST: 10%]
+        SST[SST: 6%]
+        WHT[WHT: 3%]
+        None[None: 0%]
+    end
+
+    SetTaxRate --> CalcTax[Calculate tax amount<br/>net × tax rate]
+    CalcTax --> OverrideTax
+
+    SelectTax -->|No| OverrideTax{Override<br/>Tax Amount?}
+    OverrideTax -->|Yes| EnterTaxOverride[Enter manual tax amount]
+    EnterTaxOverride --> UseOverrideTax[Use override instead<br/>of calculated]
+    UseOverrideTax --> EnterDiscount
+
+    OverrideTax -->|No| EnterDiscount{Enter<br/>Discount?}
+    EnterDiscount -->|Yes| CalcDiscount[Calculate discount<br/>subtotal × rate]
+    CalcDiscount --> OverrideDiscount
+
+    EnterDiscount -->|No| OverrideDiscount{Override<br/>Discount?}
+    OverrideDiscount -->|Yes| EnterDiscOverride[Enter manual discount]
+    EnterDiscOverride --> UseOverrideDisc[Use override instead<br/>of calculated]
+    UseOverrideDisc --> RecalcTotals
+
+    OverrideDiscount -->|No| RecalcTotals[Recalculate all totals:<br/>- Subtotal<br/>- Net Amount<br/>- Tax Amount<br/>- Total]
+
+    RecalcTotals --> MoreChanges{More<br/>Changes?}
+    MoreChanges -->|Yes| DisplayFields
+
+    MoreChanges -->|No| SaveAction{Save?}
+    SaveAction -->|Cancel| DiscardChanges[Discard changes]
+    DiscardChanges --> End3([End])
+
+    SaveAction -->|Save| Validate{Validation<br/>OK?}
+    Validate -->|No| ShowErrors[Display validation errors]
+    ShowErrors --> DisplayFields
+
+    Validate -->|Yes| UpdateDB[(Update PR item pricing)]
+    UpdateDB --> LogAudit[(Log changes to audit trail)]
+    LogAudit --> Success[Display success message]
+    Success --> End4([End])
+```
+
+#### Calculation Flow Detail
+
+```mermaid
+flowchart LR
+    subgraph Inputs
+        Qty[Quantity]
+        Price[Unit Price]
+        DiscRate[Discount Rate]
+        DiscOverride[Discount Override]
+        TaxProfile[Tax Profile]
+        TaxOverride[Tax Override]
+    end
+
+    subgraph Calculations
+        Subtotal[Subtotal =<br/>Qty × Price]
+        DiscAmt[Discount =<br/>Override OR<br/>Subtotal × Rate]
+        NetAmt[Net Amount =<br/>Subtotal - Discount]
+        TaxAmt[Tax =<br/>Override OR<br/>Net × Profile Rate]
+        Total[Total =<br/>Net + Tax]
+    end
+
+    Qty --> Subtotal
+    Price --> Subtotal
+    Subtotal --> DiscAmt
+    DiscRate --> DiscAmt
+    DiscOverride --> DiscAmt
+    DiscAmt --> NetAmt
+    Subtotal --> NetAmt
+    NetAmt --> TaxAmt
+    TaxProfile --> TaxAmt
+    TaxOverride --> TaxAmt
+    TaxAmt --> Total
+    NetAmt --> Total
+```
+
+---
+
+### 2.8 Workflow Action Buttons Flow
+
+**Implementation Status**: ✅ Implemented
+
+**Description**: Role-based workflow action buttons (Reject, Return, Submit, Approve) displayed on PR detail page header based on user role and PR status.
+
+```mermaid
+flowchart TD
+    Start([User opens PR Detail]) --> CheckStatus{PR Status?}
+
+    CheckStatus -->|Draft| NoBtns1[No workflow buttons<br/>Only Save/Submit for Requestor]
+    CheckStatus -->|Void/Completed/Cancelled| NoBtns2[No workflow buttons<br/>Read-only view]
+    CheckStatus -->|In-progress/Approved| CheckRole{User Role?}
+
+    subgraph RequestorActions[Requestor Actions]
+        RA1[Recall Button<br/>Returns to Draft]
+        RA2[Edit Button<br/>Modify Draft PR]
+        RA3[Delete Button<br/>Remove Draft PR]
+    end
+
+    subgraph ApproverActions[Approver Actions]
+        AA1[Reject Button<br/>Red - Voids PR]
+        AA2[Return Button<br/>Outline - Returns for revision]
+        AA3[Approve Button<br/>Green - Advances PR]
+    end
+
+    subgraph PurchasingActions[Purchasing Staff Actions]
+        PA1[Reject Button<br/>Red - Voids PR]
+        PA2[Return Button<br/>Outline - Returns to Requestor]
+        PA3[Submit Button<br/>Blue - Advances to next stage]
+    end
+
+    CheckRole -->|Requestor<br/>Own PR| RequestorActions
+    CheckRole -->|Approver<br/>Pending approval| ApproverActions
+    CheckRole -->|Purchasing Staff| PurchasingActions
+
+    %% Requestor flows
+    RA1 --> ConfirmRecall{Confirm<br/>Recall?}
+    ConfirmRecall -->|Yes| RecallPR[Update status to Draft<br/>Cancel pending approvals]
+    ConfirmRecall -->|No| End1([End])
+
+    %% Approver flows
+    AA1 --> RejectDialog[Show Rejection Dialog<br/>Require reason]
+    AA2 --> ReturnDialog[Show Return Dialog<br/>Require reason]
+    AA3 --> ApproveConfirm{Confirm<br/>Approve?}
+
+    RejectDialog --> ConfirmReject{Confirm?}
+    ConfirmReject -->|Yes| RejectPR[Update status to Void<br/>Notify Requestor]
+    ConfirmReject -->|No| End2([End])
+
+    ReturnDialog --> ConfirmReturn{Confirm?}
+    ConfirmReturn -->|Yes| ReturnPR[Update status to Returned<br/>Notify previous stage]
+    ConfirmReturn -->|No| End3([End])
+
+    ApproveConfirm -->|Yes| ApprovePR[Record approval<br/>Check next stage]
+    ApproveConfirm -->|No| End4([End])
+
+    %% Purchasing flows
+    PA1 --> RejectDialog2[Show Rejection Dialog<br/>Require reason]
+    PA2 --> ReturnDialog2[Show Return Dialog<br/>Require reason]
+    PA3 --> ValidateSubmit{All items<br/>have vendors?}
+
+    RejectDialog2 --> ConfirmReject2{Confirm?}
+    ConfirmReject2 -->|Yes| RejectPR2[Update status to Void<br/>Notify all stakeholders]
+    ConfirmReject2 -->|No| End5([End])
+
+    ReturnDialog2 --> ConfirmReturn2{Confirm?}
+    ConfirmReturn2 -->|Yes| ReturnPR2[Update status to Returned<br/>Notify Requestor]
+    ConfirmReturn2 -->|No| End6([End])
+
+    ValidateSubmit -->|No| ShowValidationError[Show validation error<br/>Highlight incomplete items]
+    ShowValidationError --> End7([End])
+
+    ValidateSubmit -->|Yes| SubmitPR[Advance to next stage<br/>Notify recipient]
+
+    style RequestorActions fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    style ApproverActions fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
+    style PurchasingActions fill:#e6ffcc,stroke:#66cc00,stroke-width:2px
+```
+
+#### Button Display Matrix
+
+```mermaid
+flowchart LR
+    subgraph ButtonMatrix[Workflow Button Visibility by Role]
+        direction TB
+
+        subgraph Requestor[Requestor - Own PR]
+            R_Draft[Draft: Edit, Delete, Submit]
+            R_InProgress[In-progress: Recall only]
+            R_Returned[Returned: Edit, Resubmit]
+        end
+
+        subgraph Approver[Approver - Pending Task]
+            A_Pending[Pending Approval:<br/>Reject | Return | Approve]
+            A_Completed[Already Actioned:<br/>View only]
+        end
+
+        subgraph Purchaser[Purchasing Staff]
+            P_Processing[Processing PR:<br/>Reject | Return | Submit]
+            P_Completed[PR Completed:<br/>View only]
+        end
+    end
+
+    style Requestor fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    style Approver fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
+    style Purchaser fill:#e6ffcc,stroke:#66cc00,stroke-width:2px
+```
+
+#### Button Styling Specifications
+
+| Button | Color | Variant | Icon | Position |
+|--------|-------|---------|------|----------|
+| Reject | Red (`destructive`) | Solid | XCircle | Left |
+| Return | Gray | Outline | RotateCcw | Center |
+| Approve | Green (`bg-green-600`) | Solid | CheckCircle | Right |
+| Submit | Blue (`default`) | Solid | Send | Right |
+| Recall | Yellow (`warning`) | Outline | RotateCcw | Right |
+
+---
+
+### 2.9 Bulk Item Actions Flow
+
+**Status**: 🔧 Partial
+**Related BR**: FR-PR-026
+
+This flow describes the process for selecting multiple line items and performing bulk actions on them.
+
+#### 2.9.1 Main Selection Flow
+
+```mermaid
+flowchart TB
+    Start([User views PR Items Tab]) --> DisplayGrid[Display item grid<br/>with selection checkboxes]
+    DisplayGrid --> SelectAction{User action}
+
+    SelectAction -->|Click item checkbox| ToggleItem[Toggle item selection]
+    SelectAction -->|Click Select All| SelectAll[Select all visible items]
+    SelectAction -->|Click Clear| ClearSelection[Clear all selections]
+
+    ToggleItem --> UpdateCount[Update selection count]
+    SelectAll --> UpdateCount
+    ClearSelection --> HideToolbar[Hide bulk action toolbar]
+
+    UpdateCount --> CheckCount{Items selected?}
+    CheckCount -->|Yes| ShowToolbar[Show bulk action toolbar:<br/>Selection summary + Action buttons]
+    CheckCount -->|No| HideToolbar
+
+    ShowToolbar --> DisplaySummary["Display: {n} items selected: {status breakdown}"]
+    DisplaySummary --> WaitAction([Wait for action selection])
+
+    HideToolbar --> End([End])
+
+    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style ShowToolbar fill:#ffe6cc,stroke:#cc6600,stroke-width:2px
+```
+
+#### 2.9.2 Bulk Approve Flow
+
+```mermaid
+flowchart TB
+    Start([User clicks Approve Selected]) --> ValidateRole{User has<br/>approval permission?}
+    ValidateRole -->|No| ShowError1[Display: Permission denied]
+    ValidateRole -->|Yes| IdentifyItems[Identify valid items<br/>Status: Pending/In-progress]
+
+    IdentifyItems --> CheckValid{All items valid?}
+    CheckValid -->|Some invalid| ShowWarning["Display: X of Y cannot be approved<br/>[Proceed] [Cancel]"]
+    CheckValid -->|All valid| ShowConfirm["Display confirmation:<br/>Approve {n} items?"]
+
+    ShowWarning -->|Proceed| ShowConfirm
+    ShowWarning -->|Cancel| End1([End - No changes])
+
+    ShowConfirm --> UserConfirm{User confirms?}
+    UserConfirm -->|No| End1
+    UserConfirm -->|Yes| BeginTx[Begin transaction]
+
+    BeginTx --> ProcessLoop[For each valid item:]
+    ProcessLoop --> UpdateItem["- Status = Approved<br/>- approved_qty = requested_qty<br/>- approval_timestamp = now<br/>- approver_id = current_user"]
+    UpdateItem --> NextItem{More items?}
+    NextItem -->|Yes| ProcessLoop
+    NextItem -->|No| CommitTx[Commit transaction]
+
+    CommitTx --> LogActivity[Log bulk approval activity]
+    LogActivity --> SendNotify[Send notification to requestor]
+    SendNotify --> RefreshGrid[Refresh item grid]
+    RefreshGrid --> ShowSuccess["Display: {n} items approved"]
+    ShowSuccess --> End2([End - Success])
+
+    ShowError1 --> End1
+
+    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End1 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End2 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style CommitTx fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+    style ShowSuccess fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+```
+
+#### 2.9.3 Bulk Reject Flow
+
+```mermaid
+flowchart TB
+    Start([User clicks Reject Selected]) --> ValidateRole{User has<br/>rejection permission?}
+    ValidateRole -->|No| ShowError1[Display: Permission denied]
+    ValidateRole -->|Yes| IdentifyItems[Identify valid items<br/>Status: Pending/In-progress]
+
+    IdentifyItems --> CheckValid{All items valid?}
+    CheckValid -->|Some invalid| ShowWarning["Display: X of Y cannot be rejected<br/>[Proceed] [Cancel]"]
+    CheckValid -->|All valid| ShowDialog[Display rejection dialog]
+
+    ShowWarning -->|Proceed| ShowDialog
+    ShowWarning -->|Cancel| End1([End - No changes])
+
+    ShowDialog --> EnterReason[User enters rejection reason]
+    EnterReason --> ValidateComment{Comment >= 10 chars?}
+    ValidateComment -->|No| ShowCommentError[Display: Minimum 10 characters required]
+    ShowCommentError --> EnterReason
+
+    ValidateComment -->|Yes| UserConfirm{User confirms?}
+    UserConfirm -->|No| End1
+    UserConfirm -->|Yes| BeginTx[Begin transaction]
+
+    BeginTx --> ProcessLoop[For each valid item:]
+    ProcessLoop --> UpdateItem["- Status = Rejected<br/>- rejection_timestamp = now<br/>- rejection_reason = comment<br/>- rejector_id = current_user"]
+    UpdateItem --> NextItem{More items?}
+    NextItem -->|Yes| ProcessLoop
+    NextItem -->|No| CommitTx[Commit transaction]
+
+    CommitTx --> LogActivity[Log bulk rejection activity]
+    LogActivity --> SendNotify[Send notification to requestor]
+    SendNotify --> RefreshGrid[Refresh item grid]
+    RefreshGrid --> ShowSuccess["Display: {n} items rejected"]
+    ShowSuccess --> End2([End - Success])
+
+    ShowError1 --> End1
+
+    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End1 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End2 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style CommitTx fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style ShowSuccess fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+```
+
+#### 2.9.4 Bulk Return Flow
+
+```mermaid
+flowchart TB
+    Start([User clicks Return Selected]) --> ValidateRole{User has<br/>return permission?}
+    ValidateRole -->|No| ShowError1[Display: Permission denied]
+    ValidateRole -->|Yes| IdentifyItems[Identify valid items<br/>Status: Pending/In-progress/Approved]
+
+    IdentifyItems --> CheckValid{All items valid?}
+    CheckValid -->|Some invalid| ShowWarning["Display: X of Y cannot be returned<br/>[Proceed] [Cancel]"]
+    CheckValid -->|All valid| ShowDialog[Display return dialog]
+
+    ShowWarning -->|Proceed| ShowDialog
+    ShowWarning -->|Cancel| End1([End - No changes])
+
+    ShowDialog --> EnterReason[User enters return reason]
+    EnterReason --> ValidateComment{Comment >= 10 chars?}
+    ValidateComment -->|No| ShowCommentError[Display: Minimum 10 characters required]
+    ShowCommentError --> EnterReason
+
+    ValidateComment -->|Yes| UserConfirm{User confirms?}
+    UserConfirm -->|No| End1
+    UserConfirm -->|Yes| BeginTx[Begin transaction]
+
+    BeginTx --> ProcessLoop[For each valid item:]
+    ProcessLoop --> UpdateItem["- Status = Returned<br/>- return_timestamp = now<br/>- return_reason = comment<br/>- returned_by = current_user"]
+    UpdateItem --> NextItem{More items?}
+    NextItem -->|Yes| ProcessLoop
+    NextItem -->|No| CommitTx[Commit transaction]
+
+    CommitTx --> LogActivity[Log bulk return activity]
+    LogActivity --> SendNotify[Send notification to requestor]
+    SendNotify --> RefreshGrid[Refresh item grid]
+    RefreshGrid --> ShowSuccess["Display: {n} items returned for revision"]
+    ShowSuccess --> End2([End - Success])
+
+    ShowError1 --> End1
+
+    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End1 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End2 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style CommitTx fill:#fff0cc,stroke:#cc9900,stroke-width:2px
+    style ShowSuccess fill:#fff0cc,stroke:#cc9900,stroke-width:2px
+```
+
+#### 2.9.5 Split Items Flow
+
+```mermaid
+flowchart TB
+    Start([User clicks Split]) --> ValidateRole{User is<br/>Purchasing Staff?}
+    ValidateRole -->|No| ShowError1[Display: Permission denied]
+    ValidateRole -->|Yes| CheckCount{Items >= 2?}
+
+    CheckCount -->|No| ShowError2[Display: Minimum 2 items required]
+    CheckCount -->|Yes| ShowDialog[Display split configuration dialog]
+
+    ShowDialog --> SelectMethod{Select split method}
+    SelectMethod -->|By Vendor| GroupVendor[Group items by vendor]
+    SelectMethod -->|By Date| GroupDate[Group items by delivery date]
+    SelectMethod -->|Manual| GroupManual[User defines groupings]
+
+    GroupVendor --> ShowPreview[Show split preview:<br/>- Groups formed<br/>- Items per group<br/>- New PR count]
+    GroupDate --> ShowPreview
+    GroupManual --> ShowPreview
+
+    ShowPreview --> UserConfirm{User confirms split?}
+    UserConfirm -->|No| End1([End - No changes])
+    UserConfirm -->|Yes| BeginTx[Begin transaction]
+
+    BeginTx --> CreateNewPRs[Create new PR for each group:<br/>- Copy header from original<br/>- Assign new ref number<br/>- Link to original PR]
+    CreateNewPRs --> UpdateOriginal["Update original PR:<br/>- Remove split items<br/>- Recalculate totals<br/>- Add split reference"]
+    UpdateOriginal --> CommitTx[Commit transaction]
+
+    CommitTx --> LogActivity[Log split activity with links]
+    LogActivity --> SendNotify["Send notifications:<br/>- Requestor: PR split<br/>- Staff: New PRs created"]
+    SendNotify --> ShowSuccess["Display success with links to new PRs"]
+    ShowSuccess --> End2([End - Success])
+
+    ShowError1 --> End1
+    ShowError2 --> End1
+
+    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End1 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End2 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style CreateNewPRs fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    style ShowSuccess fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+```
+
+#### 2.9.6 Set Date Required Flow
+
+```mermaid
+flowchart TB
+    Start([User clicks Set Date Required]) --> ValidateRole{User has<br/>edit permission?}
+    ValidateRole -->|No| ShowError1[Display: Permission denied]
+    ValidateRole -->|Yes| ShowDialog[Display date picker dialog]
+
+    ShowDialog --> SelectDate[User selects date]
+    SelectDate --> ValidateDate{Date >= today?}
+    ValidateDate -->|No| ShowDateError[Display: Date must be today or later]
+    ShowDateError --> SelectDate
+
+    ValidateDate -->|Yes| UserConfirm{User confirms?}
+    UserConfirm -->|No| End1([End - No changes])
+    UserConfirm -->|Yes| BeginTx[Begin transaction]
+
+    BeginTx --> ProcessLoop[For each selected item:]
+    ProcessLoop --> UpdateItem["- delivery_date = selected_date<br/>- Record in audit trail"]
+    UpdateItem --> NextItem{More items?}
+    NextItem -->|Yes| ProcessLoop
+    NextItem -->|No| CommitTx[Commit transaction]
+
+    CommitTx --> LogActivity[Log bulk date change activity]
+    LogActivity --> RefreshGrid[Refresh item grid]
+    RefreshGrid --> ShowSuccess["Display: Required date updated for {n} items"]
+    ShowSuccess --> End2([End - Success])
+
+    ShowError1 --> End1
+
+    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End1 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End2 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style CommitTx fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+    style ShowSuccess fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+```
+
+#### Role-Based Action Availability Matrix
+
+```mermaid
+flowchart LR
+    subgraph ActionMatrix[Bulk Item Action Availability]
+        direction TB
+
+        subgraph Requestor[Requestor - Draft/Void/Returned]
+            R_Select[Select Items: ✅]
+            R_SetDate[Set Date Required: ✅]
+            R_Others[Approve/Reject/Return/Split: ❌]
+        end
+
+        subgraph Approver[Approver]
+            A_Select[Select Items: ✅]
+            A_Approve[Approve Selected: ✅]
+            A_Reject[Reject Selected: ✅]
+            A_Return[Return Selected: ✅]
+            A_SetDate[Set Date Required: ✅]
+            A_Split[Split: ❌]
+        end
+
+        subgraph Purchasing[Purchasing Staff]
+            P_All[All Actions: ✅]
+            P_Note[Including Split]
+        end
+    end
+
+    style Requestor fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    style Approver fill:#ffe6e6,stroke:#cc0000,stroke-width:2px
+    style Purchasing fill:#e6ffcc,stroke:#66cc00,stroke-width:2px
+```
+
+---
+
+### 2.10 Budget Tab CRUD Flow
+
+**Implementation Status**: ✅ Implemented
+
+**Description**: Process flows for managing budget allocations within the Budget tab of Purchase Requests, including add, edit, and delete operations with real-time calculations.
+
+#### 2.10.1 View Budget Tab Flow
+
+```mermaid
+flowchart TB
+    Start([User opens Budget tab]) --> CheckRole{User role?}
+
+    CheckRole -->|Requestor/Approver| LoadReadOnly[Load budget data<br/>Read-only mode]
+    CheckRole -->|Purchasing Staff/Finance Manager| LoadWithActions[Load budget data<br/>With CRUD actions]
+
+    LoadReadOnly --> DisplayTable[Display budget allocation table]
+    LoadWithActions --> DisplayTableActions[Display table with<br/>Add button & row actions]
+
+    DisplayTable --> CalculateTotals[Calculate totals row]
+    DisplayTableActions --> CalculateTotals
+
+    CalculateTotals --> RenderStatus[Render status badges:<br/>- Over Budget (red)<br/>- Near Limit (yellow)<br/>- Within Budget (green)]
+
+    RenderStatus --> CheckDevice{Device type?}
+    CheckDevice -->|Desktop| ShowTable[Show table layout]
+    CheckDevice -->|Mobile| ShowCards[Show card layout]
+
+    ShowTable --> End([End])
+    ShowCards --> End
+
+    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style LoadWithActions fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+```
+
+#### 2.10.2 Add Budget Allocation Flow
+
+```mermaid
+flowchart TB
+    Start([User clicks Add Budget]) --> CheckPerm{Has add<br/>permission?}
+    CheckPerm -->|No| ShowError[Display: Permission denied]
+    ShowError --> End1([End])
+
+    CheckPerm -->|Yes| OpenDialog[Open Add Budget dialog]
+    OpenDialog --> InitForm[Initialize empty form:<br/>- Location (required)<br/>- Category (required)<br/>- Total Budget (required)<br/>- Soft Commitment DH (0)<br/>- Soft Commitment PO (0)<br/>- Hard Commitment (0)<br/>- Current PR Amount (0)]
+
+    InitForm --> UserInput[User fills form]
+    UserInput --> UpdatePreview[Update Available Budget preview:<br/>Total - Soft(DH) - Soft(PO) - Hard]
+    UpdatePreview --> UserInput
+
+    UserInput --> ClickSave{User clicks Save?}
+    ClickSave -->|No| ClickCancel{User clicks Cancel?}
+    ClickCancel -->|Yes| CloseDialog[Close dialog]
+    CloseDialog --> End2([End - No changes])
+    ClickCancel -->|No| UserInput
+
+    ClickSave -->|Yes| ValidateForm{Validate form}
+    ValidateForm -->|Missing required| ShowFieldError[Show field error message]
+    ShowFieldError --> UserInput
+
+    ValidateForm -->|Invalid number| ShowNumError[Show: Must be >= 0]
+    ShowNumError --> UserInput
+
+    ValidateForm -->|Duplicate| ShowDupError[Show: Location + Category exists]
+    ShowDupError --> UserInput
+
+    ValidateForm -->|Valid| CalcStatus[Calculate status:<br/>- Over Budget if Available < 0<br/>- Near Limit if <= 20%<br/>- Within Budget otherwise]
+
+    CalcStatus --> CreateRecord[Create budget allocation record]
+    CreateRecord --> UpdateTable[Update table with new row]
+    UpdateTable --> RecalcTotals[Recalculate totals row]
+    RecalcTotals --> LogActivity[Log add activity]
+    LogActivity --> ShowSuccess[Show toast: Added successfully]
+    ShowSuccess --> CloseDialogSuccess[Close dialog]
+    CloseDialogSuccess --> End3([End - Success])
+
+    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End1 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End2 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End3 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style CreateRecord fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+    style ShowSuccess fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+    style ShowFieldError fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style ShowNumError fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style ShowDupError fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+```
+
+#### 2.10.3 Edit Budget Allocation Flow
+
+```mermaid
+flowchart TB
+    Start([User clicks Edit in row menu]) --> CheckPerm{Has edit<br/>permission?}
+    CheckPerm -->|No| ShowError[Display: Permission denied]
+    ShowError --> End1([End])
+
+    CheckPerm -->|Yes| LoadData[Load existing budget data]
+    LoadData --> OpenDialog[Open Edit Budget dialog<br/>Pre-populated with values]
+
+    OpenDialog --> UserModify[User modifies fields]
+    UserModify --> UpdatePreview[Update Available Budget preview]
+    UpdatePreview --> UserModify
+
+    UserModify --> ClickSave{User clicks Save?}
+    ClickSave -->|No| ClickCancel{User clicks Cancel?}
+    ClickCancel -->|Yes| CloseDialog[Close dialog]
+    CloseDialog --> End2([End - No changes])
+    ClickCancel -->|No| UserModify
+
+    ClickSave -->|Yes| ValidateForm{Validate form}
+    ValidateForm -->|Invalid| ShowError2[Show validation error]
+    ShowError2 --> UserModify
+
+    ValidateForm -->|Duplicate<br/>(changed to existing)| ShowDupError[Show: Location + Category exists]
+    ShowDupError --> UserModify
+
+    ValidateForm -->|Valid| CalcStatus[Recalculate status]
+    CalcStatus --> UpdateRecord[Update budget allocation record]
+    UpdateRecord --> RefreshRow[Refresh table row]
+    RefreshRow --> RecalcTotals[Recalculate totals]
+    RecalcTotals --> LogActivity[Log edit activity]
+    LogActivity --> ShowSuccess[Show toast: Updated successfully]
+    ShowSuccess --> CloseDialogSuccess[Close dialog]
+    CloseDialogSuccess --> End3([End - Success])
+
+    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End1 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End2 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End3 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style UpdateRecord fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+    style ShowSuccess fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+```
+
+#### 2.10.4 Delete Budget Allocation Flow
+
+```mermaid
+flowchart TB
+    Start([User clicks Delete in row menu]) --> CheckPerm{Has delete<br/>permission?}
+    CheckPerm -->|No| ShowError[Display: Permission denied]
+    ShowError --> End1([End])
+
+    CheckPerm -->|Yes| ShowConfirm[Show AlertDialog:<br/>Delete {Location} - {Category}?<br/>This cannot be undone.]
+
+    ShowConfirm --> UserChoice{User choice?}
+    UserChoice -->|Cancel| CloseDialog[Close dialog]
+    CloseDialog --> End2([End - No changes])
+
+    UserChoice -->|Delete| RemoveRecord[Remove budget allocation]
+    RemoveRecord --> UpdateTable[Remove row from table]
+    UpdateTable --> RecalcTotals[Recalculate totals]
+    RecalcTotals --> LogActivity[Log delete activity]
+    LogActivity --> ShowSuccess[Show toast: Deleted]
+    ShowSuccess --> End3([End - Success])
+
+    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End1 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End2 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style End3 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style ShowConfirm fill:#fff3cd,stroke:#ffc107,stroke-width:2px
+    style RemoveRecord fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style ShowSuccess fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+```
+
+#### 2.10.5 Budget Calculation Flow
+
+```mermaid
+flowchart LR
+    subgraph Inputs
+        TB[Total Budget]
+        SCDH[Soft Commitment<br/>Dept Head]
+        SCPO[Soft Commitment<br/>PO]
+        HC[Hard Commitment]
+    end
+
+    subgraph Calculation
+        CALC["Available Budget =<br/>TB - SCDH - SCPO - HC"]
+    end
+
+    subgraph StatusLogic[Status Determination]
+        CHECK1{Available < 0?}
+        CHECK2{Available <= 20% of Total?}
+        STATUS1[Over Budget ❌]
+        STATUS2[Near Limit ⚠️]
+        STATUS3[Within Budget ✅]
+    end
+
+    TB --> CALC
+    SCDH --> CALC
+    SCPO --> CALC
+    HC --> CALC
+
+    CALC --> CHECK1
+    CHECK1 -->|Yes| STATUS1
+    CHECK1 -->|No| CHECK2
+    CHECK2 -->|Yes| STATUS2
+    CHECK2 -->|No| STATUS3
+
+    style TB fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style SCDH fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style SCPO fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style HC fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style CALC fill:#fff3cd,stroke:#ffc107,stroke-width:2px
+    style STATUS1 fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    style STATUS2 fill:#fff3cd,stroke:#ffc107,stroke-width:2px
+    style STATUS3 fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+```
+
+#### Budget Tab Role Access Matrix
+
+```mermaid
+flowchart LR
+    subgraph AccessMatrix[Budget Tab CRUD Access]
+        direction TB
+
+        subgraph ReadOnly[Requestor / Approver]
+            RO_View[View Budget Tab: ✅]
+            RO_Add[Add Budget: ❌]
+            RO_Edit[Edit Budget: ❌]
+            RO_Delete[Delete Budget: ❌]
+        end
+
+        subgraph FullAccess[Purchasing Staff / Finance Manager]
+            FA_View[View Budget Tab: ✅]
+            FA_Add[Add Budget: ✅]
+            FA_Edit[Edit Budget: ✅]
+            FA_Delete[Delete Budget: ✅]
+        end
+    end
+
+    style ReadOnly fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+    style FullAccess fill:#ccffcc,stroke:#00cc00,stroke-width:2px
 ```
 
 ---

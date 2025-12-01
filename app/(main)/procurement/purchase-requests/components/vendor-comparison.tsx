@@ -3,7 +3,7 @@ import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Check, Plus, History } from "lucide-react"
+import { Check, Plus, History, CheckCircle2, ArrowRight, Star, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DialogFooter } from "@/components/ui/custom-dialog"
 import StatusBadge from "@/components/ui/custom-status-badge"
 import { getVendorOptionsForItem, getCurrentVendorOption, type ItemVendorOption } from "./item-vendor-data"
+import { cn } from "@/lib/utils"
 
 export default function VendorComparison({ 
   currentPricelistNumber, 
@@ -94,8 +95,8 @@ export default function VendorComparison({
   const vendorOptions = itemVendorData?.vendorOptions || fallbackVendorOptions;
   
   // Determine user permissions
-  const isPurchaser = userRole === 'Purchasing Staff' || userRole === 'Purchaser';
-  const isApprover = userRole === 'Department Manager' || 
+  const isPurchaser = userRole === 'Purchasing Staff' || userRole === 'Purchaser' || userRole === 'Purchasing Agent' || userRole === 'Procurement Manager';
+  const isApprover = userRole === 'Department Manager' ||
                     userRole === 'Financial Manager' ||
                     userRole === 'Approver';
   const canSelectPricelist = isPurchaser && onPricelistSelect;
@@ -241,14 +242,23 @@ export default function VendorComparison({
         </div>
       </div>
 
+      {/* Instruction Banner for Purchasers */}
+      {canSelectPricelist && (
+        <div className="mb-3 bg-green-50 border border-green-200 p-3 rounded-lg">
+          <div className="flex items-center gap-2">
+            <Info className="h-4 w-4 text-green-600" />
+            <span className="text-sm font-medium text-green-800">
+              Click "Select Vendor" on any row below to allocate that vendor to this item
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50 border-b border-gray-200">
-                {canSelectPricelist && (
-                  <TableHead className="w-[50px] text-center font-semibold text-gray-700 text-xs py-2">Select</TableHead>
-                )}
                 <TableHead className="font-semibold text-gray-700 text-xs py-2">Vendor</TableHead>
                 <TableHead className="w-[60px] text-center font-semibold text-gray-700 text-xs py-2">Preferred</TableHead>
                 <TableHead className="w-[60px] text-center font-semibold text-gray-700 text-xs py-2">Rating</TableHead>
@@ -258,41 +268,51 @@ export default function VendorComparison({
                 <TableHead className="w-[60px] text-center font-semibold text-gray-700 text-xs py-2">Currency</TableHead>
                 <TableHead className="w-[90px] text-right font-semibold text-gray-700 text-xs py-2">Unit Price</TableHead>
                 <TableHead className="w-[80px] text-right font-semibold text-gray-700 text-xs py-2">Min. Qty</TableHead>
+                {canSelectPricelist && (
+                  <TableHead className="w-[130px] text-center font-semibold text-gray-700 text-xs py-2">Action</TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredVendorOptions.map((option, index) => {
                 const isCurrentPricelist = currentPricelistNumber === option.priceListNumber;
                 const isSelected = selectedPricelist === option.priceListNumber;
-                const rowClassName = isCurrentPricelist 
-                  ? "bg-blue-50 border-l-4 border-l-blue-500 hover:bg-blue-100" 
-                  : isSelected 
-                  ? "bg-green-50 border-l-4 border-l-green-500 hover:bg-green-100" 
+                const rowClassName = isCurrentPricelist
+                  ? "bg-blue-50 border-l-4 border-l-blue-500"
                   : "hover:bg-gray-50";
-                
+
+                // Direct select handler for one-click selection
+                const handleDirectSelect = () => {
+                  if (onPricelistSelect) {
+                    onPricelistSelect(
+                      option.vendorName,
+                      option.priceListNumber,
+                      option.unitPrice
+                    );
+                  }
+                };
+
                 return (
                   <TableRow key={`${option.vendorId}-${option.priceListNumber}`} className={`${rowClassName} transition-colors`}>
-                    {canSelectPricelist && (
-                      <TableCell className="text-center py-2">
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => handlePricelistSelection(option.priceListNumber)}
-                          className="mx-auto h-3 w-3"
-                        />
-                      </TableCell>
-                    )}
                     <TableCell className="py-2">
-                      <div className="text-xs font-medium text-gray-900">{option.vendorName}</div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-xs font-medium text-gray-900">{option.vendorName}</div>
+                        {isCurrentPricelist && (
+                          <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300 text-[10px] px-1.5 py-0">
+                            Current
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-center py-2">
                       {option.isPreferred && (
                         <div className="flex justify-center">
-                          <Check className="w-3 h-3 text-green-600 bg-green-100 rounded-full p-0.5" />
+                          <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                         </div>
                       )}
                     </TableCell>
                     <TableCell className="text-center py-2">
-                      <div className="inline-flex items-center justify-center bg-gray-100 text-gray-800 font-semibold px-1 py-0.5 rounded text-xs min-w-[30px]">
+                      <div className="inline-flex items-center justify-center bg-gray-100 text-gray-800 font-semibold px-1.5 py-0.5 rounded text-xs min-w-[32px]">
                         {option.rating.toFixed(1)}
                       </div>
                     </TableCell>
@@ -323,6 +343,25 @@ export default function VendorComparison({
                       <div className="text-xs font-medium text-gray-900">{option.minQuantity}</div>
                       <div className="text-xs text-gray-500">{option.orderUnit}</div>
                     </TableCell>
+                    {canSelectPricelist && (
+                      <TableCell className="text-center py-2">
+                        {isCurrentPricelist ? (
+                          <div className="flex items-center justify-center gap-1 text-blue-600">
+                            <CheckCircle2 className="w-4 h-4" />
+                            <span className="text-xs font-medium">Selected</span>
+                          </div>
+                        ) : (
+                          <Button
+                            size="sm"
+                            onClick={handleDirectSelect}
+                            className="bg-green-600 hover:bg-green-700 text-white font-medium text-xs h-7 px-3 shadow-sm"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                            Select Vendor
+                          </Button>
+                        )}
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}
@@ -330,48 +369,13 @@ export default function VendorComparison({
           </Table>
         </div>
       </div>
-      
-      {canSelectPricelist && (
-        <div className="mt-4 p-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
-          <div className="flex justify-between items-center">
-            <div className="text-xs text-gray-600">
-              {selectedPricelist ? (
-                <span className="flex items-center gap-1">
-                  <Check className="w-3 h-3 text-green-600" />
-                  <span>Vendor & pricelist selected</span>
-                </span>
-              ) : (
-                "Select a vendor and pricelist combination"
-              )}
-            </div>
-            <div className="flex space-x-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleCancelSelection} 
-                disabled={selectedPricelist === null}
-                className="border-gray-300 text-gray-700 hover:bg-gray-100 text-xs h-7 px-3"
-              >
-                Clear Selection
-              </Button>
-              <Button 
-                size="sm"
-                onClick={handleSelectPricelist} 
-                disabled={selectedPricelist === null}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs h-7 px-4"
-              >
-                {selectedPricelist ? "Select This Vendor" : "Choose Vendor & Pricelist"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-      
+
       {!canSelectPricelist && (
-        <div className="mt-4 p-3 bg-blue-50 border-t border-blue-200 rounded-b-lg">
+        <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
           <div className="flex items-center justify-center gap-2">
-            <div className="text-xs text-blue-700 font-medium">
-              View-only mode - Vendor comparison for approval review
+            <Info className="w-4 h-4 text-amber-600" />
+            <div className="text-sm text-amber-800 font-medium">
+              View-only mode — Comparing vendor options for approval review
             </div>
           </div>
         </div>

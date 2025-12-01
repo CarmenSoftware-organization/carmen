@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Requests
 - **Database**: Carmen ERP PostgreSQL
-- **Schema Version**: 2.1.0
-- **Last Updated**: 2025-11-26
+- **Schema Version**: 2.2.0
+- **Last Updated**: 2025-11-28
 - **Owner**: Procurement Team
 - **Status**: Active
 
@@ -15,6 +15,7 @@
 | 1.0.0 | 2025-01-30 | System Architect | Initial SQL-based schema |
 | 2.0.0 | 2025-01-01 | Development Team | Converted to text-based DD format + added new fields for 9/7/2025 requirements |
 | 2.1.0 | 2025-11-26 | Documentation Team | Synchronized with BR document - updated status values, removed fictional features, added implementation status markers |
+| 2.2.0 | 2025-11-28 | Development Team | Added Returned status, return_reason and rejection_reason fields for workflow actions |
 
 ## Implementation Status
 
@@ -167,31 +168,49 @@ erDiagram
 - **Status**: Current status in PR lifecycle
   - Required: Yes
   - Default: Draft
-  - Allowed values: Draft, In-progress, Approved, Void, Completed, Cancelled
+  - Allowed values: Draft, In-progress, Returned, Approved, Void, Completed, Cancelled
   - Status transitions:
     * Draft → In-progress (when user submits for approval)
     * In-progress → Approved (when all approvals complete)
-    * In-progress → Void (when any approver rejects)
+    * In-progress → Void (when any approver or purchasing staff rejects)
+    * In-progress → Returned (when approver/purchaser returns for revision)
+    * Returned → In-progress (when requestor resubmits)
     * Draft/Void → Cancelled (user cancels)
     * Approved → Completed (converted to Purchase Order)
   - Status meanings:
     * **Draft**: Saved but not submitted (editable by requestor)
     * **In-progress**: Some approvals received, others pending
+    * **Returned**: Returned for revision by approver or purchasing staff (editable by requestor)
     * **Approved**: All approvals received (ready for PO conversion)
-    * **Void**: Approval denied (returned to requestor with comments)
+    * **Void**: Request rejected by approver or purchasing staff (with reason)
     * **Completed**: Converted to Purchase Order(s) (read-only)
     * **Cancelled**: Manually cancelled by requestor or approver (with reason)
   - Example: "In-progress"
 
 - **Approval Status**: Current approval workflow state
   - Required: No (NULL for Draft status)
-  - Allowed values: Pending, Approved, Rejected, Recalled
+  - Allowed values: Pending, Approved, Rejected, Recalled, Returned
   - Business meaning:
     * Pending: Awaiting approval from one or more approvers
     * Approved: All required approvals obtained
     * Rejected: One or more approvers rejected
     * Recalled: Requester recalled for modifications
+    * Returned: Sent back to previous stage for revision
   - Example: "Pending"
+
+- **Return Reason**: Reason for returning PR to previous stage
+  - Required: No (required when status = Returned)
+  - Data type: TEXT
+  - Constraints: Minimum 10 characters when provided
+  - Business purpose: Documents why PR was returned for revision
+  - Example: "Please provide more detailed specifications for item 3"
+
+- **Rejection Reason**: Reason for rejecting/voiding PR
+  - Required: No (required when status = Void)
+  - Data type: TEXT
+  - Constraints: Minimum 10 characters when provided
+  - Business purpose: Documents why PR was rejected
+  - Example: "Budget exceeded for current fiscal quarter"
 
 - **Current Approval Stage ID**: Reference to current approval stage
   - Required: No (NULL for Draft/Approved/Rejected status)
@@ -336,8 +355,10 @@ erDiagram
 | delivery_date | DATE | Yes | - | Expected delivery date | 2025-01-22 | >= date field |
 | department_id | UUID | Yes | - | Department reference | 550e8400-... | Must exist in departments |
 | location_id | UUID | Yes | - | Location reference | 550e8400-... | Must exist in locations, belong to department |
-| status | VARCHAR(20) | Yes | Draft | Current PR status | Draft, In-progress, Approved, Void, Completed, Cancelled | Must be in allowed values |
-| approval_status | VARCHAR(20) | No | NULL | Approval workflow status | Pending, Approved, Rejected | Must be in allowed values |
+| status | VARCHAR(20) | Yes | Draft | Current PR status | Draft, In-progress, Returned, Approved, Void, Completed, Cancelled | Must be in allowed values |
+| approval_status | VARCHAR(20) | No | NULL | Approval workflow status | Pending, Approved, Rejected, Recalled, Returned | Must be in allowed values |
+| return_reason | TEXT | No | NULL | Reason for returning PR | "Please provide more details" | Min 10 chars when provided |
+| rejection_reason | TEXT | No | NULL | Reason for rejecting PR | "Budget exceeded" | Min 10 chars when provided |
 | current_approval_stage_id | UUID | No | NULL | Current approval stage | 550e8400-... | Must exist in approval_stages |
 | subtotal | DECIMAL(15,2) | Yes | 0.00 | Sum of line totals | 1500.00 | >= 0, auto-calculated |
 | tax_amount | DECIMAL(15,2) | Yes | 0.00 | Total tax | 120.00 | >= 0, auto-calculated |
@@ -408,12 +429,14 @@ erDiagram
 
 **Check Constraints**:
 - **Type values**: Must be one of: General, Market List, Asset
-- **Status values**: Must be one of: Draft, In-progress, Approved, Void, Completed, Cancelled
-- **Approval status values**: Must be one of: Pending, Approved, Rejected, Recalled
+- **Status values**: Must be one of: Draft, In-progress, Returned, Approved, Void, Completed, Cancelled
+- **Approval status values**: Must be one of: Pending, Approved, Rejected, Recalled, Returned
 - **Date validation**: delivery_date >= date
 - **Amount validation**: All financial fields (subtotal, tax_amount, discount_amount, total_amount, base amounts) must be >= 0
 - **Exchange rate validation**: exchange_rate > 0
 - **Currency consistency**: If currency_code = base_currency_code, then exchange_rate must = 1.0
+- **Return reason validation**: If status = 'Returned', return_reason must be provided with min 10 characters
+- **Rejection reason validation**: If status = 'Void', rejection_reason must be provided with min 10 characters
 
 **Calculation Rules**:
 - `total_amount` = `subtotal` + `tax_amount` - `discount_amount`
@@ -733,8 +756,13 @@ erDiagram
 | discount_amount | DECIMAL(15,2) | Yes | 0.00 | Total discount for line | 5.00 | >= 0, <= (unit_price × quantity) |
 | discount_percentage | DECIMAL(5,2) | No | 0.00 | Discount rate % | 10.00 | >= 0, <= 100 |
 | net_amount | DECIMAL(15,2) | Yes | 0.00 | Amount after discount | 45.00 | >= 0, auto-calc |
-| tax_rate | DECIMAL(5,2) | Yes | 0.00 | Tax percentage | 8.00 | >= 0, <= 100 |
+| tax_profile | VARCHAR(20) | No | 'VAT' | Tax profile code | VAT, GST, SST, WHT, None | Must be valid tax profile |
+| tax_rate | DECIMAL(5,2) | Yes | 0.00 | Tax percentage from profile | 7.00 | >= 0, <= 100, auto-set from profile |
 | tax_amount | DECIMAL(15,2) | Yes | 0.00 | Calculated tax | 3.60 | >= 0, auto-calc |
+| tax_amount_override | DECIMAL(15,2) | No | NULL | Manual tax override | 4.00 | >= 0, overrides calculated |
+| discount_amount_override | DECIMAL(15,2) | No | NULL | Manual discount override | 10.00 | >= 0, overrides calculated |
+| currency_code | VARCHAR(3) | No | 'USD' | ISO currency code | USD, EUR, GBP, THB | Must be valid currency |
+| exchange_rate | DECIMAL(15,6) | No | 1.000000 | Currency exchange rate | 1.000000 | > 0 |
 | line_total | DECIMAL(15,2) | Yes | 0.00 | Subtotal (price × qty) | 50.00 | >= 0, auto-calc |
 | total_amount | DECIMAL(15,2) | Yes | 0.00 | Final line total | 48.60 | >= 0, auto-calc |
 | on_hand | INTEGER | No | NULL | Current inventory | 150 | Read-only, from inventory API |
@@ -814,10 +842,21 @@ erDiagram
 
 **Calculation Rules**:
 - `line_total` = `unit_price` × `quantity`
+- `discount_amount` = IF `discount_amount_override` IS NOT NULL THEN `discount_amount_override` ELSE (`unit_price` × `quantity`) × (`discount_percentage` / 100)
 - `net_amount` = (`unit_price` × `quantity`) - `discount_amount`
-- `tax_amount` = `net_amount` × (`tax_rate` / 100)
+- `tax_amount` = IF `tax_amount_override` IS NOT NULL THEN `tax_amount_override` ELSE `net_amount` × (`tax_rate` / 100)
 - `total_amount` = `net_amount` + `tax_amount`
 - When FOC quantity > 0, `unit_price` automatically set to 0.00
+- `tax_rate` auto-populated from `tax_profile` lookup (VAT=7%, GST=10%, SST=6%, WHT=3%, None=0%)
+
+**Tax Profile Defaults**:
+| Profile | Rate | Description |
+|---------|------|-------------|
+| VAT | 7% | Value Added Tax |
+| GST | 10% | Goods and Services Tax |
+| SST | 6% | Sales and Service Tax |
+| WHT | 3% | Withholding Tax |
+| None | 0% | No Tax Applied |
 
 **Visibility Rules**:
 - **FOC Fields** (`foc_quantity`, `foc_unit`):
@@ -831,6 +870,30 @@ erDiagram
   - Always visible: Approver, Procurement, Finance roles (override hide_price flag)
   - Implementation: Conditional rendering based on hide_price flag AND user role
   - Data storage: Always saved regardless of visibility
+
+**Edit Permissions by Role** (in Edit Mode):
+
+| Field | Requestor | Approver | Purchasing Staff |
+|-------|-----------|----------|------------------|
+| vendor_name | Read-only | Read-only | Editable |
+| currency_code | Read-only | Read-only | Editable |
+| exchange_rate | Read-only | Read-only | Editable |
+| unit_price | Read-only | Read-only | Editable |
+| discount_percentage | Read-only | Read-only | Editable |
+| discount_amount_override | Hidden | Hidden | Editable |
+| tax_profile | Read-only | Read-only | Editable |
+| tax_rate | Read-only | Read-only | Read-only (auto from profile) |
+| tax_amount_override | Hidden | Hidden | Editable |
+| foc_quantity | Hidden | Hidden | Editable |
+| quantity (approved) | Read-only | Editable | Editable |
+| delivery_point | Editable | Editable | Editable |
+
+**Tax Profile Auto-Population Logic**:
+When `tax_profile` is changed by purchasing staff:
+1. System retrieves tax rate from tax_profiles configuration table
+2. System auto-sets `tax_rate` to the profile's default rate
+3. Tax rate field remains read-only (cannot be manually overridden)
+4. User can override calculated `tax_amount` using `tax_amount_override` field
 
 **Default Values**:
 - All monetary amounts: 0.00

@@ -386,7 +386,7 @@ The Requests for Pricing module provides a campaign-based system to collect pric
 
 ## 4. Data Model
 
-### 4.1 Campaign Entity (PriceCollectionCampaign)
+### 4.1 Campaign Data Definition (PriceCollectionCampaign)
 
 | Field | Type | Description |
 |-------|------|-------------|

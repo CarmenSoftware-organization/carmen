@@ -40,6 +40,8 @@ export const mockInventoryLocations: InventoryLocation[] = [
     departmentName: 'Central Kitchen',
     costCenterId: 'cc-001',
     costCenterName: 'F&B Operations',
+    deliveryPointId: 'dp-001',
+    deliveryPointName: 'Central Kitchen - Main Entrance',
     shelvesCount: 8,
     assignedUsersCount: 5,
     assignedProductsCount: 150,
@@ -65,6 +67,8 @@ export const mockInventoryLocations: InventoryLocation[] = [
     departmentName: 'Warehouse',
     costCenterId: 'cc-002',
     costCenterName: 'Logistics',
+    deliveryPointId: 'dp-002',
+    deliveryPointName: 'Main Warehouse - Receiving Dock',
     shelvesCount: 15,
     assignedUsersCount: 8,
     assignedProductsCount: 320,
@@ -85,6 +89,8 @@ export const mockInventoryLocations: InventoryLocation[] = [
     departmentName: 'Food & Beverage',
     costCenterId: 'cc-003',
     costCenterName: 'Bar Operations',
+    deliveryPointId: 'dp-003',
+    deliveryPointName: 'Bar - Service Entrance',
     shelvesCount: 3,
     assignedUsersCount: 3,
     assignedProductsCount: 45,
@@ -768,4 +774,18 @@ export function getInventoryLocationSummaries(): InventoryLocationSummary[] {
  */
 export function getActiveInventoryLocations(): InventoryLocation[] {
   return mockInventoryLocations.filter(loc => loc.status === 'active')
+}
+
+/**
+ * Get all delivery points
+ */
+export function getAllDeliveryPoints(): DeliveryPoint[] {
+  return mockDeliveryPoints
+}
+
+/**
+ * Get active delivery points
+ */
+export function getActiveDeliveryPoints(): DeliveryPoint[] {
+  return mockDeliveryPoints.filter(dp => dp.isActive)
 }

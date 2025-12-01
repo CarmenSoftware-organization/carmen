@@ -549,7 +549,7 @@ interface Category {
 type CategoryType = 'CATEGORY' | 'SUBCATEGORY' | 'ITEM_GROUP';
 ```
 
-### Product Entity (Referenced)
+### Product Data Definition (Referenced)
 
 **Purpose**: Products are assigned to categories for organizational purposes. This is a simplified view showing only category-related fields.
 

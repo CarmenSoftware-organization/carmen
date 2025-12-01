@@ -212,6 +212,7 @@ const menuItems: MenuItem[] = [
     subItems: [
       { name: "User Management", path: "/system-administration/user-management" },
       { name: "Location Management", path: "/system-administration/location-management" },
+      { name: "Delivery Points", path: "/system-administration/delivery-points" },
       { name: "Workflow Management", path: "/system-administration/workflow/workflow-configuration" },
       { name: "General Settings", path: "/system-administration/settings" },
       { name: "Notification Preferences", path: "/system-administration/settings/notifications" },

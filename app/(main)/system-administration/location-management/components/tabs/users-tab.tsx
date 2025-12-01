@@ -1,54 +1,19 @@
 "use client"
 
-import React, { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import React, { useState, useMemo } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
-  Plus,
-  MoreHorizontal,
-  Pencil,
-  Trash2,
+  Search,
+  ChevronRight,
+  ChevronLeft,
   Users,
-  Star,
 } from "lucide-react"
 import {
   UserLocationAssignment,
-  LocationUserRole,
-  LocationPermission,
-  LOCATION_ROLE_LABELS,
 } from "@/lib/types/location-management"
 
 interface UsersTabProps {
@@ -57,330 +22,336 @@ interface UsersTabProps {
   isEditing: boolean
 }
 
-// Mock available users to assign
-const availableUsers = [
-  { id: 'user-007', name: 'Alex Turner', email: 'alex.t@company.com' },
-  { id: 'user-008', name: 'Emma Davis', email: 'emma.d@company.com' },
-  { id: 'user-009', name: 'Chris Lee', email: 'chris.l@company.com' },
-]
-
-const allPermissions: { id: LocationPermission; label: string; description: string }[] = [
-  { id: 'location:view', label: 'View Location', description: 'View location details' },
-  { id: 'location:edit', label: 'Edit Location', description: 'Edit location settings' },
-  { id: 'inventory:view', label: 'View Inventory', description: 'View inventory levels' },
-  { id: 'inventory:receive', label: 'Receive Stock', description: 'Receive incoming stock' },
-  { id: 'inventory:issue', label: 'Issue Stock', description: 'Issue stock from location' },
-  { id: 'inventory:adjust', label: 'Adjust Inventory', description: 'Make inventory adjustments' },
-  { id: 'inventory:transfer', label: 'Transfer Stock', description: 'Transfer between locations' },
-  { id: 'count:view', label: 'View Counts', description: 'View physical count data' },
-  { id: 'count:participate', label: 'Participate in Counts', description: 'Enter count data' },
-  { id: 'count:finalize', label: 'Finalize Counts', description: 'Approve and finalize counts' },
-  { id: 'shelf:manage', label: 'Manage Shelves', description: 'Add/edit/delete shelves' },
+// Mock available users (all users in the system)
+const allSystemUsers = [
+  { id: 'user-001', name: 'John Smith', email: 'john.smith@company.com', department: 'Operations' },
+  { id: 'user-002', name: 'Sarah Johnson', email: 'sarah.j@company.com', department: 'Kitchen' },
+  { id: 'user-003', name: 'Michael Brown', email: 'michael.b@company.com', department: 'Warehouse' },
+  { id: 'user-004', name: 'Emily Davis', email: 'emily.d@company.com', department: 'Front of House' },
+  { id: 'user-005', name: 'James Wilson', email: 'james.w@company.com', department: 'Management' },
+  { id: 'user-006', name: 'Jessica Martinez', email: 'jessica.m@company.com', department: 'Kitchen' },
+  { id: 'user-007', name: 'Alex Turner', email: 'alex.t@company.com', department: 'Operations' },
+  { id: 'user-008', name: 'Emma Davis', email: 'emma.d@company.com', department: 'Management' },
+  { id: 'user-009', name: 'Chris Lee', email: 'chris.l@company.com', department: 'Warehouse' },
+  { id: 'user-010', name: 'Amanda White', email: 'amanda.w@company.com', department: 'Front of House' },
+  { id: 'user-011', name: 'David Kim', email: 'david.k@company.com', department: 'Kitchen' },
+  { id: 'user-012', name: 'Lisa Chen', email: 'lisa.c@company.com', department: 'Operations' },
 ]
 
 export function UsersTab({ locationId, assignments, isEditing }: UsersTabProps) {
-  const [showAddDialog, setShowAddDialog] = useState(false)
-  const [editingAssignment, setEditingAssignment] = useState<UserLocationAssignment | null>(null)
-  const [selectedUserId, setSelectedUserId] = useState('')
-  const [selectedRole, setSelectedRole] = useState<LocationUserRole>('viewer')
-  const [selectedPermissions, setSelectedPermissions] = useState<LocationPermission[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedAvailable, setSelectedAvailable] = useState<string[]>([])
+  const [selectedAssigned, setSelectedAssigned] = useState<string[]>([])
 
-  const handleAddUser = (e: React.FormEvent) => {
-    e.preventDefault()
-    // In a real app, this would add the user assignment
-    setShowAddDialog(false)
-    setSelectedUserId('')
-    setSelectedRole('viewer')
-    setSelectedPermissions([])
-  }
+  // Local state for assigned users (in real app, this would be managed via API)
+  const [localAssignedUserIds, setLocalAssignedUserIds] = useState<string[]>(
+    assignments.map(a => a.userId)
+  )
 
-  const handleEditUser = (e: React.FormEvent) => {
-    e.preventDefault()
-    // In a real app, this would save the user assignment
-    setEditingAssignment(null)
-  }
+  // Filter available users (not assigned to this location)
+  const availableUsers = useMemo(() => {
+    return allSystemUsers.filter(user => !localAssignedUserIds.includes(user.id))
+  }, [localAssignedUserIds])
 
-  const handleRemoveUser = (assignment: UserLocationAssignment) => {
-    if (window.confirm(`Are you sure you want to remove ${assignment.userName} from this location?`)) {
-      // In a real app, this would remove the assignment
-    }
-  }
+  // Get assigned users with full details
+  const assignedUsers = useMemo(() => {
+    return allSystemUsers.filter(user => localAssignedUserIds.includes(user.id))
+  }, [localAssignedUserIds])
 
-  const togglePermission = (permission: LocationPermission) => {
-    setSelectedPermissions(prev =>
-      prev.includes(permission)
-        ? prev.filter(p => p !== permission)
-        : [...prev, permission]
+  // Filter by search query
+  const filteredAvailable = useMemo(() => {
+    if (!searchQuery.trim()) return availableUsers
+    const query = searchQuery.toLowerCase()
+    return availableUsers.filter(user =>
+      user.name.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query) ||
+      user.department.toLowerCase().includes(query)
+    )
+  }, [availableUsers, searchQuery])
+
+  const filteredAssigned = useMemo(() => {
+    if (!searchQuery.trim()) return assignedUsers
+    const query = searchQuery.toLowerCase()
+    return assignedUsers.filter(user =>
+      user.name.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query) ||
+      user.department.toLowerCase().includes(query)
+    )
+  }, [assignedUsers, searchQuery])
+
+  // Toggle selection in available list
+  const toggleAvailableSelection = (userId: string) => {
+    if (!isEditing) return
+    setSelectedAvailable(prev =>
+      prev.includes(userId)
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
     )
   }
 
-  // Filter out already assigned users
-  const unassignedUsers = availableUsers.filter(
-    user => !assignments.some(a => a.userId === user.id)
+  // Toggle selection in assigned list
+  const toggleAssignedSelection = (userId: string) => {
+    if (!isEditing) return
+    setSelectedAssigned(prev =>
+      prev.includes(userId)
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    )
+  }
+
+  // Bulk select all available users (filtered)
+  const selectAllAvailable = () => {
+    if (!isEditing) return
+    const allIds = filteredAvailable.map(u => u.id)
+    setSelectedAvailable(allIds)
+  }
+
+  // Bulk deselect all available users
+  const deselectAllAvailable = () => {
+    setSelectedAvailable([])
+  }
+
+  // Bulk select all assigned users (filtered)
+  const selectAllAssigned = () => {
+    if (!isEditing) return
+    const allIds = filteredAssigned.map(u => u.id)
+    setSelectedAssigned(allIds)
+  }
+
+  // Bulk deselect all assigned users
+  const deselectAllAssigned = () => {
+    setSelectedAssigned([])
+  }
+
+  // Check if all available are selected
+  const isAllAvailableSelected = filteredAvailable.length > 0 &&
+    filteredAvailable.every(u => selectedAvailable.includes(u.id))
+
+  // Check if some available are selected
+  const isSomeAvailableSelected = filteredAvailable.some(u => selectedAvailable.includes(u.id))
+
+  // Check if all assigned are selected
+  const isAllAssignedSelected = filteredAssigned.length > 0 &&
+    filteredAssigned.every(u => selectedAssigned.includes(u.id))
+
+  // Check if some assigned are selected
+  const isSomeAssignedSelected = filteredAssigned.some(u => selectedAssigned.includes(u.id))
+
+  // Move selected users from available to assigned
+  const assignUsers = () => {
+    setLocalAssignedUserIds(prev => [...prev, ...selectedAvailable])
+    setSelectedAvailable([])
+  }
+
+  // Move selected users from assigned to available
+  const unassignUsers = () => {
+    setLocalAssignedUserIds(prev => prev.filter(id => !selectedAssigned.includes(id)))
+    setSelectedAssigned([])
+  }
+
+  // User item component with checkbox
+  const UserItem = ({
+    user,
+    isSelected,
+    onToggle
+  }: {
+    user: typeof allSystemUsers[0]
+    isSelected: boolean
+    onToggle: () => void
+  }) => (
+    <div
+      className={`flex items-center gap-3 p-3 rounded-md border transition-colors ${
+        isSelected
+          ? 'bg-primary/5 border-primary/30'
+          : 'hover:bg-muted border-transparent'
+      } ${!isEditing ? 'cursor-default' : 'cursor-pointer'}`}
+      onClick={onToggle}
+    >
+      <Checkbox
+        checked={isSelected}
+        onCheckedChange={() => onToggle()}
+        disabled={!isEditing}
+        onClick={(e) => e.stopPropagation()}
+      />
+      <div className="flex-1 min-w-0">
+        <div className="font-medium truncate">{user.email}</div>
+        <div className="text-sm text-muted-foreground truncate">
+          {user.name}, {user.department}
+        </div>
+      </div>
+    </div>
   )
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Assigned Users</CardTitle>
-            <CardDescription>
-              Users who have access to this location
-            </CardDescription>
-          </div>
-          {isEditing && (
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-              <DialogTrigger asChild>
-                <Button disabled={unassignedUsers.length === 0}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Assign User
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <form onSubmit={handleAddUser}>
-                  <DialogHeader>
-                    <DialogTitle>Assign User to Location</DialogTitle>
-                    <DialogDescription>
-                      Select a user and configure their role and permissions
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="user">User</Label>
-                        <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select user" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {unassignedUsers.map((user) => (
-                              <SelectItem key={user.id} value={user.id}>
-                                <div>
-                                  <div className="font-medium">{user.name}</div>
-                                  <div className="text-xs text-muted-foreground">{user.email}</div>
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="role">Role at Location</Label>
-                        <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as LocationUserRole)}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.entries(LOCATION_ROLE_LABELS).map(([role, label]) => (
-                              <SelectItem key={role} value={role}>
-                                {label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Permissions</Label>
-                      <div className="grid grid-cols-2 gap-2 max-h-[200px] overflow-y-auto border rounded-md p-3">
-                        {allPermissions.map((permission) => (
-                          <div key={permission.id} className="flex items-start space-x-2">
-                            <Checkbox
-                              id={permission.id}
-                              checked={selectedPermissions.includes(permission.id)}
-                              onCheckedChange={() => togglePermission(permission.id)}
-                            />
-                            <div className="grid gap-0.5">
-                              <Label htmlFor={permission.id} className="text-sm font-normal">
-                                {permission.label}
-                              </Label>
-                              <span className="text-xs text-muted-foreground">
-                                {permission.description}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={!selectedUserId}>
-                      Assign User
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
-          )}
-        </CardHeader>
-        <CardContent>
-          {assignments.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>No users assigned to this location</p>
-              {isEditing && unassignedUsers.length > 0 && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-4"
-                  onClick={() => setShowAddDialog(true)}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Assign First User
-                </Button>
+    <div className="space-y-4">
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search users by name, email, or department..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
+      {/* Dual Panel Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-[1fr,auto,1fr] gap-4 items-start">
+        {/* Available Users Panel */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base font-medium">
+                Available Users
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  ({filteredAvailable.length})
+                </span>
+              </CardTitle>
+              {isEditing && filteredAvailable.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={isAllAvailableSelected}
+                    ref={(el) => {
+                      if (el) {
+                        (el as HTMLButtonElement & { indeterminate: boolean }).indeterminate =
+                          isSomeAvailableSelected && !isAllAvailableSelected
+                      }
+                    }}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        selectAllAvailable()
+                      } else {
+                        deselectAllAvailable()
+                      }
+                    }}
+                  />
+                  <span className="text-xs text-muted-foreground">Select All</span>
+                </div>
               )}
             </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Permissions</TableHead>
-                  <TableHead>Primary</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Assigned</TableHead>
-                  {isEditing && <TableHead className="w-[80px]">Actions</TableHead>}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {assignments.map((assignment) => (
-                  <TableRow key={assignment.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{assignment.userName}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {assignment.userEmail}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {LOCATION_ROLE_LABELS[assignment.roleAtLocation]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1 max-w-[200px]">
-                        {assignment.permissions.slice(0, 3).map((perm) => (
-                          <Badge key={perm} variant="secondary" className="text-xs">
-                            {perm.split(':')[1]}
-                          </Badge>
-                        ))}
-                        {assignment.permissions.length > 3 && (
-                          <Badge variant="secondary" className="text-xs">
-                            +{assignment.permissions.length - 3} more
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {assignment.isPrimary && (
-                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={assignment.isActive ? "default" : "secondary"}>
-                        {assignment.isActive ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {assignment.assignedAt.toLocaleDateString()}
-                    </TableCell>
-                    {isEditing && (
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => setEditingAssignment(assignment)}>
-                              <Pencil className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleRemoveUser(assignment)}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Remove
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <ScrollArea className="h-[400px] pr-4">
+              {filteredAvailable.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">
+                    {searchQuery ? 'No users match your search' : 'All users are assigned'}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {filteredAvailable.map(user => (
+                    <UserItem
+                      key={user.id}
+                      user={user}
+                      isSelected={selectedAvailable.includes(user.id)}
+                      onToggle={() => toggleAvailableSelection(user.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </CardContent>
+        </Card>
 
-      {/* Edit User Assignment Dialog */}
-      <Dialog open={!!editingAssignment} onOpenChange={(open) => !open && setEditingAssignment(null)}>
-        <DialogContent className="max-w-2xl">
-          <form onSubmit={handleEditUser}>
-            <DialogHeader>
-              <DialogTitle>Edit User Assignment</DialogTitle>
-              <DialogDescription>
-                Update role and permissions for {editingAssignment?.userName}
-              </DialogDescription>
-            </DialogHeader>
-            {editingAssignment && (
-              <div className="grid gap-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="editRole">Role at Location</Label>
-                  <Select defaultValue={editingAssignment.roleAtLocation}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(LOCATION_ROLE_LABELS).map(([role, label]) => (
-                        <SelectItem key={role} value={role}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+        {/* Transfer Buttons */}
+        <div className="flex md:flex-col gap-2 justify-center items-center py-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={assignUsers}
+            disabled={!isEditing || selectedAvailable.length === 0}
+            title="Assign selected users"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={unassignUsers}
+            disabled={!isEditing || selectedAssigned.length === 0}
+            title="Remove selected users"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Assigned Users Panel */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base font-medium">
+                Assigned Users
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  ({filteredAssigned.length})
+                </span>
+              </CardTitle>
+              {isEditing && filteredAssigned.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={isAllAssignedSelected}
+                    ref={(el) => {
+                      if (el) {
+                        (el as HTMLButtonElement & { indeterminate: boolean }).indeterminate =
+                          isSomeAssignedSelected && !isAllAssignedSelected
+                      }
+                    }}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        selectAllAssigned()
+                      } else {
+                        deselectAllAssigned()
+                      }
+                    }}
+                  />
+                  <span className="text-xs text-muted-foreground">Select All</span>
                 </div>
-                <div className="space-y-2">
-                  <Label>Permissions</Label>
-                  <div className="grid grid-cols-2 gap-2 max-h-[200px] overflow-y-auto border rounded-md p-3">
-                    {allPermissions.map((permission) => (
-                      <div key={permission.id} className="flex items-start space-x-2">
-                        <Checkbox
-                          id={`edit-${permission.id}`}
-                          defaultChecked={editingAssignment.permissions.includes(permission.id)}
-                        />
-                        <div className="grid gap-0.5">
-                          <Label htmlFor={`edit-${permission.id}`} className="text-sm font-normal">
-                            {permission.label}
-                          </Label>
-                          <span className="text-xs text-muted-foreground">
-                            {permission.description}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <ScrollArea className="h-[400px] pr-4">
+              {filteredAssigned.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">
+                    {searchQuery ? 'No users match your search' : 'No users assigned to this location'}
+                  </p>
                 </div>
-              </div>
-            )}
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setEditingAssignment(null)}>
-                Cancel
-              </Button>
-              <Button type="submit">Save Changes</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+              ) : (
+                <div className="space-y-2">
+                  {filteredAssigned.map(user => (
+                    <UserItem
+                      key={user.id}
+                      user={user}
+                      isSelected={selectedAssigned.includes(user.id)}
+                      onToggle={() => toggleAssignedSelection(user.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Selection Summary */}
+      {isEditing && (selectedAvailable.length > 0 || selectedAssigned.length > 0) && (
+        <div className="text-sm text-muted-foreground text-center">
+          {selectedAvailable.length > 0 && (
+            <span>
+              {selectedAvailable.length} user{selectedAvailable.length > 1 ? 's' : ''} selected to assign
+            </span>
+          )}
+          {selectedAvailable.length > 0 && selectedAssigned.length > 0 && ' • '}
+          {selectedAssigned.length > 0 && (
+            <span>
+              {selectedAssigned.length} user{selectedAssigned.length > 1 ? 's' : ''} selected to remove
+            </span>
+          )}
+        </div>
+      )}
     </div>
   )
 }

@@ -2,6 +2,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -748,6 +750,20 @@ interface ConsolidatedItemDetailsCardProps extends VendorPricingCardProps, Inven
   onArchiveClick?: () => void;
   onMoreActions?: () => void;
   showActions?: boolean;
+  // Purchaser editing capabilities
+  isPurchaserEditable?: boolean;
+  onVendorChange?: (vendor: string) => void;
+  onCurrencyChange?: (currency: string) => void;
+  onCurrencyRateChange?: (rate: number) => void;
+  onUnitPriceChange?: (price: number) => void;
+  onDiscountRateChange?: (rate: number) => void;
+  onDiscountAmountChange?: (amount: number) => void;
+  onTaxTypeChange?: (taxType: string) => void;
+  onTaxRateChange?: (rate: number) => void;
+  onTaxAmountChange?: (amount: number) => void;
+  vendorOptions?: Array<{ value: string; label: string }>;
+  currencyOptions?: Array<{ value: string; label: string }>;
+  taxTypeOptions?: Array<{ value: string; label: string; rate?: number }>;
 }
 
 export const ConsolidatedItemDetailsCard: React.FC<ConsolidatedItemDetailsCardProps> = ({
@@ -771,7 +787,7 @@ export const ConsolidatedItemDetailsCard: React.FC<ConsolidatedItemDetailsCardPr
   onCompareClick,
   currencyRate = 1,
   showCurrencyConversion = false,
-  
+
   // Inventory props
   onHand,
   onOrder,
@@ -785,7 +801,7 @@ export const ConsolidatedItemDetailsCard: React.FC<ConsolidatedItemDetailsCardPr
   onDeliveryPointChange,
   onHandClick,
   onOrderClick,
-  
+
   // Business Dimensions props
   jobNumber,
   event,
@@ -799,19 +815,46 @@ export const ConsolidatedItemDetailsCard: React.FC<ConsolidatedItemDetailsCardPr
   eventOptions = [],
   projectOptions = [],
   marketSegmentOptions = [],
-  
+
   // Section visibility props
   showVendorPricing = true,
   showInventoryInfo = true,
   showBusinessDimensions = true,
-  
+
   // Action handlers
   onEditClick,
   onDeleteClick,
   onDuplicateClick,
   onArchiveClick,
   onMoreActions,
-  showActions = true
+  showActions = true,
+
+  // Purchaser editing capabilities
+  isPurchaserEditable = false,
+  onVendorChange,
+  onCurrencyChange,
+  onCurrencyRateChange,
+  onUnitPriceChange,
+  onDiscountRateChange,
+  onDiscountAmountChange,
+  onTaxTypeChange,
+  onTaxRateChange,
+  onTaxAmountChange,
+  vendorOptions = [],
+  currencyOptions = [
+    { value: 'USD', label: 'USD - US Dollar' },
+    { value: 'EUR', label: 'EUR - Euro' },
+    { value: 'GBP', label: 'GBP - British Pound' },
+    { value: 'THB', label: 'THB - Thai Baht' },
+    { value: 'JPY', label: 'JPY - Japanese Yen' },
+    { value: 'CNY', label: 'CNY - Chinese Yuan' },
+  ],
+  taxTypeOptions = [
+    { value: 'VAT', label: 'VAT (7%)', rate: 0.07 },
+    { value: 'GST', label: 'GST (10%)', rate: 0.10 },
+    { value: 'SST', label: 'SST (6%)', rate: 0.06 },
+    { value: 'None', label: 'No Tax (0%)', rate: 0 },
+  ],
 }) => {
   const [collapsedSections, setCollapsedSections] = React.useState<Set<string>>(new Set());
 
@@ -937,46 +980,96 @@ export const ConsolidatedItemDetailsCard: React.FC<ConsolidatedItemDetailsCardPr
             
             {!collapsedSections.has('vendor-pricing') && (
               <div className="space-y-2 pl-3 border-l-2 border-blue-100">
-                {/* Vendor Information */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-gray-500 mb-0.5">Vendor</p>
-                    <p className="text-sm font-semibold text-gray-900">
-                      {vendor || "Not assigned"}
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <p className="text-xs text-gray-500 mb-0.5">Pricelist</p>
-                    <p className="text-xs font-semibold text-gray-900">
-                      {pricelistNumber || "Not assigned"}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Pricing Details */}
-                <div className="pt-2 border-t border-gray-100">
-                  <div className="grid grid-cols-6 gap-4">
-                    {/* Unit Price */}
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500 mb-1">Unit Price</p>
-                      <div className="space-y-0.5">
-                        <p className="text-sm font-semibold text-gray-900">
-                          {currency} {unitPrice.toFixed(2)}
-                        </p>
-                        <p className="text-xs text-gray-500">per {unit}</p>
-                        {formatCurrencyConversion(unitPrice) && (
-                          <p className="text-xs text-green-700">{formatCurrencyConversion(unitPrice)} per {unit}</p>
+                {/* Vendor Information - Editable for Purchasers */}
+                {isPurchaserEditable ? (
+                  <div className="space-y-3">
+                    {/* Row 1: Vendor Selection */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs text-gray-500 mb-1 block">Vendor</Label>
+                        {onVendorChange && vendorOptions.length > 0 ? (
+                          <Select value={vendor || ""} onValueChange={onVendorChange}>
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue placeholder="Select vendor" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {vendorOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <p className="text-sm font-semibold text-gray-900">
+                            {vendor || "Not assigned"}
+                          </p>
                         )}
                       </div>
-                    </div>
-                    
-                    {/* Subtotal */}
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500 mb-1">Subtotal</p>
                       <div>
+                        <Label className="text-xs text-gray-500 mb-1 block">Pricelist</Label>
+                        <p className="text-xs font-semibold text-gray-900">
+                          {pricelistNumber || "Not assigned"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Row 2: Currency and Exchange Rate */}
+                    <div className="grid grid-cols-4 gap-3 pt-2 border-t border-gray-100">
+                      <div>
+                        <Label className="text-xs text-gray-500 mb-1 block">Currency</Label>
+                        {onCurrencyChange ? (
+                          <Select value={currency || "USD"} onValueChange={onCurrencyChange}>
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue placeholder="Currency" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {currencyOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <p className="text-xs font-semibold text-gray-900">{currency}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label className="text-xs text-gray-500 mb-1 block">Exch. Rate</Label>
+                        {onCurrencyRateChange ? (
+                          <Input
+                            type="number"
+                            step="0.0001"
+                            value={currencyRate}
+                            onChange={(e) => onCurrencyRateChange(parseFloat(e.target.value) || 1)}
+                            className="h-8 text-xs"
+                          />
+                        ) : (
+                          <p className="text-xs font-semibold text-gray-900">{currencyRate}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label className="text-xs text-gray-500 mb-1 block">Unit Price</Label>
+                        {onUnitPriceChange ? (
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={unitPrice}
+                            onChange={(e) => onUnitPriceChange(parseFloat(e.target.value) || 0)}
+                            className="h-8 text-xs"
+                          />
+                        ) : (
+                          <p className="text-sm font-semibold text-gray-900">
+                            {unitPrice.toFixed(2)}
+                          </p>
+                        )}
+                        <p className="text-xs text-gray-500">per {unit}</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-gray-500 mb-1 block">Subtotal</Label>
                         <p className="text-sm font-semibold text-gray-900">
-                          {subtotal.toFixed(2)}
+                          {currency} {subtotal.toFixed(2)}
                         </p>
                         {formatCurrencyConversion(subtotal) && (
                           <p className="text-xs text-green-700">
@@ -985,61 +1078,76 @@ export const ConsolidatedItemDetailsCard: React.FC<ConsolidatedItemDetailsCardPr
                         )}
                       </div>
                     </div>
-                    
-                    {/* Discount */}
-                    <div className="text-right">
-                      <div className="flex items-center justify-end gap-1 mb-1">
-                        {onDiscountToggle && (
-                          <Checkbox 
-                            checked={isDiscountApplied}
-                            onCheckedChange={onDiscountToggle}
-                            className="w-3 h-3"
-                          />
+
+                    {/* Row 3: Tax Profile and Tax */}
+                    <div className="grid grid-cols-4 gap-3 pt-2 border-t border-gray-100">
+                      <div>
+                        <Label className="text-xs text-gray-500 mb-1 block">Tax Profile</Label>
+                        {onTaxTypeChange && onTaxRateChange ? (
+                          <Select
+                            value={taxType || "VAT"}
+                            onValueChange={(value) => {
+                              onTaxTypeChange(value);
+                              // Auto-set tax rate based on selected profile
+                              const selectedProfile = taxTypeOptions.find(opt => opt.value === value);
+                              if (selectedProfile?.rate !== undefined) {
+                                onTaxRateChange(selectedProfile.rate);
+                              }
+                            }}
+                          >
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue placeholder="Tax Type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {taxTypeOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <p className="text-xs font-semibold text-gray-900">{taxType}</p>
                         )}
-                        <p className="text-xs text-gray-500">Discount {(discountRate * 100).toFixed(0)}%</p>
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900">
-                          {actualDiscountAmount.toFixed(2)}
+                        <div className="flex items-center gap-1 mb-1">
+                          {onTaxToggle && (
+                            <Checkbox
+                              checked={isTaxApplied}
+                              onCheckedChange={onTaxToggle}
+                              className="w-3 h-3"
+                            />
+                          )}
+                          <Label className="text-xs text-gray-500">Tax Rate</Label>
+                        </div>
+                        {/* Tax rate is read-only - determined by tax profile */}
+                        <p className="text-sm font-semibold text-gray-900 h-8 flex items-center">
+                          {(taxRate * 100).toFixed(2)}%
                         </p>
-                        {formatCurrencyConversion(actualDiscountAmount) && (
-                          <p className="text-xs text-green-700">
-                            {formatCurrencyConversion(actualDiscountAmount)}
+                        <p className="text-xs text-gray-400">From profile</p>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-gray-500 mb-1 block">Tax Amount Override</Label>
+                        {onTaxAmountChange ? (
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={taxAmount}
+                            onChange={(e) => onTaxAmountChange(parseFloat(e.target.value) || 0)}
+                            className="h-8 text-xs"
+                            placeholder="Override"
+                          />
+                        ) : (
+                          <p className="text-sm font-semibold text-gray-900">
+                            {actualTaxAmount.toFixed(2)}
                           </p>
                         )}
                       </div>
-                    </div>
-                    
-                    {/* Net Amount */}
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500 mb-1">Net Amount</p>
                       <div>
+                        <Label className="text-xs text-gray-500 mb-1 block">Tax (Calculated)</Label>
                         <p className="text-sm font-semibold text-gray-900">
-                          {netAmount.toFixed(2)}
-                        </p>
-                        {formatCurrencyConversion(netAmount) && (
-                          <p className="text-xs text-green-700">
-                            {formatCurrencyConversion(netAmount)}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Tax */}
-                    <div className="text-right">
-                      <div className="flex items-center justify-end gap-1 mb-1">
-                        {onTaxToggle && (
-                          <Checkbox 
-                            checked={isTaxApplied}
-                            onCheckedChange={onTaxToggle}
-                            className="w-3 h-3"
-                          />
-                        )}
-                        <p className="text-xs text-gray-500">Tax ({taxType}) {(taxRate * 100).toFixed(0)}%</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900">
-                          {actualTaxAmount.toFixed(2)}
+                          {currency} {actualTaxAmount.toFixed(2)}
                         </p>
                         {formatCurrencyConversion(actualTaxAmount) && (
                           <p className="text-xs text-green-700">
@@ -1048,13 +1156,64 @@ export const ConsolidatedItemDetailsCard: React.FC<ConsolidatedItemDetailsCardPr
                         )}
                       </div>
                     </div>
-                    
-                    {/* Total */}
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500 mb-1">Total</p>
+
+                    {/* Row 4: Discount */}
+                    <div className="grid grid-cols-4 gap-3 pt-2 border-t border-gray-100">
                       <div>
+                        <div className="flex items-center gap-1 mb-1">
+                          {onDiscountToggle && (
+                            <Checkbox
+                              checked={isDiscountApplied}
+                              onCheckedChange={onDiscountToggle}
+                              className="w-3 h-3"
+                            />
+                          )}
+                          <Label className="text-xs text-gray-500">Discount Rate %</Label>
+                        </div>
+                        {onDiscountRateChange ? (
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={(discountRate * 100).toFixed(2)}
+                            onChange={(e) => onDiscountRateChange((parseFloat(e.target.value) || 0) / 100)}
+                            className="h-8 text-xs"
+                          />
+                        ) : (
+                          <p className="text-xs font-semibold text-gray-900">{(discountRate * 100).toFixed(2)}%</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label className="text-xs text-gray-500 mb-1 block">Discount Override</Label>
+                        {onDiscountAmountChange ? (
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={discountAmount}
+                            onChange={(e) => onDiscountAmountChange(parseFloat(e.target.value) || 0)}
+                            className="h-8 text-xs"
+                            placeholder="Override"
+                          />
+                        ) : (
+                          <p className="text-sm font-semibold text-gray-900">
+                            {actualDiscountAmount.toFixed(2)}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <Label className="text-xs text-gray-500 mb-1 block">Net Amount</Label>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {currency} {netAmount.toFixed(2)}
+                        </p>
+                        {formatCurrencyConversion(netAmount) && (
+                          <p className="text-xs text-green-700">
+                            {formatCurrencyConversion(netAmount)}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <Label className="text-xs text-gray-500 mb-1 block">Total</Label>
                         <p className="text-base font-bold text-green-600">
-                          {finalTotal.toFixed(2)}
+                          {currency} {finalTotal.toFixed(2)}
                         </p>
                         {formatCurrencyConversion(finalTotal) && (
                           <p className="text-xs text-green-700">
@@ -1064,7 +1223,138 @@ export const ConsolidatedItemDetailsCard: React.FC<ConsolidatedItemDetailsCardPr
                       </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    {/* Read-only Vendor Information */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Vendor</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {vendor || "Not assigned"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Pricelist</p>
+                        <p className="text-xs font-semibold text-gray-900">
+                          {pricelistNumber || "Not assigned"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Read-only Pricing Details */}
+                    <div className="pt-2 border-t border-gray-100">
+                      <div className="grid grid-cols-6 gap-4">
+                        {/* Unit Price */}
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500 mb-1">Unit Price</p>
+                          <div className="space-y-0.5">
+                            <p className="text-sm font-semibold text-gray-900">
+                              {currency} {unitPrice.toFixed(2)}
+                            </p>
+                            <p className="text-xs text-gray-500">per {unit}</p>
+                            {formatCurrencyConversion(unitPrice) && (
+                              <p className="text-xs text-green-700">{formatCurrencyConversion(unitPrice)} per {unit}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Subtotal */}
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500 mb-1">Subtotal</p>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {subtotal.toFixed(2)}
+                            </p>
+                            {formatCurrencyConversion(subtotal) && (
+                              <p className="text-xs text-green-700">
+                                {formatCurrencyConversion(subtotal)}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Discount */}
+                        <div className="text-right">
+                          <div className="flex items-center justify-end gap-1 mb-1">
+                            {onDiscountToggle && (
+                              <Checkbox
+                                checked={isDiscountApplied}
+                                onCheckedChange={onDiscountToggle}
+                                className="w-3 h-3"
+                              />
+                            )}
+                            <p className="text-xs text-gray-500">Discount {(discountRate * 100).toFixed(0)}%</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {actualDiscountAmount.toFixed(2)}
+                            </p>
+                            {formatCurrencyConversion(actualDiscountAmount) && (
+                              <p className="text-xs text-green-700">
+                                {formatCurrencyConversion(actualDiscountAmount)}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Net Amount */}
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500 mb-1">Net Amount</p>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {netAmount.toFixed(2)}
+                            </p>
+                            {formatCurrencyConversion(netAmount) && (
+                              <p className="text-xs text-green-700">
+                                {formatCurrencyConversion(netAmount)}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Tax */}
+                        <div className="text-right">
+                          <div className="flex items-center justify-end gap-1 mb-1">
+                            {onTaxToggle && (
+                              <Checkbox
+                                checked={isTaxApplied}
+                                onCheckedChange={onTaxToggle}
+                                className="w-3 h-3"
+                              />
+                            )}
+                            <p className="text-xs text-gray-500">Tax ({taxType}) {(taxRate * 100).toFixed(0)}%</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {actualTaxAmount.toFixed(2)}
+                            </p>
+                            {formatCurrencyConversion(actualTaxAmount) && (
+                              <p className="text-xs text-green-700">
+                                {formatCurrencyConversion(actualTaxAmount)}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Total */}
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500 mb-1">Total</p>
+                          <div>
+                            <p className="text-base font-bold text-green-600">
+                              {finalTotal.toFixed(2)}
+                            </p>
+                            {formatCurrencyConversion(finalTotal) && (
+                              <p className="text-xs text-green-700">
+                                {formatCurrencyConversion(finalTotal)}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>

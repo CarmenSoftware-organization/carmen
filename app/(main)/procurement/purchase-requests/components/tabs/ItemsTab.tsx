@@ -12,13 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useSimpleUser } from "@/lib/context/simple-user-context";
@@ -50,7 +43,6 @@ import {
   Star,
   Clock,
   Trash2,
-  MoreHorizontal,
   History,
 } from "lucide-react";
 import { PurchaseRequestItem, PRStatus, asMockPurchaseRequestItem, MockPurchaseRequestItem } from "@/lib/types";
@@ -132,7 +124,7 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
   // Role detection logic - Using role NAME from context
   const requestorRoles = ['Staff', 'Requestor', 'Store Staff', 'Chef', 'Counter Staff', 'Executive Chef', 'Warehouse Staff'];
   const approverRoles = ['Department Manager', 'Financial Manager', 'Approver', 'General Manager', 'Finance Director'];
-  const purchaserRoles = ['Purchasing Staff', 'Purchaser', 'Procurement Manager'];
+  const purchaserRoles = ['Purchasing Staff', 'Purchaser', 'Procurement Manager', 'Purchasing Agent'];
 
   const isRequestor = requestorRoles.includes(userRoleName);
   const isApprover = approverRoles.includes(userRoleName);
@@ -991,9 +983,18 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                           )}
                           {/* FOC field below approved quantity - Hidden for requestors and approvers, only visible for purchasers */}
                           {itemIsPurchaser && (() => {
-                            const focValue = mockItem.foc as number | undefined;
-                            const focDisplay = focValue !== undefined ? focValue.toFixed(5) : "";
-                            const focDisplayShort = focValue !== undefined ? focValue.toFixed(3) : '0.000';
+                            // FOC is typed as boolean but used as number (FOC Quantity) - handle both cases
+                            const rawFocValue = mockItem.foc as unknown;
+                            let focValue: number | undefined;
+                            if (typeof rawFocValue === 'number') {
+                              focValue = rawFocValue;
+                            } else if (typeof rawFocValue === 'string' && rawFocValue !== '') {
+                              focValue = parseFloat(rawFocValue);
+                            } else {
+                              focValue = undefined;
+                            }
+                            const focDisplay = focValue !== undefined && !isNaN(focValue) ? focValue.toFixed(5) : "";
+                            const focDisplayShort = focValue !== undefined && !isNaN(focValue) ? focValue.toFixed(3) : '0.000';
 
                             return (
                               <div className="pt-1 border-t border-gray-200 mt-2 flex flex-col items-center">
@@ -1179,66 +1180,56 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
                                         showVendorPricing={canSeePrices}
                                         showInventoryInfo={true}
                                         showBusinessDimensions={true}
+                                        showActions={false}
 
-                                        // Action handlers
-                                        onEditClick={() => {
-                                          console.log('Edit item:', item.id);
-                                          // Add edit logic here
-                                        }}
-                                        onDuplicateClick={() => {
-                                          console.log('Duplicate item:', item.id);
-                                          // Add duplicate logic here
-                                        }}
-                                        onArchiveClick={() => {
-                                          console.log('Archive item:', item.id);
-                                          // Add archive logic here
-                                        }}
-                                        onDeleteClick={() => {
-                                          console.log('Delete item:', item.id);
-                                          // Add delete logic here
-                                        }}
-                                        onMoreActions={() => {
-                                          console.log('More actions for item:', item.id);
-                                          // Add more actions logic here
-                                        }}
-                                        showActions={formMode === "edit"}
+                                        // Purchaser editing capabilities - only enabled for purchasers in edit mode
+                                        isPurchaserEditable={itemIsPurchaser && formMode === "edit"}
+                                        onVendorChange={itemIsPurchaser && formMode === "edit" ? (vendor) => {
+                                          item.id && handleItemChange(item.id, 'vendor', vendor);
+                                        } : undefined}
+                                        onCurrencyChange={itemIsPurchaser && formMode === "edit" ? (currency) => {
+                                          item.id && handleItemChange(item.id, 'currency', currency);
+                                        } : undefined}
+                                        onCurrencyRateChange={itemIsPurchaser && formMode === "edit" ? (rate) => {
+                                          item.id && handleItemChange(item.id, 'currencyRate', rate);
+                                        } : undefined}
+                                        onUnitPriceChange={itemIsPurchaser && formMode === "edit" ? (price) => {
+                                          item.id && handleItemChange(item.id, 'price', price);
+                                        } : undefined}
+                                        onDiscountRateChange={itemIsPurchaser && formMode === "edit" ? (rate) => {
+                                          item.id && handleItemChange(item.id, 'discountRate', rate);
+                                        } : undefined}
+                                        onDiscountAmountChange={itemIsPurchaser && formMode === "edit" ? (amount) => {
+                                          item.id && handleItemChange(item.id, 'discountAmount', amount);
+                                        } : undefined}
+                                        onTaxTypeChange={itemIsPurchaser && formMode === "edit" ? (taxType) => {
+                                          item.id && handleItemChange(item.id, 'taxType', taxType);
+                                        } : undefined}
+                                        onTaxRateChange={itemIsPurchaser && formMode === "edit" ? (rate) => {
+                                          item.id && handleItemChange(item.id, 'taxRate', rate);
+                                        } : undefined}
+                                        onTaxAmountChange={itemIsPurchaser && formMode === "edit" ? (amount) => {
+                                          item.id && handleItemChange(item.id, 'taxAmount', amount);
+                                        } : undefined}
+                                        vendorOptions={[
+                                          { value: "Premium Food Suppliers Inc.", label: "Premium Food Suppliers Inc." },
+                                          { value: "Organic Farms Co.", label: "Organic Farms Co." },
+                                          { value: "Fresh Produce Ltd.", label: "Fresh Produce Ltd." },
+                                          { value: "Bulk Foods International", label: "Bulk Foods International" },
+                                          { value: "Quality Ingredients Corp.", label: "Quality Ingredients Corp." }
+                                        ]}
+                                        taxTypeOptions={[
+                                          { value: 'VAT', label: 'VAT (7%)', rate: 0.07 },
+                                          { value: 'GST', label: 'GST (10%)', rate: 0.10 },
+                                          { value: 'SST', label: 'SST (6%)', rate: 0.06 },
+                                          { value: 'WHT', label: 'WHT (3%)', rate: 0.03 },
+                                          { value: 'None', label: 'No Tax (0%)', rate: 0 },
+                                        ]}
                                       />
                                     );
                                   })()}
                                 </div>
 
-                                {/* Vendor Comparison Dialog - Moved outside of card */}
-                                {canSeePrices && (itemIsApprover || itemIsPurchaser) && selectedItemForComparison && (() => {
-                                  const comparisonMockItem = asMockPurchaseRequestItem(selectedItemForComparison);
-                                  return (
-                                    <Dialog open={isVendorComparisonOpen} onOpenChange={setIsVendorComparisonOpen}>
-                                      <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
-                                        <DialogHeader>
-                                          <DialogTitle>Vendor Comparison</DialogTitle>
-                                        </DialogHeader>
-                                        <VendorComparison
-                                          currentPricelistNumber={comparisonMockItem.pricelistNumber}
-                                          selectedVendor={itemIsPurchaser ? undefined : comparisonMockItem.vendor}
-                                          itemName={comparisonMockItem.name}
-                                          itemDescription={selectedItemForComparison.description}
-                                          itemUnit={selectedItemForComparison.unit}
-                                          itemStatus={selectedItemForComparison.status}
-                                          requestedQuantity={comparisonMockItem.quantityRequested}
-                                          approvedQuantity={comparisonMockItem.quantityApproved}
-                                          userRole={userRoleName}
-                                          onPricelistSelect={itemIsPurchaser ? (vendor, pricelistNumber, unitPrice) => {
-                                            if (selectedItemForComparison?.id) {
-                                              handleItemChange(selectedItemForComparison.id, 'vendor', vendor);
-                                              handleItemChange(selectedItemForComparison.id, 'pricelistNumber', pricelistNumber);
-                                              handleItemChange(selectedItemForComparison.id, 'price', unitPrice);
-                                            }
-                                            setIsVendorComparisonOpen(false);
-                                          } : undefined}
-                                        />
-                                      </DialogContent>
-                                    </Dialog>
-                                  );
-                                })()}
                               </div>
                             )}
                           </div>
@@ -1361,6 +1352,35 @@ export function ItemsTab({ items = samplePRItems, currentUser, onOrderUpdate, fo
         </Dialog>
       )}
 
+      {/* Vendor Comparison Dialog - Moved outside of items loop */}
+      {selectedItemForComparison && (
+        <Dialog open={isVendorComparisonOpen} onOpenChange={setIsVendorComparisonOpen}>
+          <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Vendor Comparison</DialogTitle>
+            </DialogHeader>
+            <VendorComparison
+              currentPricelistNumber={asMockPurchaseRequestItem(selectedItemForComparison).pricelistNumber}
+              selectedVendor={isPurchaser ? undefined : asMockPurchaseRequestItem(selectedItemForComparison).vendor}
+              itemName={asMockPurchaseRequestItem(selectedItemForComparison).name}
+              itemDescription={selectedItemForComparison.description}
+              itemUnit={selectedItemForComparison.unit}
+              itemStatus={selectedItemForComparison.status}
+              requestedQuantity={asMockPurchaseRequestItem(selectedItemForComparison).quantityRequested}
+              approvedQuantity={asMockPurchaseRequestItem(selectedItemForComparison).quantityApproved}
+              userRole={userRoleName}
+              onPricelistSelect={isPurchaser ? (vendor, pricelistNumber, unitPrice) => {
+                if (selectedItemForComparison?.id) {
+                  handleItemChange(selectedItemForComparison.id, 'vendor', vendor);
+                  handleItemChange(selectedItemForComparison.id, 'pricelistNumber', pricelistNumber);
+                  handleItemChange(selectedItemForComparison.id, 'price', unitPrice);
+                }
+                setIsVendorComparisonOpen(false);
+              } : undefined}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* On Hand by Location Modal */}
       <Dialog open={isOnHandPopupOpen} onOpenChange={setIsOnHandPopupOpen}>

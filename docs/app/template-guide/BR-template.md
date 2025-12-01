@@ -114,7 +114,7 @@
 
 **Note**: The interfaces shown below are **conceptual data models** used to communicate business requirements. They are NOT intended to be copied directly into code. Developers should use these as a guide to understand the required data structure and then implement using appropriate technologies and patterns for the technical stack.
 
-### {Entity Name} Entity
+### {Name} Entity
 
 **Purpose**: {Brief description of what this entity represents and its role in the business domain}
 
@@ -152,7 +152,7 @@ interface {EntityName} {
 }
 ```
 
-### {Related Entity} Entity
+### {Related Name} Entity
 
 ```typescript
 interface {RelatedEntity} {
