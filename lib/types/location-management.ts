@@ -35,32 +35,6 @@ export enum StorageZoneType {
  */
 export type LocationStatus = 'active' | 'inactive' | 'closed' | 'pending_setup'
 
-/**
- * User roles specific to location operations
- */
-export type LocationUserRole =
-  | 'location_manager'
-  | 'inventory_controller'
-  | 'receiver'
-  | 'picker'
-  | 'counter'
-  | 'viewer'
-
-/**
- * Granular permissions for location operations
- */
-export type LocationPermission =
-  | 'location:view'
-  | 'location:edit'
-  | 'inventory:view'
-  | 'inventory:receive'
-  | 'inventory:issue'
-  | 'inventory:adjust'
-  | 'inventory:transfer'
-  | 'count:view'
-  | 'count:participate'
-  | 'count:finalize'
-  | 'shelf:manage'
 
 // ====== CONFIGURATION INTERFACES ======
 
@@ -194,7 +168,7 @@ export interface Shelf {
 }
 
 /**
- * User-Location Assignment - Links users to locations with roles
+ * User-Location Assignment - Links users to locations
  */
 export interface UserLocationAssignment {
   id: string
@@ -203,10 +177,6 @@ export interface UserLocationAssignment {
   userEmail: string
   locationId: string
 
-  roleAtLocation: LocationUserRole
-  permissions: LocationPermission[]
-
-  isPrimary: boolean
   isActive: boolean
 
   effectiveFrom?: Date
@@ -360,18 +330,6 @@ export const STORAGE_ZONE_LABELS: Record<StorageZoneType, string> = {
   [StorageZoneType.FROZEN]: 'Frozen Storage',
   [StorageZoneType.AMBIENT]: 'Ambient',
   [StorageZoneType.CONTROLLED]: 'Controlled Environment'
-}
-
-/**
- * Location user role labels
- */
-export const LOCATION_ROLE_LABELS: Record<LocationUserRole, string> = {
-  location_manager: 'Location Manager',
-  inventory_controller: 'Inventory Controller',
-  receiver: 'Receiver',
-  picker: 'Picker',
-  counter: 'Counter',
-  viewer: 'Viewer'
 }
 
 // ====== FORM TYPES ======

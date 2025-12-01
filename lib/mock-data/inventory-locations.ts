@@ -324,21 +324,6 @@ export const mockUserLocationAssignments: UserLocationAssignment[] = [
     userName: 'John Smith',
     userEmail: 'john.smith@company.com',
     locationId: 'loc-001',
-    roleAtLocation: 'location_manager',
-    permissions: [
-      'location:view',
-      'location:edit',
-      'inventory:view',
-      'inventory:receive',
-      'inventory:issue',
-      'inventory:adjust',
-      'inventory:transfer',
-      'count:view',
-      'count:participate',
-      'count:finalize',
-      'shelf:manage'
-    ],
-    isPrimary: true,
     isActive: true,
     assignedAt: new Date('2024-01-15'),
     assignedBy: 'admin'
@@ -349,17 +334,6 @@ export const mockUserLocationAssignments: UserLocationAssignment[] = [
     userName: 'Sarah Johnson',
     userEmail: 'sarah.j@company.com',
     locationId: 'loc-001',
-    roleAtLocation: 'inventory_controller',
-    permissions: [
-      'location:view',
-      'inventory:view',
-      'inventory:receive',
-      'inventory:issue',
-      'inventory:adjust',
-      'count:view',
-      'count:participate'
-    ],
-    isPrimary: true,
     isActive: true,
     assignedAt: new Date('2024-01-20'),
     assignedBy: 'admin'
@@ -370,13 +344,6 @@ export const mockUserLocationAssignments: UserLocationAssignment[] = [
     userName: 'Mike Chen',
     userEmail: 'mike.c@company.com',
     locationId: 'loc-001',
-    roleAtLocation: 'receiver',
-    permissions: [
-      'location:view',
-      'inventory:view',
-      'inventory:receive'
-    ],
-    isPrimary: true,
     isActive: true,
     assignedAt: new Date('2024-02-01'),
     assignedBy: 'admin'
@@ -388,21 +355,6 @@ export const mockUserLocationAssignments: UserLocationAssignment[] = [
     userName: 'Lisa Wong',
     userEmail: 'lisa.w@company.com',
     locationId: 'loc-002',
-    roleAtLocation: 'location_manager',
-    permissions: [
-      'location:view',
-      'location:edit',
-      'inventory:view',
-      'inventory:receive',
-      'inventory:issue',
-      'inventory:adjust',
-      'inventory:transfer',
-      'count:view',
-      'count:participate',
-      'count:finalize',
-      'shelf:manage'
-    ],
-    isPrimary: true,
     isActive: true,
     assignedAt: new Date('2024-01-10'),
     assignedBy: 'admin'
@@ -413,13 +365,6 @@ export const mockUserLocationAssignments: UserLocationAssignment[] = [
     userName: 'Tom Brown',
     userEmail: 'tom.b@company.com',
     locationId: 'loc-002',
-    roleAtLocation: 'picker',
-    permissions: [
-      'location:view',
-      'inventory:view',
-      'inventory:issue'
-    ],
-    isPrimary: true,
     isActive: true,
     assignedAt: new Date('2024-01-15'),
     assignedBy: 'admin'
@@ -431,15 +376,6 @@ export const mockUserLocationAssignments: UserLocationAssignment[] = [
     userName: 'James Wilson',
     userEmail: 'james.w@company.com',
     locationId: 'loc-003',
-    roleAtLocation: 'location_manager',
-    permissions: [
-      'location:view',
-      'location:edit',
-      'inventory:view',
-      'inventory:receive',
-      'inventory:issue'
-    ],
-    isPrimary: true,
     isActive: true,
     assignedAt: new Date('2024-02-01'),
     assignedBy: 'admin'

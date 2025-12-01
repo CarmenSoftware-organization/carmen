@@ -55,6 +55,7 @@ export default function LocationDetailPage() {
   const [isEditing, setIsEditing] = useState(initialMode === 'edit')
   const [activeTab, setActiveTab] = useState("general")
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [assignedUserIds, setAssignedUserIds] = useState<string[] | null>(null)
 
   // Fetch location data
   const location = useMemo(() => getInventoryLocationById(locationId), [locationId])
@@ -212,7 +213,7 @@ export default function LocationDetailPage() {
             <Users className="h-4 w-4" />
             <span className="text-sm">Users</span>
           </div>
-          <p className="text-2xl font-semibold">{location.assignedUsersCount}</p>
+          <p className="text-2xl font-semibold">{assignedUserIds?.length ?? location.assignedUsersCount}</p>
         </div>
         <div className="p-4 rounded-lg border bg-card">
           <div className="flex items-center gap-2 text-muted-foreground mb-1">
@@ -236,7 +237,7 @@ export default function LocationDetailPage() {
           </TabsTrigger>
           <TabsTrigger value="users" className="gap-2">
             <Users className="h-4 w-4" />
-            Users ({userAssignments.length})
+            Users ({assignedUserIds?.length ?? userAssignments.length})
           </TabsTrigger>
           <TabsTrigger value="products" className="gap-2">
             <Package className="h-4 w-4" />
@@ -265,6 +266,7 @@ export default function LocationDetailPage() {
             locationId={locationId}
             assignments={userAssignments}
             isEditing={isEditing}
+            onAssignmentsChange={setAssignedUserIds}
           />
         </TabsContent>
 
