@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -16,14 +14,12 @@ import {
   Mail,
   Printer,
   AlertTriangle,
-  ChevronRight,
   ChevronLeft,
-  PanelRight,
+  PanelRightOpen,
   PanelRightClose,
   Download,
   FileText,
   Table as TableIcon,
-  Plus,
   Calendar as CalendarIcon,
   Tag as TagIcon,
   User as UserIcon,
@@ -35,7 +31,6 @@ import {
   FileText as FileTextIcon,
   MessageSquare as MessageSquareIcon
 } from "lucide-react";
-import DetailPageTemplate from "@/components/templates/DetailPageTemplate";
 import {
   TooltipProvider,
   Tooltip,
@@ -66,6 +61,7 @@ import EnhancedItemsTab from "./tabs/EnhancedItemsTab";
 import FinancialDetailsTab from "./tabs/FinancialDetailsTab";
 import RelatedDocumentsTab from "./tabs/RelatedDocumentsTab";
 import ActivityLogTab from "./tabs/ActivityLogTab";
+import CommentsAttachmentsTab from "./tabs/CommentsAttachmentsTab";
 import {
   PurchaseOrderItem,
   PurchaseOrderStatus,
@@ -99,7 +95,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<PurchaseOrderStatus | null>(null);
   const [statusReason, setStatusReason] = useState("");
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [exportFormat, setExportFormat] = useState("pdf");
   const [selectedSections, setSelectedSections] = useState<string[]>([
@@ -397,7 +393,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
   };
 
   const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
+    setIsSidebarVisible(!isSidebarVisible);
   };
 
   const handleExport = () => {
@@ -422,26 +418,6 @@ export default function PODetailPage({ params }: PODetailPageProps) {
   if (!poData) {
     return <div>Loading... (Data not found)</div>;
   }
-
-  const title = (
-    <div className="flex items-center space-x-2">
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        onClick={() => router.push('/procurement/purchase-orders')}
-        className="mr-2 h-6 w-6"
-      >
-        <ChevronLeft className="h-3 w-3" />
-        <span className="sr-only">Back to Purchase Orders</span>
-      </Button>
-      <div className="flex flex-col">
-        <h1 className="text-lg font-bold">{(poData as any)?.number || poData?.orderNumber || 'Purchase Order'}</h1>
-        {((poData as any)?.number || poData?.orderNumber) && (poData as any)?.number !== 'New PO' && (
-          <p className="text-xs text-muted-foreground mt-1">Purchase Order</p>
-        )}
-      </div>
-    </div>
-  );
 
   const headerDetails = (
     <div className="space-y-6">
@@ -648,161 +624,175 @@ export default function PODetailPage({ params }: PODetailPageProps) {
     </div>
   );
 
-  const actionButtons = (
-    <div className="flex flex-wrap gap-2 items-center">
-      {isEditing ? (
-        <>
-          <Button variant="default" className="h-8 px-3 text-xs" onClick={handleSave}>
-            <CheckSquare className="mr-2 h-3 w-3" />
-            Save
-          </Button>
-          <Button variant="outline" className="h-8 px-2 text-xs" onClick={handleCancel}>
-            <X className="mr-2 h-3 w-3" />
-            Cancel
-          </Button>
-        </>
-      ) : (
-        <>
-          <Button variant="default" onClick={handleEdit}>
-            <Edit className="mr-2 h-3 w-3" />
-            Edit
-          </Button>
-          <Button variant="outline" className="h-8 px-2 text-xs" onClick={handleDelete}>
-            <Trash2 className="mr-2 h-3 w-3" />
-            Delete
-          </Button>
-          <Button variant="outline" className="h-8 px-2 text-xs" onClick={handlePrint}>
-            <Printer className="mr-2 h-3 w-3" />
-            Print
-          </Button>
-          <Button variant="outline" className="h-8 px-2 text-xs" onClick={handleEmail}>
-            <Mail className="mr-2 h-3 w-3" />
-            Email
-          </Button>
-          <Button variant="outline" className="h-8 px-2 text-xs" onClick={handleExport}>
-            <FileDown className="mr-2 h-3 w-3" />
-            Export
-          </Button>
-        </>
-      )}
-      
-      {/* Panel toggle button */}
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline" 
-              size="icon" 
-              onClick={toggleSidebar}
-              className="h-6 w-6"
-            >
-              {isSidebarCollapsed ? (
-                <PanelRight className="h-3 w-3" />
-              ) : (
-                <PanelRightClose className="h-3 w-3" />
-              )}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            {isSidebarCollapsed ? "Show panel" : "Hide panel"}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
-  );
-
   return (
     <TooltipProvider>
-      <DetailPageTemplate
-        title={title}
-        status={poData?.status && <StatusBadge status={poData.status} />}
-        details={headerDetails}
-        isEditing={isEditing}
-        backLink="/procurement/purchase-orders"
-        actionButtons={actionButtons}
-        content={
-          <div className="flex flex-col lg:flex-row gap-4 relative">
-            {/* Main content area */}
-            <div className={`flex-1 space-y-4 ${isSidebarCollapsed ? 'lg:pr-0' : 'lg:pr-4'}`}>
-
-              {/* Tabs */}
-              <Card className="bg-white dark:bg-gray-800">
-                <Tabs defaultValue="items" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-700">
-                    <TabsTrigger value="items" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                      Items
-                    </TabsTrigger>
-                    {params.id !== 'new' && (
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 pb-32">
+        <div className="flex flex-col lg:flex-row space-y-6 lg:space-y-0 lg:space-x-6">
+          {/* Main Content */}
+          <div className={`flex-grow space-y-6 ${isSidebarVisible ? 'lg:w-3/4' : 'w-full'}`}>
+            {/* Header Card */}
+            <Card className="shadow-sm overflow-hidden">
+              <CardHeader className="pb-4 border-b bg-muted/10">
+                <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 rounded-full p-0 mr-1"
+                        onClick={() => router.push('/procurement/purchase-orders')}
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                        <span className="sr-only">Back to Purchase Orders</span>
+                      </Button>
+                      <div className="flex flex-col">
+                        <h1 className="text-2xl font-bold">
+                          {params.id === 'new'
+                            ? "Create New Purchase Order"
+                            : (poData as any)?.number || poData?.orderNumber || "Purchase Order Details"}
+                        </h1>
+                        {params.id !== 'new' && (
+                          <p className="text-sm text-muted-foreground mt-1">Purchase Order</p>
+                        )}
+                      </div>
+                      {poData?.status && <StatusBadge status={poData.status} className="h-6" />}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap justify-end">
+                    {isEditing ? (
                       <>
-                        <TabsTrigger value="relatedDocs" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                          Documents
-                        </TabsTrigger>
+                        <Button variant="default" onClick={handleSave} size="sm" className="h-9">
+                          <CheckSquare className="mr-2 h-4 w-4" />
+                          Save
+                        </Button>
+                        <Button variant="outline" onClick={handleCancel} size="sm" className="h-9">
+                          <X className="mr-2 h-4 w-4" />
+                          Cancel
+                        </Button>
                       </>
+                    ) : (
+                      <Button onClick={handleEdit} size="sm" className="h-9">
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </Button>
                     )}
-                  </TabsList>
+                    <Button variant="outline" size="sm" className="h-9" onClick={handlePrint}>
+                      <Printer className="mr-2 h-4 w-4" />
+                      Print
+                    </Button>
+                    <Button variant="outline" size="sm" className="h-9" onClick={handleExport}>
+                      <FileDown className="mr-2 h-4 w-4" />
+                      Export
+                    </Button>
+                    <Button variant="outline" size="sm" className="h-9" onClick={handleEmail}>
+                      <Mail className="mr-2 h-4 w-4" />
+                      Share
+                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={toggleSidebar}
+                          className="h-9 w-9 p-0"
+                        >
+                          {isSidebarVisible ? (
+                            <PanelRightClose className="h-4 w-4" />
+                          ) : (
+                            <PanelRightOpen className="h-4 w-4" />
+                          )}
+                          <span className="sr-only">Toggle sidebar</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {isSidebarVisible ? "Hide Sidebar" : "Show Sidebar"}
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </div>
+              </CardHeader>
 
-                  <TabsContent value="items" className="p-4">
-                    <EnhancedItemsTab
-                      poData={poData as any}
-                      onUpdateItem={handleUpdateItem}
-                      onDeleteItem={handleDeleteItem}
-                      onAddItem={handleAddItem}
-                      onGoodsReceived={(item) => {
-                        // Implement goods received logic
-                        console.log('Goods received for item:', item);
-                      }}
-                      onSplitLine={(item) => {
-                        // Implement split line logic
-                        console.log('Split line for item:', item);
-                      }}
-                      onCancelItem={(item) => {
-                        // Implement cancel item logic
-                        console.log('Cancel item:', item);
-                      }}
-                      editable={isEditing}
-                    />
-                  </TabsContent>
+              {/* Main Content - Header Details */}
+              <CardContent className="p-6">
+                {headerDetails}
+              </CardContent>
+            </Card>
 
+            {/* Tabs Card */}
+            <Card className="shadow-sm">
+              <Tabs defaultValue="items" className="w-full">
+                <TabsList className={`grid w-full ${params.id !== 'new' ? 'grid-cols-2' : 'grid-cols-1'} bg-gray-100 dark:bg-gray-700 m-1`}>
+                  <TabsTrigger value="items" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    Items
+                  </TabsTrigger>
                   {params.id !== 'new' && (
-                    <>
-
-                      <TabsContent value="relatedDocs" className="p-4">
-                        <RelatedDocumentsTab poData={poData} />
-                      </TabsContent>
-                    </>
+                    <TabsTrigger value="relatedDocs" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                      Documents
+                    </TabsTrigger>
                   )}
-                </Tabs>
-              </Card>
+                </TabsList>
 
-              {/* Financial Summary */}
-              <Card className="bg-white dark:bg-gray-800">
-                <CardContent className="py-6">
-                  <TransactionSummary poData={poData} isEditing={isEditing} />
-                </CardContent>
-              </Card>
-            </div>
+                <TabsContent value="items" className="p-4">
+                  <EnhancedItemsTab
+                    poData={poData as any}
+                    onUpdateItem={handleUpdateItem}
+                    onDeleteItem={handleDeleteItem}
+                    onAddItem={handleAddItem}
+                    onGoodsReceived={(item) => {
+                      console.log('Goods received for item:', item);
+                    }}
+                    onSplitLine={(item) => {
+                      console.log('Split line for item:', item);
+                    }}
+                    onCancelItem={(item) => {
+                      console.log('Cancel item:', item);
+                    }}
+                    editable={isEditing}
+                  />
+                </TabsContent>
 
-            {/* Sidebar - Activity Log */}
-            <div 
-              className={`transition-all duration-300 ease-in-out ${
-                isSidebarCollapsed 
-                  ? 'lg:w-0 lg:opacity-0 lg:overflow-hidden' 
-                  : 'lg:w-80 opacity-100'
-              } space-y-4`}
-            >
-              {/* Activity Log */}
-              <Card className="bg-white dark:bg-gray-800">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-base">Activity Log</CardTitle>
-                </CardHeader>
-                <CardContent className="py-2">
-                  {params.id !== 'new' && <ActivityLogTab poData={poData} />}
-                </CardContent>
-              </Card>
-            </div>
+                {params.id !== 'new' && (
+                  <TabsContent value="relatedDocs" className="p-4">
+                    <RelatedDocumentsTab poData={poData} />
+                  </TabsContent>
+                )}
+              </Tabs>
+            </Card>
+
+            {/* Financial Summary Card */}
+            <Card className="shadow-sm">
+              <CardContent className="py-6">
+                <TransactionSummary poData={poData} isEditing={isEditing} />
+              </CardContent>
+            </Card>
           </div>
-        }
-      />
+
+          {/* Sidebar */}
+          <div className={`space-y-6 ${isSidebarVisible ? 'lg:w-1/4' : 'w-0 opacity-0 overflow-hidden'} transition-all duration-300`}>
+            {/* Comments & Attachments */}
+            {params.id !== 'new' && (
+              <Card className="shadow-sm">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Comments & Attachments</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <CommentsAttachmentsTab poData={poData} />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Activity Log */}
+            <Card className="shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Activity Log</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {params.id !== 'new' && <ActivityLogTab poData={poData} />}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
 
       {/* Status Change Confirmation Dialog */}
       <Dialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>

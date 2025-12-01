@@ -67,13 +67,14 @@ export default function EnhancedItemsTab({
 
   // Filter items based on search term
   const filteredItems = useMemo(() => {
+    if (!poData?.items) return [];
     return poData.items.filter((item) => {
       const matchesSearch =
         item.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()));
       return matchesSearch;
     });
-  }, [poData.items, searchTerm]);
+  }, [poData?.items, searchTerm]);
 
   // Calculate summary statistics
   const summaryStats = useMemo(() => {

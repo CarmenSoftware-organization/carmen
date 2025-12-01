@@ -1,7 +1,12 @@
 import { PurchaseOrder, PurchaseOrderStatus, PurchaseOrderItem, PurchaseOrderTerms } from "@/lib/types";
 import { sub } from "date-fns";
 
-export const Mock_purchaseOrders: PurchaseOrder[] = [
+// Extended type to include items array for mock data
+interface PurchaseOrderWithItems extends PurchaseOrder {
+  items?: PurchaseOrderItem[];
+}
+
+export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
   {
     id: "PO-002",
     orderNumber: "PO-2023-002",
@@ -32,6 +37,47 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
     pendingItems: 3,
     createdBy: "102",
     createdAt: new Date("2023-06-05"),
+    items: [
+      {
+        id: "poi-002-001",
+        orderId: "PO-002",
+        lineNumber: 1,
+        itemCode: "OFF-001",
+        itemName: "A4 Copy Paper (Box of 5 reams)",
+        description: "Premium quality A4 copy paper, 80gsm",
+        orderedQuantity: 20,
+        receivedQuantity: 0,
+        unitPrice: { amount: 25.00, currency: "EUR" },
+        unit: "Box",
+        status: "pending"
+      },
+      {
+        id: "poi-002-002",
+        orderId: "PO-002",
+        lineNumber: 2,
+        itemCode: "OFF-002",
+        itemName: "Ballpoint Pens (Pack of 12)",
+        description: "Blue ink ballpoint pens",
+        orderedQuantity: 15,
+        receivedQuantity: 0,
+        unitPrice: { amount: 8.50, currency: "EUR" },
+        unit: "Pack",
+        status: "pending"
+      },
+      {
+        id: "poi-002-003",
+        orderId: "PO-002",
+        lineNumber: 3,
+        itemCode: "OFF-003",
+        itemName: "Stapler Heavy Duty",
+        description: "Desktop stapler, 50 sheet capacity",
+        orderedQuantity: 5,
+        receivedQuantity: 0,
+        unitPrice: { amount: 35.00, currency: "EUR" },
+        unit: "Each",
+        status: "pending"
+      }
+    ]
   },
   {
     id: "PO-003",
@@ -58,11 +104,52 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
       warrantyPeriod: 365,
       specialInstructions: "Please schedule installation"
     },
-    totalItems: 1,
+    totalItems: 3,
     receivedItems: 0,
-    pendingItems: 1,
+    pendingItems: 3,
     createdBy: "103",
     createdAt: new Date("2023-06-10"),
+    items: [
+      {
+        id: "poi-003-001",
+        orderId: "PO-003",
+        lineNumber: 1,
+        itemCode: "IT-001",
+        itemName: "Dell Latitude 5540 Laptop",
+        description: "15.6\" FHD, Intel i7, 16GB RAM, 512GB SSD",
+        orderedQuantity: 5,
+        receivedQuantity: 0,
+        unitPrice: { amount: 1850.00, currency: "EUR" },
+        unit: "Each",
+        status: "pending"
+      },
+      {
+        id: "poi-003-002",
+        orderId: "PO-003",
+        lineNumber: 2,
+        itemCode: "IT-002",
+        itemName: "27\" 4K Monitor",
+        description: "Dell UltraSharp 27\" 4K USB-C Monitor",
+        orderedQuantity: 5,
+        receivedQuantity: 0,
+        unitPrice: { amount: 650.00, currency: "EUR" },
+        unit: "Each",
+        status: "pending"
+      },
+      {
+        id: "poi-003-003",
+        orderId: "PO-003",
+        lineNumber: 3,
+        itemCode: "IT-003",
+        itemName: "Wireless Keyboard & Mouse Set",
+        description: "Logitech MX Keys + MX Master 3",
+        orderedQuantity: 5,
+        receivedQuantity: 0,
+        unitPrice: { amount: 180.00, currency: "EUR" },
+        unit: "Set",
+        status: "pending"
+      }
+    ]
   },
   {
     id: "PO-004",
@@ -88,11 +175,65 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
       deliveryTerms: "Direct Delivery",
       specialInstructions: "Early morning delivery preferred"
     },
-    totalItems: 2,
+    totalItems: 4,
     receivedItems: 0,
-    pendingItems: 2,
+    pendingItems: 4,
     createdBy: "104",
     createdAt: new Date("2023-06-15"),
+    items: [
+      {
+        id: "poi-004-001",
+        orderId: "PO-004",
+        lineNumber: 1,
+        itemCode: "PRD-001",
+        itemName: "Fresh Salmon Fillet",
+        description: "Premium Atlantic salmon, skinless fillet",
+        orderedQuantity: 15,
+        receivedQuantity: 0,
+        unitPrice: { amount: 28.00, currency: "EUR" },
+        unit: "Kg",
+        status: "pending"
+      },
+      {
+        id: "poi-004-002",
+        orderId: "PO-004",
+        lineNumber: 2,
+        itemCode: "PRD-002",
+        itemName: "Organic Mixed Vegetables",
+        description: "Seasonal vegetable mix - carrots, broccoli, beans",
+        orderedQuantity: 20,
+        receivedQuantity: 0,
+        unitPrice: { amount: 8.50, currency: "EUR" },
+        unit: "Kg",
+        status: "pending"
+      },
+      {
+        id: "poi-004-003",
+        orderId: "PO-004",
+        lineNumber: 3,
+        itemCode: "PRD-003",
+        itemName: "Fresh Herbs Assortment",
+        description: "Basil, thyme, rosemary, parsley",
+        orderedQuantity: 10,
+        receivedQuantity: 0,
+        unitPrice: { amount: 5.00, currency: "EUR" },
+        unit: "Bundle",
+        status: "pending"
+      },
+      {
+        id: "poi-004-004",
+        orderId: "PO-004",
+        lineNumber: 4,
+        itemCode: "PRD-004",
+        itemName: "Extra Virgin Olive Oil",
+        description: "Italian EVOO, cold pressed",
+        orderedQuantity: 6,
+        receivedQuantity: 0,
+        unitPrice: { amount: 22.00, currency: "EUR" },
+        unit: "Litre",
+        status: "pending"
+      }
+    ]
   },
   {
     id: "PO-005",
@@ -118,11 +259,52 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
       deliveryTerms: "FOB Destination",
       specialInstructions: "Bulk order, please use lift gate truck"
     },
-    totalItems: 2,
+    totalItems: 3,
     receivedItems: 0,
-    pendingItems: 2,
+    pendingItems: 3,
     createdBy: "105",
     createdAt: new Date("2023-06-20"),
+    items: [
+      {
+        id: "poi-005-001",
+        orderId: "PO-005",
+        lineNumber: 1,
+        itemCode: "MNT-001",
+        itemName: "Industrial Cleaning Solution",
+        description: "Heavy duty degreaser, 20L drum",
+        orderedQuantity: 10,
+        receivedQuantity: 0,
+        unitPrice: { amount: 85.00, currency: "EUR" },
+        unit: "Drum",
+        status: "pending"
+      },
+      {
+        id: "poi-005-002",
+        orderId: "PO-005",
+        lineNumber: 2,
+        itemCode: "MNT-002",
+        itemName: "Safety Gloves (Box of 100)",
+        description: "Nitrile disposable gloves, size L",
+        orderedQuantity: 20,
+        receivedQuantity: 0,
+        unitPrice: { amount: 45.00, currency: "EUR" },
+        unit: "Box",
+        status: "pending"
+      },
+      {
+        id: "poi-005-003",
+        orderId: "PO-005",
+        lineNumber: 3,
+        itemCode: "MNT-003",
+        itemName: "Floor Scrubber Pads",
+        description: "17\" diameter, medium abrasive",
+        orderedQuantity: 25,
+        receivedQuantity: 0,
+        unitPrice: { amount: 22.00, currency: "EUR" },
+        unit: "Each",
+        status: "pending"
+      }
+    ]
   },
   {
     id: "PO-006",
@@ -148,11 +330,39 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
       deliveryTerms: "FOB Port",
       specialInstructions: "Delivery to port required"
     },
-    totalItems: 1,
+    totalItems: 2,
     receivedItems: 0,
-    pendingItems: 1,
+    pendingItems: 2,
     createdBy: "106",
     createdAt: new Date("2023-06-25"),
+    items: [
+      {
+        id: "poi-006-001",
+        orderId: "PO-006",
+        lineNumber: 1,
+        itemCode: "LOG-001",
+        itemName: "20ft Shipping Container Rental",
+        description: "Standard dry container, 3-month rental",
+        orderedQuantity: 2,
+        receivedQuantity: 0,
+        unitPrice: { amount: 4500.00, currency: "EUR" },
+        unit: "Each",
+        status: "pending"
+      },
+      {
+        id: "poi-006-002",
+        orderId: "PO-006",
+        lineNumber: 2,
+        itemCode: "LOG-002",
+        itemName: "40ft Shipping Container Rental",
+        description: "High cube container, 3-month rental",
+        orderedQuantity: 2,
+        receivedQuantity: 0,
+        unitPrice: { amount: 5500.00, currency: "EUR" },
+        unit: "Each",
+        status: "pending"
+      }
+    ]
   },
   {
     id: "PO-007",
@@ -179,11 +389,52 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
       warrantyPeriod: 3650, // 10 years
       specialInstructions: "Installation date to be confirmed"
     },
-    totalItems: 2,
+    totalItems: 3,
     receivedItems: 0,
-    pendingItems: 2,
+    pendingItems: 3,
     createdBy: "107",
     createdAt: new Date("2023-06-30"),
+    items: [
+      {
+        id: "poi-007-001",
+        orderId: "PO-007",
+        lineNumber: 1,
+        itemCode: "SOL-001",
+        itemName: "Solar Panel 400W Monocrystalline",
+        description: "High efficiency solar panel, 25-year warranty",
+        orderedQuantity: 50,
+        receivedQuantity: 0,
+        unitPrice: { amount: 450.00, currency: "EUR" },
+        unit: "Each",
+        status: "pending"
+      },
+      {
+        id: "poi-007-002",
+        orderId: "PO-007",
+        lineNumber: 2,
+        itemCode: "SOL-002",
+        itemName: "Solar Inverter 10kW",
+        description: "Grid-tied inverter with monitoring",
+        orderedQuantity: 5,
+        receivedQuantity: 0,
+        unitPrice: { amount: 2800.00, currency: "EUR" },
+        unit: "Each",
+        status: "pending"
+      },
+      {
+        id: "poi-007-003",
+        orderId: "PO-007",
+        lineNumber: 3,
+        itemCode: "SOL-003",
+        itemName: "Mounting Kit & Cabling",
+        description: "Complete roof mounting system with cables",
+        orderedQuantity: 1,
+        receivedQuantity: 0,
+        unitPrice: { amount: 8500.00, currency: "EUR" },
+        unit: "Set",
+        status: "pending"
+      }
+    ]
   },
   {
     id: "PO-008",
@@ -209,10 +460,51 @@ export const Mock_purchaseOrders: PurchaseOrder[] = [
       deliveryTerms: "Direct Delivery",
       specialInstructions: "Local currency order"
     },
-    totalItems: 2,
+    totalItems: 3,
     receivedItems: 0,
-    pendingItems: 2,
+    pendingItems: 3,
     createdBy: "108",
     createdAt: new Date("2023-07-05"),
+    items: [
+      {
+        id: "poi-008-001",
+        orderId: "PO-008",
+        lineNumber: 1,
+        itemCode: "TH-001",
+        itemName: "Thai Jasmine Rice",
+        description: "Premium grade, 25kg bag",
+        orderedQuantity: 50,
+        receivedQuantity: 0,
+        unitPrice: { amount: 180.00, currency: "THB" },
+        unit: "Bag",
+        status: "pending"
+      },
+      {
+        id: "poi-008-002",
+        orderId: "PO-008",
+        lineNumber: 2,
+        itemCode: "TH-002",
+        itemName: "Fish Sauce (Premium)",
+        description: "Tiparos brand, 700ml bottle",
+        orderedQuantity: 24,
+        receivedQuantity: 0,
+        unitPrice: { amount: 85.00, currency: "THB" },
+        unit: "Bottle",
+        status: "pending"
+      },
+      {
+        id: "poi-008-003",
+        orderId: "PO-008",
+        lineNumber: 3,
+        itemCode: "TH-003",
+        itemName: "Coconut Milk",
+        description: "Chaokoh brand, 400ml can",
+        orderedQuantity: 100,
+        receivedQuantity: 0,
+        unitPrice: { amount: 45.00, currency: "THB" },
+        unit: "Can",
+        status: "pending"
+      }
+    ]
   }
 ];
