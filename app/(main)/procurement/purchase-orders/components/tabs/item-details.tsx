@@ -104,10 +104,6 @@ export function ItemDetailsComponent({
     onClose();
   };
 
-  const handleRequestNumberClick = () => {
-    setIsPrItemsTableOpen(true);
-  };
-
   const handleOnHandClick = () => {
     setIsInventoryBreakdownOpen(true);
   };
@@ -206,20 +202,32 @@ export function ItemDetailsComponent({
                     </div>
                   </div>
                   
-                  {/* Quick Actions */}
-                  <div className="flex items-center gap-2 ml-4">
-                    <Button variant="outline" size="sm" className="h-6 px-2 text-xs" onClick={handleRequestNumberClick}>
-                      Request #
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-6 px-2 text-xs" onClick={handleOnHandClick}>
-                      On Hand
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-6 px-2 text-xs" onClick={handleOnOrderClick}>
-                      On Order
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-6 px-2 text-xs" onClick={handleGoodsReceivedClick}>
-                      G. Received
-                    </Button>
+                  {/* Inventory Status Indicators */}
+                  <div className="flex items-center gap-3 ml-4">
+                    <div
+                      className="flex flex-col items-center px-3 py-1 bg-blue-50 border border-blue-200 rounded cursor-pointer hover:bg-blue-100 transition-colors"
+                      onClick={handleOnHandClick}
+                    >
+                      <span className="text-xs text-blue-600 font-medium">On Hand</span>
+                      <span className="text-sm font-bold text-blue-800">125</span>
+                      <span className="text-xs text-blue-500">Kg</span>
+                    </div>
+                    <div
+                      className="flex flex-col items-center px-3 py-1 bg-amber-50 border border-amber-200 rounded cursor-pointer hover:bg-amber-100 transition-colors"
+                      onClick={handleOnOrderClick}
+                    >
+                      <span className="text-xs text-amber-600 font-medium">On Order</span>
+                      <span className="text-sm font-bold text-amber-800">500</span>
+                      <span className="text-xs text-amber-500">Kg</span>
+                    </div>
+                    <div
+                      className="flex flex-col items-center px-3 py-1 bg-green-50 border border-green-200 rounded cursor-pointer hover:bg-green-100 transition-colors"
+                      onClick={handleGoodsReceivedClick}
+                    >
+                      <span className="text-xs text-green-600 font-medium">Received</span>
+                      <span className="text-sm font-bold text-green-800">450</span>
+                      <span className="text-xs text-green-500">Kg</span>
+                    </div>
                   </div>
                 </div>
 
@@ -282,7 +290,7 @@ export function ItemDetailsComponent({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={handleRequestNumberClick}
+                    onClick={() => setIsPrItemsTableOpen(true)}
                     className="text-xs"
                   >
                     View All PRs

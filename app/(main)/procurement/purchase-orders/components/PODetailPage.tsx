@@ -66,6 +66,7 @@ import EnhancedItemsTab from "./tabs/EnhancedItemsTab";
 import FinancialDetailsTab from "./tabs/FinancialDetailsTab";
 import RelatedDocumentsTab from "./tabs/RelatedDocumentsTab";
 import ActivityLogTab from "./tabs/ActivityLogTab";
+import CommentsAttachmentsTab from "./tabs/CommentsAttachmentsTab";
 import {
   PurchaseOrderItem,
   PurchaseOrderStatus,
@@ -728,7 +729,7 @@ export default function PODetailPage({ params }: PODetailPageProps) {
               {/* Tabs */}
               <Card className="bg-white dark:bg-gray-800">
                 <Tabs defaultValue="items" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-700">
+                  <TabsList className={`grid w-full ${params.id !== 'new' ? 'grid-cols-3' : 'grid-cols-1'} bg-gray-100 dark:bg-gray-700`}>
                     <TabsTrigger value="items" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                       Items
                     </TabsTrigger>
@@ -736,6 +737,9 @@ export default function PODetailPage({ params }: PODetailPageProps) {
                       <>
                         <TabsTrigger value="relatedDocs" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                           Documents
+                        </TabsTrigger>
+                        <TabsTrigger value="comments" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                          Comments
                         </TabsTrigger>
                       </>
                     )}
@@ -765,9 +769,11 @@ export default function PODetailPage({ params }: PODetailPageProps) {
 
                   {params.id !== 'new' && (
                     <>
-
                       <TabsContent value="relatedDocs" className="p-4">
                         <RelatedDocumentsTab poData={poData} />
+                      </TabsContent>
+                      <TabsContent value="comments" className="p-4">
+                        <CommentsAttachmentsTab poData={poData} />
                       </TabsContent>
                     </>
                   )}
