@@ -1,718 +1,856 @@
-# Business Requirements: Goods Received Note
+# Business Requirements: Goods Received Note (GRN)
 
-## Module Information
-- **Module**: Procurement
-- **Sub-Module**: Goods Received Note (GRN)
-- **Route**: `/procurement/goods-received-note`
-- **Version**: 1.0.0
-- **Last Updated**: 2025-01-11
-- **Owner**: Procurement Team
-- **Status**: Approved
-
-## Document History
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0.0 | 2025-01-11 | Documentation Team | Initial version from source code analysis |
-
-
-## Overview
-
-The Goods Received Note (GRN) module is a critical component of the procurement system that manages the receiving and recording of goods delivered by vendors. This module serves as the bridge between purchase orders and inventory management, ensuring accurate tracking of all incoming materials and supplies.
-
-The GRN system supports two distinct workflows: creating GRNs from existing purchase orders (PO-based) and creating standalone manual GRNs for unplanned deliveries. It handles multi-currency transactions, discrepancy tracking, and automatic stock movements upon goods receipt. One GRN can receive items from multiple purchase orders, with PO references maintained at the line item level for complete traceability.
-
-This module is essential for hospitality operations, tracking deliveries ranging from kitchen equipment and fresh produce to office furniture and supplies, ensuring all goods are properly inspected, recorded, and stored before entering the inventory system.
-
-## Business Objectives
-
-1. **Accurate Goods Receipt Recording**: Provide a reliable system for documenting all goods received from vendors with complete traceability
-2. **Discrepancy Management**: Track and document differences between ordered and received quantities, damaged goods, and specification variances
-3. **Multi-Currency Support**: Handle international vendor transactions with automatic currency conversion and exchange rate tracking
-4. **Inventory Integration**: Automatically update stock levels and generate stock movements when goods are received and confirmed
-5. **Financial Accuracy**: Generate accurate financial records including tax calculations, extra costs distribution, and journal voucher entries
-6. **Audit Trail**: Maintain comprehensive activity logs for all GRN operations to support compliance and investigation
-7. **Vendor Performance Tracking**: Document vendor delivery accuracy and timeliness for vendor evaluation
-8. **Workflow Flexibility**: Support both planned (PO-based) and unplanned (manual) receiving processes for operational agility
-9. **Cost Management**: Track and distribute extra costs (freight, handling, insurance) across received items using configurable methods
-10. **Multi-PO Support**: Allow one GRN to receive items from multiple purchase orders with line-level PO references
-
-## Key Stakeholders
-
-- **Primary Users**: Receiving clerks, warehouse staff, purchasing staff
-- **Secondary Users**: Kitchen staff, storekeepers, department managers
-- **Administrators**: System administrators, inventory managers
-- **Reviewers**: Finance team, auditors
-- **Support**: IT support team, procurement support
+**Module**: Procurement
+**Sub-module**: Goods Received Note
+**Document Version**: 1.2
+**Last Updated**: 2025-12-02
 
 ---
 
-## Functional Requirements
+## 1. Overview
 
-### FR-GRN-001: GRN List and Overview
-**Priority**: Critical
+### 1.1 Purpose
+The Goods Received Note (GRN) module enables receiving clerks and storekeeper staff to record and validate delivery of goods from vendors, reconcile deliveries against purchase orders, manage inventory receipts, and maintain accurate stock records for hotel operations.
 
-The system must provide a comprehensive list view of all Goods Received Notes with sorting, filtering, and search capabilities to enable staff to quickly locate and manage GRN records.
+### 1.2 Scope
+- GRN creation from purchase orders (single or multiple POs)
+- Manual GRN creation without PO reference
+- Multi-PO receiving capability (single GRN can receive items from multiple POs)
+- Delivery validation and discrepancy tracking
+- Extra cost allocation (freight, handling, customs)
+- Stock movement integration
+- Financial accounting integration
+- Multi-currency transaction support
 
-**Acceptance Criteria**:
-- Display all GRN records in a sortable, filterable data table
-- Show key information: GRN number, date, vendor, status, total value, receiver
-- Support filtering by status (DRAFT, RECEIVED, COMMITTED, VOID)
-- Support filtering by date range, vendor, location
-- Provide search functionality across GRN number, vendor name, invoice number
-- Display row actions for view, edit, void operations
-- Show visual status indicators with color coding
-
-**Related Requirements**: FR-GRN-002, FR-GRN-003, FR-GRN-004
-
----
-
-### FR-GRN-002: PO-Based GRN Creation (Multi-PO Support)
-**Priority**: Critical
-
-The system must support creating GRNs from existing purchase orders, allowing receiving staff to efficiently record goods receipt against planned orders. One GRN can receive items from multiple purchase orders, with PO reference stored at line item level.
-
-**Acceptance Criteria**:
-- Provide vendor selection interface to filter applicable purchase orders
-- Display pending purchase orders for selected vendor
-- Allow selection of PO lines from multiple purchase orders in a single GRN
-- Each GRN line item maintains its own PO reference (purchaseOrderId, purchaseOrderItemId)
-- GRN header does NOT have single PO reference field
-- Pre-populate GRN line items with PO details (items, quantities, prices)
-- Allow modification of received quantities versus ordered quantities
-- Support partial receiving of purchase order lines
-- Track discrepancies between ordered and received quantities automatically
-- Generate unique GRN number following format: GRN-YYYY-NNN
-
-**Related Requirements**: FR-GRN-005, FR-GRN-006, FR-GRN-008, FR-GRN-015
+### 1.3 Key Stakeholders
+- **Receiving Clerk**: Records goods receipt, validates deliveries
+- **Storekeeper**: Manages inventory locations, confirms stock movements
+- **Purchasing Staff**: Reviews GRN against PO, resolves discrepancies
+- **AP Clerk**: Processes vendor invoices against GRN
+- **Financial Controller**: Reviews cost allocations and accounting entries
 
 ---
 
-### FR-GRN-003: Manual GRN Creation
+## 2. Functional Requirements
+
+### FR-GRN-001: GRN List Management
 **Priority**: High
+**User Story**: As a Receiving Clerk, I want to view all goods received notes with filtering and search capabilities so that I can quickly find and manage delivery records.
 
-The system must support creating standalone GRNs without purchase orders for unplanned deliveries, returns, or transfers.
+**Requirements**:
+- Display GRN list with key information (number, date, vendor, status, total amount)
+- Quick filters by status (DRAFT, RECEIVED, COMMITTED, VOID)
+- Advanced filtering by date range, vendor, location
+- Search by GRN number, vendor name, invoice number
+- Export GRN list to Excel/PDF
+- Print selected GRNs
 
 **Acceptance Criteria**:
-- Provide manual GRN creation workflow independent of purchase orders
-- Allow manual entry of vendor information
-- Allow manual selection and entry of items with quantities
-- Support item search from product catalog
-- Allow entry of delivery information (vehicle number, driver name, delivery note)
-- Generate temporary ID for new GRNs until committed
-- Support full editing before final commitment
-- Apply same validation rules as PO-based GRNs
+- List displays all GRNs with pagination
+- Filters update results in real-time
+- Search returns results within 2 seconds
+- Export includes all visible columns
+- Print format is properly formatted
 
-**Related Requirements**: FR-GRN-001, FR-GRN-005, FR-GRN-006
+**Source**: `app/(main)/procurement/goods-received-note/page.tsx`
 
 ---
 
-### FR-GRN-004: GRN Status Management
-**Priority**: Critical
-
-The system must maintain clear status transitions for GRN lifecycle from draft to commitment or void.
-
-**Acceptance Criteria**:
-- Support four status states: DRAFT, RECEIVED, COMMITTED, VOID
-- DRAFT: Initial state for new GRNs, editable, no inventory impact
-- RECEIVED: Goods received but not yet committed, editable, no inventory impact
-- COMMITTED: GRN finalized, inventory updated, no longer editable
-- VOID: Cancelled GRN, no inventory impact, preserved for audit
-- Enforce status transition rules preventing invalid state changes
-- Display clear visual indicators for each status
-- Record status change history in activity log with timestamp and user
-
-**Related Requirements**: FR-GRN-013, BR-GRN-007, BR-GRN-008
-
----
-
-### FR-GRN-005: GRN Items Management
-**Priority**: Critical
-
-The system must provide comprehensive item-level management including quantities, pricing, and discrepancies.
-
-**Acceptance Criteria**:
-- Display all items in the GRN with line numbers
-- Show item details: code, name, description, ordered quantity, delivered quantity, received quantity
-- Each line item stores PO reference (purchaseOrderId, purchaseOrderItemId) if PO-based
-- Allow entry of rejected and damaged quantities separately
-- Track unit of measure and support unit conversions
-- Display and allow edit of unit price and calculate total value per line
-- Support batch number, lot number, and serial number entry
-- Allow entry of manufacturing date and expiry date
-- Require storage location assignment for each item
-- Flag items with discrepancies and require discrepancy notes
-- Support notes entry for rejected or damaged items
-
-**Related Requirements**: FR-GRN-006, FR-GRN-010
-
----
-
-### FR-GRN-006: Discrepancy Management
+### FR-GRN-002: Create GRN from Purchase Order
 **Priority**: High
+**User Story**: As a Receiving Clerk, I want to create a GRN from one or multiple purchase orders so that I can efficiently record deliveries and auto-populate item details.
 
-The system must automatically detect and track discrepancies between expected and actual received goods.
+**Requirements**:
+- **Step 1 - Vendor Selection**: Select vendor from active vendor list with search
+- **Step 2 - PO Selection**: Display open/partial POs for selected vendor, allow multi-select
+- **Step 3 - Item & Location Selection**: Review PO items, specify receiving quantities and storage locations
+- Auto-populate item details from PO (name, ordered quantity, unit price, tax rate)
+- Support receiving partial quantities
+- Support receiving from multiple POs in single GRN
+- Each line item can reference different PO (multi-PO support)
 
 **Acceptance Criteria**:
-- Automatically flag discrepancies when received quantity ≠ ordered quantity
-- Support discrepancy types: quantity, specification, damage
-- Require discrepancy notes when discrepancy is flagged (minimum 20 characters)
-- Display discrepancy count in GRN header
-- Highlight discrepancy items in items table with visual indicators
-- Track rejected quantity and damaged quantity separately
-- Generate discrepancy reports for procurement review
+- Vendor selection shows only active vendors
+- PO selection shows only OPEN or PARTIAL status POs
+- Can select multiple POs from same vendor
+- Item details pre-fill from PO accurately
+- Can specify different storage location per item
+- Received quantity cannot exceed remaining PO quantity
+- Creates GRN in RECEIVED status
 
-**Related Requirements**: FR-GRN-005, BR-GRN-004, BR-GRN-005
+**Source**:
+- `app/(main)/procurement/goods-received-note/new/vendor-selection/page.tsx`
+- `app/(main)/procurement/goods-received-note/new/po-selection/page.tsx`
+- `app/(main)/procurement/goods-received-note/new/item-location-selection/page.tsx`
 
 ---
 
-### FR-GRN-007: Multi-Currency Support
+### FR-GRN-003: Create GRN Manually
 **Priority**: High
+**User Story**: As a Receiving Clerk, I want to create a GRN manually without PO reference so that I can record unexpected deliveries or emergency purchases.
 
-The system must handle transactions in multiple currencies with automatic conversion to base currency.
+**Requirements**:
+- Create blank GRN with system-generated temporary ID
+- Manually enter vendor information
+- Manually add line items with product search
+- Specify quantity, unit, price per item
+- Enter invoice and delivery details
+- Support consignment and cash purchase flags
 
 **Acceptance Criteria**:
-- Support transaction currency selection per GRN
-- Allow entry of exchange rate for currency conversion
-- Automatically convert all amounts to base currency (USD)
-- Display both transaction currency and base currency amounts
-- Store exchange rate with GRN for audit and reference
-- Support currency selection for extra costs
-- Calculate financial totals in both currencies
-- Support vendor payment in transaction currency
+- Can create GRN without PO reference
+- Vendor dropdown shows active vendors
+- Product search finds items from catalog
+- Can add unlimited line items
+- All required fields validated before save
+- Creates GRN in RECEIVED status
 
-**Related Requirements**: FR-GRN-008, FR-GRN-011, BR-GRN-010, BR-GRN-011
+**Source**: `app/(main)/procurement/goods-received-note/page.tsx:15-88`
 
 ---
 
-### FR-GRN-008: Extra Costs Management
+### FR-GRN-004: GRN Header Information
+**Priority**: High
+**User Story**: As a Receiving Clerk, I want to capture complete delivery information in the GRN header so that all delivery details are documented for reference and audit.
+
+**Requirements**:
+- **GRN Number**: Auto-generated unique identifier (format: GRN-YYYY-NNNN)
+- **Receipt Date**: Date goods physically received (default: today)
+- **Invoice Number**: Vendor invoice reference
+- **Invoice Date**: Date on vendor invoice
+- **Tax Invoice Number**: Tax invoice reference (if different)
+- **Tax Invoice Date**: Tax invoice date
+- **Vendor**: Vendor name and ID (required)
+- **Received By**: User who received goods (required)
+- **Location**: Storage/receiving location (required)
+- **Currency**: Transaction currency with exchange rate
+- **Description**: Free-text notes about delivery
+- **Status**: DRAFT, RECEIVED, COMMITTED, VOID
+- **Consignment Flag**: Mark as consignment stock
+- **Cash Purchase Flag**: Mark as cash purchase
+- **Cash Book**: Associated cash book (if cash purchase)
+
+**Acceptance Criteria**:
+- GRN number generated automatically on save
+- Receipt date defaults to current date
+- Vendor must be selected from active vendors
+- Received by defaults to current user
+- Location must be valid storage location
+- Currency selection triggers exchange rate lookup
+- All required fields enforced
+- Status transitions follow workflow rules
+
+**Source**:
+- `lib/types/procurement.ts:346-374` (GoodsReceiveNote interface)
+- `app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteDetail.tsx:260-383`
+
+---
+
+### FR-GRN-005: GRN Line Items Management
+**Priority**: High
+**User Story**: As a Receiving Clerk, I want to record received quantities for each item with full details so that inventory and costs are accurately tracked.
+
+**Requirements**:
+- **Line Number**: Sequential item numbering
+- **Item Code & Name**: Product identification
+- **Description**: Item description
+- **PO References**: Purchase Order ID and Line Item ID (if from PO)
+- **Ordered Quantity**: Quantity per PO (if applicable)
+- **Received Quantity**: Actual quantity accepted
+- **Unit**: Unit of measure
+- **Unit Price**: Cost per unit
+- **Subtotal**: Quantity × Price
+- **Discount Rate/Amount**: Line discount
+- **Tax Rate/Amount**: Line tax
+- **Net Amount**: Subtotal - Discount
+- **Total Amount**: Net + Tax
+- **Storage Location**: Warehouse/kitchen location
+- **Job Code**: Project/job reference
+- **Delivery Date**: Expected/actual delivery date
+- **Notes**: Line item remarks
+- **FOC Fields**: Free of Charge quantity and unit (if applicable)
+- **Tax Included**: Flag for tax-inclusive pricing
+
+**Acceptance Criteria**:
+- Support adding/editing/deleting line items
+- Unit price validates against PO (if from PO)
+- Storage location must be valid
+- Discrepancies auto-flagged when ordered vs received quantities don't match
+- Can mark items as Free of Charge (FOC)
+- Financial calculations accurate (discount, tax, totals)
+
+**Source**:
+- `lib/types/procurement.ts:378-410` (GoodsReceiveNoteItem interface)
+- `app/(main)/procurement/goods-received-note/components/tabs/GoodsReceiveNoteItems.tsx`
+
+---
+
+### FR-GRN-006: Multi-PO Receiving Support
+**Priority**: High
+**User Story**: As a Receiving Clerk, I want to receive items from multiple purchase orders in a single GRN so that I can efficiently process consolidated vendor deliveries.
+
+**Requirements**:
+- Single GRN can reference multiple POs
+- Each line item stores its own PO reference
+- PO reference stored at line item level (purchaseOrderId, purchaseOrderItemId)
+- Can mix PO-based and manual items in same GRN
+- Header-level PO fields deprecated but retained for compatibility
+
+**Acceptance Criteria**:
+- Can select multiple POs during creation workflow
+- Line items correctly reference source PO
+- Can add manual items to PO-based GRN
+- Financial summary consolidates across all POs
+- Stock movements created per line item
+- Each line updates respective PO item status
+
+**Source**: `lib/types/procurement.ts:354-357, 383-385`
+
+---
+
+### FR-GRN-007: Extra Costs Allocation
 **Priority**: Medium
+**User Story**: As an AP Clerk, I want to allocate additional costs (freight, handling, customs) to received goods so that total landed cost is accurately calculated.
 
-The system must support recording and distributing extra costs (freight, handling, insurance) across received items.
+**Requirements**:
+- Add extra cost entries: type, amount, currency
+- **Cost Types**: Freight, Handling, Customs, Insurance, Other
+- Multi-currency support with exchange rates
+- **Distribution Methods**:
+  - **Net Amount**: Distribute proportionally by line net amount
+  - **Quantity Ratio**: Distribute proportionally by quantity received
+- Auto-calculate distributed cost per line item
+- Update line item total costs with allocated extras
 
 **Acceptance Criteria**:
-- Allow entry of extra costs with type selection (shipping, handling, insurance, customs)
-- Support multiple extra cost entries per GRN
-- Allow currency and amount entry for each extra cost
-- Provide distribution method selection: by net amount, by quantity, or equal distribution
-- Automatically calculate and apply extra cost distribution to item costs
-- Display extra cost allocation per item
-- Include extra costs in total GRN value
-- Support editing and deletion of extra costs before commitment
+- Can add multiple extra cost entries
+- Cost type must be selected from predefined list
+- Amount must be positive number
+- Distribution method applies to all items
+- Line item costs update automatically
+- Extra costs included in financial totals
 
-**Related Requirements**: FR-GRN-009, FR-GRN-011, BR-GRN-012
+**Source**:
+- `lib/types/procurement.ts:329-333` (CostDistributionMethod enum)
+- `app/(main)/procurement/goods-received-note/components/tabs/ExtraCostsTab.tsx`
 
 ---
 
-### FR-GRN-009: Stock Movement Generation
-**Priority**: Critical
-
-The system must automatically generate stock movements when GRN is committed to update inventory levels.
-
-**Acceptance Criteria**:
-- Generate stock movement record for each item upon GRN commitment
-- Record from location (receiving area) and to location (storage)
-- Update inventory on-hand quantities in target locations
-- Track before stock and after stock quantities
-- Calculate stock movement cost including extra cost allocation
-- Support multiple stock movements per GRN for different locations
-- Prevent duplicate stock movements if GRN already committed
-- Include stock movement details in GRN view
-
-**Related Requirements**: FR-GRN-005, FR-GRN-010, BR-GRN-009
-
----
-
-### FR-GRN-010: Location and Storage Management
+### FR-GRN-008: Stock Movement Integration
 **Priority**: High
+**User Story**: As a Storekeeper, I want GRN to automatically create stock movements so that inventory levels are updated when goods are received.
 
-The system must support location-based receiving and storage assignment for inventory control.
+**Requirements**:
+- Auto-generate stock movement entries on GRN commit
+- One stock movement per line item
+- **Movement Details**: Item, quantity, unit, location, batch/lot
+- Movement type: "GRN Receipt"
+- Link to source GRN and line item
+- Update on-hand inventory quantities
+- Support multiple storage locations per GRN
 
 **Acceptance Criteria**:
-- Record receiving location for the GRN
-- Allow storage location assignment per item line
-- Support location types: warehouse, kitchen, office, receiving area
-- Display location code, name, and type
-- Validate location exists and is active
-- Support location-based inventory tracking
-- Allow different storage locations for different items in same GRN
-- Track inventory by location in stock movements
+- Stock movements created only when GRN status = COMMITTED
+- Each line item creates one stock movement
+- Inventory quantities increase by received amount
+- Rejected/damaged quantities handled separately
+- Can view stock movements from GRN detail page
+- Movement transaction is atomic (all or none)
 
-**Related Requirements**: FR-GRN-009, BR-GRN-009
+**Source**:
+- `app/(main)/procurement/goods-received-note/components/tabs/StockMovementTab.tsx`
+- `app/(main)/procurement/goods-received-note/components/tabs/stock-movement.tsx`
 
 ---
 
-### FR-GRN-011: Financial Summary and Tax Calculation
-**Priority**: Critical
-
-The system must calculate accurate financial totals including taxes, discounts, and generate journal voucher entries.
-
-**Acceptance Criteria**:
-- Calculate subtotal from all item line totals
-- Apply discount at item or GRN level
-- Calculate tax amount based on tax rates
-- Sum extra costs into total
-- Calculate net amount and total amount
-- Display financial summary with all components clearly itemized
-- Generate journal voucher with proper GL account codes
-- Include department allocation in journal entries
-- Support cash and credit transaction types
-- Record cash book reference for cash transactions
-- Track VAT and tax invoice numbers
-
-**Related Requirements**: FR-GRN-007, FR-GRN-008, BR-GRN-010, BR-GRN-011, BR-GRN-012
-
----
-
-### FR-GRN-012: Activity Log and Audit Trail
+### FR-GRN-009: Financial Summary and Accounting
 **Priority**: High
+**User Story**: As an AP Clerk, I want to view complete financial summary with accounting entries so that I can process vendor invoices and verify costs.
 
-The system must maintain comprehensive activity logs for all GRN operations to support compliance and investigation.
+**Requirements**:
+- **Financial Totals**:
+  - Subtotal (sum of line subtotals)
+  - Discount Amount (if applicable)
+  - Net Amount (subtotal - discount)
+  - Tax Amount (VAT/GST)
+  - Total Amount (net + tax + extra costs)
+- Display in both transaction currency and base currency
+- Exchange rate conversion
+- **Journal Voucher Preview**:
+  - JV Type: GRN
+  - JV Number: Auto-generated
+  - JV Date: Receipt date
+  - Debit: Inventory account
+  - Credit: Accounts Payable
+  - GL account codes per department
+- Tax breakdown by tax rate
+- Cost center allocation
 
 **Acceptance Criteria**:
-- Automatically log all GRN creation, modification, and status change events
-- Record user ID, user name, and timestamp for each activity
-- Capture activity type (document creation, status change, modification)
-- Store description of activity for context
-- Display activity log in chronological order (newest first)
-- Show activity log in dedicated tab in GRN detail view
-- Prevent deletion or modification of activity log entries
-- Support activity log export for audit purposes
+- Financial summary calculates automatically
+- Multi-currency amounts displayed correctly
+- Exchange rate applied consistently
+- JV preview shows all accounting entries
+- Debits equal credits
+- Tax calculations accurate
+- Extra costs included in totals
 
-**Related Requirements**: FR-GRN-013, BR-GRN-008
+**Source**:
+- `app/(main)/procurement/goods-received-note/components/tabs/FinancialSummaryTab.tsx`
+- `app/(main)/procurement/goods-received-note/components/SummaryTotal.tsx`
+- `app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteDetail.tsx:185-217`
 
 ---
 
-### FR-GRN-013: Comments and Attachments
+### FR-GRN-010: GRN Status Workflow
+**Priority**: High
+**User Story**: As a Receiving Clerk, I want clear status workflow for GRN lifecycle so that I can track document progress and ensure proper controls.
+
+**Requirements**:
+- **DRAFT**: Initial creation, editable, no inventory impact
+- **RECEIVED**: Goods physically received, pending verification
+- **COMMITTED**: Verified and committed, inventory updated, creates stock movements
+- **VOID**: Cancelled GRN, reverses inventory impact
+
+**Status Transitions**:
+- New GRN → RECEIVED (on save)
+- RECEIVED → COMMITTED (user commits)
+- RECEIVED → VOID (user cancels)
+- COMMITTED → cannot change (final state)
+- VOID → cannot change (final state)
+
+**Permissions**:
+- Receiving Clerk: Create, edit DRAFT/RECEIVED
+- Storekeeper: Commit RECEIVED → COMMITTED
+- Purchasing Manager: Void GRN
+
+**Acceptance Criteria**:
+- Status displayed prominently on GRN detail
+- Only valid transitions allowed
+- COMMITTED GRN cannot be edited
+- VOID GRN cannot be un-voided
+- Inventory updated only on COMMITTED
+- Audit log captures all status changes
+
+**Source**: `lib/types/procurement.ts:338-343` (GRNStatus enum)
+
+---
+
+### FR-GRN-011: Multi-Currency Support
 **Priority**: Medium
+**User Story**: As a Purchasing Staff, I want to record GRN in vendor's currency and convert to base currency so that foreign vendor invoices are accurately tracked.
 
-The system must support adding comments and file attachments to GRNs for documentation and collaboration.
+**Requirements**:
+- Select transaction currency per GRN
+- Enter/retrieve exchange rate for conversion date
+- Display amounts in both transaction and base currency
+- Store both currency amounts in database
+- Base currency defined in system settings
+- **Exchange Rate**:
+  - Auto-fetch from system exchange rate table
+  - Allow manual override if needed
+  - Use receipt date for rate lookup
 
 **Acceptance Criteria**:
-- Allow users to add text comments to GRN
-- Record comment author, timestamp with each comment
-- Display comments in chronological order
-- Support file attachments (delivery notes, packing slips, photos)
-- Allow multiple attachments per GRN
-- Store attachment URLs and metadata
-- Provide download/view functionality for attachments
-- Support common file formats (PDF, images, Excel)
+- Can select any active currency
+- Exchange rate auto-populated
+- Can override exchange rate manually
+- All amounts calculated in transaction currency
+- Base currency amounts calculated automatically
+- Both currencies displayed in financial summary
+- Exchange rate locked when GRN committed
 
-**Related Requirements**: FR-GRN-012, BR-GRN-008
+**Source**:
+- `app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteDetail.tsx:339-355`
+- Line items support multi-currency
 
 ---
 
-### FR-GRN-014: Purchase Order Reference Tracking (Multi-PO)
+### FR-GRN-012: Comments and Attachments
+**Priority**: Medium
+**User Story**: As a Receiving Clerk, I want to add comments and attach documents to GRN so that additional context and supporting documents are available.
+
+**Requirements**:
+- Add text comments with timestamp and user
+- Attach files (PDF, images, Excel)
+- Supported document types: Invoice, Delivery Note, Packing List, Photos, Other
+- Comment history with user name and timestamp
+- Download attached files
+- Preview images inline
+
+**Acceptance Criteria**:
+- Can add unlimited comments
+- Comments show user and timestamp
+- Can upload multiple files
+- File size limit: 10MB per file
+- Supported formats: PDF, JPG, PNG, XLSX
+- Can delete own comments/attachments
+- Cannot delete others' comments (except admin)
+
+**Source**: `app/(main)/procurement/goods-received-note/components/tabs/CommentsAttachmentsTab.tsx`
+
+---
+
+### FR-GRN-013: Activity Log and Audit Trail
+**Priority**: Medium
+**User Story**: As a Financial Controller, I want to view complete activity log of GRN changes so that I can audit all modifications and ensure compliance.
+
+**Requirements**:
+- **Logged Actions**:
+  - GRN created
+  - Status changed
+  - Items added/edited/deleted
+  - Extra costs added/modified
+  - Comments added
+  - Attachments uploaded
+  - GRN committed
+  - GRN voided
+- Each log entry includes: timestamp, user, action type, description
+- Activity log read-only (cannot modify history)
+- Sort by timestamp (newest first)
+
+**Acceptance Criteria**:
+- All modifications logged automatically
+- Log shows user who made change
+- Timestamp accurate to second
+- Action descriptions clear and specific
+- Cannot delete or modify log entries
+- Log retained even if GRN voided
+
+**Source**: `app/(main)/procurement/goods-received-note/components/tabs/ActivityLogTab.tsx`
+
+---
+
+### FR-GRN-014: Bulk Actions on Line Items
+**Priority**: Low
+**User Story**: As a Receiving Clerk, I want to perform bulk actions on multiple line items so that I can efficiently manage large GRNs.
+
+**Requirements**:
+- Select multiple line items via checkbox
+- **Bulk Actions**:
+  - Delete selected items
+  - Apply same storage location
+  - Apply same discount rate
+  - Mark as accepted (set received = delivered)
+- Select all / deselect all functionality
+- Action confirmation prompt
+- Actions apply to all selected items
+
+**Acceptance Criteria**:
+- Can select/deselect individual items
+- Select all checkbox works
+- Bulk delete removes all selected items
+- Bulk location updates all selected items
+- Confirmation required for destructive actions
+- Selected item count displayed
+- Bulk actions only available in edit mode
+
+**Source**: `app/(main)/procurement/goods-received-note/components/tabs/GoodsReceiveNoteItemsBulkActions.tsx`
+
+---
+
+### FR-GRN-015: Export and Print
+**Priority**: Medium
+**User Story**: As a Receiving Clerk, I want to export and print GRN so that I can share with vendors and maintain paper records.
+
+**Requirements**:
+- Export GRN to PDF (formatted for printing)
+- Export GRN to Excel (data format)
+- Print-friendly GRN format with logo
+- Include all line items and totals
+- Show company and vendor details
+- Display status and approvals
+- Include attached documents in PDF export
+
+**Acceptance Criteria**:
+- PDF export matches print layout
+- Excel export includes all data fields
+- Print layout fits standard paper size
+- Company logo displayed on print
+- Vendor details clearly visible
+- All line items included
+- Page breaks appropriate for long GRNs
+
+**Source**: `app/(main)/procurement/goods-received-note/page.tsx:122-130`
+
+---
+
+### FR-GRN-016: QR/Barcode Scanning for Mobile Receiving
 **Priority**: High
+**User Story**: As a Receiving Clerk using mobile device, I want to scan PO QR codes to quickly create GRN so that I can efficiently receive goods in the warehouse.
 
-The system must maintain clear linkage between GRN line items and source purchase orders for traceability. One GRN can reference multiple purchase orders at the line item level.
+**Status**: ✅ **IMPLEMENTED IN MOBILE APP** (`cmobile` repository)
+
+**Requirements**:
+- **Mobile-First Workflow**: Optimized for warehouse tablets and smartphones
+- **QR/Barcode Scanner Integration**: Camera-based scanning for PO documents
+- **PO Lookup Methods**:
+  1. **Primary: Scan QR Code**: Scan QR on PO printout (fastest method)
+  2. **Alternative: Scan Barcode**: Scan 1D barcode on delivery note
+  3. **Fallback: Manual Entry**: Type PO number if scan unavailable
+  4. **Fallback: Advanced Search**: Search by vendor, date, amount
+- **Auto-GRN Creation**: Automatically create GRN when PO found via scan
+- **Streamlined Item Receiving**: Touch-optimized interface for quantity entry
+- **Draft Auto-Save**: Save work-in-progress if user exits before completing
+- **Offline Capability**: Queue scans for processing when network returns
+- **Business Unit Selection**: Select receiving location before scanning
+
+**Scan Receiving Process** (5-Step Mobile Workflow):
+
+**Step 1: Business Unit Selection**
+- User selects business unit/location before scanning
+- Defaults to user's primary location
+- Required for proper stock allocation
+
+**Step 2: Scan PO QR/Barcode**
+- User taps "Scan PO" button
+- Camera opens with viewfinder overlay
+- User aims camera at QR code or barcode on PO
+- System decodes and validates PO number
+- **Scan time**: ~2 seconds
+
+**Step 3: Auto-Create GRN**
+- If PO found and valid:
+  - System retrieves PO details (vendor, items, quantities)
+  - System auto-creates GRN in RECEIVED status
+  - System pre-fills header (vendor, date, PO reference)
+  - System loads all PO line items
+  - System navigates to GRN Detail page
+- If PO not found:
+  - Display "PO not found" message
+  - Offer manual PO entry option
+  - Offer advanced search option
+
+**Step 4: Item Receiving**
+- Display touch-optimized items table:
+  - Product name and SKU
+  - PO number (if multi-PO supported)
+  - Ordered quantity and unit
+  - Remaining to receive
+  - **Received quantity** (editable, default: remaining)
+  - **Received unit** (editable dropdown)
+  - **FOC quantity** (Free of Charge, optional)
+  - **Comment** (optional notes per item)
+- User adjusts received quantities via:
+  - Touch-friendly number pads
+  - Quick buttons: Full, Half, Zero
+  - Manual keyboard entry
+- **Mobile UX Features**:
+  - Large touch targets (44x44px minimum)
+  - Haptic feedback on tap
+  - Swipe to navigate items
+  - Pinch to zoom item details
+  - Voice input for comments (optional)
+
+**Step 5: Save/Submit**
+- User clicks "Save Draft" or "Submit GRN"
+- **Save Draft**:
+  - Saves GRN with status DRAFT
+  - User can resume later from "Draft GRNs" list
+  - Auto-saves every 30 seconds
+- **Submit GRN**:
+  - Validates all data (quantities, locations)
+  - Sets status to RECEIVED
+  - Generates GRN number
+  - Displays success confirmation
+  - Returns to Receiving home
+
+**Mobile-Specific Features**:
+- **Touch Optimization**: Large buttons, gesture navigation, swipe actions
+- **Haptic Feedback**: Vibration on scan success, button taps
+- **Network Monitoring**: Online/offline status indicator
+- **Camera Permissions**: Request camera access on first use
+- **Scan History**: Recent scans list for quick re-scan
+- **Photo Capture**: Take photos of damaged goods (optional)
+- **Voice Notes**: Record voice notes for discrepancies (optional)
+
+**Performance Targets** (Mobile):
+- Scan to PO lookup: < 2 seconds
+- PO to GRN creation: < 1 second
+- Item list load: < 1 second
+- Save draft: < 500ms
+- Full scan-to-save workflow: 30 seconds to 3 minutes
 
 **Acceptance Criteria**:
-- Store purchase order ID and PO line item ID with each GRN line item
-- GRN header does NOT store single PO reference
-- Display PO references at line item level in GRN detail view
-- Support viewing linked purchase order from GRN line item
-- Display list of GRNs that received items from a specific purchase order
-- Track partial fulfillment of purchase order lines
-- Show outstanding PO line items not yet received
-- Support multiple GRNs per purchase order and multiple POs per GRN
-- Maintain PO-GRN line item link even after GRN commitment
-- Show summary of which POs are referenced in a GRN (e.g., "This GRN receives from 3 POs: PO-001, PO-002, PO-003")
+- Can scan QR codes from printed PO documents
+- Can scan 1D barcodes from delivery notes
+- Auto-creates GRN when valid PO scanned
+- Supports manual PO entry if scan unavailable
+- Works on iOS and Android mobile browsers
+- Handles poor lighting conditions (flash available)
+- Validates PO status (only OPEN/PARTIAL allowed)
+- Pre-fills item quantities with remaining PO quantities
+- Saves draft automatically every 30 seconds
+- Works offline (queues scans for sync when online)
+- Touch-friendly UI (minimum 44x44px tap targets)
+- Haptic feedback for user actions
 
-**Related Requirements**: FR-GRN-002, BR-GRN-001, BR-GRN-003
+**Supported Barcode Formats**:
+- QR Code (primary, recommended)
+- Code 128
+- Code 39
+- EAN-13
+- UPC-A
 
----
+**Error Handling**:
+- Invalid QR/barcode: Display "Invalid code" message
+- PO not found: Offer manual entry or search
+- PO already fully received: Display "PO already received" message
+- Network unavailable: Queue scan for processing when online
+- Camera permission denied: Prompt user to enable in settings
+- Low light conditions: Suggest using flash or manual entry
 
-## Business Rules
+**Source**:
+- `cmobile/src/app/(mobile)/receiving/page.tsx` - Main receiving page with scan button
+- `cmobile/src/app/(mobile)/receiving/scan-po/page.tsx` - QR/Barcode scanning workflow
+- `cmobile/src/app/(mobile)/receiving/grn-detail/page.tsx` - Item receiving interface
+- `cmobile/components/mobile-nav.tsx` - Bottom navigation
+- `cmobile/components/mobile-optimizations.tsx` - Touch feedback, haptics, network monitoring
 
-### General Rules
-- **BR-GRN-001**: Each GRN must be assigned a unique sequential number following the format GRN-YYYY-NNN where YYYY is the year and NNN is a sequential number
-- **BR-GRN-002**: GRNs can only be created by users with receiving clerk, purchasing staff, or warehouse staff roles
-- **BR-GRN-003**: GRN line items can reference purchase orders (PO-based) or have no PO reference (manual lines). One GRN can contain both PO-based and manual lines. PO references are stored at line item level (purchaseOrderId, purchaseOrderItemId), not at GRN header level
+**Platform**: Mobile Web App (PWA) - Next.js 15, React 19, Tailwind CSS 4
 
-### Data Validation Rules
-- **BR-GRN-004**: Received quantity must be greater than 0 for each item line
-- **BR-GRN-005**: Rejected quantity + damaged quantity cannot exceed delivered quantity
-- **BR-GRN-006**: Exchange rate must be greater than 0 for currency conversions
-- **BR-GRN-007**: Expiry date, if provided, must be after manufacturing date
-- **BR-GRN-008**: Storage location must be assigned for all items before GRN can be committed
-- **BR-GRN-009**: Receipt date cannot be in the future
+**Deployment Status**: Production (Mobile app: `cmobile` repository)
 
-### Workflow Rules
-- **BR-GRN-010**: GRNs in DRAFT status can be fully edited or deleted
-- **BR-GRN-011**: GRNs in RECEIVED status can be edited but not deleted
-- **BR-GRN-012**: GRNs in COMMITTED status cannot be edited or deleted, only voided
-- **BR-GRN-013**: GRNs in VOID status are read-only and preserved for audit purposes
-- **BR-GRN-014**: Stock movements are only generated when GRN status changes to COMMITTED
-- **BR-GRN-015**: GRN commitment does not require approval. Any authorized user (receiving clerk, warehouse staff, purchasing staff) can commit a GRN directly from RECEIVED to COMMITTED status
-- **BR-GRN-016**: GRN cannot be committed if the receipt date falls within a closed accounting period. System must validate that the accounting period for the receipt date is open before allowing commitment
-- **BR-GRN-017**: GRN cannot be committed for a location if a stock take (physical count) is currently in progress for that location. System must check for active stock take sessions before allowing commitment
+**Integration with Desktop**:
+- Mobile creates GRN in RECEIVED status
+- Desktop can view/edit/commit mobile-created GRNs
+- Sync via shared database (real-time)
+- Desktop handles COMMITTED status and stock movements
+- Both platforms share same GRN data model
 
-### Calculation Rules
-- **BR-GRN-018**: Item total amount = (received quantity × unit price) + allocated extra cost
-- **BR-GRN-019**: GRN subtotal = sum of all item total amounts
-- **BR-GRN-020**: GRN net amount = subtotal - discount amount
-- **BR-GRN-021**: GRN total amount = net amount + tax amount + sum of extra costs
-- **BR-GRN-022**: Extra cost distribution by net amount = (item net amount ÷ total net amount) × total extra costs
-- **BR-GRN-023**: Extra cost distribution by quantity = (item quantity ÷ total quantity) × total extra costs
-- **BR-GRN-024**: Extra cost distribution equal = total extra costs ÷ number of items
-
-### Security Rules
-- **BR-GRN-025**: Only the creator or users with procurement manager role can void a GRN
-- **BR-GRN-026**: Users can only view GRNs for their assigned locations unless they have cross-location permission
-
----
-
-## Data Model
-
-The interfaces shown below are conceptual data models used to communicate business requirements. They are NOT intended to be copied directly into code. Developers should use these as a guide to understand the required data structure.
-
-### GoodsReceiveNote Entity
-
-**Purpose**: Represents a goods receipt transaction documenting delivery of goods from a vendor, tracking all items received, quantities, and financial details
-
-**Conceptual Structure**:
-
-```typescript
-interface GoodsReceiveNote {
-  // Primary key
-  id: string;                           // Unique identifier (UUID)
-
-  // Core identifying fields
-  grnNumber: string;                    // Unique GRN number (GRN-YYYY-NNN format)
-  receiptDate: Date;                    // Date goods were received
-
-  // Vendor information
-  vendorId: string;                     // Foreign key to vendor
-  vendorName: string;                   // Vendor name for display
-
-  // NOTE: PO references are stored at LINE ITEM level, not header level
-  // One GRN can receive from multiple POs
-
-  // Delivery documentation
-  invoiceNumber?: string;               // Vendor invoice number
-  invoiceDate?: Date;                   // Invoice date
-  deliveryNote?: string;                // Delivery note number
-  vehicleNumber?: string;               // Delivery vehicle registration
-  driverName?: string;                  // Driver name
-
-  // Status and workflow
-  status: GRNStatus;                    // DRAFT | RECEIVED | COMMITTED | VOID
-
-  // Personnel
-  receivedBy: string;                   // User who received the goods
-  committedBy?: string;                 // User who committed the GRN
-
-  // Location
-  locationId: string;                   // Receiving location
-
-  // Summary metrics
-  totalItems: number;                   // Count of item lines
-  totalQuantity: number;                // Sum of received quantities
-  totalValue: Money;                    // Total financial value
-  discrepancies: number;                // Count of items with discrepancies
-
-  // Additional information
-  notes?: string;                       // General notes
-  attachments?: string[];               // File attachment URLs
-
-  // Audit fields
-  createdDate: Date;                    // Creation timestamp
-  createdBy: string;                    // Creator user ID
-  updatedDate: Date;                    // Last update timestamp
-  updatedBy: string;                    // Last updater user ID
-}
-```
-
-### GoodsReceiveNoteItem Entity
-
-**Purpose**: Represents an individual item line within a GRN, tracking quantities, pricing, PO references, and discrepancies for each product received. Each line item can reference a different purchase order, enabling multi-PO receiving in a single GRN.
-
-**Conceptual Structure**:
-
-```typescript
-interface GoodsReceiveNoteItem {
-  // Primary key
-  id: string;                           // Unique identifier (UUID)
-
-  // Parent reference
-  grnId: string;                        // Foreign key to GRN
-  lineNumber: number;                   // Sequential line number
-
-  // Purchase order reference (line-level, allows multi-PO in one GRN)
-  purchaseOrderId?: string;             // Which PO this line is from
-  purchaseOrderItemId?: string;         // Which PO line item
-
-  // Item identification
-  itemId: string;                       // Foreign key to product
-  itemCode: string;                     // Product code
-  itemName: string;                     // Product name
-  description: string;                  // Item description
-
-  // Quantity tracking
-  orderedQuantity?: number;             // Quantity ordered (from PO)
-  deliveredQuantity: number;            // Quantity delivered by vendor
-  receivedQuantity: number;             // Quantity accepted into stock
-  rejectedQuantity: number;             // Quantity rejected
-  damagedQuantity: number;              // Quantity damaged
-
-  // Unit and pricing
-  unit: string;                         // Unit of measure
-  unitPrice: Money;                     // Price per unit
-  totalValue: Money;                    // Line total value
-
-  // Batch and traceability
-  batchNumber?: string;                 // Manufacturing batch
-  lotNumber?: string;                   // Lot number
-  serialNumbers?: string[];             // Serial numbers (if applicable)
-  manufacturingDate?: Date;             // Manufacturing date
-  expiryDate?: Date;                    // Expiry date
-
-  // Storage
-  storageLocationId: string;            // Storage location assignment
-
-  // Discrepancy tracking
-  hasDiscrepancy: boolean;              // Discrepancy flag
-  discrepancyType?: 'quantity' | 'specification' | 'damage';
-  discrepancyNotes?: string;            // Discrepancy explanation (required if hasDiscrepancy = true)
-
-  // Additional notes
-  notes?: string;                       // Line-specific notes
-}
-```
-
-### GRNStatus Enum
-
-**Purpose**: Defines the lifecycle states of a GRN
-
-```typescript
-enum GRNStatus {
-  DRAFT = "DRAFT",              // Initial state, editable, no inventory impact
-  RECEIVED = "RECEIVED",        // Goods received, editable, no inventory impact
-  COMMITTED = "COMMITTED",      // Finalized, inventory updated, read-only
-  VOID = "VOID"                 // Cancelled, preserved for audit
-}
-```
-
-### ExtraCost Entity
-
-**Purpose**: Represents additional costs associated with goods receipt (freight, handling, insurance)
-
-**Conceptual Structure**:
-
-```typescript
-interface ExtraCost {
-  id: string;                           // Unique identifier
-  grnId: string;                        // Foreign key to GRN
-  type: string;                         // Cost type (shipping, handling, insurance, customs)
-  amount: number;                       // Cost amount
-  currency: string;                     // Cost currency
-  exchangeRate: number;                 // Exchange rate to base currency
-  baseAmount: number;                   // Amount in base currency
-  baseCurrency: string;                 // Base currency (USD)
-}
-```
-
-### StockMovement Entity
-
-**Purpose**: Represents inventory movement generated when GRN is committed
-
-**Conceptual Structure**:
-
-```typescript
-interface StockMovement {
-  id: string;                           // Unique identifier
-  grnId: string;                        // Foreign key to GRN
-  itemId: string;                       // Foreign key to product
-  itemName: string;                     // Product name
-  lotNumber?: string;                   // Lot number
-  quantity: number;                     // Movement quantity
-  unit: string;                         // Unit of measure
-  fromLocation: string;                 // Source location (receiving)
-  toLocation: string;                   // Destination location (storage)
-  cost: number;                         // Unit cost
-  totalCost: number;                    // Total cost
-  currency: string;                     // Currency
-  beforeStock: number;                  // Stock level before movement
-  afterStock: number;                   // Stock level after movement
-  movementDate: Date;                   // Movement timestamp
-}
-```
+**Future Enhancements** (Mobile):
+- Batch/Lot barcode scanning (scan item barcodes)
+- Multi-item scanning (scan all items in delivery)
+- Weight scale integration (Bluetooth scales)
+- Signature capture for delivery acceptance
+- GPS location verification (geofence receiving area)
+- Augmented reality (AR) location guidance
 
 ---
 
-## Integration Points
+### FR-GRN-017: Consignment and Cash Purchase Handling
+**Priority**: Low
+**User Story**: As an AP Clerk, I want to flag consignment and cash purchases so that accounting treatment differs from standard credit purchases.
 
-### Internal Integrations
-- **Purchase Orders Module**: Source PO data for PO-based GRN creation, update PO fulfillment status
-- **Inventory Management Module**: Generate stock movements, update inventory levels, track lot/batch numbers
-- **Vendor Management Module**: Retrieve vendor details, update vendor performance metrics
-- **Finance Module**: Generate journal vouchers, record payables, track tax information
-- **Product Management Module**: Retrieve product details, unit conversions, pricing information
+**Requirements**:
+- **Consignment Flag**: Indicates goods held on consignment
+  - No immediate payment obligation
+  - Inventory tracked separately
+  - Payment due when goods sold/used
+- **Cash Purchase Flag**: Indicates paid in cash on delivery
+  - Requires cash book selection
+  - Payment recorded immediately
+  - No AP entry created
 
-### External Integrations
-- **Not Applicable**: This module operates entirely within the internal ERP system
+**Acceptance Criteria**:
+- Consignment checkbox on GRN header
+- Cash purchase checkbox on GRN header
+- Cash book dropdown required if cash purchase
+- Consignment GRN creates different JV entry
+- Cash purchase debits cash book, not AP
+- Cannot be both consignment and cash
 
-### Data Dependencies
-- **Depends On**: Purchase Orders, Vendors, Products, Locations, Users, GL Accounts
-- **Used By**: Inventory Management, Finance, Reporting & Analytics, Vendor Performance
-
----
-
-## Non-Functional Requirements
-
-### Performance
-- **NFR-GRN-001**: GRN list page must load within 2 seconds for up to 1000 records
-- **NFR-GRN-002**: GRN detail page must load within 1.5 seconds
-- **NFR-GRN-003**: GRN creation from PO must complete within 3 seconds
-- **NFR-GRN-004**: GRN commitment and stock movement generation must complete within 5 seconds
-- **NFR-GRN-005**: Support concurrent editing by up to 20 users
-
-### Security
-- **NFR-GRN-006**: All GRN operations must require authenticated user session
-- **NFR-GRN-007**: Role-based access control enforced for create, edit, commit, void operations
-- **NFR-GRN-008**: Location-based access control restricts users to assigned locations
-- **NFR-GRN-009**: All data transmitted encrypted using TLS 1.2 or higher
-- **NFR-GRN-010**: Audit trail maintained for all GRN modifications with user and timestamp
-
-### Usability
-- **NFR-GRN-011**: Interface must be intuitive requiring less than 30 minutes training for experienced procurement staff
-- **NFR-GRN-012**: WCAG 2.1 AA accessibility compliance for screen readers and keyboard navigation
-- **NFR-GRN-013**: Responsive design supporting desktop (1920x1080), tablet (1024x768), and mobile (375x667) viewports
-- **NFR-GRN-014**: Clear visual feedback for all user actions (loading, success, error states)
-- **NFR-GRN-015**: Inline help tooltips and field-level guidance for complex fields
-
-### Reliability
-- **NFR-GRN-016**: System availability of 99.5% during business hours (6 AM - 10 PM local time)
-- **NFR-GRN-017**: Daily automated backups with 30-day retention
-- **NFR-GRN-018**: Data integrity validation prevents orphaned records or duplicate GRN numbers
-- **NFR-GRN-019**: Graceful error handling with user-friendly error messages
-- **NFR-GRN-020**: Transaction rollback on commitment failure to prevent partial inventory updates
-
-### Scalability
-- **NFR-GRN-021**: Support up to 500 GRNs created per day across all locations
-- **NFR-GRN-022**: Handle GRN database growth up to 100,000 records over 3 years
-- **NFR-GRN-023**: Accommodate up to 100 concurrent users during peak receiving hours
+**Source**: `app/(main)/procurement/goods-received-note/components/GoodsReceiveNoteDetail.tsx:374-380`
 
 ---
 
-## Success Metrics
+## 3. Non-Functional Requirements
 
-### Efficiency Metrics
-- Reduce average GRN creation time from 15 minutes to 8 minutes
-- Reduce GRN processing errors by 60% through validation and automation
-- Achieve 95% of GRNs committed on same day as goods receipt
+### NFR-GRN-001: Performance
+- GRN list loads within 2 seconds for up to 10,000 records
+- GRN detail page loads within 1 second
+- Save/update operations complete within 3 seconds
+- Search returns results within 2 seconds
+- Export to Excel completes within 10 seconds for 500 line items
 
-### Data Quality Metrics
-- Inventory accuracy improved to 98% through proper GRN recording
-- Discrepancy identification rate above 95% for quantity variances
-- Data entry accuracy above 99% through validation rules
+### NFR-GRN-002: Usability
+- Mobile-responsive interface for warehouse tablet use
+- Touch-friendly controls for receiving staff
+- Keyboard shortcuts for frequent actions
+- Auto-save draft functionality (every 30 seconds)
+- Confirmation prompts for destructive actions
 
-### Adoption Metrics
-- 100% of receiving staff using system within 2 weeks of training
-- 90% of GRNs created from purchase orders (vs. manual entry)
-- Zero manual spreadsheet tracking after 1 month of deployment
+### NFR-GRN-003: Data Integrity
+- All financial calculations rounded to 2 decimal places
+- Quantity fields support 3 decimal places
+- Exchange rates stored with 4 decimal places
+- Database transactions ensure atomicity
+- Concurrent edit detection prevents data conflicts
 
-### Business Impact Metrics
-- Reduce invoice processing time by 40% through accurate GRN data
-- Improve vendor dispute resolution time by 50% with complete receiving documentation
-- Support month-end close 2 days faster through automated financial postings
+### NFR-GRN-004: Security
+- Role-based access control (RBAC)
+- Receiving Clerk: Create, edit DRAFT/RECEIVED GRNs
+- Storekeeper: Commit GRNs
+- Purchasing Manager: View all, void GRNs
+- Financial Controller: View all, export reports
+- Audit log immutable and tamper-proof
 
----
-
-## Dependencies
-
-### Module Dependencies
-- **Purchase Orders Module**: Required for PO-based GRN creation, PO reference data
-- **Vendor Management Module**: Required for vendor information and selection
-- **Product Management Module**: Required for item catalog, unit conversions, pricing
-- **Inventory Management Module**: Required for stock locations, inventory updates
-- **Finance Module**: Required for GL accounts, journal voucher posting
-
-### Technical Dependencies
-- **Authentication Service**: User authentication and role management
-- **Database Service**: PostgreSQL for data persistence
-- **File Storage Service**: Storage for attachments (delivery notes, photos)
-
-### Data Dependencies
-- **Master Data**: Vendors, products, locations, GL accounts must be configured before GRN usage
-- **Reference Data**: Units of measure, currency exchange rates, tax rates
+### NFR-GRN-005: Compliance
+- Support for tax regulations (VAT, GST)
+- Audit trail for regulatory compliance
+- Data retention per company policy
+- Support for tax invoicing requirements
+- Proper accounting controls and segregation of duties
 
 ---
 
-## Assumptions and Constraints
+## 4. Business Rules
+
+### BR-GRN-001: GRN Numbering
+- GRN numbers auto-generated in format: GRN-YYYY-NNNN
+- Sequential numbering per fiscal year
+- No gaps allowed in sequence
+- Cannot manually assign GRN number
+
+### BR-GRN-002: PO Reference Validation
+- If GRN created from PO, line items must reference valid PO item
+- Received quantity cannot exceed (ordered - previously received)
+- Unit price should match PO price (±10% tolerance, flag if exceeded)
+- Vendor on GRN must match PO vendor
+
+### BR-GRN-003: Status Transition Rules
+- Can only commit GRN if all required fields complete
+- Cannot edit COMMITTED or VOID GRN
+- Voiding GRN requires reason entry
+- COMMITTED GRN creates irreversible stock movements
+
+### BR-GRN-004: Financial Calculations
+- Line Subtotal = Received Qty × Unit Price
+- Line Discount = Subtotal × Discount %
+- Line Net = Subtotal - Discount
+- Line Tax = Net × Tax %
+- Line Total = Net + Tax
+- GRN Total = Sum(Line Totals) + Extra Costs
+
+### BR-GRN-005: Discrepancy Handling
+- Quantity discrepancy auto-flagged if |delivered - ordered| > 0
+- Rejected quantity must have rejection reason
+- Damaged goods tracked separately from rejected
+- Received Qty + Rejected Qty + Damaged Qty = Delivered Qty
+
+### BR-GRN-006: Multi-PO Constraints
+- All POs in single GRN must be from same vendor
+- All POs must be in same currency (or base currency)
+- Cannot mix different exchange rates in single GRN
+- Each line item references one PO line item (or manual entry)
+
+### BR-GRN-007: Inventory Impact
+- Stock movements created only when status = COMMITTED
+- Rejected and damaged quantities do not increase inventory
+- Only received quantity (accepted) increases on-hand stock
+- Stock movement cannot be reversed (must create adjustment)
+
+---
+
+## 5. Integration Points
+
+### 5.1 Purchase Order Module
+- Retrieve open/partial POs by vendor
+- Link GRN line items to PO line items
+- Update PO item status (partial/fully received)
+- Update PO header status based on items received
+
+### 5.2 Inventory Management
+- Create stock movement transactions
+- Update on-hand inventory quantities
+- Update storage location balances
+- Record batch/lot numbers and expiry dates
+
+### 5.3 Accounts Payable
+- Trigger AP invoice matching
+- Create journal voucher for GRN
+- Update vendor payable balance
+- Three-way matching: PO - GRN - Invoice
+
+### 5.4 General Ledger
+- Post inventory receipt entries
+- Debit inventory account
+- Credit accounts payable
+- Handle tax entries (input VAT)
+- Cost center allocation
+
+### 5.5 Vendor Management
+- Retrieve vendor master data
+- Track vendor delivery performance
+- Update last purchase date and price
+- Feed vendor evaluation metrics
+
+---
+
+## 6. Assumptions and Dependencies
 
 ### Assumptions
-- Users have basic computer literacy and understanding of procurement processes
-- Network connectivity is available at receiving locations
-- Barcode scanners or mobile devices available for item scanning (future enhancement)
-- Vendor invoices received within reasonable timeframe after goods delivery
+- Users have basic computer and warehouse operations knowledge
+- Vendors provide accurate delivery notes and invoices
+- Network connectivity available in receiving areas
+- Purchase orders created before goods delivered (in normal workflow)
+- System exchange rates updated daily
 
-### Constraints
-- System must integrate with existing ERP database schema
-- Must maintain backward compatibility with existing purchase order data
-- Limited to web-based access (no native mobile app in initial release)
-- File attachment size limited to 10MB per file
-- Currency conversion rates manually entered (no real-time API integration in initial release)
-
-### Risks
-- **Vendor adoption of delivery documentation standards** - Mitigation: Provide vendor onboarding materials and templates
-- **User resistance to system change** - Mitigation: Comprehensive training program and phased rollout
-- **Data migration from legacy system** - Mitigation: Data cleansing and validation process before migration, parallel run period
+### Dependencies
+- Purchase Order module operational
+- Vendor master data maintained
+- Product catalog current and complete
+- Storage locations configured
+- GL account codes defined
+- User roles and permissions assigned
+- Exchange rate table updated
 
 ---
 
-## Future Enhancements
+## 7. Success Criteria
 
-### Phase 2 Enhancements
-- Mobile app for receiving clerks with barcode scanning capability
-- Automated matching of GRN with vendor invoice (3-way matching)
-- Integration with weighing scales for automated weight capture
-- Photo capture and attachment from mobile devices
-- Real-time currency exchange rate API integration
-- Vendor self-service portal for delivery scheduling
-
-### Future Considerations
-- AI-powered discrepancy prediction based on vendor historical performance
-- Integration with warehouse management system (WMS) for putaway optimization
-- Blockchain-based traceability for high-value or regulated items
-
-### Technical Debt
-- Current mock data implementation to be replaced with database integration
-- Manual unit conversion to be replaced with automated conversion tables
-- Hardcoded location types to be moved to configuration
+- 100% of goods receipts documented in system
+- 95% of GRNs created from POs (vs manual)
+- <5% discrepancy rate on received goods
+- GRN committed within 24 hours of receipt
+- Zero accounting errors from GRN entries
+- 90% user satisfaction rating
+- <2 seconds average page load time
+- Zero data loss incidents
 
 ---
 
-## Appendix
+## 8. Future Enhancements (Out of Scope for Current Release)
 
-### Glossary
-- **GRN**: Goods Received Note - Document recording receipt of goods from vendor
-- **PO**: Purchase Order - Document authorizing purchase from vendor
-- **Discrepancy**: Variance between ordered/expected and actual received goods
-- **Commitment**: Finalization of GRN triggering inventory and financial updates
-- **Extra Cost**: Additional costs beyond item prices (freight, handling, insurance)
-- **Stock Movement**: Inventory transaction moving goods between locations
-- **Base Currency**: Primary currency for financial reporting (USD)
-- **Transaction Currency**: Currency used in the specific GRN transaction
+**Note**: Mobile app with QR/Barcode scanning is already implemented (see FR-GRN-016).
 
-### References
-- [Technical Specification](./TS-goods-received-note.md)
-- [Use Cases](./UC-goods-received-note.md)
-- [Data Definition](./DD-goods-received-note.md)
-- [Flow Diagrams](./FD-goods-received-note.md)
-- [Validations](./VAL-goods-received-note.md)
+**Desktop Enhancements**:
+- QR code generation on PO printouts for mobile scanning
+- **Webcam-based QR scanning during GRN creation** - Allow desktop users to scan PO QR codes using webcam as alternative to manual selection during the PO selection step of GRN creation workflow
+- Barcode printing for inventory items
+- Quality inspection workflow integration
+- Automatic discrepancy notification to purchasing
+- Vendor performance scoring based on GRN data
+- Predictive analytics for delivery times
+- Integration with weighing scales
+- RFID tag support for high-value items
+- Blockchain-based audit trail
 
-### Change Requests
-| CR ID | Date | Description | Status |
-|-------|------|-------------|--------|
-| - | - | - | - |
+**Mobile Enhancements** (Beyond Current Implementation):
+- Batch/Lot barcode scanning (scan individual item barcodes)
+- Multi-item scanning (scan all items in delivery at once)
+- Photo capture of damaged goods (camera integration)
+- Signature capture for delivery acceptance
+- Weight scale integration (Bluetooth scales)
+- GPS location verification (geofence receiving area)
+- Augmented reality (AR) location guidance
+- Voice-to-text for comments and notes
+- Offline mode with full sync capability
 
 ---
 
-**Document End**
+**Document Control**
 
-> 📝 **Note to Reviewers**:
-> - This document was generated from actual source code analysis of the GRN module
-> - All features documented exist in the current codebase
-> - No fictional features have been added
-> - Review for accuracy against current implementation
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2025-12-02 | System Analyst | Initial BR document based on code analysis |
+| 1.1 | 2025-12-02 | System Analyst | Added FR-GRN-016: QR/Barcode Scanning for Mobile Receiving with complete scan workflow documentation |
+| 1.2 | 2025-12-02 | System Analyst | Added desktop webcam-based QR scanning to Future Enhancements |
+
+**Approval**
+
+| Role | Name | Signature | Date |
+|------|------|-----------|------|
+| Business Owner | | | |
+| Project Manager | | | |
+| IT Manager | | | |

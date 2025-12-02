@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Orders
 - **Document Type**: Validations (VAL)
-- **Version**: 2.0.0
-- **Last Updated**: 2025-10-31
+- **Version**: 2.3.0
+- **Last Updated**: 2025-12-02
 - **Status**: Approved
 
 ## Related Documents
@@ -19,6 +19,9 @@
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2025-12-02 | System Analyst | Added VAL-PO-016: QR Code Generation and Format validations for mobile receiving integration |
+| 2.2.0 | 2025-12-01 | System | Added PO Item Details Dialog validations (VAL-PO-013 through VAL-PO-015) for inventory status indicators, source PR references, and financial calculations |
+| 2.1.0 | 2025-12-01 | System | Added Comments & Attachments sidebar feature documentation; Updated page layout validations to include collapsible right sidebar |
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
@@ -382,6 +385,177 @@ This document defines all validation requirements for the Purchase Orders sub-mo
 
 ---
 
+### VAL-PO-013: Item Details Inventory Status Calculations
+
+**Field**: Inventory Status Indicators (On Hand, On Order, Received)
+**Display Location**: Item Details Dialog
+
+**Validation Rule**: Inventory status totals must be calculated from actual inventory data and displayed in inventory units (not order units).
+
+**Rationale**: Provides accurate real-time inventory visibility for the specific item across all locations.
+
+**Implementation Requirements**:
+- **Client-Side**: Display calculated totals from inventory data. Show loading state while fetching. Handle empty data gracefully (show 0).
+- **Server-Side**: Query inventory tables for On Hand, pending PO items for On Order, and GRN items for Received. Return totals with inventory unit.
+- **Database**: Aggregate queries from inventory_items, purchase_order_line_items, and grn_line_items tables.
+
+**Calculation Logic**:
+- **On Hand**: SUM(inventory_items.quantity_on_hand) WHERE item_code matches
+- **On Order**: SUM(po_line_items.pending_quantity) WHERE status = 'pending' AND item_code matches
+- **Received**: SUM(grn_line_items.received_quantity) WHERE item_code matches
+
+**Error Code**: VAL-PO-013
+**Error Message**: "Unable to calculate inventory status. Please refresh and try again"
+**User Action**: System auto-calculates - user can retry if error occurs.
+
+**Test Cases**:
+- ✅ Valid: On Hand = 350 (sum of all locations)
+- ✅ Valid: On Order = 0 (no pending orders)
+- ✅ Valid: Received = 8 (total from all GRNs)
+- ❌ Invalid: Negative quantities displayed
+- ❌ Invalid: Order units displayed instead of inventory units
+
+---
+
+### VAL-PO-014: Source Purchase Request Reference
+
+**Field**: `source_request_id`, `source_request_item_id`
+**Database Columns**: `purchase_order_line_items.source_request_id`, `purchase_order_line_items.source_request_item_id`
+
+**Validation Rule**: If source request ID is provided, it must reference a valid, existing purchase request. The link should navigate to the source PR when clicked.
+
+**Rationale**: Maintains traceability from PO line items back to originating purchase requests for audit purposes.
+
+**Implementation Requirements**:
+- **Client-Side**: Display source PR as clickable link. Verify PR exists before navigation. Show "N/A" if no source PR.
+- **Server-Side**: Validate source_request_id format (PR-YYYY-NNNN). Verify PR exists in database when saving.
+- **Database**: Optional fields (NULL allowed). If provided, should match existing PR records.
+
+**Error Code**: VAL-PO-014
+**Error Message**: "Invalid source purchase request reference"
+**User Action**: System auto-populates from PR conversion. Manual entry should follow PR-YYYY-NNNN format.
+
+**Test Cases**:
+- ✅ Valid: source_request_id = "PR-2024-0045" (existing PR)
+- ✅ Valid: source_request_id = null (manual PO, no source)
+- ❌ Invalid: source_request_id = "PR-999" (non-existent)
+- ❌ Invalid: source_request_id = "PO-2024-001" (wrong document type)
+
+---
+
+### VAL-PO-015: Line Item Financial Calculations
+
+**Field**: Line Item Financial Summary (Subtotal, Discount, Tax, Line Total)
+**Display Location**: Item Details Dialog - Order Summary Section
+
+**Validation Rule**: Financial calculations must be accurate and consistent with the formula: Line Total = (Ordered Quantity × Unit Price) - Discount Amount + Tax Amount.
+
+**Rationale**: Ensures accurate financial display and prevents discrepancies between displayed and stored values.
+
+**Implementation Requirements**:
+- **Client-Side**: Calculate and display: Subtotal = quantity × unit_price, Tax = subtotal × tax_rate, Line Total = subtotal - discount_amount + tax_amount. Use stored line_total if available, fallback to calculation.
+- **Server-Side**: Validate line_total matches calculation within 1 cent tolerance.
+- **Database**: line_total, tax_amount stored as DECIMAL(15,2).
+
+**Error Code**: VAL-PO-015
+**Error Message**: "Financial calculation error in line item"
+**User Action**: System auto-calculates - if discrepancy exists, system should recalculate.
+
+**Test Cases**:
+- ✅ Valid: qty=20, price=25.00, discount=0, tax_rate=0.07 → subtotal=500.00, tax=35.00, total=535.00
+- ✅ Valid: qty=5, price=8.50, discount=2.50, tax_rate=0.10 → subtotal=42.50, tax=4.00, total=44.00
+- ❌ Invalid: displayed total doesn't match calculation
+- ❌ Invalid: tax_amount > subtotal
+
+---
+
+### VAL-PO-016: QR Code Generation and Format
+
+**Field**: QR Code (qr_code, qr_code_image, qr_code_generated_at)
+**Database Columns**: `purchase_orders.qr_code`, `purchase_orders.qr_code_image`, `purchase_orders.qr_code_generated_at`
+**Component**: QRCodeSection.tsx
+
+**Validation Rule**: QR code must be automatically generated when PO is created or updated, following the exact format `PO:{orderNumber}` (e.g., "PO:PO-2025-0001"). The QR code image must be a valid base64-encoded data URL that can be displayed and downloaded.
+
+**Rationale**: Ensures consistent QR code format for reliable mobile scanning, enables quick GRN creation via mobile app, maintains data integrity between QR code value and PO number.
+
+**Implementation Requirements**:
+- **Client-Side**:
+  * Auto-generate QR code on component mount using `generatePOQRCode()` utility
+  * Display 200×200px QR code with 2-module margin
+  * Validate QR code format matches `PO:{orderNumber}` pattern
+  * Handle generation errors with user-friendly message
+  * Download generates 400×400px PNG with 4-module margin
+  * Show loading state during generation (<200ms target)
+  * Cache generated QR code in component state
+  * Validate clipboard copy success/failure
+
+- **Server-Side**:
+  * Validate qr_code format exactly matches `PO:{orderNumber}` pattern
+  * Verify qr_code_image is valid base64 data URL starting with `data:image/png;base64,`
+  * Auto-set qr_code_generated_at timestamp when generated
+  * Regenerate QR code if PO number changes
+  * Validate QR generation doesn't timeout (5 second max)
+  * Log QR generation failures for monitoring
+
+- **Database**:
+  * qr_code: VARCHAR(100), nullable, format constraint: `^PO:[A-Z0-9-]+$`
+  * qr_code_image: TEXT, nullable, stores base64 data URL
+  * qr_code_generated_at: TIMESTAMP, nullable, auto-set on generation
+
+**QR Code Specifications**:
+- Format: Exactly `PO:{orderNumber}` with no spaces or variations
+- Error Correction Level: Medium (M) - 15% data restoration
+- Display Size: 200×200px (2-module margin)
+- Download Size: 400×400px (4-module margin)
+- Encoding: UTF-8
+- Image Format: PNG (base64-encoded data URL)
+- Library: qrcode v1.5.3 (npm package)
+
+**Error Code**: VAL-PO-016
+**Error Messages**:
+- "Unable to generate QR code. Please refresh the page." (generation failure)
+- "Invalid QR code format. Expected format: PO:{orderNumber}" (format validation)
+- "QR code generation timeout. Please try again." (timeout exceeded)
+- "Failed to download QR code. Please try again." (download failure)
+- "Clipboard not supported. Please copy manually: {orderNumber}" (clipboard unsupported)
+
+**User Actions**:
+- If generation fails: Refresh page or contact support
+- If format invalid: System auto-regenerates with correct format
+- If download fails: Retry download or take screenshot
+- If copy fails: Manually copy displayed PO number
+
+**Test Cases**:
+- ✅ Valid: PO number "PO-2025-0001" → QR value "PO:PO-2025-0001"
+- ✅ Valid: Generated QR code scans correctly with mobile app
+- ✅ Valid: Download creates PNG file named "PO-2025-0001-QR.png"
+- ✅ Valid: QR code image is valid base64 data URL
+- ✅ Valid: Copy to clipboard copies exact PO number
+- ✅ Valid: QR generation completes within 200ms
+- ✅ Valid: High-res download QR (400×400px) is scannable when printed
+- ❌ Invalid: QR code format "PO-2025-0001" (missing prefix "PO:")
+- ❌ Invalid: QR code format "PO: PO-2025-0001" (contains space)
+- ❌ Invalid: Empty qr_code field when PO number exists
+- ❌ Invalid: qr_code_image not a valid base64 data URL
+- ❌ Invalid: Generation timeout exceeds 5 seconds
+
+**Mobile Integration Validation**:
+- Mobile app must successfully scan QR code
+- Extracted PO number must exactly match database PO number
+- Scanned QR triggers automatic GRN creation workflow
+- Invalid QR codes must be rejected with clear error message
+- See GRN BR document (FR-GRN-016) for mobile validation requirements
+
+**Performance Requirements**:
+- QR generation: <200ms per PO (target), <500ms (maximum)
+- Download preparation: <100ms
+- Clipboard copy: <50ms
+- Component load: <300ms including QR generation
+- Success rate: >99.5% for generation, >99% for download, >95% for copy
+
+---
+
 ## Business Rule Validations (101-199)
 
 ### VAL-PO-101: Vendor Must Be Active
@@ -730,8 +904,8 @@ This document defines all validation requirements for the Purchase Orders sub-mo
 
 ## Summary
 
-This document defines **38 validation rules** across five categories:
-- **Field-Level (001-099)**: 12 validations for individual field requirements
+This document defines **41 validation rules** across five categories:
+- **Field-Level (001-099)**: 15 validations for individual field requirements (including Item Details Dialog validations VAL-PO-013 through VAL-PO-015)
 - **Business Rules (101-199)**: 5 validations for business logic
 - **Cross-Field (201-299)**: 4 validations for field relationships
 - **Security (301-399)**: 2 validations for access control
@@ -754,3 +928,4 @@ These validations ensure purchase order data quality, compliance with business r
 |---------|------|--------|---------|
 | 1.0.0 | 2025-10-30 | System | Initial creation from template |
 | 2.0.0 | 2025-10-31 | System | Removed approval workflow validations (VAL-PO-105, VAL-PO-106), updated VAL-PO-107, VAL-PO-203, VAL-PO-401 to reflect Draft → Sent workflow |
+| 2.1.0 | 2025-12-01 | System | Added Comments & Attachments sidebar feature documentation |

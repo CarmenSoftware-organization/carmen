@@ -186,30 +186,35 @@ Data Stored
 
 ---
 
-### VAL-CN-006: GRN ID - Required for All Credit Types
+### VAL-CN-006: GRN ID - Optional with Auto-Assignment
 
 **Field**: `grnId`
 **Database Column**: `credit_notes.grn_id`
 **Data Type**: VARCHAR(100) / string
 
-**Validation Rule**: GRN reference is mandatory for both quantity returns and amount discounts.
+**Validation Rule**: GRN reference is optional during draft creation. If not provided, system will auto-assign the most recent matching GRN during commitment process.
 
-**Rationale**: All credit notes must reference the original GRN for traceability and audit purposes.
+**Rationale**: Standalone credit notes are allowed for pricing adjustments or credits not tied to a specific GRN. For quantity returns, GRN reference is recommended but can be auto-assigned based on vendor and product matching during commit.
 
 **Implementation Requirements**:
-- **Client-Side**: Display red asterisk (*) next to field label. GRN dropdown required. Show error if empty.
-- **Server-Side**: Reject request if GRN ID is missing or GRN doesn't exist in system. Verify GRN belongs to selected vendor.
-- **Database**: Column defined as NOT NULL with foreign key constraint to goods_receive_notes table.
+- **Client-Side**: Optional field. GRN dropdown available but not required. Show info message if empty: "GRN will be auto-assigned during commit if applicable."
+- **Server-Side**: If GRN ID provided, verify it exists and belongs to selected vendor. If empty during commit for QUANTITY_RETURN, attempt auto-assignment from vendor's recent GRNs.
+- **Database**: Column allows NULL. Foreign key constraint to goods_receive_notes table when value present.
+
+**Auto-Assignment Logic** (during commit):
+1. For QUANTITY_RETURN without GRN: Find most recent GRN for the vendor containing the credited products
+2. For AMOUNT_DISCOUNT without GRN: Optional, no auto-assignment required
+3. If auto-assignment fails for quantity return, prompt user to select GRN manually
 
 **Error Code**: VAL-CN-006
-**Error Message**: "GRN reference is required"
-**User Action**: User must select a GRN from the dropdown list for the selected vendor.
+**Error Message**: "Could not auto-assign GRN. Please select a GRN manually."
+**User Action**: User can optionally select a GRN from the dropdown list or allow system to auto-assign during commit.
 
 **Test Cases**:
-- ✅ Valid: grnId = "GRN-2025-000123"
-- ❌ Invalid: grnId = null
-- ❌ Invalid: grnId = "" (empty)
-- ❌ Invalid: grnId = "GRN-INVALID" (non-existent GRN)
+- ✅ Valid: grnId = "GRN-2025-000123" (explicitly selected)
+- ✅ Valid: grnId = null (will be auto-assigned on commit for quantity returns)
+- ✅ Valid: grnId = null for AMOUNT_DISCOUNT (standalone credit)
+- ❌ Invalid: grnId = "GRN-INVALID" (non-existent GRN if explicitly provided)
 
 ---
 
@@ -217,9 +222,9 @@ Data Stored
 
 **Field**: `status`
 **Database Column**: `credit_notes.status`
-**Data Type**: ENUM('DRAFT', 'POSTED', 'VOID') / CreditNoteStatus
+**Data Type**: ENUM('DRAFT', 'COMMITTED', 'VOID') / CreditNoteStatus
 
-**Validation Rule**: Status must be one of the defined enum values: DRAFT, POSTED, or VOID.
+**Validation Rule**: Status must be one of the defined enum values: DRAFT, COMMITTED, or VOID.
 
 **Implementation Requirements**:
 - **Client-Side**: Use dropdown with only valid status values. Default to DRAFT for new credit notes.
@@ -243,7 +248,7 @@ Data Stored
 
 **Field**: `creditReason`
 **Database Column**: `credit_notes.credit_reason`
-**Data Type**: ENUM('DAMAGED_GOODS', 'INCORRECT_ITEM', 'QUALITY_ISSUE', 'PRICING_ERROR', 'OTHER') / CreditNoteReason
+**Data Type**: ENUM('DAMAGED', 'EXPIRED', 'WRONG_DELIVERY', 'QUALITY_ISSUE', 'PRICE_ADJUSTMENT', 'OTHER') / CreditNoteReason
 
 **Validation Rule**: Credit reason is mandatory and must be one of the defined enum values.
 
@@ -257,10 +262,11 @@ Data Stored
 **User Action**: User must select a reason for the credit note.
 
 **Test Cases**:
-- ✅ Valid: "DAMAGED_GOODS"
-- ✅ Valid: "INCORRECT_ITEM"
+- ✅ Valid: "DAMAGED"
+- ✅ Valid: "EXPIRED"
+- ✅ Valid: "WRONG_DELIVERY"
 - ✅ Valid: "QUALITY_ISSUE"
-- ✅ Valid: "PRICING_ERROR"
+- ✅ Valid: "PRICE_ADJUSTMENT"
 - ✅ Valid: "OTHER"
 - ❌ Invalid: null
 - ❌ Invalid: "" (empty)
@@ -1065,11 +1071,11 @@ Data Stored
 
 ### VAL-CN-201: Posted Status Immutable Except Void
 
-**Rule**: Credit notes in POSTED status cannot be edited or deleted. Only void action allowed.
+**Rule**: Credit notes in COMMITTED status cannot be edited or deleted. Only void action allowed.
 
 **Implementation Requirements**:
 - **Client-Side**: Disable all form fields. Show only "Void" button if authorized.
-- **Server-Side**: Reject all edit/delete requests when status = 'POSTED'. Only allow void action.
+- **Server-Side**: Reject all edit/delete requests when status = 'COMMITTED'. Only allow void action.
 - **Database**: No direct constraint. Enforced at application level.
 
 **Error Code**: VAL-CN-201
@@ -1107,11 +1113,11 @@ Data Stored
 
 ### VAL-CN-203: Status Transition from Draft to Posted
 
-**Rule**: Can transition from DRAFT to POSTED only if all required fields are complete and journal entries are successfully generated.
+**Rule**: Can transition from DRAFT to COMMITTED only if all required fields are complete and journal entries are successfully generated.
 
 **Implementation Requirements**:
-- **Client-Side**: Validate all required fields before "Post to GL" action. Show validation errors if incomplete. Show confirmation dialog explaining posting is irreversible.
-- **Server-Side**: Run all field and business rule validations. Generate journal entries atomically. Only update status to POSTED if all validations pass and journal entry creation succeeds.
+- **Client-Side**: Validate all required fields before "Commit" action. Show validation errors if incomplete. Show confirmation dialog explaining commitment is irreversible.
+- **Server-Side**: Run all field and business rule validations. Generate journal entries atomically. Only update status to COMMITTED if all validations pass and journal entry creation succeeds.
 - **Database**: Use database transaction. Rollback if any part fails.
 
 **Error Code**: VAL-CN-203
@@ -1130,11 +1136,11 @@ Data Stored
 
 ### VAL-CN-204: Status Transition to Void
 
-**Rule**: Can transition to VOID only from POSTED status. Requires void reason and authorization.
+**Rule**: Can transition to VOID only from COMMITTED status. Requires void reason and authorization.
 
 **Implementation Requirements**:
-- **Client-Side**: Show "Void" button only for posted credit notes. Show confirmation dialog. Require void reason input. Show warning about irreversibility.
-- **Server-Side**: Verify status = POSTED. Verify user has void authority. Generate reversal journal entries. Record void reason and timestamp.
+- **Client-Side**: Show "Void" button only for committed credit notes. Show confirmation dialog. Require void reason input. Show warning about irreversibility.
+- **Server-Side**: Verify status = COMMITTED. Verify user has void authority. Generate reversal journal entries. Record void reason and timestamp.
 - **Database**: Use database transaction. Ensure all reversals complete before status update.
 
 **Error Code**: VAL-CN-204

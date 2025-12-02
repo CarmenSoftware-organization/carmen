@@ -81,6 +81,7 @@ interface ActivityLogEntry {
 import { mockPurchaseOrders } from "@/lib/mock-data";
 import StatusBadge from "@/components/ui/custom-status-badge";
 import TransactionSummary from "./TransactionSummary";
+import QRCodeSection from "./QRCodeSection";
 
 interface PODetailPageProps {
   params: { id: string }
@@ -779,6 +780,11 @@ export default function PODetailPage({ params }: PODetailPageProps) {
                   <CommentsAttachmentsTab poData={poData} />
                 </CardContent>
               </Card>
+            )}
+
+            {/* QR Code for Mobile Receiving */}
+            {params.id !== 'new' && (poData.orderNumber || (poData as any).number) && (
+              <QRCodeSection orderNumber={poData.orderNumber || (poData as any).number} />
             )}
 
             {/* Activity Log */}

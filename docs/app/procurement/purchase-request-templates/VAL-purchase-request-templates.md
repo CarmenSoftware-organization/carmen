@@ -216,37 +216,38 @@ description: z.string()
 ---
 
 ### VR-ITEM-003: UOM Required
-**Rule**: UOM (Unit of Measure) must be from approved list
+**Rule**: UOM (Unit of Measure) must be a valid value from centralized Product Order Unit lookup
 
-**Validation Type**: Required field, enum validation
+**Validation Type**: Required field, foreign key validation
 
 **Client-Side Validation** (Zod):
 ```
-uom: z.enum(
-  ['KG', 'EA', 'BTL', 'CTN', 'LTR', 'BOX', 'PKG', 'DOZ', 'MTR'],
-  { errorMap: () => ({ message: "Invalid unit of measure" }) }
-)
+uom: z.string()
+  .min(1, "Unit of measure is required")
+  .refine(async (val) => await isValidProductOrderUnit(val), {
+    message: "Invalid unit of measure"
+  })
 ```
 
-**Server-Side Validation**: Same Zod schema + database check constraint
+**Server-Side Validation**: Zod + database foreign key constraint to product_order_units table
 
 **Error Messages**:
 - Empty: "Unit of measure is required"
-- Invalid: "UOM must be one of: KG, EA, BTL, CTN, LTR, BOX, PKG, DOZ, MTR"
+- Invalid: "Selected unit of measure does not exist"
 
 **Business Rule Reference**: BR-TPL-010
 
 ---
 
-### VR-ITEM-004: Quantity Positive
-**Rule**: Quantity must be positive number between 0 and 999,999
+### VR-ITEM-004: Quantity Non-Negative
+**Rule**: Quantity must be non-negative number between 0 and 999,999
 
 **Validation Type**: Number validation, range validation
 
 **Client-Side Validation** (Zod):
 ```
 quantity: z.number()
-  .min(0.001, "Quantity must be greater than 0")
+  .min(0, "Quantity cannot be negative")
   .max(999999, "Quantity cannot exceed 999,999")
   .multipleOf(0.001, "Quantity can have maximum 3 decimal places")
 ```
@@ -254,8 +255,7 @@ quantity: z.number()
 **Server-Side Validation**: Same Zod schema + database check constraint
 
 **Error Messages**:
-- Empty/Zero: "Quantity is required and must be greater than 0"
-- Negative: "Quantity must be a positive number"
+- Negative: "Quantity cannot be negative"
 - Too large: "Quantity cannot exceed 999,999"
 - Too many decimals: "Quantity can have maximum 3 decimal places"
 

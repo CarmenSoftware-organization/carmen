@@ -1300,7 +1300,7 @@ Key workflows include credit note list management, item-level credit processing 
 
 **Preconditions**:
 - Credit note type is QUANTITY_RETURN
-- Credit note status changed to POSTED
+- Credit note status changed to COMMITTED
 - Inventory lots selected for all items
 - Inventory locations configured
 
@@ -1390,7 +1390,7 @@ Key workflows include credit note list management, item-level credit processing 
 **Frequency**: Triggered by credit note posting (10-20 times per day)
 
 **Preconditions**:
-- Credit note status changed to POSTED
+- Credit note status changed to COMMITTED
 - GL account mapping configured
 - Accounting period is open
 - Vendor account exists
@@ -1464,7 +1464,7 @@ Key workflows include credit note list management, item-level credit processing 
 - Use case ends with failure
 
 **Business Rules**:
-- **BR-CN-050**: Journal entries posted only when credit note status is POSTED
+- **BR-CN-050**: Journal entries posted only when credit note status is COMMITTED
 - **BR-CN-051**: Posting date must be within open accounting period
 - **BR-CN-052**: Total debits must equal total credits
 - **BR-CN-053**: Entry order number determines posting sequence
@@ -1610,7 +1610,7 @@ Key workflows include credit note list management, item-level credit processing 
 - Credit note type is QUANTITY_RETURN
 - Items referenced in credit note have been fully consumed or used
 - No available inventory balance exists for returned items
-- Credit note status is being changed to POSTED
+- Credit note status is being changed to COMMITTED
 
 **Postconditions**:
 - **Success**: COGS adjusted, vendor payable reduced, no stock movements generated
@@ -1705,7 +1705,7 @@ Key workflows include credit note list management, item-level credit processing 
 - Credit note type is QUANTITY_RETURN
 - Return quantity exceeds available inventory quantity for one or more items
 - Some inventory balance exists but less than return quantity
-- Credit note status is being changed to POSTED
+- Credit note status is being changed to COMMITTED
 
 **Postconditions**:
 - **Success**: Stock movements generated for available quantity, COGS adjusted for consumed quantity, vendor payable reduced for total amount
@@ -1834,7 +1834,7 @@ Key workflows include credit note list management, item-level credit processing 
 - Credit note references multiple historical GRNs or purchase orders
 - Vendor has agreed to retrospective discount (volume rebate, promotional discount, etc.)
 - Discount amount and allocation method specified
-- Credit note status is being changed to POSTED
+- Credit note status is being changed to COMMITTED
 
 **Postconditions**:
 - **Success**: Discount allocated across historical purchases, vendor payable reduced, allocation history logged
@@ -2045,19 +2045,17 @@ Key workflows include credit note list management, item-level credit processing 
 ### Appendix A: Status Flow Diagram
 
 ```
-DRAFT ──────────► PENDING ──────────► APPROVED ──────────► POSTED
-  │                  │                    │                     │
-  │                  │                    │                     │
-  └──────────────────┴────────────────────┴─────────────────────┴────► VOID
-       (delete)        (reject)           (reject)              (void)
+DRAFT ──────────► COMMITTED
+  │                     │
+  │                     │
+  └─────────────────────┴────► VOID
+       (delete)              (void)
 ```
 
 **Status Descriptions**:
 - **DRAFT**: Credit note created, editable, not submitted
-- **PENDING**: Submitted for approval, locked from editing
-- **APPROVED**: Approved by manager, ready for posting
-- **POSTED**: Posted to financial system, inventory updated, irreversible except by void
-- **VOID**: Reversed after posting, reversing entries created
+- **COMMITTED**: Committed to financial system, inventory updated, irreversible except by void
+- **VOID**: Reversed after commitment, reversing entries created
 
 ### Appendix B: Credit Note Types
 

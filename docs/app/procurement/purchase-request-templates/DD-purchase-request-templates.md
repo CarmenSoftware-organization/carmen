@@ -91,8 +91,8 @@ This document defines the complete data schema for the Purchase Request Template
 | line_number | INTEGER | NOT NULL | Display order (1-based) |
 | item_code | VARCHAR(50) | NOT NULL | Product/SKU code |
 | description | TEXT | NOT NULL, CHECK (length >= 5) | Item description |
-| uom | VARCHAR(10) | NOT NULL | Unit of measure |
-| quantity | DECIMAL(15,3) | NOT NULL, CHECK (> 0) | Ordered quantity |
+| uom | VARCHAR(10) | NOT NULL, FOREIGN KEY → product_order_units(code) | Unit of measure (from centralized lookup) |
+| quantity | DECIMAL(15,3) | NOT NULL, CHECK (>= 0) | Ordered quantity |
 | unit_price | DECIMAL(15,2) | NOT NULL, CHECK (>= 0) | Price per unit |
 | currency | VARCHAR(3) | NOT NULL, DEFAULT 'USD' | Item currency |
 | currency_rate | DECIMAL(15,6) | NOT NULL, DEFAULT 1.0, CHECK (> 0) | Exchange rate to base currency |
@@ -128,14 +128,14 @@ This document defines the complete data schema for the Purchase Request Template
 
 **Check Constraints**:
 - `chk_item_description_length`: length(description) >= 5
-- `chk_item_quantity`: quantity > 0 AND quantity <= 999999
+- `chk_item_quantity`: quantity >= 0 AND quantity <= 999999
 - `chk_item_unit_price`: unit_price >= 0 AND unit_price <= 99999999.99
 - `chk_item_currency`: currency IN ('USD', 'EUR', 'GBP', 'THB')
 - `chk_item_currency_rate`: currency_rate > 0
 - `chk_item_discount_rate`: discount_rate >= 0 AND discount_rate <= 100
 - `chk_item_tax_rate`: tax_rate >= 0 AND tax_rate <= 100
 - `chk_item_amounts`: base_amount >= 0 AND net_amount >= 0 AND total_amount >= 0
-- `chk_item_uom`: uom IN ('KG', 'EA', 'BTL', 'CTN', 'LTR', 'BOX', 'PKG', 'DOZ', 'MTR')
+- `chk_item_uom`: uom EXISTS IN product_order_units(code) -- validated via foreign key
 - `chk_item_tax_code`: tax_code IN ('VAT7', 'VAT0', 'EXEMPT', 'VAT_REDUCED')
 
 **Foreign Key Relationships**:

@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Orders
 - **Document Type**: Flow Diagrams (FD)
-- **Version**: 2.0.0
-- **Last Updated**: 2025-10-31
+- **Version**: 2.3.0
+- **Last Updated**: 2025-12-02
 - **Status**: Approved
 
 **Document History**:
@@ -23,6 +23,8 @@
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2025-12-02 | System Analyst | Added Diagram 10: QR Code Generation for Mobile Receiving flow, updated PO creation flow (Diagram 1) to include QR code generation step |
+| 2.1.0 | 2025-12-01 | System | Added Comments & Attachments sidebar feature; Updated page layout description to include collapsible right sidebar with Comments, Attachments, and Activity Log sections |
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
@@ -42,7 +44,7 @@ This document provides visual representations of purchase order workflows, data 
 ## 1. Purchase Order Creation Process Flow
 
 \`\`\`mermaid
-flowchart TD
+graph TD
     Start([User Starts PO Creation]) --> CheckSource{Source?}
     
     CheckSource -->|From PR| SelectPR[Select Approved PRs]
@@ -81,7 +83,8 @@ flowchart TD
     GeneratePONum --> CreateLineItems[Create Line Items]
     CreateLineItems --> CreateBudgetAlloc[Create Budget Allocations]
     CreateBudgetAlloc --> UpdatePRStatus[Update PR Status<br/>if from PR]
-    UpdatePRStatus --> CreateAuditLog[Create Audit Log Entry]
+    UpdatePRStatus --> GenerateQRCode[Generate QR Code<br/>PO:{po_number}]
+    GenerateQRCode --> CreateAuditLog[Create Audit Log Entry]
     CreateAuditLog --> End([PO Created<br/>Status: Draft])
     
     CancelCreate --> EndCancel([Creation Cancelled])
@@ -92,7 +95,7 @@ flowchart TD
 ## 2. Send Purchase Order to Vendor
 
 \`\`\`mermaid
-flowchart TD
+graph TD
     Start([PO Status: Draft]) --> UserClickSend[User Clicks<br/>'Send to Vendor']
     UserClickSend --> DisplayDialog[Display Send Dialog]
     
@@ -149,7 +152,7 @@ flowchart TD
 ## 3. Purchase Order Change Order Process
 
 \`\`\`mermaid
-flowchart TD
+graph TD
     Start([PO Status: Sent/Acknowledged]) --> UserInitiate[User Clicks<br/>'Request Change Order']
     UserInitiate --> DisplayChangeForm[Display Change Order Form]
     
@@ -210,7 +213,7 @@ flowchart TD
 ## 4. Purchase Order Cancellation Process
 
 \`\`\`mermaid
-flowchart TD
+graph TD
     Start([User Initiates Cancellation]) --> CheckPOStatus{Current<br/>PO Status}
     
     CheckPOStatus -->|Draft| SimpleCancellation[Simple Cancellation<br/>No Vendor Notification]
@@ -279,7 +282,7 @@ flowchart TD
 ## 5. Purchase Order Status State Transition Diagram
 
 \`\`\`mermaid
-stateDiagram-v2
+stateDiagram
     [*] --> Draft: Create PO
 
     Draft --> Sent: Send to Vendor
@@ -388,7 +391,7 @@ stateDiagram-v2
 ## 6. Budget Integration Data Flow
 
 \`\`\`mermaid
-flowchart LR
+graph LR
     subgraph PO_System["Purchase Order System"]
         CreatePO[Create PO]
         SendPO[Send PO to Vendor]
@@ -481,7 +484,7 @@ sequenceDiagram
 ## 8. Goods Receipt Integration Flow
 
 \`\`\`mermaid
-flowchart TD
+graph TD
     Start([GRN Created]) --> GRNApproved{GRN<br/>Approved?}
     
     GRNApproved -->|No| EndWait([Wait for GRN Approval])
@@ -530,6 +533,125 @@ flowchart TD
 
 ---
 
+## 9. Line Item Details View Flow
+
+\`\`\`mermaid
+graph TD
+    Start([User Clicks Line Item Row]) --> LoadItem[Load Item Data from PO Line]
+    LoadItem --> ShowDialog[Open Item Details Dialog]
+
+    ShowDialog --> DisplayHeader[Display Item Header]
+    DisplayHeader --> LoadInventory[Load Inventory Status Data]
+
+    LoadInventory --> CalcOnHand[Calculate On Hand]
+    LoadInventory --> CalcOnOrder[Calculate On Order]
+    LoadInventory --> CalcReceived[Calculate Received]
+
+    CalcOnHand --> DisplayIndicators[Display Inventory Status]
+    CalcOnOrder --> DisplayIndicators
+    CalcReceived --> DisplayIndicators
+
+    DisplayIndicators --> DisplayMetrics[Display Key Metrics]
+    DisplayMetrics --> DisplayPR[Display Related PR]
+    DisplayPR --> DisplaySummary[Display Order Summary]
+    DisplaySummary --> DisplayForm[Display Form Fields]
+
+    DisplayIndicators --> UserClick{User Clicks Indicator?}
+
+    UserClick -->|On Hand| OpenOnHand[Open On Hand Dialog]
+    UserClick -->|On Order| OpenOnOrder[Open Pending POs Dialog]
+    UserClick -->|Received| OpenReceived[Open GRN History Dialog]
+
+    OpenOnHand --> ShowLocations[Show Location Table]
+    ShowLocations --> CloseSubDialog[Close Sub-Dialog]
+
+    OpenOnOrder --> ShowPendingPOs[Show Pending POs Table]
+    ShowPendingPOs --> CloseSubDialog
+
+    OpenReceived --> ShowGRNs[Show GRN History Table]
+    ShowGRNs --> CloseSubDialog
+
+    CloseSubDialog --> UserClick
+
+    DisplayForm --> UserAction{User Action?}
+    UserAction -->|Save| ValidateForm{Form Valid?}
+    UserAction -->|Cancel| CloseDialog[Close Dialog]
+
+    ValidateForm -->|Yes| SaveChanges[Save Item Changes]
+    ValidateForm -->|No| ShowErrors[Show Validation Errors]
+    ShowErrors --> DisplayForm
+
+    SaveChanges --> UpdatePO[Update PO Line Item]
+    UpdatePO --> CloseDialog
+
+    CloseDialog --> End([Return to PO Detail Page])
+\`\`\`
+
+**Description**: User flow for viewing and interacting with line item details, including inventory status indicators and sub-dialogs.
+
+---
+
+## 10. QR Code Generation for Mobile Receiving
+
+```mermaid
+graph TD
+    Start([PO Created/Updated]) --> CheckPONum{PO Number<br/>Generated?}
+    CheckPONum -->|No| WaitForNum[Wait for PO Number]
+    WaitForNum --> CheckPONum
+
+    CheckPONum -->|Yes| BuildValue[Build QR Value<br/>Format: PO:{po_number}]
+    BuildValue --> CallQRLib[Call qrcode Library v1.5.3]
+
+    CallQRLib --> SetOptions[Set QR Options:<br/>- Error Correction: M 15%<br/>- Width: 300px<br/>- Margin: 4 modules]
+    SetOptions --> GenerateImage[Generate Base64 Image]
+
+    GenerateImage --> CheckSuccess{Generation<br/>Success?}
+    CheckSuccess -->|No| LogError[Log Error]
+    LogError --> SetNull[Set qr_code fields = NULL]
+    SetNull --> End([QR Code Generation Failed])
+
+    CheckSuccess -->|Yes| StoreValue[Store qr_code value<br/>e.g., "PO:PO-2025-0001"]
+    StoreValue --> StoreImage[Store qr_code_image<br/>Base64 data URL]
+    StoreImage --> StoreTimestamp[Store qr_code_generated_at<br/>Current timestamp]
+
+    StoreTimestamp --> DisplayOnUI[Display QR Code<br/>on PO Detail Page]
+    DisplayOnUI --> ShowActions[Show Actions:<br/>- Download QR<br/>- Copy PO Number]
+    ShowActions --> ShowInstructions[Show Mobile<br/>Scanning Instructions]
+
+    ShowInstructions --> UserAction{User Action?}
+    UserAction -->|Download| DownloadQR[Generate High-Res QR<br/>400x400px, 4 margin]
+    DownloadQR --> SaveFile[Save as PNG:<br/>{po_number}-QR.png]
+    SaveFile --> UserAction
+
+    UserAction -->|Copy| CopyToClipboard[Copy PO Number<br/>to Clipboard]
+    CopyToClipboard --> ShowConfirm[Show "Copied!"<br/>Confirmation]
+    ShowConfirm --> UserAction
+
+    UserAction -->|None| Ready([Ready for Mobile Scan])
+
+    Ready --> MobileScan[Mobile App Scans QR]
+    MobileScan --> ExtractPO[Extract PO Number<br/>from QR Value]
+    ExtractPO --> FetchPO[API: Fetch PO Details]
+    FetchPO --> CreateGRN[Auto-Create GRN<br/>Status: RECEIVED]
+    CreateGRN --> OpenGRNPage[Open GRN Detail Page]
+    OpenGRNPage --> MobileEnd([Mobile Receiving Workflow])
+```
+
+**Description**: Complete flow for automatic QR code generation on PO creation/update, desktop display with download/copy actions, and integration with mobile receiving workflow. QR codes enable quick GRN creation by scanning PO QR codes on mobile devices.
+
+**Key Components**:
+- **QR Library**: qrcode v1.5.3 (npm package)
+- **QR Format**: `PO:{orderNumber}` (e.g., "PO:PO-2025-0001")
+- **Desktop Component**: `QRCodeSection.tsx` at `app/(main)/procurement/purchase-orders/components/`
+- **Utilities**: `lib/utils/qr-code.ts` with 7+ utility functions
+- **Mobile Integration**: cmobile app scans QR → Extracts PO number → Auto-creates GRN
+- **Display Options**:
+  * On-screen: 200×200px, 2-module margin
+  * Download: 400×400px PNG, 4-module margin
+- **Error Correction**: Medium (M) level - 15% data restoration capability
+
+---
+
 ## Summary
 
 This document provides comprehensive visual representations of all major purchase order workflows including:
@@ -542,6 +664,8 @@ This document provides comprehensive visual representations of all major purchas
 6. **Budget Integration**: Real-time budget system interaction
 7. **Vendor Communication Sequence**: Email transmission sequence
 8. **GRN Integration**: Automatic status updates on receipt
+9. **Line Item Details View**: Item details dialog with inventory status and sub-dialogs
+10. **QR Code Generation**: Automatic QR code generation for mobile receiving integration
 
 These diagrams serve as reference for developers, testers, and stakeholders to understand system behavior and data flows.
 
@@ -552,3 +676,6 @@ These diagrams serve as reference for developers, testers, and stakeholders to u
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0.0 | 2025-10-30 | System | Initial creation from template |
+| 2.1.0 | 2025-12-01 | System | Added Comments & Attachments sidebar feature documentation |
+| 2.2.0 | 2025-12-01 | System | Added Line Item Details View Flow (Diagram 9) showing item details dialog with inventory status indicators, sub-dialogs for On Hand Breakdown, Pending POs, and GRN History |
+| 2.3.0 | 2025-12-02 | System Analyst | Added Diagram 10: QR Code Generation for Mobile Receiving flow with complete desktop and mobile integration, updated Diagram 1 to include QR code generation step |

@@ -22,7 +22,7 @@ const mockRelatedGRNItems = [
     comment: "Items received in good condition"
   },
   {
-    id: 'GRN002', 
+    id: 'GRN002',
     grnNumber: 'GRN-2024-002',
     receivedDate: '2024-10-20',
     receivedQuantity: 3,
@@ -33,12 +33,19 @@ const mockRelatedGRNItems = [
   }
 ]
 
-export function GrnItemsTable() {
+interface GrnItemsTableProps {
+  itemData?: {
+    name: string;
+    description: string;
+  };
+}
+
+export function GrnItemsTable({ itemData }: GrnItemsTableProps) {
   return (
     <div className="container mx-auto py-4">
       <div className="bg-muted p-4 rounded-lg mb-6">
-        <h3 className="text-lg font-semibold mb-2">Office Chair</h3>
-        <p className="text-muted-foreground">Ergonomic office chair with lumbar support</p>
+        <h3 className="text-lg font-semibold mb-2">{itemData?.name || "Item"}</h3>
+        <p className="text-muted-foreground">{itemData?.description || "Item description"}</p>
       </div>
       <Table>
         <TableHeader>

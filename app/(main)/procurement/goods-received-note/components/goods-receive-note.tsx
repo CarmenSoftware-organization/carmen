@@ -458,13 +458,13 @@ export function GoodsReceiveNoteComponent({
                           id="date"
                           name="date"
                           type="date"
-                          value={formData.receiptDate.toISOString().split("T")[0]}
+                          value={formData.receiptDate ? new Date(formData.receiptDate).toISOString().split("T")[0] : ''}
                           onChange={handleInputChange}
                           className="w-full"
                         />
                       ) : (
                         <div className="text-gray-900 font-medium">
-                          {formData.receiptDate.toLocaleDateString('en-GB')}
+                          {formData.receiptDate ? new Date(formData.receiptDate).toLocaleDateString('en-GB') : 'N/A'}
                         </div>
                       )}
                     </div>

@@ -43,7 +43,9 @@ This document provides visual representations of the key workflows, data flows, 
 
 ## PO-Based GRN Creation Flow
 
-**Purpose**: Document the complete workflow for creating a Goods Received Note from an existing Purchase Order
+**Purpose**: Document the complete workflow for creating a Goods Received Note from existing Purchase Orders
+
+**Multi-PO Support**: A single GRN can receive items from multiple POs. Each line item stores its own PO reference (purchaseOrderId, purchaseOrderItemId) rather than a single PO at header level.
 
 **Actors**: Receiving Clerk, Purchasing Staff, System
 
@@ -57,8 +59,8 @@ flowchart TD
     VendorSelect --> LoadPOs[System loads<br/>pending POs for vendor]
     LoadPOs --> DisplayPOs[Display pending<br/>PO list]
 
-    DisplayPOs --> SelectPO[User selects<br/>PO lines to receive]
-    SelectPO --> CreateGRN[System creates GRN<br/>with PO data]
+    DisplayPOs --> SelectPO[User selects<br/>PO lines to receive<br/>from one or more POs]
+    SelectPO --> CreateGRN[System creates GRN<br/>with line-level PO references]
 
     CreateGRN --> PrePopulate[Pre-populate:<br/>- Vendor info<br/>- Items<br/>- Ordered qty<br/>- Prices]
 

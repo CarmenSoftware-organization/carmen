@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Orders
 - **Document Type**: Technical Specification (TS)
-- **Version**: 2.0.0
-- **Last Updated**: 2025-10-31
+- **Version**: 2.3.0
+- **Last Updated**: 2025-12-02
 - **Status**: Approved
 
 **Document History**:
@@ -24,6 +24,9 @@
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2025-12-02 | System Analyst | Added QR Code Generation section with QRCodeSection component, lib/utils/qr-code.ts utilities, qrcode library v1.5.3 integration, and mobile receiving integration details |
+| 2.2.0 | 2025-12-01 | System | Added PO Item Details Dialog documentation (DetailDialog9) with inventory status indicators (On Hand, On Order, Received), related PR links, and financial summary; Added sub-dialogs for On Hand Breakdown, Pending POs, and GRN History |
+| 2.1.0 | 2025-12-01 | System | Added Comments & Attachments collapsible sidebar feature; Updated Detail Page layout to include right sidebar with Comments, Attachments, and Activity Log sections matching PR page pattern |
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
@@ -282,11 +285,24 @@ graph TD
 - **Notes Section**:
   * Public notes (visible to vendor)
   * Internal notes (internal use only)
-- **Activity Log**:
-  * Chronological list of all changes
-  * Change type, changed by, date/time
-  * Old value → New value (for field changes)
-  * Comments/reason for change
+- **Collapsible Sidebar** (right side, full-page height):
+  * Toggle button in header to show/hide sidebar
+  * Sidebar hidden by default
+  * When visible, spans full page height alongside main content
+  * **Comments & Attachments Section**:
+    - Comments list with user avatar, name, timestamp
+    - Blue left-border cards for each comment
+    - Add new comment with textarea
+    - Keyboard shortcut: Ctrl+Enter to send
+    - Attachments list with file type badges
+    - View and Download actions for attachments
+    - Attach File button for uploads
+  * **Activity Log Section**:
+    - Chronological activity entries
+    - User avatar, action badge, description, timestamp
+    - Actions: Created, Updated, Approved, Sent, Comment
+
+**Note**: Comments & Attachments and Activity Log are displayed in the collapsible right sidebar instead of as separate tabs.
 
 **Key Features**:
 - Print-friendly layout
@@ -689,8 +705,9 @@ graph TD
 
 - **Line Items**: Displays all PO line items with quantities and receipt status
   - Content: Item table (Line#, Product, Description, Qty Ordered, Qty Received, Qty Remaining, Unit Price, Line Total)
-  - Features: Sortable, expandable rows for specifications, receipt status indicators
-  - Actions: View item history, create GRN for selected items
+  - Features: Sortable, expandable rows for specifications, receipt status indicators, click row to open item details
+  - Actions: View item details, view item history, create GRN for selected items
+  - **Item Click Behavior**: Clicking a row opens the Item Details Dialog (see DetailDialog9 below)
 
 - **Documents**: Lists all attachments (quotes, specs, delivery notes)
   - Content: File list (Name, Type, Size, Uploaded By, Date, Category)
@@ -778,6 +795,47 @@ graph TD
   - Features: Track changes, calculate price impact, budget re-check
   - Actions: "Create Change Order", "Cancel"
   - Success: Creates amendment record, sends to vendor, updates budget encumbrance
+
+- **Item Details Dialog** (DetailDialog9 - Modal - Large)
+  - Trigger: Click on a line item row in Line Items table
+  - Content: Comprehensive item details view with inventory status, related records, and financial summary
+  - **Sections**:
+    - **Item Header**: Item name, description banner (full width, muted background)
+    - **Inventory Status Indicators**: Three clickable status cards
+      - **On Hand**: Shows total quantity on hand across all locations (in inventory units)
+        - Click opens On Hand Breakdown Dialog showing location-by-location quantities
+      - **On Order**: Shows total quantity on order from pending POs (in inventory units)
+        - Click opens Pending POs Dialog showing all pending POs for this item
+      - **Received**: Shows total quantity received from GRNs (in inventory units)
+        - Click opens GRN History Dialog showing all receipts for this item
+    - **Key Metrics Grid**: 3-column grid showing:
+      - Order Quantity with unit
+      - Unit Price with currency
+      - Discount percentage
+    - **Related Purchase Request Section**: Links to source PR
+      - Source Request ID (clickable link to PR)
+      - Source Request Item ID
+    - **Order Summary Section**: Financial summary
+      - Subtotal (quantity × unit price)
+      - Discount amount
+      - Tax amount with rate
+      - Line Total (final amount)
+    - **Form Fields** (read-only when viewing):
+      - Name (text input)
+      - Description (textarea)
+      - Status (dropdown: pending, partial, received, cancelled)
+  - **Sub-Dialogs**:
+    - **On Hand Breakdown Dialog**: Shows inventory breakdown by location
+      - Table columns: Location, Category, Status, Quantity, Inventory Units
+      - Displays all locations where item is stocked
+    - **Pending POs Dialog**: Shows all pending purchase orders for the item
+      - Table columns: PO#, Vendor, Delivery Date, Remaining Qty, Inventory Units, Locations Ordered
+      - Shows total on order at bottom
+    - **GRN History Dialog**: Shows all goods receipts for the item
+      - Table columns: GRN Number, Received Date, Received Qty, Rejected Qty, Inspected By, Location
+      - Comment row below each entry showing inspection notes
+  - Actions: "Save Changes" (if editable), "Cancel"
+  - Validation: Item status must match business rules, quantities must be non-negative
 
 **Navigation Targets**:
 - **To List Page**: Click breadcrumb or "Back to List" button
@@ -1595,6 +1653,107 @@ Amount After Discount = Subtotal - Discount
 Tax = Amount After Discount × Tax Rate(s)
 Grand Total = Amount After Discount + Tax + Shipping
 ```
+
+---
+
+### QR Code Section Component
+
+**Responsibility**: Display QR code for mobile receiving integration on PO detail pages
+
+**Component Path**: `app/(main)/procurement/purchase-orders/components/QRCodeSection.tsx`
+
+**Features**:
+- Auto-generate QR code when PO created/updated
+- Display QR code image (200×200px) with PO number
+- Download high-resolution QR code PNG (400×400px)
+- Copy PO number to clipboard
+- Show mobile scanning instructions
+- Link to mobile app download page
+- Loading state during QR generation
+- Error handling for generation failures
+
+**Props**:
+```typescript
+interface QRCodeSectionProps {
+  orderNumber: string;      // PO number (e.g., "PO-2025-0001")
+  className?: string;        // Optional CSS classes
+}
+```
+
+**Component Sections**:
+1. **Header**:
+   - "Mobile Receiving" title with QR code icon
+   - Description: "Scan this QR code with the mobile app to quickly receive goods"
+
+2. **QR Code Display**:
+   - 200×200px QR code image
+   - White background with subtle border
+   - Loading spinner during generation
+   - PO number displayed below QR code
+   - Error state if generation fails
+
+3. **Action Buttons**:
+   - **Download QR Code**:
+     * Generates 400×400px high-resolution PNG
+     * Filename: `{orderNumber}-QR.png`
+     * 4-module margin for better print quality
+   - **Copy PO Number**:
+     * Copies PO number to clipboard
+     * Shows "Copied!" confirmation (2 seconds)
+
+4. **Instructions Panel**:
+   - Blue background card with border
+   - "How to use:" header
+   - 5-step numbered list:
+     1. Open the Carmen mobile app
+     2. Go to Receiving section
+     3. Tap "Scan PO" button
+     4. Point camera at this QR code
+     5. Goods receipt will be created automatically
+
+5. **Mobile App Link**:
+   - Link to `/mobile-app` page
+   - Text: "Don't have the mobile app? Get it here"
+
+**QR Code Generation**:
+- Uses `qrcode` library v1.5.3
+- QR format: `PO:{orderNumber}` (e.g., "PO:PO-2025-0001")
+- Utility functions from `lib/utils/qr-code.ts`:
+  * `generatePOQRCode()`: Generate base64 image
+  * `downloadPOQRCode()`: Download PNG file
+- Error correction level: Medium (M) - 15% data restoration
+- Auto-generates on component mount
+- Caches in component state after generation
+
+**State Management**:
+```typescript
+const [qrCodeImage, setQrCodeImage] = useState<string>('');
+const [isGenerating, setIsGenerating] = useState(false);
+const [copied, setCopied] = useState(false);
+```
+
+**Event Handlers**:
+- `handleDownload()`: Downloads high-res QR code PNG
+- `handleCopyOrderNumber()`: Copies PO number to clipboard
+
+**Mobile Integration**:
+- cmobile app scans QR code
+- Extracts PO number from format `PO:{orderNumber}`
+- Fetches PO details via API
+- Auto-creates GRN in RECEIVED status
+- See GRN BR document (FR-GRN-016) for complete workflow
+
+**Styling**:
+- Uses shadcn/ui Card components
+- Tailwind CSS for layout and styling
+- Responsive design (works on desktop and tablets)
+- Icons from Lucide React (QrCode, Download, Copy, Check)
+
+**Performance**:
+- QR generation: <200ms per PO
+- Asynchronous generation doesn't block UI
+- Error boundaries for graceful failure handling
+- Lazy loading of QR code on component mount
 
 ---
 

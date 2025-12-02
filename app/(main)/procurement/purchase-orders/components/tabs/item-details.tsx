@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,14 +18,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  Edit, 
-  Eye, 
-  Box, 
-  DollarSign, 
-  AlertCircle, 
-  Settings, 
-  Truck, 
+import {
+  Edit,
+  Eye,
+  Box,
+  DollarSign,
+  AlertCircle,
+  Settings,
+  Truck,
   MoreHorizontal,
   FileText,
   Trash2,
@@ -52,6 +52,28 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { PurchaseOrderItem } from "@/lib/types";
 import { PrItemsTable } from "./pr-items-table";
 import { GrnItemsTable } from "./grn-items-table";
+import { InventoryBreakdownContent } from "./inventory-breakdown";
+import { PendingPurchaseOrdersComponent } from "./pending-purchase-orders";
+
+// Mock data matching inventory-breakdown.tsx
+const inventoryData = [
+  { location: "Warehouse A", quantityOnHand: 500, units: "pcs" },
+  { location: "Store B", quantityOnHand: 150, units: "pcs" },
+  { location: "Distribution Center C", quantityOnHand: 1000, units: "pcs" },
+];
+
+// Mock data matching pending-purchase-orders.tsx
+const pendingPOData = [
+  { poNumber: "PO-001", qtyToReceive: 100, units: "pcs" },
+  { poNumber: "PO-002", qtyToReceive: 50, units: "pcs" },
+  { poNumber: "PO-003", qtyToReceive: 200, units: "pcs" },
+];
+
+// Mock data matching grn-items-table.tsx
+const grnItemsData = [
+  { id: 'GRN001', receivedQuantity: 5, rejectedQuantity: 0 },
+  { id: 'GRN002', receivedQuantity: 3, rejectedQuantity: 2 },
+];
 
 type Mode = "view" | "edit" | "add";
 
@@ -89,6 +111,22 @@ export function ItemDetailsComponent({
 
   const isReadOnly = mode === "view";
 
+  // Calculate totals from mock data to match dialog contents
+  const totalOnHand = useMemo(() =>
+    inventoryData.reduce((sum, item) => sum + item.quantityOnHand, 0),
+  []);
+
+  const totalOnOrder = useMemo(() =>
+    pendingPOData.reduce((sum, item) => sum + item.qtyToReceive, 0),
+  []);
+
+  const totalReceived = useMemo(() =>
+    grnItemsData.reduce((sum, item) => sum + item.receivedQuantity, 0),
+  []);
+
+  // Get inventory unit from mock data (they all use the same unit)
+  const inventoryUnit = inventoryData[0]?.units || "pcs";
+
   const handleModeChange = (newMode: Mode) => {
     setMode(newMode);
   };
@@ -102,10 +140,6 @@ export function ItemDetailsComponent({
       onSubmit(itemData as PurchaseOrderItem);
     }
     onClose();
-  };
-
-  const handleRequestNumberClick = () => {
-    setIsPrItemsTableOpen(true);
   };
 
   const handleOnHandClick = () => {
@@ -188,7 +222,8 @@ export function ItemDetailsComponent({
                           <Label htmlFor="name" className="text-xs uppercase tracking-wide text-gray-500">Name</Label>
                           <Input
                             id="name"
-                            defaultValue="Organic Quinoa zzz"
+                            value={itemData.itemName || ""}
+                            onChange={(e) => handleInputChange('itemName', e.target.value)}
                             readOnly={isReadOnly}
                             className="h-8 text-xs font-semibold text-gray-900"
                           />
@@ -197,7 +232,8 @@ export function ItemDetailsComponent({
                           <Label htmlFor="description" className="text-xs uppercase tracking-wide text-gray-500">Description</Label>
                           <Input
                             id="description"
-                            defaultValue="Premium organic white quinoa grains"
+                            value={itemData.description || ""}
+                            onChange={(e) => handleInputChange('description', e.target.value)}
                             readOnly={isReadOnly}
                             className="h-8 text-xs text-gray-600"
                           />
@@ -206,20 +242,32 @@ export function ItemDetailsComponent({
                     </div>
                   </div>
                   
-                  {/* Quick Actions */}
-                  <div className="flex items-center gap-2 ml-4">
-                    <Button variant="outline" size="sm" className="h-6 px-2 text-xs" onClick={handleRequestNumberClick}>
-                      Request #
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-6 px-2 text-xs" onClick={handleOnHandClick}>
-                      On Hand
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-6 px-2 text-xs" onClick={handleOnOrderClick}>
-                      On Order
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-6 px-2 text-xs" onClick={handleGoodsReceivedClick}>
-                      G. Received
-                    </Button>
+                  {/* Inventory Status Indicators */}
+                  <div className="flex items-center gap-3 ml-4">
+                    <div
+                      className="flex flex-col items-center px-3 py-1 bg-blue-50 border border-blue-200 rounded cursor-pointer hover:bg-blue-100 transition-colors"
+                      onClick={handleOnHandClick}
+                    >
+                      <span className="text-xs text-blue-600 font-medium">On Hand</span>
+                      <span className="text-sm font-bold text-blue-800">{totalOnHand}</span>
+                      <span className="text-xs text-blue-500">{inventoryUnit}</span>
+                    </div>
+                    <div
+                      className="flex flex-col items-center px-3 py-1 bg-amber-50 border border-amber-200 rounded cursor-pointer hover:bg-amber-100 transition-colors"
+                      onClick={handleOnOrderClick}
+                    >
+                      <span className="text-xs text-amber-600 font-medium">On Order</span>
+                      <span className="text-sm font-bold text-amber-800">{totalOnOrder}</span>
+                      <span className="text-xs text-amber-500">{inventoryUnit}</span>
+                    </div>
+                    <div
+                      className="flex flex-col items-center px-3 py-1 bg-green-50 border border-green-200 rounded cursor-pointer hover:bg-green-100 transition-colors"
+                      onClick={handleGoodsReceivedClick}
+                    >
+                      <span className="text-xs text-green-600 font-medium">Received</span>
+                      <span className="text-sm font-bold text-green-800">{totalReceived}</span>
+                      <span className="text-xs text-green-500">{inventoryUnit}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -228,42 +276,51 @@ export function ItemDetailsComponent({
                   <div className="metric-item text-center">
                     <Label className="text-xs uppercase tracking-wide text-gray-500 mb-1 block">Unit</Label>
                     <Input
-                      defaultValue="Kg"
+                      value={itemData.unit || ""}
+                      onChange={(e) => handleInputChange('unit', e.target.value)}
                       readOnly={isReadOnly}
                       className="h-8 text-xs font-medium text-gray-900 text-center"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Base: Kg | 1 Bag = 0.5 Kg</p>
+                    <p className="text-xs text-gray-500 mt-1">Base: {itemData.unit || "Pcs"}</p>
                   </div>
                   <div className="metric-item text-center">
                     <Label className="text-xs uppercase tracking-wide text-gray-500 mb-1 block">Ordered</Label>
                     <Input
-                      defaultValue="500"
+                      value={itemData.orderedQuantity?.toString() || "0"}
+                      onChange={(e) => handleInputChange('orderedQuantity', parseFloat(e.target.value) || 0)}
                       readOnly={isReadOnly}
                       className="h-8 text-xs font-medium text-gray-900 text-center"
+                      type="number"
                     />
-                    <p className="text-xs text-gray-500 mt-1">5 Kg</p>
+                    <p className="text-xs text-gray-500 mt-1">{itemData.orderedQuantity || 0} {itemData.unit || "Pcs"}</p>
                   </div>
                   <div className="metric-item text-center">
                     <Label className="text-xs uppercase tracking-wide text-gray-500 mb-1 block">Received</Label>
                     <Input
-                      defaultValue="450"
+                      value={itemData.receivedQuantity?.toString() || "0"}
+                      onChange={(e) => handleInputChange('receivedQuantity', parseFloat(e.target.value) || 0)}
                       readOnly={isReadOnly}
                       className="h-8 text-xs font-medium text-gray-900 text-center"
+                      type="number"
                     />
-                    <p className="text-xs text-gray-500 mt-1">4.5 Kg</p>
+                    <p className="text-xs text-gray-500 mt-1">{itemData.receivedQuantity || 0} {itemData.unit || "Pcs"}</p>
                   </div>
                   <div className="metric-item text-center">
                     <Label className="text-xs uppercase tracking-wide text-gray-500 mb-1 block">Remaining</Label>
                     <Input
-                      defaultValue="50"
-                      readOnly={isReadOnly}
-                      className="h-8 text-xs font-medium text-gray-900 text-center"
+                      value={((itemData.orderedQuantity || 0) - (itemData.receivedQuantity || 0)).toString()}
+                      readOnly
+                      className="h-8 text-xs font-medium text-gray-900 text-center bg-gray-50"
                     />
-                    <p className="text-xs text-gray-500 mt-1">0.5 Kg</p>
+                    <p className="text-xs text-gray-500 mt-1">{(itemData.orderedQuantity || 0) - (itemData.receivedQuantity || 0)} {itemData.unit || "Pcs"}</p>
                   </div>
                   <div className="metric-item text-center">
                     <Label className="text-xs uppercase tracking-wide text-gray-500 mb-1 block">Price</Label>
-                    <div className="text-xs font-medium text-gray-900">$3.99</div>
+                    <div className="text-xs font-medium text-gray-900">
+                      ${typeof itemData.unitPrice === 'object' && itemData.unitPrice !== null
+                        ? ((itemData.unitPrice as any).amount?.toFixed(2) || '0.00')
+                        : (itemData.unitPrice !== undefined ? (itemData.unitPrice as unknown as number).toFixed(2) : '0.00')}
+                    </div>
                   </div>
                   <div className="metric-item text-center flex flex-col items-center justify-center">
                     <Label className="text-xs uppercase tracking-wide text-gray-500 mb-1 block">FOC</Label>
@@ -282,13 +339,13 @@ export function ItemDetailsComponent({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={handleRequestNumberClick}
+                    onClick={() => setIsPrItemsTableOpen(true)}
                     className="text-xs"
                   >
                     View All PRs
                   </Button>
                 </div>
-                
+
                 <div className="p-4">
                   {/* PR List Table */}
                   <div className="space-y-2">
@@ -300,40 +357,24 @@ export function ItemDetailsComponent({
                       <div>Status</div>
                       <div>Requestor</div>
                     </div>
-                    
-                    {/* Sample PR Rows */}
-                    <div className="grid grid-cols-6 gap-4 text-xs text-gray-900 py-2 border-b border-gray-50 hover:bg-gray-50 cursor-pointer">
-                      <div className="font-medium text-blue-600">PR-2024-0001</div>
-                      <div>200 Kg</div>
-                      <div>200 Kg</div>
-                      <div>$3.99</div>
-                      <div>
-                        <Badge className="bg-green-100 text-green-700 text-xs px-1 py-0">Approved</Badge>
+
+                    {/* PR Row - showing source PR if available */}
+                    {itemData.sourceRequestId ? (
+                      <div className="grid grid-cols-6 gap-4 text-xs text-gray-900 py-2 border-b border-gray-50 hover:bg-gray-50 cursor-pointer">
+                        <div className="font-medium text-blue-600">{itemData.sourceRequestId}</div>
+                        <div>{itemData.orderedQuantity || 0} {itemData.unit || ''}</div>
+                        <div>{itemData.orderedQuantity || 0} {itemData.unit || ''}</div>
+                        <div>${typeof itemData.unitPrice === 'object' && itemData.unitPrice !== null
+                          ? ((itemData.unitPrice as any).amount?.toFixed(2) || '0.00')
+                          : (itemData.unitPrice !== undefined ? (itemData.unitPrice as unknown as number).toFixed(2) : '0.00')}</div>
+                        <div>
+                          <Badge className="bg-green-100 text-green-700 text-xs px-1 py-0">Approved</Badge>
+                        </div>
+                        <div>-</div>
                       </div>
-                      <div>Kitchen Manager</div>
-                    </div>
-                    
-                    <div className="grid grid-cols-6 gap-4 text-xs text-gray-900 py-2 border-b border-gray-50 hover:bg-gray-50 cursor-pointer">
-                      <div className="font-medium text-blue-600">PR-2024-0002</div>
-                      <div>150 Kg</div>
-                      <div>150 Kg</div>
-                      <div>$3.99</div>
-                      <div>
-                        <Badge className="bg-green-100 text-green-700 text-xs px-1 py-0">Approved</Badge>
-                      </div>
-                      <div>Restaurant Manager</div>
-                    </div>
-                    
-                    <div className="grid grid-cols-6 gap-4 text-xs text-gray-900 py-2 border-b border-gray-50 hover:bg-gray-50 cursor-pointer">
-                      <div className="font-medium text-blue-600">PR-2024-0003</div>
-                      <div>150 Kg</div>
-                      <div>100 Kg</div>
-                      <div>$3.99</div>
-                      <div>
-                        <Badge className="bg-yellow-100 text-yellow-700 text-xs px-1 py-0">Partial</Badge>
-                      </div>
-                      <div>Catering Manager</div>
-                    </div>
+                    ) : (
+                      <div className="text-xs text-gray-500 py-4 text-center">No related purchase requests</div>
+                    )}
                   </div>
 
                   {/* PR Summary */}
@@ -341,19 +382,21 @@ export function ItemDetailsComponent({
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
                       <div>
                         <Label className="block text-xs font-medium text-gray-700 mb-1">Total PRs</Label>
-                        <span className="text-gray-900 font-semibold">3 Requests</span>
+                        <span className="text-gray-900 font-semibold">{itemData.sourceRequestId ? '1 Request' : '0 Requests'}</span>
                       </div>
                       <div>
                         <Label className="block text-xs font-medium text-gray-700 mb-1">Total Requested</Label>
-                        <span className="text-gray-900 font-semibold">500 Kg</span>
+                        <span className="text-gray-900 font-semibold">{itemData.orderedQuantity || 0} {itemData.unit || ''}</span>
                       </div>
                       <div>
                         <Label className="block text-xs font-medium text-gray-700 mb-1">Total Approved</Label>
-                        <span className="text-gray-900 font-semibold">450 Kg</span>
+                        <span className="text-gray-900 font-semibold">{itemData.orderedQuantity || 0} {itemData.unit || ''}</span>
                       </div>
                       <div>
                         <Label className="block text-xs font-medium text-gray-700 mb-1">Average Price</Label>
-                        <span className="text-gray-900 font-semibold">$3.99 / Kg</span>
+                        <span className="text-gray-900 font-semibold">${typeof itemData.unitPrice === 'object' && itemData.unitPrice !== null
+                          ? ((itemData.unitPrice as any).amount?.toFixed(2) || '0.00')
+                          : (itemData.unitPrice !== undefined ? (itemData.unitPrice as unknown as number).toFixed(2) : '0.00')} / {itemData.unit || 'Unit'}</span>
                       </div>
                     </div>
                   </div>
@@ -368,7 +411,7 @@ export function ItemDetailsComponent({
                     <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wide">Order Summary</h3>
                   </div>
                 </div>
-                
+
                 <div className="p-4">
                   <div className="grid grid-cols-2 gap-8">
                     <div>
@@ -376,30 +419,46 @@ export function ItemDetailsComponent({
                       <div className="space-y-2 text-xs">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Order Quantity:</span>
-                          <span className="font-medium">500 Kg</span>
+                          <span className="font-medium">{itemData.orderedQuantity || 0} {itemData.unit || ''}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Received Quantity:</span>
-                          <span className="font-medium">450 Kg</span>
+                          <span className="font-medium">{itemData.receivedQuantity || 0} {itemData.unit || ''}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Remaining:</span>
-                          <span className="font-medium text-orange-600">50 Kg</span>
+                          <span className="font-medium text-orange-600">{(itemData.orderedQuantity || 0) - (itemData.receivedQuantity || 0)} {itemData.unit || ''}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Unit Price:</span>
-                          <span className="font-medium">$3.99</span>
+                          <span className="font-medium">${typeof itemData.unitPrice === 'object' && itemData.unitPrice !== null
+                            ? ((itemData.unitPrice as any).amount?.toFixed(2) || '0.00')
+                            : (itemData.unitPrice !== undefined ? (itemData.unitPrice as unknown as number).toFixed(2) : '0.00')}</span>
                         </div>
                       </div>
                     </div>
-                    
+
                     <div>
                       <h4 className="text-xs font-semibold text-gray-900 mb-3">Financial Summary</h4>
                       <div className="space-y-2">
                         <div className="grid grid-cols-2 gap-4 text-xs">
                           <div>
                             <span className="text-gray-600">Total Amount:</span>
-                            <span className="font-semibold ml-2">${typeof itemData.lineTotal === 'object' && itemData.lineTotal !== null ? ((itemData.lineTotal as any).amount?.toFixed(2) || '0.00') : (itemData.lineTotal as any)?.toFixed(2) || '0.00'}</span>
+                            <span className="font-semibold ml-2">${(() => {
+                              // First try lineTotal
+                              if (itemData.lineTotal) {
+                                if (typeof itemData.lineTotal === 'object' && itemData.lineTotal !== null) {
+                                  return (itemData.lineTotal as any).amount?.toFixed(2) || '0.00';
+                                }
+                                return (itemData.lineTotal as unknown as number).toFixed(2);
+                              }
+                              // Calculate from orderedQuantity * unitPrice
+                              const qty = itemData.orderedQuantity || 0;
+                              const price = typeof itemData.unitPrice === 'object' && itemData.unitPrice !== null
+                                ? ((itemData.unitPrice as any).amount || 0)
+                                : (itemData.unitPrice as unknown as number || 0);
+                              return (qty * price).toFixed(2);
+                            })()}</span>
                           </div>
                         </div>
                       </div>
@@ -434,30 +493,12 @@ export function ItemDetailsComponent({
         </DialogContent>
       </Dialog>
 
-      {/* InventoryBreakdown Dialog */}
+      {/* InventoryBreakdown Dialog - On Hand */}
       <Dialog open={isInventoryBreakdownOpen} onOpenChange={setIsInventoryBreakdownOpen}>
-        <DialogContent className="max-w-3xl [&>button]:hidden">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto [&>button]:hidden">
           <DialogHeader>
             <div className="flex justify-between w-full items-center">
-              <DialogTitle className="text-lg">Inventory Breakdown</DialogTitle>
-              <Button variant="ghost" size="sm" className="h-6 w-6" onClick={() => setIsInventoryBreakdownOpen(false)}>
-                <X className="h-3 w-3" />
-              </Button>
-            </div>
-          </DialogHeader>
-          <div className="p-4">
-            <div className="text-center text-gray-500">
-              <p>Inventory breakdown for {itemData.itemName || "this item"} will be displayed here.</p>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isPendingPOsOpen} onOpenChange={setIsPendingPOsOpen}>
-        <DialogContent className="max-w-5xl max-h-[90vh] [&>button]:hidden">
-          <DialogHeader>
-            <div className="flex justify-between w-full items-center">
-              <DialogTitle className="text-lg">Pending Purchase Orders</DialogTitle>
+              <DialogTitle className="text-lg">On Hand - Inventory Breakdown</DialogTitle>
               <DialogClose asChild>
                 <Button variant="ghost" size="sm" className="h-6 w-6">
                   <X className="h-3 w-3" />
@@ -465,31 +506,57 @@ export function ItemDetailsComponent({
               </DialogClose>
             </div>
           </DialogHeader>
-          <div className="p-4">
-            <div className="text-center text-gray-500">
-              <p>Pending Purchase Orders information will be displayed here.</p>
-            </div>
-          </div>
+          <InventoryBreakdownContent
+            itemData={{
+              name: itemData.itemName || "Item",
+              description: itemData.description || "",
+              status: "Active"
+            }}
+          />
         </DialogContent>
       </Dialog>
 
+      {/* Pending Purchase Orders Dialog - On Order */}
+      <Dialog open={isPendingPOsOpen} onOpenChange={setIsPendingPOsOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] [&>button]:hidden">
+          <DialogHeader>
+            <div className="flex justify-between w-full items-center">
+              <DialogTitle className="text-lg">On Order - Pending Purchase Orders</DialogTitle>
+              <DialogClose asChild>
+                <Button variant="ghost" size="sm" className="h-6 w-6">
+                  <X className="h-3 w-3" />
+                </Button>
+              </DialogClose>
+            </div>
+          </DialogHeader>
+          <PendingPurchaseOrdersComponent
+            itemData={{
+              name: itemData.itemName || "Item",
+              description: itemData.description || ""
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Goods Received Notes Dialog - Received */}
       <Dialog open={isGRNDialogOpen} onOpenChange={setIsGRNDialogOpen}>
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto [&>button]:hidden">
-        <DialogHeader>
-          <div className="flex justify-between w-full items-center">
-          <DialogTitle className="text-lg">Goods Receive Note</DialogTitle>
-          <DialogClose asChild>
-                  <Button variant="ghost" size="sm" className="h-6 w-6">
-                    <X className="h-3 w-3" />
-                  </Button>
-                </DialogClose>
-                </div>
-          </DialogHeader>
-          <div className="p-4">
-            <div className="text-center text-gray-500">
-              <p>Goods Receive Note information will be displayed here.</p>
+          <DialogHeader>
+            <div className="flex justify-between w-full items-center">
+              <DialogTitle className="text-lg">Received - Goods Receipt Notes</DialogTitle>
+              <DialogClose asChild>
+                <Button variant="ghost" size="sm" className="h-6 w-6">
+                  <X className="h-3 w-3" />
+                </Button>
+              </DialogClose>
             </div>
-          </div>
+          </DialogHeader>
+          <GrnItemsTable
+            itemData={{
+              name: itemData.itemName || "Item",
+              description: itemData.description || ""
+            }}
+          />
         </DialogContent>
       </Dialog>
     </>

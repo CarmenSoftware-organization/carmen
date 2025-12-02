@@ -199,12 +199,13 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 - **creditReason**: Standardized reason code for credit
   - Required: Yes
   - Data type: Enum (CreditNoteReason)
-  - Allowed values: PRICING_ERROR, DAMAGED_GOODS, RETURN, DISCOUNT_AGREEMENT, OTHER
+  - Allowed values: DAMAGED, EXPIRED, WRONG_DELIVERY, QUALITY_ISSUE, PRICE_ADJUSTMENT, OTHER
   - Business meanings:
-    - PRICING_ERROR: Vendor charged incorrect price
-    - DAMAGED_GOODS: Items damaged in transit or storage
-    - RETURN: General return of goods to vendor
-    - DISCOUNT_AGREEMENT: Negotiated discount or rebate
+    - DAMAGED: Items damaged in transit or storage
+    - EXPIRED: Products past expiration date or shelf life
+    - WRONG_DELIVERY: Incorrect items delivered by vendor
+    - QUALITY_ISSUE: Products do not meet quality standards
+    - PRICE_ADJUSTMENT: Vendor charged incorrect price or negotiated discount
     - OTHER: Other reason not listed (requires detailed description)
 
 - **description**: Detailed explanation of credit reason
@@ -304,7 +305,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 | taxInvoiceReference | VARCHAR(100) | No | NULL | Tax invoice number | TAX-2024-001 | - |
 | taxDate | DATE | No | NULL | Tax invoice date | 2024-10-10 | - |
 | status | VARCHAR(20) | Yes | DRAFT | Credit note lifecycle status | COMMITTED | DRAFT\|COMMITTED\|VOID |
-| creditReason | VARCHAR(50) | Yes | - | Standardized reason code | DAMAGED_GOODS | PRICING_ERROR\|DAMAGED_GOODS\|RETURN\|DISCOUNT_AGREEMENT\|OTHER |
+| creditReason | VARCHAR(50) | Yes | - | Standardized reason code | DAMAGED | DAMAGED\|EXPIRED\|WRONG_DELIVERY\|QUALITY_ISSUE\|PRICE_ADJUSTMENT\|OTHER |
 | description | TEXT | Yes | - | Detailed explanation | Partial shipment damaged... | Min 10 chars (50 for OTHER) |
 | currency | CHAR(3) | Yes | Base | Currency code (ISO 4217) | USD | Valid ISO code |
 | exchangeRate | DECIMAL(15,6) | Yes | 1.000000 | Exchange rate to base | 34.500000 | > 0 |
@@ -815,25 +816,30 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 **Description**: Standardized reason codes explaining why credit note was issued, used for reporting and analysis.
 
 **Values**:
-- **PRICING_ERROR**: Vendor charged incorrect price on invoice
-  - Example: Unit price should be $380 but vendor billed $400
-  - Typically results in amount discount credit note
-  - No physical return required
-
-- **DAMAGED_GOODS**: Items damaged during transit or in storage
+- **DAMAGED**: Items damaged during transit or in storage
   - Example: Kitchen equipment arrived with cracked components
   - Typically results in quantity return credit note
   - Photos/documentation recommended
 
-- **RETURN**: General return of goods to vendor
-  - Example: Over-shipment of items not ordered
-  - Quantity return credit note
-  - May or may not be vendor's fault
+- **EXPIRED**: Products past expiration date or shelf life
+  - Example: Received products with expiry dates already passed
+  - Typically results in quantity return credit note
+  - Important for food and beverage items
 
-- **DISCOUNT_AGREEMENT**: Negotiated discount or rebate from vendor
-  - Example: Volume discount applied retrospectively
-  - Amount discount credit note
-  - Based on vendor agreement or contract terms
+- **WRONG_DELIVERY**: Incorrect items delivered by vendor
+  - Example: Ordered stainless steel pans but received aluminum pans
+  - Typically results in quantity return credit note
+  - May require vendor pickup arrangement
+
+- **QUALITY_ISSUE**: Products do not meet quality standards
+  - Example: Fabric napkins with discoloration or stains
+  - Can result in either quantity return or amount discount
+  - Quality inspection documentation recommended
+
+- **PRICE_ADJUSTMENT**: Vendor charged incorrect price or negotiated discount
+  - Example: Unit price should be $380 but vendor billed $400, or volume rebate applied
+  - Typically results in amount discount credit note
+  - No physical return required
 
 - **OTHER**: Reason not covered by standard codes
   - Requires detailed description (minimum 50 characters)

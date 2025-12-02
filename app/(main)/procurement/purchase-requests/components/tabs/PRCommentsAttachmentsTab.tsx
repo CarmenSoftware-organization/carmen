@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Paperclip, Send } from 'lucide-react';
+import { Paperclip, Send, FileText, FileSpreadsheet, FileImage, File, Download, Eye } from 'lucide-react';
 import { PurchaseRequest, Comment, asMockPurchaseRequest } from '@/lib/types';
 import { useSimpleUser } from '@/lib/context/simple-user-context';
 
@@ -65,10 +65,31 @@ export default function PRCommentsAttachmentsTab({ prData }: PRCommentsAttachmen
 
   // Mock attachments based on PR type and items
   const mockAttachments = [
-    { name: 'quotation_kitchen_equipment.pdf', type: 'application/pdf' },
-    { name: 'vendor_specifications.docx', type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
-    { name: 'budget_approval.pdf', type: 'application/pdf' }
+    { name: 'quotation_kitchen_equipment.pdf', type: 'application/pdf', size: '312 KB', uploadedAt: new Date('2024-01-15T10:30:00Z') },
+    { name: 'vendor_specifications.docx', type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', size: '156 KB', uploadedAt: new Date('2024-01-15T11:00:00Z') },
+    { name: 'budget_approval.pdf', type: 'application/pdf', size: '78 KB', uploadedAt: new Date('2024-01-16T09:15:00Z') }
   ];
+
+  // Helper function to get file icon based on type
+  const getFileIcon = (type: string) => {
+    if (type.includes('pdf')) return <FileText className="h-4 w-4 text-red-500" />;
+    if (type.includes('spreadsheet') || type.includes('excel') || type.includes('csv')) return <FileSpreadsheet className="h-4 w-4 text-green-600" />;
+    if (type.includes('image') || type.includes('png') || type.includes('jpg') || type.includes('jpeg')) return <FileImage className="h-4 w-4 text-blue-500" />;
+    if (type.includes('word') || type.includes('document')) return <FileText className="h-4 w-4 text-blue-600" />;
+    return <File className="h-4 w-4 text-muted-foreground" />;
+  };
+
+  // Helper function to get friendly file type label
+  const getFileTypeLabel = (type: string, fileName: string) => {
+    const extension = fileName.split('.').pop()?.toUpperCase() || '';
+    if (type.includes('pdf')) return 'PDF';
+    if (type.includes('spreadsheet') || type.includes('excel')) return 'Excel';
+    if (type.includes('csv')) return 'CSV';
+    if (type.includes('word') || type.includes('document')) return 'Word';
+    if (type.includes('image') || type.includes('png')) return 'PNG';
+    if (type.includes('jpg') || type.includes('jpeg')) return 'JPEG';
+    return extension;
+  };
 
   return (
     <div className="space-y-4">
@@ -103,26 +124,36 @@ export default function PRCommentsAttachmentsTab({ prData }: PRCommentsAttachmen
 
       {/* Attachments Section */}
       <div className="space-y-3 mb-6">
-        <h4 className="font-semibold text-sm text-muted-foreground">Attachments</h4>
-        {mockAttachments.map((attachment, index) => (
-          <div key={index} className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
-            <div className="flex items-center space-x-2">
-              <Paperclip className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">{attachment.name}</span>
-              <span className="text-xs text-muted-foreground">
-                ({attachment.type.split('/').pop()?.toUpperCase()})
-              </span>
+        <div className="flex items-center justify-between">
+          <h4 className="font-semibold text-sm text-muted-foreground">Attachments</h4>
+          <span className="text-xs text-muted-foreground">{mockAttachments.length} files</span>
+        </div>
+        <div className="space-y-2">
+          {mockAttachments.map((attachment, index) => (
+            <div key={index} className="group flex items-center gap-3 p-3 bg-muted/30 hover:bg-muted/50 rounded-lg border border-transparent hover:border-muted transition-all">
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-background flex items-center justify-center border">
+                {getFileIcon(attachment.type)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{attachment.name}</p>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="px-1.5 py-0.5 bg-muted rounded text-[10px] font-medium">
+                    {getFileTypeLabel(attachment.type, attachment.name)}
+                  </span>
+                  <span>{attachment.size}</span>
+                </div>
+              </div>
+              <div className="flex-shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button variant="ghost" size="icon" className="h-8 w-8" title="View">
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" title="Download">
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-            <div className="flex space-x-1">
-              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
-                View
-              </Button>
-              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
-                Download
-              </Button>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
       
       {/* Add Comment Section */}

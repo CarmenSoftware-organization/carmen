@@ -4,14 +4,17 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Orders
 - **Route**: `/procurement/purchase-orders`
-- **Version**: 1.0.0
-- **Last Updated**: 2025-10-31
+- **Version**: 1.3.0
+- **Last Updated**: 2025-12-02
 - **Owner**: Procurement Team
 - **Status**: Approved
 
 ## Document History
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.3.0 | 2025-12-02 | System Analyst | Added FR-PO-017: QR Code Generation for Mobile Receiving Integration with implementation details, updated PDF generation section, updated dependencies with qrcode library v1.5.3 |
+| 1.2.0 | 2025-12-01 | System | Enhanced PO Item Details dialog with inventory indicators (On Hand, On Order, Received), Related PR section, Order Summary with financial calculations, and linked mock data with sourceRequestId |
+| 1.1.0 | 2025-12-01 | System | Added Comments & Attachments sidebar feature; Updated page layout to match PR page pattern |
 | 1.0.0 | 2025-10-31 | System | Initial version based on comprehensive code analysis |
 
 
@@ -354,14 +357,7 @@ The system provides comprehensive tracking of PO status progression (draft → s
 - Invoices: Vendor invoices, invoice numbers, dates, amounts, 3-way match status
 - Change Orders: Amendments/revisions, change order numbers, dates, reasons
 
-*Tab 4 - Comments & Attachments*:
-- Comments section: Threaded comments, user avatar/name/timestamp, mention users (@username), mark resolved
-- Attachments section: Upload files (PDF, DOC, XLS, images), max 10MB per file, display file name/size/upload date/uploaded by, download/preview/delete actions, version control
-
-*Tab 5 - Activity Log*:
-- Complete audit trail: Timestamp, User, Action type, Description, Old value → New value
-- Filter by: Action type, Date range, User
-- Export to PDF/Excel
+*Note: Comments & Attachments and Activity Log are displayed in the collapsible right sidebar instead of as tabs. See "Collapsible Sidebar" section below for details.*
 
 **Action Buttons** (context-sensitive based on status and permissions):
 - Draft status: Edit, Delete, Send to Vendor
@@ -389,11 +385,22 @@ The system provides comprehensive tracking of PO status progression (draft → s
   * Partial/Fully Received: Very restricted (notes only)
   * Closed/Cancelled: No edits allowed
 
-**Collapsible Sidebar** (right side):
-- Quick actions menu
-- Status history timeline
-- Related items quick links
-- PO statistics (days since creation, days until delivery)
+**Collapsible Sidebar** (right side, full-page height):
+- Toggle button in header to show/hide sidebar
+- Sidebar hidden by default
+- When visible, spans full page height alongside main content
+- **Comments & Attachments Section**:
+  * Comments list with user avatar, name, timestamp
+  * Blue left-border cards for each comment
+  * Add new comment with textarea
+  * Keyboard shortcut: Ctrl+Enter to send
+  * Attachments list with file type badges
+  * View and Download actions for attachments
+  * Attach File button for uploads
+- **Activity Log Section**:
+  * Chronological activity entries
+  * User avatar, action badge, description, timestamp
+  * Actions: Created, Updated, Approved, Sent, Comment
 
 **Acceptance Criteria**:
 - Page loads within 2 seconds for POs with 100+ line items
@@ -627,6 +634,95 @@ The system provides comprehensive tracking of PO status progression (draft → s
 
 ---
 
+### FR-PO-006A: Purchase Order Item Details Dialog
+**Priority**: High
+
+**User Story**: As a purchasing staff member, I want to view comprehensive details of a PO line item including inventory status, related purchase requests, and order summary so that I can track item fulfillment and make informed decisions.
+
+**Requirements**:
+
+**Item Details Dialog**:
+- Opened by clicking on a line item row in the Items tab
+- Modal dialog displaying complete item information
+- View and Edit modes (edit only for Draft status)
+
+**Header Section**:
+- Item Name (large, prominent)
+- Item Description
+- Inventory Status Indicators (clickable cards):
+  * **On Hand**: Total quantity across all locations (in inventory units)
+  * **On Order**: Total quantity on pending POs (in inventory units)
+  * **Received**: Total quantity received via GRNs (in inventory units)
+- Each indicator opens a breakdown dialog when clicked
+
+**Inventory Breakdown Dialogs**:
+
+*On Hand Dialog*:
+- Table showing inventory by location
+- Columns: Location, Quantity On Hand, Inventory Units, Par, Reorder Point, Min Stock, Max Stock
+- Data sourced from inventory management system
+
+*On Order Dialog (Pending POs)*:
+- Table showing all pending purchase orders for this item
+- Columns: PO Number, Vendor, Delivery Date, Remaining Qty, Inventory Units, Locations Ordered
+- Total On Order summary at bottom
+
+*Received Dialog (GRN Items)*:
+- Table showing all GRN receipts for this item
+- Columns: GRN Number, Received Date, Received Qty, Rejected Qty, Inspected By, Location
+- Comment row below each GRN entry
+- Provides receipt history and quality information
+
+**Key Metrics Grid**:
+- Unit: Base unit of measure
+- Ordered: Quantity ordered on this PO
+- Received: Quantity received against this PO
+- Remaining: Calculated (Ordered - Received)
+- Price: Unit price from PO
+- FOC: Free of Charge indicator (checkbox)
+
+**Related Purchase Requests Section**:
+- Shows source PR(s) linked to this PO line item
+- Table columns: PR Number, Requested Qty, Approved Qty, Unit Price, Status, Requestor
+- Displays "No related purchase requests" if item not from PR
+- Summary panel:
+  * Total PRs count
+  * Total Requested quantity
+  * Total Approved quantity
+  * Average Price per unit
+- "View All PRs" button to open detailed PR list
+
+**Order Summary Section**:
+- **Order Details**:
+  * Order Quantity (with unit)
+  * Received Quantity (with unit)
+  * Remaining (highlighted in orange if >0)
+  * Unit Price
+- **Financial Summary**:
+  * Total Amount: Calculated as (orderedQuantity × unitPrice) or from lineTotal field
+  * Displays in PO currency
+
+**Data Source Requirements**:
+- Item data from `PurchaseOrderItem` type
+- Must include `sourceRequestId` and `sourceRequestItemId` for PR traceability
+- Must include `lineTotal` for accurate financial display
+- Inventory indicators require integration with inventory and receiving systems
+
+**Acceptance Criteria**:
+- Item details dialog opens within 500ms
+- All item data displays correctly from itemData props
+- Inventory indicators show accurate totals from related systems
+- On Hand, On Order, and Received dialogs show correct breakdown data
+- Financial summary calculates correctly (quantity × price)
+- Related PR section shows linked purchase request(s)
+- Order Summary reflects actual PO item quantities and amounts
+- Edit mode allows modification of editable fields (Draft status only)
+- Changes saved correctly when dialog closed
+
+**Related Requirements**: FR-PO-004, FR-PO-006, FR-PO-014
+
+---
+
 ### FR-PO-007: Purchase Order Communication and Distribution
 **Priority**: High
 
@@ -680,7 +776,13 @@ The system provides comprehensive tracking of PO status progression (draft → s
 - Generate on-demand or pre-generated for sent POs
 - Standard template (professional business format)
 - Custom templates per organization/department (if configured)
-- Includes barcode/QR code with PO number for scanning
+- **Includes QR code with PO number for mobile scanning**:
+  * QR code format: `PO:{orderNumber}` (e.g., "PO:PO-2025-0001")
+  * Positioned on PDF: Top right corner, bottom right corner, or dedicated section (configurable)
+  * QR code size: 2×2 cm minimum for reliable scanning
+  * Generated using `qrcode` library v1.5.3
+  * Error correction level: Medium (M) for 15% data restoration
+  * Purpose: Enable quick GRN creation via mobile app scanning
 - Watermark for draft/cancelled POs
 - File naming: PO-[Number]-[Vendor]-[Date].pdf
 
@@ -1562,6 +1664,116 @@ The system provides comprehensive tracking of PO status progression (draft → s
 
 ---
 
+### FR-PO-017: QR Code Generation for Mobile Receiving Integration
+**Priority**: High
+
+**User Story**: As a purchasing staff member, I want QR codes automatically generated on purchase orders so that receiving staff can quickly scan and create goods receipt notes using the mobile receiving app.
+
+**Requirements**:
+
+**QR Code Generation**:
+- QR code automatically generated when PO created/updated
+- Generated using `qrcode` library (v1.5.3)
+- QR code format: `PO:{orderNumber}`
+  * Example: `PO:PO-2025-0001`
+  * Prefix: "PO" (identifies entity type)
+  * Separator: ":"
+  * PO Number: Full purchase order number
+- Base64-encoded data URL stored in database
+- Regenerated if PO number changes (rare edge case)
+
+**QR Code Display on PO Detail Page**:
+- **QRCodeSection Component**: Located at `app/(main)/procurement/purchase-orders/components/QRCodeSection.tsx`
+- Displayed as card in PO detail page sidebar or detail section
+- Card sections:
+  * **Header**: "Mobile Receiving" title with QR code icon
+  * **Description**: "Scan this QR code with the mobile app to quickly receive goods"
+  * **QR Code Display**:
+    - 200×200px QR code image
+    - Error correction level: Medium (M) - ~15% data restoration
+    - 2-module margin around code
+    - White background with subtle border
+    - Loading spinner during generation
+  * **PO Number**: Displayed below QR code for reference
+  * **Action Buttons**:
+    - Download QR Code: Downloads high-resolution PNG (400×400px, 4-module margin)
+    - Copy PO Number: Copies PO number to clipboard with confirmation
+  * **Instructions Panel**:
+    - "How to use:" header
+    - 5-step mobile scanning workflow
+    - Visual guide with icons
+  * **Mobile App Link**: Link to mobile app download page
+
+**QR Code Storage**:
+- PO interface fields:
+  * `qrCode: string` - QR code value (e.g., "PO:PO-2025-0001")
+  * `qrCodeImage: string` - Base64 data URL for display
+  * `qrCodeGeneratedAt: Date` - Generation timestamp
+- Updated whenever PO created or PO number changes
+- Stored in database for quick retrieval
+
+**QR Code PDF Integration**:
+- QR code included in PDF printouts
+- Positioned on PO document:
+  * Top right corner OR
+  * Bottom right corner OR
+  * Dedicated section (configurable)
+- PDF QR code size: Scaled for printing (2×2 cm minimum)
+- Maintains scannability when printed
+
+**Mobile Receiving Integration**:
+- Mobile app (cmobile repository) scans QR code
+- Extracts PO number from format: `PO:{orderNumber}`
+- Retrieves PO details from API
+- Auto-creates GRN in RECEIVED status
+- See GRN BR document (FR-GRN-016) for complete mobile receiving workflow
+
+**QR Code Utility Functions** (`lib/utils/qr-code.ts`):
+- `generatePOQRValue(orderNumber)`: Creates QR code value string
+- `parseQRValue(qrValue)`: Parses scanned QR code, extracts type and ID
+- `isPOQRCode(qrValue)`: Validates QR code is for a PO
+- `generatePOQRCode(orderNumber, options)`: Generates base64 QR code image
+- `generatePOQRCodeCanvas(orderNumber, canvas, options)`: Renders QR code to HTML5 canvas
+- `downloadPOQRCode(orderNumber, filename, options)`: Downloads QR code as PNG file
+- `generateBatchPOQRCodes(orderNumbers, options)`: Bulk generates QR codes for multiple POs
+
+**QR Code Options**:
+- Error correction level: L (7%), M (15%), Q (25%), H (30%)
+- Width/height: Configurable (default: 300px for display, 400px for download)
+- Margin: Configurable modules (default: 4 for download, 2 for display)
+- Image type: PNG, JPEG, WebP (default: PNG)
+
+**Performance**:
+- QR code generation: <200ms per PO
+- Asynchronous generation to avoid blocking UI
+- Cached in component state after generation
+- Background regeneration if PO updated
+
+**Security**:
+- QR code contains only PO number (no sensitive data)
+- API authentication required to retrieve PO details after scan
+- Scanned PO must exist and be in valid status for receiving
+- Role-based access controls enforced on mobile API
+
+**Acceptance Criteria**:
+- QR code auto-generates when PO created or updated
+- QR code displays correctly on PO detail page within 500ms
+- QR code format is `PO:{orderNumber}` exactly
+- Download button creates PNG file named `{orderNumber}-QR.png`
+- Downloaded QR code is high-resolution (400×400px) and scannable
+- Copy button copies PO number and shows "Copied!" confirmation
+- QR code visible on both desktop and mobile browsers
+- QR code in PDF printouts is scannable when printed
+- Mobile app successfully scans QR code and extracts PO number
+- Scanning invalid QR code shows appropriate error message
+- QR code component handles missing/invalid PO number gracefully
+- Instructions panel clearly explains mobile scanning workflow
+- Can generate QR codes for 100+ POs without performance issues
+
+**Related Requirements**: FR-PO-004, FR-PO-007, FR-PO-009, FR-GRN-016 (GRN module)
+
+---
+
 ## Business Rules
 
 ### Data Validation Rules
@@ -1889,7 +2101,12 @@ The system provides comprehensive tracking of PO status progression (draft → s
 1. **Email Service**: SMTP server or email service (SendGrid, AWS SES) for sending PO emails
 2. **PDF Generation Library**: For creating PO PDF documents
 3. **Exchange Rate Service** (optional): External API for real-time currency exchange rates (e.g., exchangeratesapi.io, xe.com)
-4. **Barcode/QR Code Library**: For generating barcodes on PO documents
+4. **QR Code Library**: ✅ **IMPLEMENTED** - `qrcode` v1.5.3 (npm package)
+   - Generates QR codes for PO numbers in format `PO:{orderNumber}`
+   - Used for mobile receiving integration with cmobile app
+   - Provides base64 data URLs for web display and PNG downloads
+   - Implementation: `lib/utils/qr-code.ts` utilities and `QRCodeSection.tsx` component
+   - Purpose: Enable quick GRN creation by scanning PO QR codes on mobile devices
 
 ### Infrastructure Dependencies
 
@@ -1923,6 +2140,7 @@ The system provides comprehensive tracking of PO status progression (draft → s
 | **Purchase Requisition (PR)** | Internal request for goods/services, requiring approval before conversion to PO |
 | **PO Currency** | The currency in which the Purchase Order is denominated (may differ from base currency) |
 | **PO Template** | Saved PO configuration for commonly ordered items, used to quickly create new POs |
+| **QR Code** | Machine-readable code containing PO number in format `PO:{orderNumber}`, scannable by mobile app for quick GRN creation |
 | **Received Quantity** | Actual quantity of items received and recorded in GRNs |
 | **Recurring PO** | Purchase Order automatically created at regular intervals based on predefined schedule |
 | **Source PR** | The original Purchase Requisition from which a PO was created (traceability) |
@@ -1946,9 +2164,9 @@ The system provides comprehensive tracking of PO status progression (draft → s
 
 **Document Control**
 - Location: `/docs/app/procurement/purchase-orders/BR-purchase-orders.md`
-- Last Updated: 2025-10-31
-- Next Review: 2026-01-31
-- Version: 1.0.0
+- Last Updated: 2025-12-02
+- Next Review: 2026-03-01
+- Version: 1.3.0
 
 ---
 

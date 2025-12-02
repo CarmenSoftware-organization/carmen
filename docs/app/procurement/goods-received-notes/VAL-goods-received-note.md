@@ -676,17 +676,20 @@ Data Stored
 
 ---
 
-### VAL-GRN-105: PO-Based GRN Must Reference Valid PO
+### VAL-GRN-105: PO-Based GRN Must Reference Valid PO (Multi-PO Support)
 
-**Rule Description**: If GRN is created from a Purchase Order, the purchaseOrderId must reference a valid, existing PO.
+**Rule Description**: For PO-based GRN items, the purchaseOrderId on each line item must reference a valid, existing PO. The system supports multi-PO receiving where a single GRN can contain items from multiple POs.
 
-**Business Justification**: Ensures traceability between GRN and originating PO. Prevents orphaned records and maintains procurement audit trail.
+**Business Justification**: Ensures traceability between GRN line items and originating POs. Prevents orphaned records and maintains procurement audit trail. Multi-PO support enables consolidated receiving from single vendor deliveries.
 
 **Validation Logic**:
-1. If purchaseOrderId is provided, verify PO exists in system
-2. Verify PO is in approved status
-3. Verify PO belongs to same vendor as GRN
-4. Reject if PO invalid or not found
+1. For each line item with purchaseOrderId:
+   - Verify PO exists in system
+   - Verify PO is in approved status
+   - Verify PO belongs to same vendor as GRN header
+2. Line items without purchaseOrderId are valid (manual items mixed with PO items)
+3. Header-level purchaseOrderId is deprecated; validation focuses on line items
+4. Reject if any referenced PO is invalid or not found
 
 **When Validated**: On GRN creation, on PO reference change
 
@@ -1089,28 +1092,29 @@ Data Stored
 
 ---
 
-### VAL-GRN-205: PO Reference Fields Consistency
+### VAL-GRN-205: PO Reference Fields Consistency (DEPRECATED)
 
-**Fields Involved**: `purchaseOrderId`, `purchaseOrderNumber`
+**Fields Involved**: `purchaseOrderId`, `purchaseOrderNumber` (header-level - DEPRECATED)
 
-**Validation Rule**: If PO-based GRN, both purchaseOrderId and purchaseOrderNumber must be provided and must match an existing PO.
+**DEPRECATION NOTE**: Header-level PO reference fields are deprecated in favor of line-item level PO references to support multi-PO receiving. These validation rules are retained for backward compatibility only.
 
-**Business Justification**: Maintains referential integrity between GRN and PO. Ensures proper audit trail.
+**Validation Rule**: If header-level PO fields are populated (legacy), both must be consistent. For new implementations, use line-item level `purchaseOrderId` and `purchaseOrderItemId` instead.
+
+**Business Justification**: Maintains backward compatibility while supporting multi-PO receiving at line item level.
 
 **Validation Logic**:
-1. If purchaseOrderId is provided:
+1. If header purchaseOrderId is provided (legacy):
    - Verify purchaseOrderNumber is also provided
    - Query PO table with both ID and number
    - Verify they reference the same PO
-2. If purchaseOrderId is null (manual GRN):
-   - Verify purchaseOrderNumber is also null
+2. For multi-PO support, validate line-item level references (see VAL-GRN-105)
 
-**When Validated**: On PO reference change, on GRN save
+**When Validated**: On GRN save (legacy compatibility only)
 
 **Implementation Requirements**:
-- **Client-Side**: Auto-populate both fields when PO selected. Prevent manual entry of just one field.
-- **Server-Side**: Verify both fields match same PO or both are null.
-- **Database**: Foreign key constraint on purchaseOrderId. CHECK constraint for consistency.
+- **Client-Side**: For new GRNs, populate PO references at line item level. Header fields optional for legacy support.
+- **Server-Side**: Verify line-item PO references. Header fields validated only if present.
+- **Database**: Foreign key constraints on line-item level `purchaseOrderId`.
 
 **Error Code**: VAL-GRN-206
 **Error Message**: "Purchase Order reference fields are inconsistent"

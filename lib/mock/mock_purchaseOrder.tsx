@@ -47,9 +47,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Premium quality A4 copy paper, 80gsm",
         orderedQuantity: 20,
         receivedQuantity: 0,
+        pendingQuantity: 20,
         unitPrice: { amount: 25.00, currency: "EUR" },
         unit: "Box",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 500.00, currency: "EUR" },
+        taxRate: 0.07,
+        taxAmount: { amount: 35.00, currency: "EUR" },
+        deliveryDate: new Date("2023-06-20"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0045",
+        sourceRequestItemId: "pri-045-001"
       },
       {
         id: "poi-002-002",
@@ -60,9 +69,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Blue ink ballpoint pens",
         orderedQuantity: 15,
         receivedQuantity: 0,
+        pendingQuantity: 15,
         unitPrice: { amount: 8.50, currency: "EUR" },
         unit: "Pack",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 127.50, currency: "EUR" },
+        taxRate: 0.07,
+        taxAmount: { amount: 8.93, currency: "EUR" },
+        deliveryDate: new Date("2023-06-20"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0045",
+        sourceRequestItemId: "pri-045-002"
       },
       {
         id: "poi-002-003",
@@ -73,9 +91,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Desktop stapler, 50 sheet capacity",
         orderedQuantity: 5,
         receivedQuantity: 0,
+        pendingQuantity: 5,
         unitPrice: { amount: 35.00, currency: "EUR" },
         unit: "Each",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 175.00, currency: "EUR" },
+        taxRate: 0.07,
+        taxAmount: { amount: 12.25, currency: "EUR" },
+        deliveryDate: new Date("2023-06-20"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0046",
+        sourceRequestItemId: "pri-046-001"
       }
     ]
   },
@@ -119,9 +146,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "15.6\" FHD, Intel i7, 16GB RAM, 512GB SSD",
         orderedQuantity: 5,
         receivedQuantity: 0,
+        pendingQuantity: 5,
         unitPrice: { amount: 1850.00, currency: "EUR" },
         unit: "Each",
-        status: "pending"
+        discount: 0.05,
+        discountAmount: { amount: 462.50, currency: "EUR" },
+        lineTotal: { amount: 8787.50, currency: "EUR" },
+        taxRate: 0.07,
+        taxAmount: { amount: 615.13, currency: "EUR" },
+        deliveryDate: new Date("2023-07-01"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0050",
+        sourceRequestItemId: "pri-050-001"
       },
       {
         id: "poi-003-002",
@@ -132,9 +168,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Dell UltraSharp 27\" 4K USB-C Monitor",
         orderedQuantity: 5,
         receivedQuantity: 0,
+        pendingQuantity: 5,
         unitPrice: { amount: 650.00, currency: "EUR" },
         unit: "Each",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 3250.00, currency: "EUR" },
+        taxRate: 0.07,
+        taxAmount: { amount: 227.50, currency: "EUR" },
+        deliveryDate: new Date("2023-07-01"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0050",
+        sourceRequestItemId: "pri-050-002"
       },
       {
         id: "poi-003-003",
@@ -145,9 +190,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Logitech MX Keys + MX Master 3",
         orderedQuantity: 5,
         receivedQuantity: 0,
+        pendingQuantity: 5,
         unitPrice: { amount: 180.00, currency: "EUR" },
         unit: "Set",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 900.00, currency: "EUR" },
+        taxRate: 0.07,
+        taxAmount: { amount: 63.00, currency: "EUR" },
+        deliveryDate: new Date("2023-07-01"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0050",
+        sourceRequestItemId: "pri-050-003"
       }
     ]
   },
@@ -190,9 +244,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Premium Atlantic salmon, skinless fillet",
         orderedQuantity: 15,
         receivedQuantity: 0,
+        pendingQuantity: 15,
         unitPrice: { amount: 28.00, currency: "EUR" },
         unit: "Kg",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 420.00, currency: "EUR" },
+        taxRate: 0,
+        taxAmount: { amount: 0, currency: "EUR" },
+        deliveryDate: new Date("2023-06-17"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0055",
+        sourceRequestItemId: "pri-055-001"
       },
       {
         id: "poi-004-002",
@@ -203,9 +266,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Seasonal vegetable mix - carrots, broccoli, beans",
         orderedQuantity: 20,
         receivedQuantity: 0,
+        pendingQuantity: 20,
         unitPrice: { amount: 8.50, currency: "EUR" },
         unit: "Kg",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 170.00, currency: "EUR" },
+        taxRate: 0,
+        taxAmount: { amount: 0, currency: "EUR" },
+        deliveryDate: new Date("2023-06-17"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0055",
+        sourceRequestItemId: "pri-055-002"
       },
       {
         id: "poi-004-003",
@@ -216,9 +288,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Basil, thyme, rosemary, parsley",
         orderedQuantity: 10,
         receivedQuantity: 0,
+        pendingQuantity: 10,
         unitPrice: { amount: 5.00, currency: "EUR" },
         unit: "Bundle",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 50.00, currency: "EUR" },
+        taxRate: 0,
+        taxAmount: { amount: 0, currency: "EUR" },
+        deliveryDate: new Date("2023-06-17"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0056",
+        sourceRequestItemId: "pri-056-001"
       },
       {
         id: "poi-004-004",
@@ -229,9 +310,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Italian EVOO, cold pressed",
         orderedQuantity: 6,
         receivedQuantity: 0,
+        pendingQuantity: 6,
         unitPrice: { amount: 22.00, currency: "EUR" },
         unit: "Litre",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 132.00, currency: "EUR" },
+        taxRate: 0,
+        taxAmount: { amount: 0, currency: "EUR" },
+        deliveryDate: new Date("2023-06-17"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0056",
+        sourceRequestItemId: "pri-056-002"
       }
     ]
   },
@@ -274,9 +364,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Heavy duty degreaser, 20L drum",
         orderedQuantity: 10,
         receivedQuantity: 0,
+        pendingQuantity: 10,
         unitPrice: { amount: 85.00, currency: "EUR" },
         unit: "Drum",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 850.00, currency: "EUR" },
+        taxRate: 0.1,
+        taxAmount: { amount: 85.00, currency: "EUR" },
+        deliveryDate: new Date("2023-07-20"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0060",
+        sourceRequestItemId: "pri-060-001"
       },
       {
         id: "poi-005-002",
@@ -287,9 +386,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Nitrile disposable gloves, size L",
         orderedQuantity: 20,
         receivedQuantity: 0,
+        pendingQuantity: 20,
         unitPrice: { amount: 45.00, currency: "EUR" },
         unit: "Box",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 900.00, currency: "EUR" },
+        taxRate: 0.1,
+        taxAmount: { amount: 90.00, currency: "EUR" },
+        deliveryDate: new Date("2023-07-20"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0060",
+        sourceRequestItemId: "pri-060-002"
       },
       {
         id: "poi-005-003",
@@ -300,9 +408,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "17\" diameter, medium abrasive",
         orderedQuantity: 25,
         receivedQuantity: 0,
+        pendingQuantity: 25,
         unitPrice: { amount: 22.00, currency: "EUR" },
         unit: "Each",
-        status: "pending"
+        discount: 0.05,
+        discountAmount: { amount: 27.50, currency: "EUR" },
+        lineTotal: { amount: 522.50, currency: "EUR" },
+        taxRate: 0.1,
+        taxAmount: { amount: 52.25, currency: "EUR" },
+        deliveryDate: new Date("2023-07-20"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0061",
+        sourceRequestItemId: "pri-061-001"
       }
     ]
   },
@@ -345,9 +462,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Standard dry container, 3-month rental",
         orderedQuantity: 2,
         receivedQuantity: 0,
+        pendingQuantity: 2,
         unitPrice: { amount: 4500.00, currency: "EUR" },
         unit: "Each",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 9000.00, currency: "EUR" },
+        taxRate: 0.1,
+        taxAmount: { amount: 900.00, currency: "EUR" },
+        deliveryDate: new Date("2023-07-25"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0065",
+        sourceRequestItemId: "pri-065-001"
       },
       {
         id: "poi-006-002",
@@ -358,9 +484,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "High cube container, 3-month rental",
         orderedQuantity: 2,
         receivedQuantity: 0,
+        pendingQuantity: 2,
         unitPrice: { amount: 5500.00, currency: "EUR" },
         unit: "Each",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 11000.00, currency: "EUR" },
+        taxRate: 0.1,
+        taxAmount: { amount: 1100.00, currency: "EUR" },
+        deliveryDate: new Date("2023-07-25"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0065",
+        sourceRequestItemId: "pri-065-002"
       }
     ]
   },
@@ -404,9 +539,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "High efficiency solar panel, 25-year warranty",
         orderedQuantity: 50,
         receivedQuantity: 0,
+        pendingQuantity: 50,
         unitPrice: { amount: 450.00, currency: "EUR" },
         unit: "Each",
-        status: "pending"
+        discount: 0.05,
+        discountAmount: { amount: 1125.00, currency: "EUR" },
+        lineTotal: { amount: 21375.00, currency: "EUR" },
+        taxRate: 0.1,
+        taxAmount: { amount: 2137.50, currency: "EUR" },
+        deliveryDate: new Date("2023-08-15"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0070",
+        sourceRequestItemId: "pri-070-001"
       },
       {
         id: "poi-007-002",
@@ -417,9 +561,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Grid-tied inverter with monitoring",
         orderedQuantity: 5,
         receivedQuantity: 0,
+        pendingQuantity: 5,
         unitPrice: { amount: 2800.00, currency: "EUR" },
         unit: "Each",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 14000.00, currency: "EUR" },
+        taxRate: 0.1,
+        taxAmount: { amount: 1400.00, currency: "EUR" },
+        deliveryDate: new Date("2023-08-15"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0070",
+        sourceRequestItemId: "pri-070-002"
       },
       {
         id: "poi-007-003",
@@ -430,9 +583,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Complete roof mounting system with cables",
         orderedQuantity: 1,
         receivedQuantity: 0,
+        pendingQuantity: 1,
         unitPrice: { amount: 8500.00, currency: "EUR" },
         unit: "Set",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "EUR" },
+        lineTotal: { amount: 8500.00, currency: "EUR" },
+        taxRate: 0.1,
+        taxAmount: { amount: 850.00, currency: "EUR" },
+        deliveryDate: new Date("2023-08-15"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0070",
+        sourceRequestItemId: "pri-070-003"
       }
     ]
   },
@@ -475,9 +637,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Premium grade, 25kg bag",
         orderedQuantity: 50,
         receivedQuantity: 0,
+        pendingQuantity: 50,
         unitPrice: { amount: 180.00, currency: "THB" },
         unit: "Bag",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "THB" },
+        lineTotal: { amount: 9000.00, currency: "THB" },
+        taxRate: 0.07,
+        taxAmount: { amount: 630.00, currency: "THB" },
+        deliveryDate: new Date("2023-07-15"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0075",
+        sourceRequestItemId: "pri-075-001"
       },
       {
         id: "poi-008-002",
@@ -488,9 +659,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Tiparos brand, 700ml bottle",
         orderedQuantity: 24,
         receivedQuantity: 0,
+        pendingQuantity: 24,
         unitPrice: { amount: 85.00, currency: "THB" },
         unit: "Bottle",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "THB" },
+        lineTotal: { amount: 2040.00, currency: "THB" },
+        taxRate: 0.07,
+        taxAmount: { amount: 142.80, currency: "THB" },
+        deliveryDate: new Date("2023-07-15"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0075",
+        sourceRequestItemId: "pri-075-002"
       },
       {
         id: "poi-008-003",
@@ -501,9 +681,18 @@ export const Mock_purchaseOrders: PurchaseOrderWithItems[] = [
         description: "Chaokoh brand, 400ml can",
         orderedQuantity: 100,
         receivedQuantity: 0,
+        pendingQuantity: 100,
         unitPrice: { amount: 45.00, currency: "THB" },
         unit: "Can",
-        status: "pending"
+        discount: 0,
+        discountAmount: { amount: 0, currency: "THB" },
+        lineTotal: { amount: 4500.00, currency: "THB" },
+        taxRate: 0.07,
+        taxAmount: { amount: 315.00, currency: "THB" },
+        deliveryDate: new Date("2023-07-15"),
+        status: "pending",
+        sourceRequestId: "PR-2024-0076",
+        sourceRequestItemId: "pri-076-001"
       }
     ]
   }

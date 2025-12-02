@@ -142,12 +142,13 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
   - Data type: String (max 255 characters)
   - Example: "Professional Kitchen Supplies"
 
-- **purchaseOrderId**: Optional reference to source purchase order
+- **purchaseOrderId**: (DEPRECATED) Optional reference to source purchase order
   - Required: No (NULL for manual GRNs)
   - Data type: UUID
   - Links to PurchaseOrder entity
+  - **DEPRECATED**: For multi-PO support, PO references are now stored at line item level. Retained for backward compatibility.
 
-- **purchaseOrderNumber**: Denormalized PO number for display
+- **purchaseOrderNumber**: (DEPRECATED) Denormalized PO number for display
   - Required: No
   - Data type: String
   - Example: "PO-2024-001"
@@ -256,8 +257,8 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 | receiptDate | DATE | Yes | - | Date goods received | 2024-01-15 | Cannot be future |
 | vendorId | UUID | Yes | - | Vendor reference | 550e8400-... | FK to vendors.id |
 | vendorName | VARCHAR(255) | Yes | - | Vendor name (denormalized) | Professional Kitchen Supplies | Non-empty |
-| purchaseOrderId | UUID | No | NULL | PO reference (optional) | 550e8400-... | FK to purchase_orders.id |
-| purchaseOrderNumber | VARCHAR(50) | No | NULL | PO number (denormalized) | PO-2024-001 | - |
+| purchaseOrderId | UUID | No | NULL | (DEPRECATED) PO reference - use line item level | 550e8400-... | FK to purchase_orders.id |
+| purchaseOrderNumber | VARCHAR(50) | No | NULL | (DEPRECATED) PO number - use line item level | PO-2024-001 | - |
 | invoiceNumber | VARCHAR(100) | No | NULL | Vendor invoice number | INV-20240115-001 | - |
 | invoiceDate | DATE | No | NULL | Invoice date | 2024-01-14 | - |
 | deliveryNote | VARCHAR(100) | No | NULL | Delivery note reference | DN-12345 | - |
@@ -297,10 +298,10 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
   - On Update: CASCADE
   - Business rule: All goods must have valid vendor reference
 
-- **Purchase Order** (`purchaseOrderId` → `purchase_orders.id`)
+- **Purchase Order** (`purchaseOrderId` → `purchase_orders.id`) - (DEPRECATED)
   - On Delete: SET NULL (preserve GRN even if PO deleted)
   - On Update: CASCADE
-  - Business rule: Optional reference for PO-based GRNs, NULL for manual GRNs
+  - **DEPRECATED**: For multi-PO support, PO references now stored at line item level. Retained for backward compatibility.
 
 - **Location** (`locationId` → `locations.id`)
   - On Delete: RESTRICT (cannot delete location with GRNs)
@@ -353,8 +354,14 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 - **itemName**: Product name
 - **description**: Detailed item description
 
-**Purchase Order Reference**:
+**Purchase Order Reference** (Multi-PO Support):
+- **purchaseOrderId**: Optional link to source purchase order (NULL for manual GRNs)
+  - Data type: UUID
+  - Links to PurchaseOrder entity
+  - Enables multi-PO receiving: each line can reference a different PO
 - **purchaseOrderItemId**: Optional link to source PO line item (NULL for manual GRNs)
+  - Data type: UUID
+  - Links to PurchaseOrderItem entity
 
 **Quantity Tracking**:
 - **orderedQuantity**: Quantity originally ordered (from PO, NULL for manual)
@@ -393,6 +400,7 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 | id | UUID | Yes | Auto | Primary key identifier | 550e8400-... | Unique |
 | grnId | UUID | Yes | - | Parent GRN reference | 550e8400-... | FK to grn.id, CASCADE delete |
 | lineNumber | INTEGER | Yes | - | Sequential line number | 1, 2, 3 | > 0 |
+| purchaseOrderId | UUID | No | NULL | PO reference (Multi-PO) | 550e8400-... | FK to purchase_orders.id |
 | purchaseOrderItemId | UUID | No | NULL | PO item reference | 550e8400-... | FK to po_items.id |
 | itemId | UUID | Yes | - | Product reference | 550e8400-... | FK to products.id |
 | itemCode | VARCHAR(100) | Yes | - | Product SKU | PROD-123 | Non-empty |
@@ -433,6 +441,16 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 - **Location** (`storageLocationId` → `locations.id`)
   - On Delete: RESTRICT
   - On Update: CASCADE
+
+- **Purchase Order** (`purchaseOrderId` → `purchase_orders.id`) - Multi-PO Support
+  - On Delete: RESTRICT
+  - On Update: CASCADE
+  - NULL allowed for manual GRN items
+
+- **PO Item** (`purchaseOrderItemId` → `purchase_order_items.id`)
+  - On Delete: RESTRICT
+  - On Update: CASCADE
+  - NULL allowed for manual GRN items
 
 **Check Constraints**:
 - `receivedQuantity` + `rejectedQuantity` + `damagedQuantity` ≤ `deliveredQuantity`

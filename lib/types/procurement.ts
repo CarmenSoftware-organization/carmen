@@ -285,6 +285,10 @@ export interface PurchaseOrder {
   pendingItems: number;
   notes?: string;
   attachments?: string[];
+  // QR Code for mobile scanning
+  qrCode?: string; // QR code value (e.g., "PO:PO-2025-0001")
+  qrCodeImage?: string; // Base64 encoded QR code image
+  qrCodeGeneratedAt?: Date; // Timestamp when QR code was generated
   // Audit fields
   createdAt?: Date;
   updatedAt?: Date;

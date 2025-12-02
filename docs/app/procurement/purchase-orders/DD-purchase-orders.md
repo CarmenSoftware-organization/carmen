@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Orders
 - **Document Type**: Data Definition (DD)
-- **Version**: 3.0.0
-- **Last Updated**: 2025-11-21
+- **Version**: 3.3.0
+- **Last Updated**: 2025-12-02
 - **Status**: In Progress
 
 ## Document History
@@ -15,6 +15,9 @@
 | 1.0.0 | 2025-10-30 | System | Initial creation with approval workflow tables |
 | 2.0.0 | 2025-10-31 | System | Removed purchase_order_approvals table, updated ERD, removed v_pending_po_approvals view, updated status constraints, clarified approved_by/approved_at fields are NOT multi-stage approval workflow |
 | 3.0.0 | 2025-11-21 | System | Major restructure: Converted from SQL-focused implementation document to proper Data Definition document with field definitions, business rules, and diagrams; moved all SQL code (DDL, triggers, functions, views) to Technical Specification document |
+| 3.1.0 | 2025-12-01 | System | Added Comments & Attachments sidebar feature documentation; Updated page layout to describe collapsible right sidebar with Comments, Attachments, and Activity Log sections |
+| 3.3.0 | 2025-12-02 | System Analyst | Added QR Code fields (qr_code, qr_code_image, qr_code_generated_at) to Purchase Orders table for mobile receiving integration |
+| 3.2.0 | 2025-12-01 | System | Added PO Item enhanced fields: sourceRequestId, sourceRequestItemId, lineTotal, pendingQuantity, discount, discountAmount, taxRate, taxAmount, deliveryDate for PR traceability and financial calculations |
 
 ## Related Documents
 
@@ -116,6 +119,10 @@ erDiagram
 | **Audit Fields** |
 | updated_at | Timestamp | Yes | Last update timestamp | Auto-updated |
 | updated_by | UUID | Yes | User who last updated | Reference to users |
+| **QR Code for Mobile Receiving** |
+| qr_code | String(100) | No | QR code value for mobile scanning | Format: PO:{po_number}, e.g., "PO:PO-2025-0001" |
+| qr_code_image | Text | No | Base64-encoded QR code image | Data URL format for web display |
+| qr_code_generated_at | Timestamp | No | QR code generation timestamp | Auto-set when generated |
 | **Soft Delete** |
 | deleted_at | Timestamp | No | Deletion timestamp | Null if not deleted |
 | deleted_by | UUID | No | User who deleted | |
@@ -142,6 +149,12 @@ erDiagram
    - Only authorized purchasing staff can send POs to vendors
    - approved_by and approved_at are set together when PO is sent
 
+5. **QR Code Generation**:
+   - qr_code value must follow format: `PO:{po_number}`
+   - qr_code_image must be valid base64-encoded data URL
+   - qr_code_generated_at auto-set when QR code generated
+   - QR codes regenerated if PO number changes
+
 ---
 
 ### 2. purchase_order_line_items Table
@@ -152,50 +165,68 @@ erDiagram
 CREATE TABLE purchase_order_line_items (
   -- Primary Key
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
+
   -- Parent Reference
   purchase_order_id UUID NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
-  
+
   -- Line Number
   line_number INT NOT NULL,
-  
-  -- Source Reference
+
+  -- Source Reference (PR Traceability)
   purchase_request_line_item_id UUID REFERENCES purchase_request_line_items(id),
-  
+  source_request_id VARCHAR(50),           -- PR number for display (e.g., "PR-2024-0045")
+  source_request_item_id VARCHAR(50),      -- PR item ID for traceability
+
   -- Product Information
   product_id UUID REFERENCES products(id),
-  description TEXT NOT NULL,
-  
+  item_code VARCHAR(50),                   -- Item code for display
+  item_name VARCHAR(255) NOT NULL,         -- Item name
+  description TEXT NOT NULL,               -- Item description
+
   -- Quantity and Pricing
-  quantity DECIMAL(15,3) NOT NULL,
-  unit_of_measure VARCHAR(20) NOT NULL,
-  unit_price DECIMAL(15,2) NOT NULL,
-  line_total DECIMAL(15,2) NOT NULL,
+  quantity DECIMAL(15,3) NOT NULL,         -- Ordered quantity
+  unit_of_measure VARCHAR(20) NOT NULL,    -- Unit of measure (e.g., "Box", "Each")
+  unit_price DECIMAL(15,2) NOT NULL,       -- Price per unit
+
+  -- Discount (line-level)
+  discount DECIMAL(5,2) DEFAULT 0,         -- Discount percentage (0-100)
+  discount_amount DECIMAL(15,2) DEFAULT 0, -- Calculated discount amount
+
+  -- Line Totals
+  line_total DECIMAL(15,2) NOT NULL,       -- (quantity * unit_price) - discount_amount
+  tax_rate DECIMAL(5,2) DEFAULT 0,         -- Tax rate percentage
   tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-  
+
   -- Delivery
-  expected_delivery_date DATE,
-  
+  expected_delivery_date DATE,             -- Line-specific delivery date (optional)
+
   -- Receipt Tracking
   quantity_received DECIMAL(15,3) NOT NULL DEFAULT 0,
+  pending_quantity DECIMAL(15,3) NOT NULL, -- Alias for quantity_remaining
   quantity_remaining DECIMAL(15,3) NOT NULL,
-  
+
   -- Additional Information
   specifications TEXT,
   notes TEXT,
-  
+
+  -- Status
+  status VARCHAR(20) NOT NULL DEFAULT 'pending', -- pending, partial, received, cancelled
+
   -- Audit Fields
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   created_by UUID NOT NULL REFERENCES users(id),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_by UUID NOT NULL REFERENCES users(id),
-  
+
   -- Constraints
   CONSTRAINT po_line_unique UNIQUE (purchase_order_id, line_number),
   CONSTRAINT po_line_quantity_check CHECK (quantity > 0),
   CONSTRAINT po_line_unit_price_check CHECK (unit_price >= 0),
   CONSTRAINT po_line_received_check CHECK (quantity_received >= 0 AND quantity_received <= quantity * 1.05),
-  CONSTRAINT po_line_remaining_check CHECK (quantity_remaining >= 0)
+  CONSTRAINT po_line_remaining_check CHECK (quantity_remaining >= 0),
+  CONSTRAINT po_line_discount_check CHECK (discount >= 0 AND discount <= 100),
+  CONSTRAINT po_line_tax_rate_check CHECK (tax_rate >= 0 AND tax_rate <= 100),
+  CONSTRAINT po_line_status_check CHECK (status IN ('pending', 'partial', 'received', 'cancelled'))
 );
 
 -- Indexes
@@ -203,12 +234,24 @@ CREATE INDEX idx_po_line_po_id ON purchase_order_line_items(purchase_order_id);
 CREATE INDEX idx_po_line_product_id ON purchase_order_line_items(product_id);
 CREATE INDEX idx_po_line_pr_line_id ON purchase_order_line_items(purchase_request_line_item_id);
 CREATE INDEX idx_po_line_line_number ON purchase_order_line_items(purchase_order_id, line_number);
+CREATE INDEX idx_po_line_source_request ON purchase_order_line_items(source_request_id);
+CREATE INDEX idx_po_line_item_code ON purchase_order_line_items(item_code);
 
 -- Comments
 COMMENT ON TABLE purchase_order_line_items IS 'Individual items on purchase orders';
 COMMENT ON COLUMN purchase_order_line_items.line_number IS 'Sequential line number within PO';
+COMMENT ON COLUMN purchase_order_line_items.source_request_id IS 'Source PR number for traceability (e.g., PR-2024-0045)';
+COMMENT ON COLUMN purchase_order_line_items.source_request_item_id IS 'Source PR line item ID for traceability';
+COMMENT ON COLUMN purchase_order_line_items.item_code IS 'Item code from product catalog';
+COMMENT ON COLUMN purchase_order_line_items.item_name IS 'Display name for the item';
+COMMENT ON COLUMN purchase_order_line_items.discount IS 'Line-level discount percentage';
+COMMENT ON COLUMN purchase_order_line_items.discount_amount IS 'Calculated discount amount';
+COMMENT ON COLUMN purchase_order_line_items.line_total IS 'Calculated line total: (quantity * unit_price) - discount_amount';
+COMMENT ON COLUMN purchase_order_line_items.tax_rate IS 'Tax rate percentage for the line item';
+COMMENT ON COLUMN purchase_order_line_items.pending_quantity IS 'Quantity pending delivery (alias for quantity_remaining)';
 COMMENT ON COLUMN purchase_order_line_items.quantity_received IS 'Total quantity received across all GRNs';
 COMMENT ON COLUMN purchase_order_line_items.quantity_remaining IS 'Quantity yet to be received';
+COMMENT ON COLUMN purchase_order_line_items.status IS 'Line item status: pending, partial, received, cancelled';
 \`\`\`
 
 ---

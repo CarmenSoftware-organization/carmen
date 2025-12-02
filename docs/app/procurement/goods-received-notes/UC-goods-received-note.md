@@ -1,1446 +1,2358 @@
-# Use Cases: Goods Received Note
+# Use Cases: Goods Received Note (GRN)
 
-## Module Information
-- **Module**: Procurement
-- **Sub-Module**: Goods Received Note (GRN)
-- **Route**: `/procurement/goods-received-note`
-- **Version**: 1.0.0
-- **Last Updated**: 2025-01-11
-- **Owner**: Procurement Team
-- **Status**: Approved
-
-## Document History
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0.0 | 2025-01-11 | Documentation Team | Initial version from source code analysis |
+**Module**: Procurement
+**Sub-module**: Goods Received Note
+**Document Version**: 1.0
+**Last Updated**: 2025-12-02
 
 ---
 
-## Overview
+## 1. Overview
 
-This document describes the use cases for the Goods Received Note (GRN) module, covering all user interactions, system processes, and integration points discovered in the actual codebase. The GRN module supports receiving goods from vendors through two primary workflows: PO-based GRN creation (from existing purchase orders) and manual GRN creation (for unplanned deliveries).
+### 1.1 Purpose
+This document defines detailed use cases for the Goods Received Note (GRN) module, describing how users interact with the system to record, validate, and manage goods receipts from vendors.
 
-Key workflows include GRN list management, item-level receiving with discrepancy tracking, multi-currency handling, extra cost distribution, and automatic stock movement generation upon commitment.
+### 1.2 Scope
+This document covers:
+- Primary use cases for all GRN workflows
+- Actor interactions and system responses
+- Preconditions, postconditions, and business rules
+- Main flows and alternative/exception flows
+- Integration points with other modules
 
-**Related Documents**:
-- [Business Requirements](./BR-goods-received-note.md)
-- [Technical Specification](./TS-goods-received-note.md)
-- [Data Definition](./DD-goods-received-note.md)
-- [Flow Diagrams](./FD-goods-received-note.md)
-- [Validations](./VAL-goods-received-note.md)
+### 1.3 Actors
 
----
-
-## Actors
-
-### Primary Actors
-
-| Actor | Description | Role |
-|-------|-------------|------|
-| Receiving Clerk | Warehouse or receiving area staff who physically receive goods | Records GRN, inspects goods, documents discrepancies |
-| Purchasing Staff | Procurement team members managing the purchasing process | Creates GRNs, reviews discrepancies, manages vendor issues |
-| Warehouse Staff | Staff responsible for inventory and storage operations | Assigns storage locations, confirms stock movements |
-
-### Secondary Actors
-
-| Actor | Description | Role |
-|-------|-------------|------|
-| Procurement Manager | Manager overseeing procurement operations | Reviews discrepancies, voids GRNs |
-| Finance Team | Financial staff processing vendor payments | Reviews GRN financial data, processes invoices |
-| Warehouse Supervisor | Supervisor of warehouse operations | Manages storage assignments |
-
-### System Actors
-
-| System | Description | Integration Type |
-|--------|-------------|------------------|
-| Inventory Management Module | Updates stock levels when GRN is committed | Internal Module Integration |
-| Finance Module | Receives journal voucher entries from committed GRNs | Internal Module Integration |
-| Purchase Orders Module | Provides source data for PO-based GRNs | Internal Module Integration |
+| Actor | Description | Permissions |
+|-------|-------------|-------------|
+| **Receiving Clerk** | Records goods receipt, validates deliveries against POs | Create, edit DRAFT/RECEIVED GRNs |
+| **Storekeeper** | Manages inventory locations, confirms stock movements | Commit GRNs, verify stock movements |
+| **Purchasing Staff** | Reviews GRN against PO, resolves discrepancies | View all GRNs, edit before commit |
+| **AP Clerk** | Processes vendor invoices, allocates costs | View GRNs, add extra costs |
+| **Financial Controller** | Reviews accounting entries, audits GRN | View all, export reports, audit logs |
+| **Purchasing Manager** | Oversees procurement operations, handles exceptions | Void GRNs, override validations |
+| **System** | Automated system processes | Auto-generate numbers, create stock movements, post JVs |
 
 ---
 
-## Use Case Diagram
+## 2. Use Case Index
 
-```
-                    ┌────────────────────────────────────────┐
-                    │    Goods Received Note System          │
-                    └──────────────┬─────────────────────────┘
-                                   │
-    ┌──────────────────────────────┼──────────────────────────────┐
-    │                              │                              │
-    │                              │                              │
-┌───▼────────┐               ┌────▼─────────┐            ┌───────▼────────┐
-│ Receiving  │               │  Purchasing  │            │   Warehouse    │
-│   Clerk    │               │    Staff     │            │     Staff      │
-└───┬────────┘               └────┬─────────┘            └───────┬────────┘
-    │                              │                              │
-[UC-GRN-001]                  [UC-GRN-002]                   [UC-GRN-005]
-[UC-GRN-003]                  [UC-GRN-003]                   [UC-GRN-006]
-[UC-GRN-004]                  [UC-GRN-007]                   [UC-GRN-009]
-[UC-GRN-005]                  [UC-GRN-008]
-[UC-GRN-006]                  [UC-GRN-010]
-
-
-              ┌──────────────────┐
-              │   Procurement    │
-              │     Manager      │
-              └────────┬─────────┘
-                       │
-                  [UC-GRN-012]
-                  [UC-GRN-013]
-
-
-    ┌──────────────┐              ┌──────────────┐              ┌──────────────┐
-    │  Inventory   │              │   Finance    │              │  Purchase    │
-    │ Management   │              │    Module    │              │    Orders    │
-    │   Module     │              │              │              │    Module    │
-    └──────┬───────┘              └──────┬───────┘              └──────┬───────┘
-           │                             │                             │
-      [UC-GRN-101]                  [UC-GRN-102]                  [UC-GRN-103]
-   (stock update)              (journal voucher)             (PO fulfillment)
-```
-
-**Legend**:
-- **Primary Actors** (top row): Receiving Clerk, Purchasing Staff, Warehouse Staff
-- **Secondary Actors** (middle row): Procurement Manager
-- **System Actors** (bottom row): Inventory, Finance, and Purchase Orders modules
+| UC ID | Use Case Name | Actor(s) | Priority | FR Reference |
+|-------|---------------|----------|----------|--------------|
+| UC-GRN-001 | View GRN List | All Users | High | FR-GRN-001 |
+| UC-GRN-002 | Filter and Search GRNs | All Users | High | FR-GRN-001 |
+| UC-GRN-003 | Create GRN from Single PO | Receiving Clerk | High | FR-GRN-002 |
+| UC-GRN-004 | Create GRN from Multiple POs | Receiving Clerk | High | FR-GRN-002, FR-GRN-006 |
+| UC-GRN-005 | Create Manual GRN | Receiving Clerk | High | FR-GRN-003 |
+| UC-GRN-006 | Edit GRN Header | Receiving Clerk | High | FR-GRN-004 |
+| UC-GRN-007 | Add Line Items | Receiving Clerk | High | FR-GRN-005 |
+| UC-GRN-008 | Edit Line Items | Receiving Clerk | High | FR-GRN-005 |
+| UC-GRN-009 | Delete Line Items | Receiving Clerk | Medium | FR-GRN-005 |
+| UC-GRN-010 | Add Extra Costs | AP Clerk | Medium | FR-GRN-007 |
+| UC-GRN-011 | Commit GRN | Storekeeper | High | FR-GRN-010, FR-GRN-008 |
+| UC-GRN-012 | Void GRN | Purchasing Manager | Medium | FR-GRN-010 |
+| UC-GRN-013 | View Financial Summary | AP Clerk | High | FR-GRN-009 |
+| UC-GRN-014 | View Stock Movements | Storekeeper | High | FR-GRN-008 |
+| UC-GRN-015 | Add Comments | All Users | Medium | FR-GRN-012 |
+| UC-GRN-016 | Upload Attachments | Receiving Clerk | Medium | FR-GRN-012 |
+| UC-GRN-017 | View Activity Log | Financial Controller | Medium | FR-GRN-013 |
+| UC-GRN-018 | Perform Bulk Actions | Receiving Clerk | Low | FR-GRN-014 |
+| UC-GRN-019 | Export GRN to PDF | All Users | Medium | FR-GRN-015 |
+| UC-GRN-020 | Export GRN to Excel | All Users | Medium | FR-GRN-015 |
+| UC-GRN-021 | Print GRN | Receiving Clerk | Medium | FR-GRN-015 |
+| UC-GRN-022 | Handle Consignment Receipt | AP Clerk | Low | FR-GRN-017 |
+| UC-GRN-023 | Handle Cash Purchase | AP Clerk | Low | FR-GRN-017 |
 
 ---
 
-## Use Case Summary
+## 3. Detailed Use Cases
 
-| ID | Use Case Name | Actor(s) | Priority | Complexity | Category |
-|----|---------------|----------|----------|------------|----------|
-| **User Use Cases** | | | | | |
-| UC-GRN-001 | View and Filter GRN List | Receiving Clerk, Purchasing Staff | High | Simple | User |
-| UC-GRN-002 | Create GRN from Purchase Order | Purchasing Staff, Receiving Clerk | Critical | Complex | User |
-| UC-GRN-003 | Create Manual GRN | Receiving Clerk, Purchasing Staff | High | Medium | User |
-| UC-GRN-004 | View GRN Details | Receiving Clerk, Purchasing Staff, Warehouse Staff | High | Simple | User |
-| UC-GRN-005 | Edit GRN (Draft/Received Status) | Receiving Clerk, Warehouse Staff | High | Medium | User |
-| UC-GRN-006 | Manage GRN Items | Receiving Clerk, Warehouse Staff | Critical | Complex | User |
-| UC-GRN-007 | Record Item Discrepancies | Receiving Clerk | High | Medium | User |
-| UC-GRN-008 | Manage Extra Costs | Purchasing Staff | Medium | Medium | User |
-| UC-GRN-009 | Assign Storage Locations | Warehouse Staff | Critical | Simple | User |
-| UC-GRN-010 | Add Comments and Attachments | Receiving Clerk, Purchasing Staff | Medium | Simple | User |
-| UC-GRN-011 | Commit GRN | Warehouse Staff, Receiving Clerk, Purchasing Staff | Critical | Complex | User |
-| UC-GRN-012 | Void GRN | Procurement Manager | Medium | Simple | User |
-| **System Use Cases** | | | | | |
-| UC-GRN-101 | Generate Stock Movements | Inventory Management Module | Critical | Complex | System |
-| UC-GRN-102 | Generate Journal Voucher | Finance Module | Critical | Complex | System |
-| UC-GRN-103 | Update PO Fulfillment Status | Purchase Orders Module | High | Medium | System |
+### UC-GRN-001: View GRN List
 
----
-
-## User Use Cases
-
-### UC-GRN-001: View and Filter GRN List
-
-**Description**: User views a paginated list of all Goods Received Notes and applies filters to find specific GRNs based on criteria such as status, date, vendor, or location.
-
-**Actor(s)**: Receiving Clerk, Purchasing Staff, Warehouse Staff
-
+**Primary Actor**: All Users
+**Stakeholders**: Receiving Clerk, Storekeeper, AP Clerk, Financial Controller
 **Priority**: High
+**FR Reference**: FR-GRN-001
 
-**Frequency**: Daily (multiple times per day)
+**Description**: User views a paginated list of all GRNs with key summary information.
 
 **Preconditions**:
 - User is authenticated and has permission to view GRNs
-- GRN data exists in the system
+- At least one GRN exists in the system (or list shows empty state)
 
 **Postconditions**:
-- **Success**: User sees filtered list of GRNs matching their criteria
-- **Failure**: User sees error message, full list displayed if filters invalid
+- GRN list is displayed with current data
+- User can select a GRN to view details
 
 **Main Flow**:
-1. User navigates to `/procurement/goods-received-note` route
-2. System loads and displays GRN list in data table with default sorting (newest first)
-3. User selects filter criteria (status, vendor, date range, location)
-4. System applies filters and updates the display
-5. User sees filtered GRN list with key information: GRN number, date, vendor, status, total value
-6. Use case ends
+1. User navigates to GRN List page (`/procurement/goods-received-note`)
+2. System retrieves GRN records from database
+3. System displays GRN list with columns:
+   - GRN Number
+   - Receipt Date
+   - Vendor Name
+   - Status (with color badge)
+   - Total Amount
+   - Created By
+   - Actions (View, Edit, Print)
+4. System displays pagination controls (10/25/50/100 per page)
+5. User can click on GRN to view details
 
 **Alternative Flows**:
 
-**Alt-1A: Search by GRN Number or Invoice** (At step 3)
-- 3a. User enters search term in search box
-- 3b. System filters GRNs matching search term in GRN number, vendor name, or invoice number
-- 3c. System displays filtered results
-- Continue to step 6
+**A1: No GRNs Exist**
+- 3a. If no GRNs exist, system displays empty state with "Create New GRN" button
+- 3b. User can click button to create first GRN
 
-**Alt-1B: Sort by Column** (At step 3)
-- 3a. User clicks column header to sort
-- 3b. System sorts GRNs by selected column (ascending/descending)
-- 3c. System displays sorted results
-- Continue to step 6
+**A2: Large Dataset**
+- 3a. If >1000 GRNs, system displays pagination and loads data incrementally
+- 3b. User can navigate pages using pagination controls
 
 **Exception Flows**:
 
-**Exc-1A: No GRNs Found** (At step 4)
-- System finds no GRNs matching filter criteria
-- System displays "No results found" message
-- User clears filters or modifies search criteria
-- Resume at step 3 or end use case
+**E1: Database Connection Error**
+- 2a. System cannot retrieve GRN data
+- 2b. System displays error message: "Unable to load GRNs. Please try again."
+- 2c. System provides "Retry" button
 
 **Business Rules**:
-- **BR-GRN-023**: Users can only view GRNs for their assigned locations unless they have cross-location permission
+- BR-GRN-001: GRN numbers displayed in format GRN-YYYY-NNNN
+- Users see only GRNs they have permission to view based on role
 
-**Related Requirements**:
-- FR-GRN-001: GRN List and Overview
-- NFR-GRN-001: List page load performance within 2 seconds
-
-**Notes**:
-- List supports sorting by all displayed columns
-- Status colors: DRAFT (gray), RECEIVED (blue), COMMITTED (green), VOID (red)
-- Pagination defaults to 20 rows per page
+**UI Requirements**:
+- List loads within 2 seconds (NFR-GRN-001)
+- Responsive table design for tablet use
+- Status badges color-coded: DRAFT (gray), RECEIVED (blue), COMMITTED (green), VOID (red)
 
 ---
 
-### UC-GRN-002: Create GRN from Purchase Order
+### UC-GRN-002: Filter and Search GRNs
 
-**Description**: User creates a new Goods Received Note by selecting items from existing purchase orders, recording actual quantities received, and documenting any discrepancies.
+**Primary Actor**: All Users
+**Priority**: High
+**FR Reference**: FR-GRN-001
 
-**Actor(s)**: Purchasing Staff, Receiving Clerk
-
-**Priority**: Critical
-
-**Frequency**: Daily (10-30 times per day across all locations)
+**Description**: User filters and searches GRN list to find specific records.
 
 **Preconditions**:
-- User is authenticated with receiving or purchasing role
-- At least one purchase order exists with status allowing receipt
-- Vendor and product master data are configured
+- User is on GRN List page
+- GRNs exist in system
 
 **Postconditions**:
-- **Success**: New GRN created with status DRAFT or RECEIVED, linked to source PO
-- **Failure**: No GRN created, user informed of validation errors
+- GRN list is filtered based on criteria
+- User can clear filters to return to full list
 
 **Main Flow**:
-1. User clicks "New GRN" button from GRN list page
-2. System displays process type selection dialog: "From PO" or "Manual"
-3. User selects "From PO"
-4. System navigates to vendor selection page
+1. User enters search term in search box (GRN number, vendor name, invoice number)
+2. System filters list in real-time as user types
+3. System highlights matching text in results
+4. User can apply additional filters:
+   - **Status filter**: Quick buttons for DRAFT, RECEIVED, COMMITTED, VOID
+   - **Date range**: Receipt date from/to
+   - **Vendor filter**: Dropdown of vendors
+   - **Location filter**: Dropdown of storage locations
+5. System combines all active filters using AND logic
+6. System displays filtered result count: "Showing X of Y GRNs"
+7. User can export filtered results
+
+**Alternative Flows**:
+
+**A1: No Results Found**
+- 6a. If filters return no results, system displays "No GRNs match your filters"
+- 6b. System suggests clearing some filters
+- 6c. User can click "Clear All Filters" to reset
+
+**A2: Advanced Search**
+- 4a. User clicks "Advanced Search" button
+- 4b. System displays modal with additional filters:
+   - Created by (user)
+   - Amount range (min/max)
+   - PO reference
+   - Job code
+- 4c. User applies advanced filters
+- 4d. System returns to main flow at step 5
+
+**Exception Flows**:
+
+**E1: Search Timeout**
+- 2a. If search takes >2 seconds, system displays loading indicator
+- 2b. If search takes >5 seconds, system shows timeout message
+- 2c. User can retry or refine search criteria
+
+**Business Rules**:
+- Search is case-insensitive
+- Filters persist during session (until page refresh or logout)
+- Date range defaults to current month if not specified
+- Status filter allows multi-select
+
+**UI Requirements**:
+- Search returns results within 2 seconds (NFR-GRN-001)
+- Filter panel collapsible on mobile
+- Active filter count badge displayed
+- "Clear All" button visible when filters active
+
+---
+
+### UC-GRN-003: Create GRN from Single PO
+
+**Primary Actor**: Receiving Clerk
+**Priority**: High
+**FR Reference**: FR-GRN-002
+
+**Description**: User creates a GRN by selecting a vendor and one purchase order, then specifying received quantities.
+
+**Preconditions**:
+- User has "Create GRN" permission
+- At least one vendor with open/partial POs exists
+- Products in PO are in product catalog
+
+**Postconditions**:
+- New GRN created with status RECEIVED
+- GRN number auto-generated
+- Line items populated from PO
+- PO status updated (if fully received)
+- Activity log entry created
+
+**Main Flow**:
+
+**Step 1: Vendor Selection**
+1. User clicks "Create GRN" button on GRN list page
+2. System displays vendor selection page
+3. System loads active vendors with open/partial POs
+4. User can search vendors by name or business registration number
 5. User selects vendor from list
-6. System displays pending purchase orders for selected vendor
-7. User selects one or more PO lines to receive
-8. System pre-populates GRN with PO details (vendor, items, ordered quantities, prices)
-9. User enters actual received quantities for each item
-10. System auto-calculates discrepancies (ordered vs. received)
-11. User enters delivery information (invoice number, invoice date, delivery note, vehicle number, driver name)
-12. User assigns receiver name and receipt date
-13. User saves GRN
-14. System validates data, assigns GRN number (GRN-YYYY-NNN format)
-15. System saves GRN with status RECEIVED
-16. System displays success message with GRN number
-17. System navigates to GRN detail page for review
-18. Use case ends
+6. User clicks "Next" button
+7. System navigates to PO selection page
+
+**Step 2: PO Selection**
+8. System loads open/partial POs for selected vendor
+9. System displays PO list with:
+   - PO Number
+   - PO Date
+   - Total Amount
+   - Currency
+   - Status (OPEN/PARTIAL)
+10. User selects one PO from list
+11. User clicks "Next" button
+12. System navigates to item selection page
+
+**Step 3: Item & Location Selection**
+13. System loads PO line items
+14. System displays items table with:
+    - Item Code & Name
+    - Ordered Quantity & Unit
+    - Previously Received
+    - Remaining to Receive
+    - **Received Quantity** (editable, default: remaining)
+    - **Storage Location** (editable, required)
+    - Unit Price (read-only)
+15. User reviews each item and:
+    - Adjusts received quantity if different from remaining
+    - Selects storage location from dropdown
+    - Can mark items as FOC (Free of Charge)
+    - Can add line notes
+16. User clicks "Create GRN" button
+17. System validates all data:
+    - Received qty ≤ remaining qty
+    - Storage location selected for each item
+    - No duplicate items
+18. System creates GRN record:
+    - Auto-generates GRN number (GRN-YYYY-NNNN)
+    - Sets receipt date to today
+    - Sets status to RECEIVED
+    - Sets created by to current user
+19. System saves all line items
+20. System updates PO line item status:
+    - If all items fully received → PO item status = RECEIVED
+    - If partial → PO item status = PARTIAL
+21. System updates PO header status
+22. System displays success message: "GRN [number] created successfully"
+23. System navigates to GRN detail page
 
 **Alternative Flows**:
 
-**Alt-2A: Partial Receipt** (At step 9)
-- 9a. User enters received quantity less than ordered quantity
-- 9b. System flags item with partial receipt indicator
-- 9c. System allows saving GRN with partial quantities
-- Continue to step 10
+**A1: Partial Quantity Received**
+- 15a. User receives less than remaining quantity
+- 15b. User enters actual received quantity
+- 15c. System flags as partial receipt
+- 15d. PO line item remains PARTIAL status
 
-**Alt-2B: Over Receipt** (At step 9)
-- 9a. User enters received quantity greater than ordered quantity
-- 9b. System displays warning about over receipt
-- 9c. User confirms over receipt or corrects quantity
-- 9d. System saves GRN if confirmed
-- Continue to step 10
+**A2: Zero Received Quantity**
+- 15a. User sets received quantity to 0 for one or more items
+- 15b. System excludes these items from GRN
+- 15c. System only creates GRN with items having qty > 0
 
-**Alt-2C: Save as Draft** (At step 13)
-- 13a. User saves GRN as draft instead of received status
-- 13b. System saves with status DRAFT
-- 13c. System allows later editing and completion
-- Continue to step 16
+**A3: Quantity Discrepancy**
+- 15a. User receives more than remaining quantity
+- 17a. System displays validation error: "Received quantity exceeds PO remaining quantity"
+- 17b. User must reduce received quantity or cancel
+- 17c. If over-receipt allowed (system setting), system shows warning but allows
 
-**Alt-2D: Record Rejected or Damaged Items** (At step 9)
-- 9a. User enters rejected quantity or damaged quantity
-- 9b. System requires rejection reason or damage notes
-- 9c. User provides required notes
-- 9d. System calculates net received quantity (delivered - rejected - damaged)
-- Continue to step 10
+**A4: Cancel Creation**
+- At any step, user clicks "Cancel" button
+- System displays confirmation dialog: "Discard GRN creation?"
+- If confirmed, system returns to GRN list without saving
+- If declined, user continues editing
 
 **Exception Flows**:
 
-**Exc-2A: Validation Failure** (At step 14)
-- System detects validation errors (missing required fields, invalid quantities)
-- System displays specific validation error messages
-- User corrects errors
-- Resume at step 13
+**E1: No Storage Location Selected**
+- 17a. System detects items without storage location
+- 17b. System highlights items in red
+- 17c. System displays error: "Please select storage location for all items"
+- 17d. User corrects and resubmits
 
-**Exc-2B: Duplicate Invoice Number** (At step 14)
-- System detects duplicate invoice number for same vendor
-- System displays warning message
-- User confirms duplicate is intentional or corrects invoice number
-- Resume at step 13 or end use case
+**E2: PO No Longer Available**
+- 8a. Selected PO changed status to CLOSED or CANCELLED
+- 8b. System displays error: "PO no longer available for receiving"
+- 8c. System returns to vendor selection
+
+**E3: Save Failure**
+- 18a. Database transaction fails
+- 18b. System rolls back all changes
+- 18c. System displays error: "Failed to create GRN. Please try again."
+- 18d. User data preserved in form for retry
 
 **Business Rules**:
-- **BR-GRN-001**: Each GRN assigned unique sequential number GRN-YYYY-NNN
-- **BR-GRN-003**: GRN must reference a purchase order OR be marked as manual
-- **BR-GRN-004**: Received quantity must be greater than 0
-- **BR-GRN-005**: Rejected + damaged quantity cannot exceed delivered quantity
-- **BR-GRN-009**: Receipt date cannot be in the future
+- BR-GRN-001: GRN number auto-generated, sequential per year
+- BR-GRN-002: Received qty cannot exceed (ordered - previously received)
+- BR-GRN-003: New GRN created with RECEIVED status
+- BR-GRN-004: Line subtotal = received qty × unit price
+- All PO prices and item details auto-populated
 
-**Includes**:
-- [UC-GRN-006: Manage GRN Items](#uc-grn-006-manage-grn-items)
-- [UC-GRN-007: Record Item Discrepancies](#uc-grn-007-record-item-discrepancies)
+**UI Requirements**:
+- Wizard navigation with step indicators (1/3, 2/3, 3/3)
+- "Back" button available on steps 2 and 3
+- Real-time quantity validation (red border if invalid)
+- Storage location dropdown grouped by warehouse/kitchen
+- Quantity fields support 3 decimal places
 
-**Related Requirements**:
-- FR-GRN-002: PO-Based GRN Creation
-- FR-GRN-005: GRN Items Management
-- FR-GRN-006: Discrepancy Management
-- NFR-GRN-003: PO-based GRN creation completes within 3 seconds
-
-**UI Mockups**: See Flow Diagrams for PO-based GRN creation workflow
-
-**Notes**:
-- System generates temporary ID (new-UUID) during creation, replaced with actual GRN number on save
-- User can select multiple PO lines from same PO or different POs for same vendor
-- System stores PO reference for traceability and audit
+**Integration Points**:
+- Purchase Order module: Retrieve PO data, update PO status
+- Product Catalog: Validate item codes, retrieve item details
+- Inventory Management: Validate storage locations
 
 ---
 
-### UC-GRN-003: Create Manual GRN
+### UC-GRN-004: Create GRN from Multiple POs
 
-**Description**: User creates a standalone Goods Received Note without a purchase order reference for unplanned deliveries, returns, or transfers.
-
-**Actor(s)**: Receiving Clerk, Purchasing Staff
-
+**Primary Actor**: Receiving Clerk
 **Priority**: High
+**FR Reference**: FR-GRN-002, FR-GRN-006
 
-**Frequency**: Daily (5-10 times per day)
+**Description**: User creates a single GRN by receiving items from multiple purchase orders from the same vendor.
 
 **Preconditions**:
-- User is authenticated with receiving or purchasing role
-- Vendor and product master data are configured
-- Items exist in product catalog
+- User has "Create GRN" permission
+- Vendor has multiple open/partial POs
+- All POs are in same currency (or base currency)
 
 **Postconditions**:
-- **Success**: New manual GRN created with status DRAFT or RECEIVED
-- **Failure**: No GRN created, user informed of validation errors
+- Single GRN created with line items from multiple POs
+- Each line item references its source PO
+- All source POs updated with received quantities
+- GRN status set to RECEIVED
 
 **Main Flow**:
-1. User clicks "New GRN" button from GRN list page
-2. System displays process type selection dialog
-3. User selects "Manual"
-4. System generates temporary GRN ID and navigates to GRN detail page in confirm mode
-5. User selects vendor from dropdown
-6. User enters delivery information (invoice number, invoice date, delivery note)
-7. User searches and selects items from product catalog
-8. For each item, user enters: received quantity, unit price, storage location
-9. User optionally enters: batch number, lot number, expiry date, manufacturing date
-10. System calculates line totals and GRN subtotal
-11. User enters receipt date and receiver name
-12. User saves GRN
-13. System validates data, assigns GRN number (GRN-YYYY-NNN format)
-14. System saves GRN with status RECEIVED
-15. System displays success message
-16. System navigates to GRN detail view
-17. Use case ends
+
+**Steps 1-7**: Same as UC-GRN-003 (Vendor Selection)
+
+**Step 2: PO Selection (Multi-Select)**
+8. System loads open/partial POs for selected vendor
+9. System displays PO list with checkboxes
+10. User selects multiple POs (minimum 2)
+11. System validates all POs:
+    - Same vendor
+    - Same currency (or all in base currency)
+12. System displays summary: "X POs selected, Y total items"
+13. User clicks "Next" button
+14. System navigates to item selection page
+
+**Step 3: Item & Location Selection (Multi-PO)**
+15. System loads line items from ALL selected POs
+16. System groups items by PO number
+17. System displays items table with:
+    - **PO Number** (for reference)
+    - Item Code & Name
+    - Ordered Quantity & Unit
+    - Remaining to Receive
+    - **Received Quantity** (editable)
+    - **Storage Location** (editable)
+    - Unit Price
+18. User processes each item:
+    - Reviews items from all POs
+    - Adjusts received quantities
+    - Selects storage locations
+19. User clicks "Create GRN" button
+20. System validates:
+    - All received quantities valid per PO
+    - All storage locations selected
+    - No conflicts across POs
+21. System creates single GRN:
+    - One GRN header
+    - Multiple line items, each with purchaseOrderId reference
+22. System updates all source POs:
+    - Updates received quantities per PO line item
+    - Updates PO statuses (PARTIAL/RECEIVED)
+23. System displays success message
+24. System navigates to GRN detail page
 
 **Alternative Flows**:
 
-**Alt-3A: Add Multiple Items** (At step 7-9)
-- User clicks "Add Item" button
-- System displays item search dialog
-- User searches and selects item
-- System adds item to GRN items list
-- User repeats for additional items
-- Continue to step 10
+**A1: Items from Same Product Across POs**
+- 17a. Same product appears in multiple selected POs
+- 17b. System lists each PO item separately (not combined)
+- 17c. Each line item maintains its own PO reference
 
-**Alt-3B: Save as Draft** (At step 12)
-- User saves GRN as draft for later completion
-- System saves with status DRAFT
-- System allows editing until status changed
-- Continue to step 15
+**A2: Mixed Currencies**
+- 11a. User selects POs with different currencies
+- 11b. System displays error: "All POs must be in same currency"
+- 11c. User deselects POs until all same currency
+- 11d. System allows proceeding
 
-**Alt-3C: Select Cash Transaction** (At step 6)
-- User marks GRN as cash transaction
-- System requires cash book selection
-- User selects cash book for recording
-- System records cash book reference
-- Continue to step 7
+**A3: Select All Items from Some POs Only**
+- 18a. User receives all items from PO-A, partial from PO-B
+- 18b. System creates GRN with all items
+- 18c. PO-A status → RECEIVED
+- 18d. PO-B status → PARTIAL
 
 **Exception Flows**:
 
-**Exc-3A: Item Not in Catalog** (At step 7)
-- User cannot find item in product catalog
-- User contacts administrator to add new item
-- User pauses GRN creation
-- Use case ends (resume later after item added)
+**E1: PO Changed During Creation**
+- 15a. One of selected POs changed status (closed/cancelled)
+- 15b. System displays warning: "PO [number] no longer available"
+- 15c. System removes items from that PO
+- 15d. User can proceed with remaining POs or cancel
 
-**Exc-3B: Missing Required Fields** (At step 13)
-- System detects missing required fields (vendor, items, quantities, locations)
-- System displays validation errors with specific field names
-- User completes missing fields
-- Resume at step 12
+**E2: Cross-PO Validation Errors**
+- 21a. System detects conflicting data across POs
+- 21b. System displays specific error messages
+- 21c. User corrects issues and resubmits
 
 **Business Rules**:
-- **BR-GRN-001**: Each GRN assigned unique sequential number
-- **BR-GRN-003**: Manual GRN has no purchase order reference
-- **BR-GRN-004**: Received quantity must be greater than 0
-- **BR-GRN-008**: Storage location must be assigned for all items before commitment
-- **BR-GRN-009**: Receipt date cannot be in the future
+- BR-GRN-006: All POs in single GRN must be from same vendor
+- BR-GRN-006: All POs must be in same currency
+- BR-GRN-006: Each line item references one PO line item
+- Each line item stores purchaseOrderId and purchaseOrderItemId
+- Cannot mix different exchange rates in single GRN
 
-**Related Requirements**:
-- FR-GRN-003: Manual GRN Creation
-- FR-GRN-005: GRN Items Management
-- FR-GRN-011: Location and Storage Management
+**UI Requirements**:
+- PO selection shows currency in list for easy verification
+- Items table has "PO Number" column for clarity
+- Can expand/collapse items by PO for easier review
+- Selected PO count badge displayed
 
-**Notes**:
-- Manual GRNs often used for vendor returns, emergency purchases, or direct deliveries
-- No ordered quantity reference available, so no automatic discrepancy detection
-- User must manually flag any discrepancies
-- Manual GRNs require same level of documentation as PO-based GRNs
+**Integration Points**:
+- Purchase Order module: Retrieve multiple POs, update multiple PO statuses
+- Validation: Ensure vendor consistency, currency consistency
 
 ---
 
-### UC-GRN-004: View GRN Details
+### UC-GRN-005: Create Manual GRN
 
-**Description**: User views complete details of an existing Goods Received Note including all items, financial summary, attachments, and activity log.
-
-**Actor(s)**: Receiving Clerk, Purchasing Staff, Warehouse Staff, Finance Team
-
+**Primary Actor**: Receiving Clerk
 **Priority**: High
+**FR Reference**: FR-GRN-003
 
-**Frequency**: Daily (50-100 times per day)
+**Description**: User creates a GRN without PO reference for unexpected deliveries or emergency purchases.
 
 **Preconditions**:
-- User is authenticated with appropriate permissions
-- GRN exists in the system
-- User has access to GRN's location (if location-based security enabled)
+- User has "Create GRN" permission
+- Vendor exists in system
+- Products exist in product catalog
 
 **Postconditions**:
-- **Success**: User views complete GRN information
-- **Failure**: User sees error message if no permission or GRN not found
+- GRN created without PO reference
+- Status set to RECEIVED
+- No PO status updates triggered
+- Activity log records manual creation
 
 **Main Flow**:
-1. User clicks GRN row in list page or navigates via direct link
-2. System loads GRN data including all related information
-3. System displays GRN detail page with multiple tabs
-4. User sees GRN header: number, status, vendor, date, receiver
-5. User sees Items tab (default) showing all received items
-6. User can switch to other tabs: Extra Costs, Stock Movement, Tax, Financial Summary, Activity Log, Comments & Attachments, Related POs
-7. System displays appropriate data for selected tab
-8. Use case ends
+
+1. User clicks "Create Manual GRN" button on GRN list page
+2. System displays blank GRN form
+3. System auto-generates temporary GRN ID (not saved until submit)
+4. User enters header information:
+   - **Vendor**: Select from dropdown (required)
+   - **Receipt Date**: Default today (editable)
+   - **Invoice Number**: Manual entry
+   - **Invoice Date**: Manual entry
+   - **Description**: Free text notes
+   - **Currency**: Select from active currencies
+   - **Exchange Rate**: Auto-populated (editable)
+5. User adds line items:
+   - Click "Add Item" button
+   - Search and select product from catalog
+   - Enter received quantity and unit
+   - Enter unit price
+   - Select storage location
+   - Optional: Add line notes, job code
+6. User repeats step 5 for all items
+7. System calculates:
+   - Line subtotals
+   - Tax amounts (if applicable)
+   - Total amount
+8. User can:
+   - Mark as consignment or cash purchase
+   - Add comments or attachments
+9. User clicks "Save GRN" button
+10. System validates:
+    - Vendor selected
+    - At least one line item
+    - All required fields complete
+    - Storage locations valid
+11. System saves GRN:
+    - Generates final GRN number (GRN-YYYY-NNNN)
+    - Sets status to RECEIVED
+    - Records created by user and timestamp
+12. System displays success message
+13. System navigates to GRN detail page
 
 **Alternative Flows**:
 
-**Alt-4A: View Related Purchase Order** (At step 6)
-- User clicks PO reference link in header
-- System navigates to PO detail page in new tab
-- User reviews PO information
-- User returns to GRN detail
-- Resume at step 6
+**A1: Save as Draft**
+- 9a. User clicks "Save as Draft" instead of "Save GRN"
+- 9b. System saves GRN with status DRAFT
+- 9c. Validation relaxed (can save with incomplete data)
+- 9d. User can continue editing later
 
-**Alt-4B: Download Attachment** (At step 7)
-- User switches to Comments & Attachments tab
-- User clicks attachment link
-- System downloads or displays attachment
-- User reviews attachment
-- Resume at step 7
+**A2: Copy from Another GRN**
+- 1a. User clicks "Copy from GRN" button
+- 1b. System displays GRN selection dialog
+- 1c. User selects source GRN
+- 1d. System copies header and line items (excluding GRN number, dates)
+- 1e. User edits as needed and saves
 
-**Alt-4C: View Activity History** (At step 7)
-- User switches to Activity Log tab
-- System displays chronological list of all GRN activities
-- User reviews creation, modifications, status changes with timestamps and users
-- Resume at step 7
+**A3: Product Not in Catalog**
+- 5a. User cannot find product in search
+- 5b. User clicks "Add New Product" (if permission)
+- 5c. System opens product creation modal
+- 5d. User creates product (minimum info)
+- 5e. System returns to GRN with new product selected
 
 **Exception Flows**:
 
-**Exc-4A: GRN Not Found** (At step 2)
-- System cannot find GRN with specified ID
-- System displays "GRN not found" error message
-- System returns user to GRN list page
-- Use case ends
+**E1: Vendor Not Found**
+- 4a. Vendor not in system
+- 4b. User clicks "Add New Vendor" (if permission)
+- 4c. System opens vendor creation modal
+- 4d. User creates vendor (minimum info)
+- 4e. System returns to GRN with new vendor selected
 
-**Exc-4B: Permission Denied** (At step 2)
-- User does not have permission to view GRN (location restriction)
-- System displays "Access denied" message
-- System returns user to previous page
-- Use case ends
+**E2: Invalid Price**
+- 5a. User enters unit price = 0 or negative
+- 10a. System displays error: "Unit price must be greater than 0"
+- 10b. User corrects price
+
+**E3: Duplicate Items**
+- 5a. User adds same product twice
+- 10a. System warns: "Product already exists in line items"
+- 10b. User can:
+   - Combine quantities
+   - Keep separate (different locations/prices)
+   - Remove duplicate
 
 **Business Rules**:
-- **BR-GRN-023**: Users can only view GRNs for their assigned locations unless cross-location permission
+- BR-GRN-001: GRN number auto-generated on save
+- No PO validation required
+- All line item data manually entered
+- Manual GRNs flagged in reporting for audit
 
-**Related Requirements**:
-- FR-GRN-004: GRN Status Management (view only)
-- FR-GRN-013: Activity Log and Audit Trail
-- FR-GRN-014: Comments and Attachments
-- NFR-GRN-002: Detail page loads within 1.5 seconds
+**UI Requirements**:
+- Product search autocomplete with typeahead
+- Quantity and price fields support decimals
+- Real-time total calculation
+- Can reorder line items via drag-and-drop
+- "Save as Draft" and "Save GRN" buttons both visible
 
-**Notes**:
-- Read-only view for COMMITTED and VOID status GRNs
-- Edit button available for DRAFT and RECEIVED status (if user has permission)
-- All tabs load data on demand for performance
-- Status badge color-coded for quick identification
+**Integration Points**:
+- Product Catalog: Search products, retrieve details
+- Vendor Management: Search vendors, retrieve vendor details
+- Inventory Management: Validate storage locations
 
 ---
 
-### UC-GRN-006: Manage GRN Items
+### UC-GRN-006: Edit GRN Header
 
-**Description**: User adds, edits, or removes items from a GRN, managing quantities, pricing, locations, and item-specific attributes like batch numbers and expiry dates.
+**Primary Actor**: Receiving Clerk
+**Priority**: High
+**FR Reference**: FR-GRN-004
 
-**Actor(s)**: Receiving Clerk, Warehouse Staff
-
-**Priority**: Critical
-
-**Frequency**: Daily (every GRN creation and edit)
+**Description**: User edits GRN header information (dates, invoice details, currency).
 
 **Preconditions**:
 - GRN exists in DRAFT or RECEIVED status
 - User has edit permission for GRN
-- Product catalog contains items to be received
+- GRN not yet committed
 
 **Postconditions**:
-- **Success**: GRN items updated with correct quantities, prices, and attributes
-- **Failure**: Items unchanged, user informed of validation errors
+- GRN header updated with new information
+- Activity log records changes
+- Financial calculations updated if currency changed
 
 **Main Flow**:
-1. User opens GRN in edit mode
-2. System displays Items tab with current item list
-3. User clicks "Add Item" button
-4. System displays item search dialog
-5. User searches for and selects item from product catalog
-6. System adds item row with editable fields
-7. User enters: received quantity, unit of measure, unit price
-8. User assigns storage location from dropdown
-9. User optionally enters: batch number, lot number, serial numbers, manufacturing date, expiry date
-10. System calculates line total (quantity × unit price)
-11. User saves item
-12. System validates item data
-13. System updates item in GRN
-14. System recalculates GRN subtotal
-15. Use case ends
+
+1. User opens GRN detail page
+2. System displays GRN in view mode
+3. User clicks "Edit" button
+4. System enables edit mode for header fields:
+   - Receipt Date
+   - Invoice Number
+   - Invoice Date
+   - Tax Invoice Number
+   - Tax Invoice Date
+   - Description
+   - Currency (if not yet committed)
+   - Exchange Rate (if currency changed)
+   - Consignment Flag
+   - Cash Purchase Flag
+   - Cash Book (if cash purchase)
+5. User modifies desired fields
+6. If currency changed:
+   - System prompts to update exchange rate
+   - System recalculates all line totals in new currency
+   - System displays confirmation: "Currency change will recalculate all amounts. Continue?"
+7. User clicks "Save" button
+8. System validates:
+   - Receipt date not in future
+   - Invoice date not before PO date (if from PO)
+   - Required fields complete
+   - Cash book selected if cash purchase = true
+9. System saves changes
+10. System updates financial summary if currency/exchange rate changed
+11. System creates activity log entry: "Header updated by [user]"
+12. System displays success message: "GRN updated successfully"
+13. System returns to view mode
 
 **Alternative Flows**:
 
-**Alt-6A: Edit Existing Item** (At step 3)
-- User clicks edit icon on existing item row
-- System enables editing of item fields
-- User modifies quantities or attributes
-- User saves changes
-- Continue to step 12
+**A1: Cancel Editing**
+- 7a. User clicks "Cancel" button
+- 7b. System prompts: "Discard changes?"
+- 7c. If confirmed, system reverts to original values
+- 7d. System returns to view mode
 
-**Alt-6B: Delete Item** (At step 3)
-- User clicks delete icon on item row
-- System displays confirmation dialog
-- User confirms deletion
-- System removes item from GRN
-- System recalculates GRN subtotal
-- Resume at step 2 or end use case
+**A2: Exchange Rate Override**
+- 6a. System auto-fetches exchange rate from system table
+- 6b. User manually overrides rate
+- 6c. System displays warning: "Using custom exchange rate"
+- 6d. System flags GRN for audit review
 
-**Alt-6C: Bulk Add from PO** (At step 3-6)
-- User selects "Add from PO" option
-- System displays PO line selector
-- User selects multiple PO lines
-- System adds all selected items with PO data
-- Continue to step 7
-
-**Alt-6D: Copy Item** (At step 3)
-- User clicks copy icon on existing item row
-- System creates duplicate item row
-- User modifies quantities or attributes as needed
-- Continue to step 11
+**A3: Mark as Cash Purchase**
+- 5a. User checks "Cash Purchase" checkbox
+- 5b. System displays cash book dropdown (required)
+- 5c. User selects cash book
+- 5d. System updates accounting preview (cash book instead of AP)
 
 **Exception Flows**:
 
-**Exc-6A: Item Validation Failure** (At step 12)
-- System detects validation errors (missing required fields, invalid quantities)
-- System displays specific error messages
-- User corrects errors
-- Resume at step 11
+**E1: GRN Already Committed**
+- 3a. GRN status = COMMITTED
+- 3b. System displays error: "Cannot edit committed GRN"
+- 3c. "Edit" button disabled
 
-**Exc-6B: Duplicate Item** (At step 12)
-- System detects same item already exists in GRN
-- System displays warning
-- User confirms adding duplicate or merges with existing item
-- Resume at step 11 or step 3
+**E2: Invoice Number Duplicate**
+- 8a. Invoice number already exists for same vendor
+- 8b. System displays warning: "Duplicate invoice number detected"
+- 8c. User can:
+   - Confirm duplicate (allowed if legitimate)
+   - Correct invoice number
+
+**E3: Currency Exchange Rate Not Found**
+- 6a. No exchange rate available for selected currency and date
+- 6b. System displays error: "Exchange rate not available for [currency] on [date]"
+- 6c. User must:
+   - Enter manual exchange rate
+   - Change receipt date
+   - Contact admin to add exchange rate
 
 **Business Rules**:
-- **BR-GRN-004**: Received quantity must be greater than 0
-- **BR-GRN-007**: Expiry date must be after manufacturing date (if both provided)
-- **BR-GRN-008**: Storage location must be assigned for all items
-- **BR-GRN-016**: Item total = (received quantity × unit price) + allocated extra cost
+- Cannot edit vendor once GRN created
+- Cannot edit GRN number (auto-generated)
+- Cannot change currency if GRN committed
+- Receipt date must be ≥ PO date (if from PO)
+- Exchange rate locked when committed
 
-**Includes**:
-- [UC-GRN-007: Record Item Discrepancies](#uc-grn-007-record-item-discrepancies)
-- [UC-GRN-009: Assign Storage Locations](#uc-grn-009-assign-storage-locations)
+**UI Requirements**:
+- Edit mode clearly distinguishable from view mode
+- Currency change confirmation modal with impact summary
+- Real-time validation messages
+- "Save" and "Cancel" buttons prominently displayed in edit mode
 
-**Related Requirements**:
-- FR-GRN-005: GRN Items Management
-- FR-GRN-009: Extra Costs Management (for cost allocation)
-
-**Notes**:
-- Unit conversions supported if product has multiple units configured
-- System auto-populates unit price from PO or product master cost
-- Batch/lot numbers required for items with batch tracking enabled
-- Serial numbers required for serialized inventory items
-- Item table supports sorting, filtering by multiple criteria
+**Integration Points**:
+- Currency Exchange Rate: Fetch rate from system table
+- Cash Book: Validate cash book selection
 
 ---
 
-### UC-GRN-007: Record Item Discrepancies
+### UC-GRN-007: Add Line Items
 
-**Description**: User documents discrepancies between expected and actual received items, including quantity variances, damaged goods, and other issues.
-
-**Actor(s)**: Receiving Clerk
-
+**Primary Actor**: Receiving Clerk
 **Priority**: High
+**FR Reference**: FR-GRN-005
 
-**Frequency**: Daily (occurs in 20-30% of GRNs)
-
-**Preconditions**:
-- GRN exists in DRAFT or RECEIVED status
-- Items exist in GRN
-- User is reviewing received goods
-
-**Postconditions**:
-- **Success**: Discrepancies documented with type, notes, and quantities
-- **Failure**: Discrepancies not recorded, user informed of missing information
-
-**Main Flow**:
-1. User reviews item delivered quantity against ordered quantity
-2. System auto-detects quantity discrepancy if delivered ≠ ordered
-3. System flags item row with discrepancy indicator
-4. User clicks on item to view/edit details
-5. System displays item detail form with discrepancy fields
-6. User selects discrepancy type: quantity, damage, or other
-7. User enters rejected quantity (if applicable)
-8. User enters damaged quantity (if applicable)
-9. User enters discrepancy notes explaining the issue
-10. User saves item details
-11. System validates discrepancy data
-12. System updates item with hasDiscrepancy flag
-13. System increments GRN discrepancies count
-14. System displays updated item in list with discrepancy badge
-15. Use case ends
-
-**Alternative Flows**:
-
-**Alt-7A: Damage Discrepancy** (At step 6)
-- User selects "damage" as discrepancy type
-- User enters damaged quantity
-- User describes nature of damage in notes
-- System calculates net received quantity (delivered - damaged)
-- Continue to step 10
-
-**Alt-7B: Other Discrepancy** (At step 6)
-- User selects "other" as discrepancy type
-- User describes the issue in notes
-- User may enter rejected quantity if items not accepted
-- Continue to step 10
-
-**Alt-7C: No Discrepancy After Review** (At step 4)
-- User confirms quantities match and no discrepancies
-- User does not flag discrepancy
-- System removes auto-detected discrepancy flag
-- Use case ends
-
-**Exception Flows**:
-
-**Exc-7A: Missing Discrepancy Notes** (At step 11)
-- System detects discrepancy flagged but no notes provided
-- System displays validation error "Discrepancy notes required"
-- User enters descriptive notes
-- Resume at step 10
-
-**Exc-7B: Invalid Quantity Values** (At step 11)
-- System detects rejected + damaged > delivered quantity
-- System displays validation error
-- User corrects quantities
-- Resume at step 10
-
-**Business Rules**:
-- **BR-GRN-005**: Rejected quantity + damaged quantity cannot exceed delivered quantity
-- **BR-GRN-006**: Discrepancy notes required when hasDiscrepancy flag is true
-
-**Related Requirements**:
-- FR-GRN-006: Discrepancy Management
-
-**Notes**:
-- Discrepancy count displayed prominently in GRN header
-- Discrepancy data used for vendor performance tracking
-- Photos can be attached as evidence via Comments & Attachments tab
-
----
-
-### UC-GRN-008: Manage Extra Costs
-
-**Description**: User adds and distributes additional costs (freight, handling, insurance, customs) across received items using selected distribution method.
-
-**Actor(s)**: Purchasing Staff
-
-**Priority**: Medium
-
-**Frequency**: Weekly (10-20% of GRNs have extra costs)
+**Description**: User adds new line items to existing GRN.
 
 **Preconditions**:
 - GRN exists in DRAFT or RECEIVED status
 - User has edit permission
-- Items exist in GRN for cost distribution
+- Product catalog accessible
 
 **Postconditions**:
-- **Success**: Extra costs recorded and distributed to items, total GRN value updated
-- **Failure**: Extra costs not added, user informed of validation errors
+- New line items added to GRN
+- Financial totals recalculated
+- Activity log updated
 
 **Main Flow**:
-1. User opens GRN in edit mode
-2. User navigates to Extra Costs tab
-3. User clicks "Add Extra Cost" button
-4. System displays extra cost entry form
-5. User selects cost type: shipping, handling, insurance, or customs
-6. User enters cost amount and currency
-7. User confirms exchange rate (if different from GRN currency)
-8. System saves extra cost to list
-9. User selects distribution method: by net amount, by quantity, or equal
-10. System calculates distribution and allocates extra costs to each item
-11. System updates item costs and totals
-12. System recalculates GRN total amount
-13. User saves changes
-14. System displays updated financial summary
-15. Use case ends
+
+1. User opens GRN detail page
+2. User navigates to "Items" tab
+3. User clicks "Add Item" button
+4. System displays item selection dialog:
+   - Product search field
+   - Recent products list
+   - Frequently used products
+5. User searches for product:
+   - Enter product code or name
+   - System shows autocomplete results
+6. User selects product from results
+7. System displays item entry form:
+   - **Product**: Pre-filled (read-only)
+   - **Description**: Pre-filled from catalog (editable)
+   - **Received Quantity**: Empty (required)
+   - **Unit**: Dropdown of product UOMs (required)
+   - **Unit Price**: Empty (required)
+   - **Storage Location**: Dropdown (required)
+   - **Discount %**: Default 0 (optional)
+   - **Tax Rate**: Default from product (editable)
+   - **FOC Quantity**: Default 0 (optional)
+   - **Job Code**: Dropdown (optional)
+   - **Notes**: Free text (optional)
+8. User enters:
+   - Received quantity
+   - Unit price
+   - Selects storage location
+9. System calculates:
+   - Subtotal = Qty × Price
+   - Discount Amount = Subtotal × Discount %
+   - Net = Subtotal - Discount
+   - Tax Amount = Net × Tax %
+   - Total = Net + Tax
+10. User clicks "Add to GRN" button
+11. System validates:
+    - Quantity > 0
+    - Unit price > 0 (unless FOC)
+    - Storage location selected
+    - Valid unit for product
+12. System adds line item to GRN
+13. System assigns line number (auto-increment)
+14. System recalculates GRN totals
+15. System creates activity log entry: "Item [product] added by [user]"
+16. System displays item in items table
+17. User can repeat steps 3-16 to add more items
 
 **Alternative Flows**:
 
-**Alt-8A: Add Multiple Extra Costs** (At step 8)
-- User clicks "Add Another" button
-- User repeats steps 5-8 for additional cost
-- System accumulates total extra costs
-- Continue to step 9
+**A1: Add from PO Item**
+- 3a. User clicks "Add from PO" button (if GRN created from PO)
+- 3b. System displays remaining PO items not yet in GRN
+- 3c. User selects PO item
+- 3d. System pre-fills all fields from PO:
+   - Product, description, unit
+   - Ordered qty, unit price
+   - Remaining qty to receive
+- 3e. User adjusts received qty if needed
+- 3f. System continues from step 8
 
-**Alt-8B: Change Distribution Method** (At step 9)
-- User changes distribution method dropdown
-- System immediately recalculates distribution
-- System updates item cost allocations
-- User reviews new allocation
-- Continue to step 13
+**A2: Mark as FOC (Free of Charge)**
+- 8a. User checks "Free of Charge" checkbox
+- 8b. System sets unit price to 0
+- 8c. System calculates subtotal = 0
+- 8d. FOC quantity stored separately from received quantity
 
-**Alt-8C: Delete Extra Cost** (At step 3)
-- User clicks delete icon on existing extra cost
-- System displays confirmation
-- User confirms deletion
-- System removes cost and recalculates distribution
-- Resume at step 9 or end use case
+**A3: Apply Discount**
+- 8a. User enters discount percentage
+- 8b. System calculates discount amount
+- 8c. System updates net amount and total
+
+**A4: Batch/Lot Tracking**
+- 8a. Product requires batch/lot tracking
+- 8b. System displays additional fields:
+   - Batch Number (required)
+   - Manufacturing Date
+   - Expiry Date
+- 8c. User enters batch information
+- 8d. System validates expiry date > today
 
 **Exception Flows**:
 
-**Exc-8A: Invalid Cost Amount** (At step 7)
-- User enters zero or negative cost amount
-- System displays validation error "Amount must be greater than 0"
-- User enters valid amount
-- Resume at step 7
+**E1: Product Not Found**
+- 5a. Search returns no results
+- 5b. User clicks "Create New Product" (if permission)
+- 5c. System opens product creation modal
+- 5d. User creates product
+- 5e. System returns to item entry with new product selected
 
-**Exc-8B: Currency Mismatch** (At step 7)
-- Extra cost currency differs from GRN currency
-- System requires exchange rate
-- User provides or confirms exchange rate
-- System converts to base currency for distribution
-- Continue to step 8
+**E2: Duplicate Product**
+- 11a. Same product already exists in GRN (same location)
+- 11b. System displays warning: "Product already in GRN"
+- 11c. User can:
+   - Combine with existing line (add quantities)
+   - Add as separate line (different batch/price)
+   - Cancel
+
+**E3: Invalid Unit Price**
+- 11a. Unit price significantly differs from last purchase price (>20%)
+- 11b. System displays warning: "Price differs from last purchase ($X.XX)"
+- 11c. User can:
+   - Confirm price (allowed)
+   - Correct price
+
+**E4: Storage Location Full**
+- 11a. Selected storage location at capacity
+- 11b. System displays warning: "Location [name] is at capacity"
+- 11c. User selects different location or overrides
 
 **Business Rules**:
-- **BR-GRN-020**: Extra cost distribution by net amount = (item net amount ÷ total net amount) × total extra costs
-- **BR-GRN-021**: Extra cost distribution by quantity = (item quantity ÷ total quantity) × total extra costs
-- **BR-GRN-022**: Extra cost distribution equal = total extra costs ÷ number of items
-- **BR-GRN-016**: Item total amount includes allocated extra cost
+- Line numbers auto-assigned sequentially (10, 20, 30...)
+- Cannot add items to COMMITTED or VOID GRN
+- Unit price must match PO price ±10% tolerance (if from PO)
+- Storage location must be active and valid
+- Quantity supports up to 3 decimal places
 
-**Related Requirements**:
-- FR-GRN-009: Extra Costs Management
-- FR-GRN-012: Financial Summary and Tax Calculation
+**UI Requirements**:
+- Product search with real-time autocomplete
+- Line calculations update in real-time as user types
+- Storage location grouped by warehouse/kitchen
+- Tax rate dropdown from system tax rates
+- Validation messages display inline
 
-**Notes**:
-- Extra costs are distributed proportionally based on selected method
-- Distribution method can be changed, and costs automatically reallocated
-- Extra costs included in journal voucher postings
-- Common cost types: freight-in, handling fees, insurance, customs duties
+**Integration Points**:
+- Product Catalog: Search products, retrieve product details, UOMs, tax settings
+- Inventory Management: Validate storage locations, check capacity
+- Purchase Order: Retrieve PO item details (if applicable)
 
 ---
 
-### UC-GRN-009: Assign Storage Locations
+### UC-GRN-008: Edit Line Items
 
-**Description**: User assigns storage locations for each received item, indicating where goods will be stored in the warehouse or facility.
+**Primary Actor**: Receiving Clerk
+**Priority**: High
+**FR Reference**: FR-GRN-005
 
-**Actor(s)**: Warehouse Staff
-
-**Priority**: Critical
-
-**Frequency**: Daily (every GRN requiring location assignment)
+**Description**: User edits existing line items in GRN (quantity, price, location, etc.).
 
 **Preconditions**:
-- GRN exists with items
-- Storage locations are configured in system
-- User has permission to assign locations
+- GRN exists in DRAFT or RECEIVED status
+- Line items exist in GRN
+- User has edit permission
 
 **Postconditions**:
-- **Success**: All items have storage locations assigned, GRN ready for commitment
-- **Failure**: Items missing locations, GRN cannot be committed
+- Line item updated with new values
+- Financial totals recalculated
+- Activity log records changes
 
 **Main Flow**:
-1. User opens GRN in edit mode
-2. User navigates to Items tab
-3. System displays items list with storage location column
-4. For each item, user clicks location dropdown
-5. System displays available storage locations filtered by location type
-6. User selects appropriate storage location (warehouse, kitchen, office, etc.)
-7. System assigns location to item
-8. User repeats for all items
-9. System validates all items have locations assigned
-10. User saves GRN
-11. System confirms all location assignments saved
-12. Use case ends
+
+1. User opens GRN detail page
+2. User navigates to "Items" tab
+3. System displays items table with all line items
+4. User clicks "Edit" icon on specific line item
+5. System displays inline edit mode or edit modal with fields:
+   - Product (read-only)
+   - Description (editable)
+   - Received Quantity (editable)
+   - Unit (editable)
+   - Unit Price (editable)
+   - Storage Location (editable)
+   - Discount % (editable)
+   - Tax Rate (editable)
+   - FOC Quantity (editable)
+   - Job Code (editable)
+   - Notes (editable)
+6. User modifies desired fields
+7. System recalculates line totals in real-time:
+   - Subtotal
+   - Discount amount
+   - Net amount
+   - Tax amount
+   - Total
+8. User clicks "Save" button
+9. System validates:
+   - Quantity > 0
+   - Unit price ≥ 0
+   - Storage location valid
+   - If from PO: Received qty ≤ PO remaining qty
+10. System updates line item
+11. System recalculates GRN financial totals
+12. System creates activity log entry: "Item [product] updated by [user] - [fields changed]"
+13. System displays updated item in table
+14. System shows success message: "Item updated"
 
 **Alternative Flows**:
 
-**Alt-9A: Bulk Location Assignment** (At step 4)
-- User selects multiple item rows
-- User clicks "Assign Location" bulk action
-- User selects location from dropdown
-- System assigns same location to all selected items
-- Continue to step 9
+**A1: Quantity Increased**
+- 6a. User increases received quantity
+- 9a. If from PO, system validates new qty ≤ remaining qty
+- 9b. If exceeds, system displays error
+- 9c. User reduces quantity or cancels
 
-**Alt-9B: Use Default Location** (At step 5)
-- System suggests default location based on item category or department
-- User accepts default location suggestion
-- System assigns default location
-- Continue to step 7
+**A2: Quantity Decreased**
+- 6a. User decreases received quantity
+- 10a. System recalculates totals with new quantity
+
+**A3: Price Changed**
+- 6a. User changes unit price
+- 9a. If from PO and price differs >10% from PO price:
+   - System displays warning: "Price differs from PO: $X.XX"
+   - User confirms or corrects
+
+**A4: Storage Location Changed**
+- 6a. User selects different storage location
+- 10a. System validates new location is active
+- 10b. System creates note in activity log about location change
+
+**A5: Cancel Editing**
+- 8a. User clicks "Cancel" button
+- 8b. System discards changes
+- 8c. Line item returns to view mode with original values
 
 **Exception Flows**:
 
-**Exc-9A: Location Not Available** (At step 5)
-- User cannot find appropriate location in dropdown
-- User contacts warehouse supervisor to create new location
-- User pauses GRN processing
-- Use case ends (resume after location created)
+**E1: GRN Already Committed**
+- 4a. GRN status = COMMITTED
+- 4b. System disables all edit icons
+- 4c. System displays message: "Cannot edit committed GRN"
 
-**Exc-9B: Missing Location Assignment** (At attempt to commit GRN)
-- System detects items without location assignments
-- System displays validation error listing items needing locations
-- User assigns missing locations
-- Resume location assignment workflow
+**E2: Validation Errors**
+- 9a. Multiple validation errors detected
+- 9b. System displays all errors in list
+- 9c. System highlights invalid fields in red
+- 9d. User corrects all errors before saving
+
+**E3: Concurrent Edit Conflict**
+- 8a. Another user edited same GRN since page loaded
+- 9a. System detects version conflict
+- 9b. System displays error: "GRN has been modified by another user"
+- 9c. User options:
+   - Reload page to see latest data (lose changes)
+   - Review conflicts and merge manually
+
+**E4: Line Linked to Stock Movement**
+- 4a. Line item already has stock movement (GRN committed then uncommitted)
+- 4b. System displays warning: "Stock movement exists for this item"
+- 4c. Edit allowed but changes flagged for review
 
 **Business Rules**:
-- **BR-GRN-008**: Storage location must be assigned for all items before GRN commitment
-- **BR-GRN-014**: Stock movements only generated when GRN committed and locations assigned
+- Cannot change product once line item created
+- Cannot edit if GRN status = COMMITTED or VOID
+- Price tolerance: PO price ±10% (warning if exceeded)
+- Quantity precision: up to 3 decimal places
+- All financial calculations rounded to 2 decimal places
 
-**Related Requirements**:
-- FR-GRN-011: Location and Storage Management
-- FR-GRN-010: Stock Movement Generation (requires locations)
+**UI Requirements**:
+- Inline editing preferred for quick changes
+- Modal editing for complex changes (batch/lot details)
+- Real-time calculation feedback
+- Validation errors display immediately on field blur
+- Unsaved changes indicator (asterisk or badge)
 
-**Notes**:
-- Location types: warehouse, kitchen storage, cold storage, dry goods, office
-- Location capacity and organization managed separately in Inventory module
-- Some locations may be restricted based on item type or user permissions
-- Location assignment critical for accurate inventory tracking
+**Integration Points**:
+- Purchase Order: Validate against PO quantities and prices
+- Inventory Management: Validate storage locations
+- Financial: Recalculate tax and totals
+
+---
+
+### UC-GRN-009: Delete Line Items
+
+**Primary Actor**: Receiving Clerk
+**Priority**: Medium
+**FR Reference**: FR-GRN-005
+
+**Description**: User removes line items from GRN.
+
+**Preconditions**:
+- GRN exists in DRAFT or RECEIVED status
+- Line items exist in GRN
+- User has edit permission
+
+**Postconditions**:
+- Line item removed from GRN
+- Line numbers resequenced
+- Financial totals recalculated
+- Activity log records deletion
+
+**Main Flow**:
+
+1. User opens GRN detail page
+2. User navigates to "Items" tab
+3. User clicks "Delete" icon on specific line item
+4. System displays confirmation dialog:
+   - "Delete [product name]?"
+   - "This action cannot be undone."
+   - [Cancel] [Delete] buttons
+5. User clicks "Delete" button
+6. System removes line item from GRN
+7. System resequences remaining line numbers (10, 20, 30...)
+8. System recalculates GRN totals:
+   - Subtotal
+   - Tax total
+   - Grand total
+9. System creates activity log entry: "Item [product] deleted by [user]"
+10. System displays success message: "Item deleted"
+11. System refreshes items table
+
+**Alternative Flows**:
+
+**A1: Delete Last Item**
+- 6a. User deletes the only line item
+- 6b. System allows deletion
+- 6c. GRN exists with zero line items
+- 6d. System displays message: "GRN has no items. Add items or delete GRN."
+
+**A2: Bulk Delete**
+- 3a. User selects multiple line items (checkboxes)
+- 3b. User clicks "Delete Selected" button
+- 4a. System displays confirmation: "Delete X items?"
+- 5a. User confirms
+- 6a. System deletes all selected items in single transaction
+- 8a. System recalculates totals once
+
+**A3: Cancel Deletion**
+- 5a. User clicks "Cancel" button
+- 5b. System closes dialog without changes
+- 5c. Line item remains in GRN
+
+**Exception Flows**:
+
+**E1: GRN Already Committed**
+- 3a. GRN status = COMMITTED
+- 3b. System disables delete icon
+- 3c. System displays message: "Cannot delete items from committed GRN"
+
+**E2: Line Item Linked to Stock Movement**
+- 6a. Line item has associated stock movement (rare: GRN committed then uncommitted)
+- 6b. System displays error: "Cannot delete item with stock movement"
+- 6c. User must first reverse stock movement or contact admin
+
+**E3: Line Item Part of Invoice**
+- 6a. Line item already matched to AP invoice
+- 6b. System displays warning: "Item matched to invoice [number]"
+- 6c. User can:
+   - Cancel deletion
+   - Force delete (creates discrepancy, requires approval)
+
+**Business Rules**:
+- Cannot delete from COMMITTED or VOID GRN
+- Deleting all items leaves empty GRN (valid state)
+- Line numbers resequenced after deletion (no gaps)
+- Activity log preserves deleted item details for audit
+
+**UI Requirements**:
+- Delete icon visible only in edit mode
+- Confirmation dialog requires explicit "Delete" click (not accidental)
+- Bulk delete checkbox column appears in edit mode
+- Deleted items briefly fade out before removal (visual feedback)
+
+**Integration Points**:
+- Purchase Order: If from PO, deletion does not revert PO item status
+- Inventory: Check for stock movements before deletion
+- AP: Check for invoice matching before deletion
+
+---
+
+### UC-GRN-010: Add Extra Costs
+
+**Primary Actor**: AP Clerk
+**Priority**: Medium
+**FR Reference**: FR-GRN-007
+
+**Description**: User allocates additional costs (freight, handling, customs) to GRN and distributes across line items.
+
+**Preconditions**:
+- GRN exists (any status except VOID)
+- At least one line item exists
+- User has permission to add costs
+
+**Postconditions**:
+- Extra cost entries added to GRN
+- Costs distributed to line items
+- Line item totals updated
+- GRN total increased by extra costs
+- Activity log records cost additions
+
+**Main Flow**:
+
+1. User opens GRN detail page
+2. User navigates to "Extra Costs" tab
+3. System displays:
+   - List of existing extra costs (if any)
+   - "Add Extra Cost" button
+   - Distribution method selector
+4. User clicks "Add Extra Cost" button
+5. System displays cost entry form:
+   - **Cost Type**: Dropdown (Freight, Handling, Customs, Insurance, Other)
+   - **Description**: Free text
+   - **Amount**: Numeric field
+   - **Currency**: Dropdown (defaults to GRN currency)
+   - **Exchange Rate**: Auto-populated if different currency
+6. User enters:
+   - Selects cost type
+   - Enters description
+   - Enters amount
+   - Selects currency (if different from GRN)
+7. If currency different from GRN currency:
+   - System fetches exchange rate
+   - System displays: "Amount in GRN currency: [converted amount]"
+8. User selects distribution method:
+   - **By Net Amount**: Distribute proportionally by line item net amount
+   - **By Quantity**: Distribute proportionally by quantity received
+9. User clicks "Add Cost" button
+10. System validates:
+    - Amount > 0
+    - Cost type selected
+    - Exchange rate available (if multi-currency)
+11. System calculates distribution:
+    - If By Net Amount:
+      - Line allocation = (Line Net / Total Net) × Extra Cost
+    - If By Quantity:
+      - Line allocation = (Line Qty / Total Qty) × Extra Cost
+12. System adds extra cost entry
+13. System updates each line item:
+    - Adds allocated extra cost to line total
+    - Stores allocation in line item metadata
+14. System recalculates GRN grand total
+15. System creates activity log entry: "Extra cost [type] added: [amount]"
+16. System displays cost in extra costs table
+17. System shows updated line item costs
+
+**Alternative Flows**:
+
+**A1: Multi-Currency Extra Cost**
+- 6a. User selects different currency than GRN currency
+- 7a. System fetches exchange rate for cost entry date
+- 7b. System converts to GRN currency for distribution
+- 7c. System stores both original and converted amounts
+
+**A2: Change Distribution Method**
+- 8a. User changes distribution method after adding costs
+- 8b. System recalculates all cost allocations using new method
+- 8c. System updates all line item totals
+- 8d. User confirms recalculation
+
+**A3: Edit Existing Extra Cost**
+- 3a. User clicks "Edit" on existing extra cost
+- 5a. System displays edit form with current values
+- 9a. User modifies values and saves
+- 10a. System recalculates distribution
+- 14a. System updates all affected line items
+
+**A4: Delete Extra Cost**
+- 3a. User clicks "Delete" on existing extra cost
+- 3b. System displays confirmation dialog
+- 3c. User confirms deletion
+- 3d. System removes cost entry
+- 3e. System recalculates line items (removes allocated costs)
+- 3f. System updates GRN total
+
+**Exception Flows**:
+
+**E1: No Line Items**
+- 4a. GRN has no line items
+- 4b. System disables "Add Extra Cost" button
+- 4c. System displays message: "Add line items before adding extra costs"
+
+**E2: Invalid Amount**
+- 10a. User enters amount ≤ 0
+- 10b. System displays error: "Amount must be greater than 0"
+- 10c. User corrects amount
+
+**E3: Exchange Rate Not Available**
+- 7a. No exchange rate found for selected currency and date
+- 10a. System displays error: "Exchange rate not available"
+- 10b. User options:
+   - Enter manual exchange rate
+   - Change currency
+   - Contact admin to add exchange rate
+
+**E4: Distribution Precision Issues**
+- 11a. Distribution results in >2 decimal places for line items
+- 11b. System rounds each line allocation to 2 decimals
+- 11c. System adjusts last line item to ensure total equals extra cost exactly
+
+**Business Rules**:
+- Extra costs always increase GRN total (never negative)
+- Distribution method applies to all extra costs in GRN
+- Cannot add extra costs to VOID GRN
+- Exchange rate locked once GRN committed
+- Line allocations rounded to 2 decimal places
+- Sum of allocations must equal extra cost amount exactly
+
+**UI Requirements**:
+- Extra costs table shows: Type, Description, Amount, Currency, Allocated (Yes/No)
+- Distribution method selector with visual explanation
+- Real-time distribution preview before confirming
+- Line items table shows allocated extra cost per line
+
+**Integration Points**:
+- Currency Exchange Rate: Fetch rates for multi-currency costs
+- Financial Accounting: Extra costs included in inventory cost and JV entries
 
 ---
 
 ### UC-GRN-011: Commit GRN
 
-**Description**: User finalizes a GRN by committing it, which triggers stock movements, updates inventory levels, and generates financial journal entries.
+**Primary Actor**: Storekeeper
+**Priority**: High
+**FR Reference**: FR-GRN-010, FR-GRN-008
 
-**Actor(s)**: Warehouse Staff, Receiving Clerk, Purchasing Staff
+**Description**: User commits GRN, finalizing the receipt and triggering stock movements and accounting entries.
 
-**Priority**: Critical
+**Preconditions**:
+- GRN exists in RECEIVED status
+- User has "Commit GRN" permission
+- All line items have storage locations
+- All required fields complete
 
-**Frequency**: Daily (10-30 times per day)
+**Postconditions**:
+- GRN status changed to COMMITTED
+- Stock movements created for all line items
+- Inventory quantities updated
+- Journal voucher posted to GL
+- PO status updated (if applicable)
+- GRN becomes read-only (cannot edit)
+- Activity log records commit action
+
+**Main Flow**:
+
+1. User opens GRN detail page (status = RECEIVED)
+2. System displays "Commit" button
+3. User clicks "Commit" button
+4. System performs pre-commit validation:
+   - All line items have storage location
+   - All required header fields complete
+   - At least one line item exists
+   - Financial totals calculated
+   - No pending validations or errors
+5. System displays commit confirmation dialog:
+   - "Commit GRN-YYYY-NNNN?"
+   - "This will update inventory and post accounting entries."
+   - "This action cannot be undone."
+   - Summary: X items, Total amount $Y.YY
+   - [Cancel] [Commit] buttons
+6. User clicks "Commit" button
+7. System initiates commit transaction:
+   - Updates GRN status to COMMITTED
+   - Locks GRN for editing
+8. System creates stock movements:
+   - One stock movement per line item
+   - Movement type: "GRN Receipt"
+   - Quantity: Received quantity (excluding rejected/damaged)
+   - Location: Line item storage location
+   - Batch/Lot: If applicable
+   - Cost: Unit price + allocated extra costs
+   - Reference: GRN number and line number
+9. System updates inventory:
+   - Increases on-hand quantity per location
+   - Updates inventory value (FIFO/WAVG method)
+   - Records batch/lot details if applicable
+10. System updates PO status (if applicable):
+    - Updates each linked PO item:
+      - Received qty increased
+      - Status updated (PARTIAL/RECEIVED)
+    - Updates PO header status if all items received
+11. System creates journal voucher:
+    - JV Type: GRN
+    - JV Date: Receipt date
+    - Debit: Inventory account (per line item dept)
+    - Credit: Accounts Payable - Vendor
+    - Amount: GRN total (including extra costs)
+    - Tax entries: Input VAT/GST
+12. System posts JV to GL
+13. System updates vendor payable balance
+14. System sets commit timestamp and user
+15. System creates activity log entry: "GRN committed by [user]"
+16. System sends notifications:
+    - Email to AP Clerk: "GRN ready for invoice matching"
+    - Email to Purchasing Manager (if discrepancies)
+17. System displays success message: "GRN committed successfully"
+18. System refreshes page in view-only mode
+19. System displays "COMMITTED" badge prominently
+
+**Alternative Flows**:
+
+**A1: Partial Quantities**
+- 8a. Some line items have received qty < ordered qty
+- 8b. System creates stock movements for received quantities only
+- 10a. PO items remain in PARTIAL status
+
+**A2: Multi-PO GRN**
+- 10a. GRN references multiple POs
+- 10b. System updates each PO separately
+- 10c. Each PO status updated independently
+
+**A3: Consignment GRN**
+- 11a. GRN marked as consignment
+- 11b. System creates different JV:
+   - Debit: Consignment Inventory
+   - Credit: Consignment Payable
+- 11c. No immediate payment obligation
+
+**A4: Cash Purchase GRN**
+- 11a. GRN marked as cash purchase
+- 11b. System creates different JV:
+   - Debit: Inventory
+   - Credit: Cash Book (not AP)
+- 11c. Payment recorded immediately
+
+**A5: Cancel Commit**
+- 6a. User clicks "Cancel" button
+- 6b. System closes dialog without changes
+- 6c. GRN remains in RECEIVED status
+
+**Exception Flows**:
+
+**E1: Validation Errors**
+- 4a. Validation fails on one or more checks
+- 4b. System displays error dialog with all issues:
+   - "3 line items missing storage location"
+   - "Invoice number required"
+- 4c. System highlights problematic fields
+- 4d. User must fix all issues before retrying commit
+
+**E2: Storage Location Inactive**
+- 8a. Storage location became inactive since item added
+- 8b. System displays error: "Location [name] is inactive"
+- 8c. User must edit item to select active location
+- 8d. System cancels commit
+
+**E3: Inventory Update Failure**
+- 9a. Inventory update fails (database error, constraint violation)
+- 9b. System rolls back entire commit transaction
+- 9c. GRN status reverts to RECEIVED
+- 9d. System displays error: "Inventory update failed. Please try again."
+- 9e. Admin notified of failure
+
+**E4: JV Posting Failure**
+- 12a. Journal voucher posting fails (GL account missing, period closed)
+- 12b. System rolls back commit transaction
+- 12c. Stock movements reversed
+- 12d. GRN status reverts to RECEIVED
+- 12e. System displays error: "Accounting entry failed: [reason]"
+- 12f. Admin notified for resolution
+
+**E5: Concurrent Commit Attempt**
+- 7a. Another user already committed this GRN
+- 7b. System detects version conflict
+- 7c. System displays error: "GRN already committed by [user]"
+- 7d. System refreshes page to show committed status
+
+**Business Rules**:
+- BR-GRN-003: Can only commit if all required fields complete
+- BR-GRN-003: COMMITTED GRN cannot be edited
+- BR-GRN-003: COMMITTED GRN creates irreversible stock movements
+- BR-GRN-007: Stock movements created only when status = COMMITTED
+- BR-GRN-007: Only received quantity (not rejected/damaged) increases inventory
+- Commit operation must be atomic (all or nothing)
+
+**UI Requirements**:
+- "Commit" button prominently placed (green, primary action)
+- Confirmation dialog clearly warns of irreversibility
+- Loading indicator during commit process (may take several seconds)
+- Success state shows confetti or checkmark animation
+- COMMITTED badge in green with lock icon
+
+**Integration Points**:
+- **Inventory Management**: Create stock movements, update on-hand quantities
+- **Purchase Order**: Update PO item and header statuses
+- **General Ledger**: Post journal voucher
+- **Accounts Payable**: Update vendor payable balance
+- **Notification System**: Send email alerts
+
+---
+
+### UC-GRN-012: Void GRN
+
+**Primary Actor**: Purchasing Manager
+**Priority**: Medium
+**FR Reference**: FR-GRN-010
+
+**Description**: User voids/cancels a GRN, reversing its effects if committed.
+
+**Preconditions**:
+- GRN exists in RECEIVED or COMMITTED status
+- User has "Void GRN" permission (manager only)
+- If committed, stock has not been consumed/transferred
+
+**Postconditions**:
+- GRN status changed to VOID
+- If was committed: Stock movements reversed, JV reversed
+- PO status reverted (if applicable)
+- GRN becomes read-only with VOID badge
+- Activity log records void action with reason
+
+**Main Flow**:
+
+1. User opens GRN detail page
+2. User clicks "Actions" dropdown
+3. User selects "Void GRN"
+4. System displays void confirmation dialog:
+   - "Void GRN-YYYY-NNNN?"
+   - Warning: "This action cannot be undone."
+   - If committed: "This will reverse inventory and accounting entries."
+   - **Void Reason**: Text area (required)
+   - [Cancel] [Void GRN] buttons
+5. User enters void reason (required)
+6. User clicks "Void GRN" button
+7. System validates:
+   - Void reason not empty (minimum 10 characters)
+   - If committed: Check if inventory consumed
+8. If GRN status = COMMITTED:
+   - System creates reversal stock movements:
+     - Negative quantities for each original movement
+     - Same locations and products
+     - Movement type: "GRN Reversal"
+     - Reference: Original GRN number
+   - System updates inventory:
+     - Decreases on-hand quantity
+     - Adjusts inventory value
+   - System creates reversal journal voucher:
+     - Opposite entries from original JV
+     - JV Type: GRN Reversal
+     - Posts to GL
+9. System updates GRN:
+   - Status → VOID
+   - Void reason saved
+   - Voided by user and timestamp
+10. System updates PO status (if applicable):
+    - Reverts each linked PO item:
+      - Reduces received qty
+      - Status reverts (OPEN/PARTIAL)
+    - Updates PO header status
+11. System creates activity log entry: "GRN voided by [user] - Reason: [reason]"
+12. System sends notifications:
+    - Email to AP Clerk: "GRN voided, check invoices"
+    - Email to Receiving Clerk (original creator)
+    - Email to Financial Controller
+13. System displays success message: "GRN voided successfully"
+14. System refreshes page with VOID badge
+
+**Alternative Flows**:
+
+**A1: Void RECEIVED GRN (Not Committed)**
+- 8a. GRN status = RECEIVED (not yet committed)
+- 8b. No stock movements to reverse
+- 8c. No JV to reverse
+- 8d. System skips steps 8a-8c, proceeds to step 9
+
+**A2: Multi-PO GRN**
+- 10a. GRN references multiple POs
+- 10b. System reverts each PO separately
+- 10c. Each PO status updated independently
+
+**A3: Cancel Void**
+- 6a. User clicks "Cancel" button
+- 6b. System closes dialog without changes
+- 6c. GRN remains in original status
+
+**Exception Flows**:
+
+**E1: Void Reason Missing**
+- 7a. User clicks "Void GRN" without entering reason
+- 7b. System displays error: "Void reason is required"
+- 7c. User must enter reason (min 10 characters)
+
+**E2: Inventory Already Consumed**
+- 8a. Stock from GRN already used in production or transferred
+- 8b. System cannot reverse stock movements
+- 8c. System displays error: "Cannot void GRN - Inventory already consumed"
+- 8d. System suggests:
+   - Create adjustment transaction
+   - Contact administrator for manual reversal
+
+**E3: Invoice Already Processed**
+- 8a. Vendor invoice already matched and paid
+- 8b. System displays warning: "Invoice [number] already processed"
+- 8c. System allows void but flags for AP review
+- 8d. AP must handle payment reversal separately
+
+**E4: JV Reversal Failure**
+- 8c. JV posting fails (GL period closed, account locked)
+- 8d. System rolls back void transaction
+- 8e. GRN status unchanged
+- 8f. System displays error: "Cannot void - Accounting period closed"
+- 8g. User must contact financial controller
+
+**E5: Concurrent Edit Conflict**
+- 6a. Another user editing or committing same GRN
+- 7a. System detects version conflict
+- 7b. System displays error: "GRN has been modified. Please refresh."
+- 7c. System reloads page with latest data
+
+**Business Rules**:
+- BR-GRN-003: Voiding GRN requires reason entry
+- BR-GRN-003: VOID GRN cannot be un-voided
+- Only users with manager permission can void
+- Cannot void if inventory already consumed
+- Voiding committed GRN creates reversal entries (not deletion)
+
+**UI Requirements**:
+- "Void GRN" option in Actions dropdown (destructive action, red text)
+- Confirmation dialog prominent and clear
+- Void reason text area with character counter (min 10, max 500)
+- VOID badge displayed in red with strikethrough on GRN number
+- Void reason and voided by/date displayed in header
+
+**Integration Points**:
+- **Inventory Management**: Reverse stock movements, update quantities
+- **General Ledger**: Post reversal journal voucher
+- **Purchase Order**: Revert PO statuses and received quantities
+- **Accounts Payable**: Flag for invoice review
+- **Notification System**: Send alerts to stakeholders
+
+---
+
+### UC-GRN-013: View Financial Summary
+
+**Primary Actor**: AP Clerk
+**Priority**: High
+**FR Reference**: FR-GRN-009
+
+**Description**: User views complete financial breakdown of GRN with tax details and accounting preview.
+
+**Preconditions**:
+- GRN exists (any status)
+- User has view permission
+- Financial calculations complete
+
+**Postconditions**:
+- User understands financial totals and breakdown
+- Ready to match against vendor invoice
+
+**Main Flow**:
+
+1. User opens GRN detail page
+2. User navigates to "Financial Summary" tab
+3. System displays financial sections:
+
+   **Section A: Line Items Totals**
+   - Subtotal: Sum of (Qty × Unit Price) for all items
+   - Discount: Sum of line discounts
+   - Net Amount: Subtotal - Discount
+   - Tax Amount: Sum of line taxes
+   - Items Total: Net + Tax
+
+   **Section B: Extra Costs**
+   - List of extra costs with type and amount
+   - Extra Costs Total
+
+   **Section C: GRN Total**
+   - Grand Total: Items Total + Extra Costs
+   - Display in transaction currency
+   - Display in base currency (if different)
+
+   **Section D: Tax Breakdown**
+   - Table with columns: Tax Rate | Taxable Amount | Tax Amount
+   - One row per tax rate
+   - Total row
+
+   **Section E: Journal Voucher Preview**
+   - JV Type: GRN
+   - JV Number: Auto-generated (if committed)
+   - JV Date: Receipt date
+   - Table with columns: Account Code | Account Name | Debit | Credit
+   - Example entries:
+     - Debit: 1300 - Inventory | $1,000.00 | -
+     - Debit: 1450 - Input VAT | $100.00 | -
+     - Credit: 2100 - Accounts Payable | - | $1,100.00
+   - Total row: Debit = Credit
+   - Status: Posted (if committed) or Preview (if not)
+
+4. User can click "Expand" to see line-by-line financial details
+5. User can export financial summary to PDF or Excel
+
+**Alternative Flows**:
+
+**A1: Multi-Currency GRN**
+- 3a. GRN in foreign currency
+- 3b. System displays both currencies side-by-side:
+   - Transaction Currency column
+   - Base Currency column
+   - Exchange rate displayed
+- 3c. JV preview shows base currency amounts
+
+**A2: Consignment GRN**
+- 3e. GRN marked as consignment
+- 3e2. JV preview shows:
+   - Debit: Consignment Inventory
+   - Credit: Consignment Payable (not regular AP)
+
+**A3: Cash Purchase GRN**
+- 3e. GRN marked as cash purchase
+- 3e2. JV preview shows:
+   - Debit: Inventory
+   - Credit: Cash Book (not AP)
+
+**A4: Multiple Tax Rates**
+- 3d. Line items have different tax rates (0%, 5%, 10%)
+- 3d. Tax Breakdown shows separate row for each rate
+- Example:
+   - 0% Tax: $100.00 | $0.00
+   - 5% Tax: $200.00 | $10.00
+   - 10% Tax: $300.00 | $30.00
+   - Total: $600.00 | $40.00
+
+**Exception Flows**:
+
+**E1: Financial Calculations Incomplete**
+- 3a. Extra costs not yet distributed
+- 3b. System displays warning: "Extra costs pending distribution"
+- 3c. Line item totals shown without extra costs
+- 3d. Grand total excludes extra costs until distributed
+
+**E2: JV Posting Failed**
+- 3e. GRN committed but JV posting failed
+- 3e2. System displays error: "JV posting failed - [reason]"
+- 3e3. JV Preview shown but status = "Failed"
+- 3e4. User must contact finance to resolve
+
+**E3: Tax Configuration Missing**
+- 3d. Tax rate assigned but GL account not configured
+- 3d. System displays warning: "Tax account not configured for [rate]%"
+- 3d. Tax breakdown shown but JV preview incomplete
+
+**Business Rules**:
+- BR-GRN-004: All financial calculations follow standard formulas
+- Financial amounts rounded to 2 decimal places
+- Currency precision per currency settings (0-4 decimals)
+- Tax amounts calculated on net (after discount)
+- Extra costs distributed before final totals
+
+**UI Requirements**:
+- Amounts formatted with thousand separators and currency symbol
+- Color coding: Debit (blue), Credit (red), Total (bold)
+- Expandable/collapsible sections for cleaner view
+- Export button exports all sections to single PDF/Excel
+- Responsive table for mobile view
+
+**Integration Points**:
+- **General Ledger**: Fetch GL account codes and names
+- **Tax Configuration**: Fetch tax rates and associated GL accounts
+- **Currency**: Fetch exchange rates for conversion
+
+---
+
+### UC-GRN-014: View Stock Movements
+
+**Primary Actor**: Storekeeper
+**Priority**: High
+**FR Reference**: FR-GRN-008
+
+**Description**: User views all stock movements generated from GRN commit.
+
+**Preconditions**:
+- GRN exists in COMMITTED status
+- Stock movements created during commit
+
+**Postconditions**:
+- User understands inventory impact of GRN
+- Can verify stock movements are correct
+
+**Main Flow**:
+
+1. User opens GRN detail page (status = COMMITTED)
+2. User navigates to "Stock Movements" tab
+3. System retrieves all stock movements linked to GRN
+4. System displays stock movements table:
+   - **Movement Number**: Auto-generated ID
+   - **Line Number**: GRN line reference
+   - **Product Code & Name**
+   - **Quantity**: Received quantity
+   - **Unit**: Unit of measure
+   - **Location**: Storage location
+   - **Batch/Lot**: If applicable
+   - **Movement Date**: GRN commit date
+   - **Created By**: User who committed GRN
+   - **Status**: POSTED
+5. User can click on movement number to view details
+6. System displays summary:
+   - Total movements: X
+   - Total items moved: Y units
+   - Locations affected: Z
+7. User can filter movements by:
+   - Location
+   - Product
+   - Date range
+8. User can export stock movements to Excel
+
+**Alternative Flows**:
+
+**A1: Batch/Lot Tracked Items**
+- 4a. Product requires batch/lot tracking
+- 4b. Table shows Batch/Lot columns
+- 4c. Can click batch number to view batch details
+
+**A2: Multiple Locations**
+- 4a. GRN has items going to different locations
+- 4b. Movements grouped by location for clarity
+- 4c. Can expand/collapse location groups
+
+**A3: GRN Not Yet Committed**
+- 1a. GRN status = RECEIVED or DRAFT
+- 3a. No stock movements exist
+- 3b. System displays message: "Stock movements will be created when GRN is committed"
+- 3c. Tab shows "Preview" mode with expected movements
+
+**A4: GRN Voided**
+- 1a. GRN status = VOID
+- 3a. Original stock movements and reversal movements both exist
+- 3b. System displays both:
+   - Original movements (crossed out)
+   - Reversal movements (highlighted)
+- 3c. Net effect = 0
+
+**Exception Flows**:
+
+**E1: Stock Movements Missing**
+- 3a. GRN status = COMMITTED but no stock movements found
+- 3b. System displays error: "Stock movements not found. Please contact administrator."
+- 3c. System flags GRN for admin review
+
+**E2: Movement Quantity Mismatch**
+- 4a. Stock movement quantity ≠ GRN line item quantity
+- 4b. System highlights discrepancy in red
+- 4c. System displays warning: "Quantity mismatch detected"
+- 4d. User contacts administrator to investigate
+
+**Business Rules**:
+- BR-GRN-007: Stock movements created only when status = COMMITTED
+- One stock movement per line item
+- Movement quantity = Received quantity (not including rejected/damaged)
+- Stock movements read-only (cannot be edited directly)
+- Reversal requires voiding entire GRN
+
+**UI Requirements**:
+- Table with fixed header for scrolling long lists
+- Batch/Lot columns hidden if not applicable
+- Color coding: Posted (green), Reversed (red)
+- Export includes all movement details
+
+**Integration Points**:
+- **Inventory Management**: Retrieve stock movement records
+- **Product Catalog**: Retrieve product names and details
+
+---
+
+### UC-GRN-015: Add Comments
+
+**Primary Actor**: All Users
+**Priority**: Medium
+**FR Reference**: FR-GRN-012
+
+**Description**: User adds text comments to GRN for communication and documentation.
+
+**Preconditions**:
+- GRN exists (any status)
+- User has view permission (minimum)
+
+**Postconditions**:
+- Comment added to GRN
+- Comment visible to all users with access
+- Activity log records comment addition
+
+**Main Flow**:
+
+1. User opens GRN detail page
+2. User navigates to "Comments & Attachments" tab
+3. System displays comments section:
+   - List of existing comments (newest first)
+   - Comment entry box at top
+4. User enters comment text (rich text editor)
+5. User can format text:
+   - Bold, italic, underline
+   - Bullet lists
+   - @mention other users
+6. User clicks "Post Comment" button
+7. System validates:
+   - Comment not empty
+   - Comment ≤ 5000 characters
+8. System saves comment:
+   - Comment text
+   - Created by (current user)
+   - Created timestamp
+   - Associated GRN ID
+9. System displays comment in list:
+   - User avatar
+   - User name
+   - Timestamp (relative: "2 hours ago")
+   - Comment text
+10. System sends notifications:
+    - Email to @mentioned users
+    - Email to GRN creator (if different)
+11. System creates activity log entry: "Comment added by [user]"
+
+**Alternative Flows**:
+
+**A1: Edit Own Comment**
+- 9a. User clicks "Edit" on own comment (within 15 minutes)
+- 9b. System enables edit mode
+- 9c. User modifies text
+- 9d. User clicks "Save"
+- 9e. System updates comment
+- 9f. System adds "(edited)" label
+
+**A2: Delete Own Comment**
+- 9a. User clicks "Delete" on own comment
+- 9b. System displays confirmation: "Delete comment?"
+- 9c. User confirms
+- 9d. System removes comment
+- 9e. System creates activity log entry: "Comment deleted by [user]"
+
+**A3: @Mention User**
+- 5a. User types "@" symbol
+- 5b. System displays autocomplete list of users
+- 5c. User selects user from list
+- 5d. System inserts user mention (highlighted)
+- 10a. System sends email to mentioned user: "[User] mentioned you in GRN [number]"
+
+**A4: Reply to Comment**
+- 9a. User clicks "Reply" on existing comment
+- 9b. System displays reply box under comment
+- 9c. User enters reply
+- 9d. Reply indented under original comment
+
+**Exception Flows**:
+
+**E1: Comment Too Long**
+- 7a. Comment exceeds 5000 characters
+- 7b. System displays error: "Comment too long (5000 character limit)"
+- 7c. System shows character counter
+- 7d. User reduces text length
+
+**E2: Empty Comment**
+- 7a. User clicks "Post Comment" with empty text
+- 7b. System ignores action (button disabled until text entered)
+
+**E3: Cannot Edit Others' Comments**
+- 9a. User tries to edit another user's comment
+- 9b. Edit/Delete buttons not visible (admin exception)
+
+**E4: Edit Timeout**
+- 9a. User tries to edit comment after 15 minutes
+- 9b. System disables edit option
+- 9c. User must add new comment with correction
+
+**Business Rules**:
+- All users can add comments to GRNs they can view
+- Can edit own comments within 15 minutes
+- Can delete own comments (comment removed, not hidden)
+- Admin can delete any comment
+- Comments retained even if GRN voided
+
+**UI Requirements**:
+- Rich text editor with formatting toolbar
+- Character counter (live)
+- @mention autocomplete
+- Comments threaded for replies
+- Timestamp shows relative time ("2 hours ago", "yesterday")
+
+**Integration Points**:
+- **User Management**: Retrieve user list for @mentions
+- **Notification System**: Send emails to mentioned users
+
+---
+
+### UC-GRN-016: Upload Attachments
+
+**Primary Actor**: Receiving Clerk
+**Priority**: Medium
+**FR Reference**: FR-GRN-012
+
+**Description**: User uploads supporting documents (invoices, delivery notes, photos) to GRN.
+
+**Preconditions**:
+- GRN exists (any status)
+- User has edit permission
+- Files to upload exist
+
+**Postconditions**:
+- Attachments uploaded and linked to GRN
+- Files accessible to authorized users
+- Activity log records upload
+
+**Main Flow**:
+
+1. User opens GRN detail page
+2. User navigates to "Comments & Attachments" tab
+3. System displays attachments section:
+   - List of existing attachments
+   - "Upload File" button
+4. User clicks "Upload File" button
+5. System displays file upload dialog:
+   - Drag-and-drop area
+   - "Browse Files" button
+   - **Document Type**: Dropdown (Invoice, Delivery Note, Packing List, Photo, Other)
+   - **Description**: Text field (optional)
+   - Supported formats: PDF, JPG, PNG, XLSX (max 10MB)
+6. User selects file(s) via:
+   - Drag-and-drop to upload area
+   - Browse file system
+7. User can upload multiple files at once
+8. User selects document type for each file
+9. User optionally enters description
+10. User clicks "Upload" button
+11. System validates each file:
+    - File size ≤ 10MB
+    - File type in allowed list (PDF, JPG, PNG, XLSX)
+    - Virus scan passed
+12. System uploads files:
+    - Saves to secure storage
+    - Generates unique file ID
+    - Records metadata:
+      - Original filename
+      - Document type
+      - Description
+      - File size
+      - Uploaded by (user)
+      - Upload timestamp
+13. System displays uploaded files in attachments list:
+    - File icon (based on type)
+    - Filename
+    - Document type badge
+    - File size
+    - Uploaded by and date
+    - [Download] [Delete] buttons
+14. System creates activity log entry: "Attachment uploaded by [user]: [filename]"
+
+**Alternative Flows**:
+
+**A1: Preview Image**
+- 13a. User clicks on image file (JPG, PNG)
+- 13b. System displays image preview modal
+- 13c. User can zoom, rotate image
+- 13d. User can download or delete from preview
+
+**A2: Download Attachment**
+- 13a. User clicks "Download" button
+- 13b. System streams file to user's browser
+- 13c. File downloads with original filename
+
+**A3: Delete Attachment**
+- 13a. User clicks "Delete" button on own attachment
+- 13b. System displays confirmation: "Delete [filename]?"
+- 13c. User confirms
+- 13d. System deletes file from storage
+- 13e. System removes from attachments list
+- 13f. System creates activity log entry: "Attachment deleted: [filename]"
+
+**A4: Multiple Files Upload**
+- 6a. User selects 5 files at once
+- 11a. System validates all files in batch
+- 12a. System uploads all files concurrently
+- 12b. System shows progress bar for each file
+- 13a. System displays all uploaded files
+
+**Exception Flows**:
+
+**E1: File Too Large**
+- 11a. File size exceeds 10MB limit
+- 11b. System displays error: "[filename] exceeds 10MB limit"
+- 11c. File excluded from upload
+- 11d. Other valid files continue uploading
+
+**E2: Invalid File Type**
+- 11a. User uploads .exe or .zip file
+- 11b. System displays error: "File type not allowed: [extension]"
+- 11c. System suggests allowed types
+- 11d. File excluded from upload
+
+**E3: Virus Detected**
+- 11a. Virus scan detects malware
+- 11b. System quarantines file
+- 11c. System displays error: "File failed security scan"
+- 11d. Admin notified
+- 11e. File not uploaded
+
+**E4: Upload Failure**
+- 12a. Network error during upload
+- 12b. System retries upload (3 attempts)
+- 12c. If fails, system displays error: "Upload failed. Please try again."
+- 12d. User can retry upload
+
+**E5: Storage Quota Exceeded**
+- 12a. GRN attachment storage limit reached (100MB per GRN)
+- 12b. System displays error: "Storage limit exceeded. Delete old attachments or contact admin."
+- 12c. Upload cancelled
+
+**E6: Cannot Delete Others' Attachments**
+- 13a. User tries to delete another user's attachment
+- 13b. Delete button not visible (admin exception)
+
+**Business Rules**:
+- Supported formats: PDF, JPG, PNG, XLSX
+- Max file size: 10MB per file
+- Max total attachments: 100MB per GRN
+- Can delete own attachments only (except admin)
+- Attachments retained even if GRN voided
+- Virus scanning required for all uploads
+
+**UI Requirements**:
+- Drag-and-drop upload area with visual feedback
+- Progress bars for upload status
+- File type icons for visual identification
+- Image thumbnails for photos
+- Inline PDF preview (if browser supports)
+
+**Integration Points**:
+- **File Storage**: Save files to secure cloud storage or server
+- **Virus Scanning**: Scan all uploads for malware
+- **User Management**: Validate user permissions
+
+---
+
+### UC-GRN-017: View Activity Log
+
+**Primary Actor**: Financial Controller
+**Priority**: Medium
+**FR Reference**: FR-GRN-013
+
+**Description**: User views complete audit trail of all changes to GRN.
+
+**Preconditions**:
+- GRN exists (any status)
+- User has view permission (audit access)
+
+**Postconditions**:
+- User understands full change history of GRN
+- Audit requirements satisfied
+
+**Main Flow**:
+
+1. User opens GRN detail page
+2. User navigates to "Activity Log" tab
+3. System retrieves all activity log entries for GRN
+4. System displays activity log table:
+   - **Timestamp**: Date and time of action (newest first)
+   - **User**: Who performed the action
+   - **Action**: Type of action performed
+   - **Description**: Details of the change
+   - **IP Address**: User's IP (if audit requirement)
+5. System displays filter options:
+   - Filter by action type
+   - Filter by user
+   - Filter by date range
+6. System displays summary:
+   - Total actions: X
+   - First action: [date] by [user]
+   - Last action: [date] by [user]
+7. User can export activity log to Excel/PDF
+
+**Activity Types Logged**:
+
+**Creation**:
+- "GRN created by [user]"
+- "Created from PO [numbers]" or "Created manually"
+
+**Status Changes**:
+- "Status changed from [old] to [new] by [user]"
+- "GRN committed by [user]"
+- "GRN voided by [user] - Reason: [reason]"
+
+**Header Changes**:
+- "Header updated by [user] - [fields changed]"
+- "Currency changed from [old] to [new] by [user]"
+- "Invoice number updated to [number] by [user]"
+
+**Line Item Changes**:
+- "Item [product] added by [user]"
+- "Item [product] updated by [user] - [fields changed]"
+- "Item [product] deleted by [user]"
+- "Quantity changed from [old] to [new] for [product]"
+
+**Extra Costs**:
+- "Extra cost added by [user]: [type] $[amount]"
+- "Extra cost updated by [user]: [details]"
+- "Extra cost deleted by [user]"
+
+**Comments & Attachments**:
+- "Comment added by [user]"
+- "Attachment uploaded by [user]: [filename]"
+- "Attachment deleted by [user]: [filename]"
+
+**System Actions**:
+- "Stock movements created - [count] movements"
+- "Journal voucher posted - JV-[number]"
+- "PO status updated - PO-[number] to [status]"
+
+**Alternative Flows**:
+
+**A1: Filter by Action Type**
+- 5a. User selects "Status Changes" filter
+- 5b. System displays only status change entries
+- 5c. Other entries hidden
+
+**A2: Filter by User**
+- 5a. User selects specific user from dropdown
+- 5b. System displays only actions by that user
+
+**A3: Date Range Filter**
+- 5a. User selects date range (from/to)
+- 5b. System displays actions within range
+
+**A4: View Change Details**
+- 4a. User clicks "View Details" on entry
+- 4b. System displays modal with full change details:
+   - Before/after values for fields
+   - Associated records affected
+   - Related system actions
+
+**Exception Flows**:
+
+**E1: Activity Log Empty**
+- 3a. GRN just created, no actions yet
+- 3b. System displays message: "No activity yet"
+- 3c. Shows creation entry only
+
+**E2: Activity Log Corrupted**
+- 3a. Activity log data missing or corrupted
+- 3b. System displays warning: "Activity log incomplete"
+- 3c. Shows available entries
+- 3d. Admin notified to investigate
+
+**Business Rules**:
+- All actions automatically logged (no manual logging)
+- Activity log is immutable (cannot edit/delete entries)
+- Log retained even if GRN voided or deleted
+- Timestamp accurate to second
+- System actions logged alongside user actions
+
+**UI Requirements**:
+- Table sortable by timestamp (default: newest first)
+- Color coding: Creation (blue), Changes (yellow), Deletions (red), System (gray)
+- Expandable rows for detailed change info
+- Filter badges show active filters
+- Export includes all columns and details
+
+**Integration Points**:
+- **User Management**: Retrieve user details for display
+- **Audit System**: Central audit logging service
+
+---
+
+### UC-GRN-018: Perform Bulk Actions
+
+**Primary Actor**: Receiving Clerk
+**Priority**: Low
+**FR Reference**: FR-GRN-014
+
+**Description**: User performs actions on multiple line items simultaneously for efficiency.
 
 **Preconditions**:
 - GRN exists in DRAFT or RECEIVED status
-- All items have storage locations assigned
-- User has permission to commit GRNs
+- Multiple line items exist
+- User has edit permission
 
 **Postconditions**:
-- **Success**: GRN status changed to COMMITTED, stock movements generated, inventory updated, journal voucher created
-- **Failure**: GRN status unchanged, user informed of blocking issues
+- Selected items updated with bulk action
+- Activity log records bulk action
 
 **Main Flow**:
-1. User opens GRN in RECEIVED status
-2. User reviews all GRN data: items, quantities, prices, locations, discrepancies
-3. User verifies all validations passed (locations assigned)
-4. User clicks "Commit GRN" button
-5. System validates GRN is ready for commitment
-6. System displays commitment confirmation dialog with impact summary
-7. User confirms commitment
-8. System changes GRN status to COMMITTED
-9. System generates stock movement records for all items
-10. System updates inventory levels in assigned storage locations
-11. System calculates financial totals including tax and extra costs
-12. System generates journal voucher with debit and credit entries
-13. System posts journal voucher to finance module
-14. System records commitment timestamp and user
-15. System displays success message with stock movement and journal voucher references
-16. System locks GRN for editing (now read-only)
-17. Use case ends
 
-**Alternative Flows**:
-
-**Alt-11A: Commitment with Discrepancies** (At step 5)
-- GRN contains flagged discrepancies
-- System displays warning about committing with discrepancies
-- User reviews discrepancy notes
-- User confirms commitment (discrepancies already documented)
-- Continue to step 6
-
-**Exception Flows**:
-
-**Exc-11A: Missing Storage Locations** (At step 5)
-- System detects items without storage location assignments
-- System displays validation error listing items needing locations
-- System prevents commitment
-- User assigns locations via UC-GRN-009
-- Resume at step 4 or end use case
-
-**Exc-11B: Stock Movement Generation Failure** (At step 9)
-- System encounters error generating stock movements
-- System rolls back GRN status change
-- System displays error message with details
-- System logs error for technical support
-- User retries after issue resolved
-- Use case ends
-
-**Business Rules**:
-- **BR-GRN-012**: COMMITTED status GRNs cannot be edited or deleted, only voided
-- **BR-GRN-014**: Stock movements only generated when GRN status changes to COMMITTED
-- **BR-GRN-008**: Storage location must be assigned for all items before commitment
-
-**Includes**:
-- [UC-GRN-101: Generate Stock Movements](#uc-grn-101-generate-stock-movements)
-- [UC-GRN-102: Generate Journal Voucher](#uc-grn-102-generate-journal-voucher)
-
-**Related Requirements**:
-- FR-GRN-004: GRN Status Management
-- FR-GRN-010: Stock Movement Generation
-- FR-GRN-012: Financial Summary and Tax Calculation
-- NFR-GRN-004: Commitment completes within 5 seconds
-
-**Notes**:
-- Commitment is irreversible transaction - only void operation allowed afterward
-- Stock movements create audit trail in inventory module
-- Journal voucher entries follow accounting department GL account mapping
-- Committed GRNs used as basis for vendor invoice matching and payment processing
-- System sends notification to finance team upon successful commitment
-
----
-
-### UC-GRN-013: Void GRN
-
-**Description**: User cancels a GRN by voiding it, preventing any inventory or financial impact while preserving the record for audit purposes.
-
-**Actor(s)**: Procurement Manager
-
-**Priority**: Medium
-
-**Frequency**: Weekly (2-5 times per week for errors or returns)
-
-**Preconditions**:
-- GRN exists in any status (DRAFT, RECEIVED, or COMMITTED)
-- User has procurement manager role or appropriate permission
-- If GRN is COMMITTED, stock movements must be reversible
-
-**Postconditions**:
-- **Success**: GRN status changed to VOID, preserved for audit, no inventory/financial impact
-- **Failure**: GRN status unchanged, user informed of issues
-
-**Main Flow**:
-1. User opens GRN to be voided
-2. User clicks "Void GRN" button in header
-3. System displays void confirmation dialog
-4. System shows impact summary (if COMMITTED, lists stock movements to reverse)
-5. User enters void reason in required field
-6. User confirms void operation
-7. System validates void operation is allowed
-8. If GRN is COMMITTED, system generates reversing stock movements
-9. If GRN is COMMITTED, system generates reversing journal voucher
-10. System changes GRN status to VOID
-11. System records void timestamp, user, and reason
-12. System adds void entry to activity log
-13. System displays success message
-14. System displays GRN in read-only mode with VOID status
-15. Use case ends
-
-**Alternative Flows**:
-
-**Alt-13A: Void Draft or Received GRN** (At step 8)
-- GRN status is DRAFT or RECEIVED (not yet committed)
-- No stock movements or journal entries exist
-- System simply changes status to VOID
-- Continue to step 10
-
-**Alt-13B: Void with Replacement GRN** (At step 5)
-- User enters void reason referencing replacement GRN
-- System links to replacement GRN number if provided
-- User confirms void
-- Continue to step 7
-
-**Exception Flows**:
-
-**Exc-13A: Missing Void Reason** (At step 7)
-- User did not enter void reason
-- System displays validation error "Void reason is required"
-- User enters reason
-- Resume at step 6
-
-**Exc-13B: Insufficient Permission** (At step 7)
-- User lacks permission to void GRN
-- System displays "Access denied - procurement manager role required"
-- Use case ends
-
-**Exc-13C: Reversal Failure** (At step 8-9)
-- System encounters error reversing stock movements or journal entries
-- System displays error message
-- System does not change GRN status
-- User contacts support to resolve issue
-- Use case ends
-
-**Business Rules**:
-- **BR-GRN-023**: Only creator or procurement manager can void a GRN
-- **BR-GRN-013**: VOID status GRNs are read-only and preserved for audit
-- **BR-GRN-012**: Cannot edit or delete voided GRNs
-
-**Related Requirements**:
-- FR-GRN-004: GRN Status Management
-- FR-GRN-013: Activity Log and Audit Trail
-
-**Notes**:
-- Void operation different from delete - record preserved in system
-- Voided GRNs appear in reports with VOID status clearly indicated
-- Common void reasons: duplicate entry, vendor return, data entry error, goods rejected
-- If goods were physically received but GRN voided, separate return process may be needed
-- Voided GRNs do not count toward vendor performance metrics
-
----
-
-### UC-GRN-010: Add Comments and Attachments
-
-**Description**: User adds text comments and file attachments to a GRN for documentation, collaboration, and record-keeping purposes.
-
-**Actor(s)**: Receiving Clerk, Purchasing Staff
-
-**Priority**: Medium
-
-**Frequency**: Daily (30-50% of GRNs have comments or attachments)
-
-**Preconditions**:
-- GRN exists in system
-- User has edit or view permission for GRN
-- For attachments: files available for upload (delivery notes, packing slips, photos)
-
-**Postconditions**:
-- **Success**: Comments and attachments added to GRN, visible to all users with access
-- **Failure**: Comments or attachments not saved, user informed of errors
-
-**Main Flow**:
 1. User opens GRN detail page
-2. User navigates to Comments & Attachments tab
-3. User sees existing comments and attachments (if any)
-4. User enters text in comment field
-5. User clicks "Add Comment" button
-6. System saves comment with user name and timestamp
-7. System displays new comment in chronological order (newest first)
-8. User clicks "Attach File" button
-9. System displays file upload dialog
-10. User selects file from device (PDF, image, Excel)
-11. System validates file type and size (max 10MB)
-12. System uploads file to storage
-13. System saves attachment reference with file name and URL
-14. System displays attachment in list with download link
-15. Use case ends
+2. User navigates to "Items" tab
+3. User clicks "Edit" mode button
+4. System displays checkboxes for each line item
+5. User selects multiple items via checkboxes
+6. System displays bulk action toolbar:
+   - Selected count: "X items selected"
+   - Bulk action dropdown: [Select Action]
+   - [Apply] button
+7. User selects action from dropdown:
+   - **Delete Selected**: Remove all selected items
+   - **Set Location**: Apply same storage location to all
+   - **Set Discount**: Apply same discount rate to all
+   - **Mark as Accepted**: Set received = ordered for all
+8. User clicks "Apply" button
+9. If action requires input:
+   - System displays input dialog
+   - Example: "Set Location" shows location dropdown
+   - User selects value
+   - User confirms
+10. System displays confirmation:
+    - "Apply [action] to X items?"
+    - [Cancel] [Confirm] buttons
+11. User clicks "Confirm"
+12. System applies action to all selected items
+13. System recalculates financial totals if needed
+14. System creates activity log entry: "Bulk action by [user]: [action] applied to X items"
+15. System displays success message: "[Action] applied to X items"
+16. System refreshes items table
+17. System clears selection
 
 **Alternative Flows**:
 
-**Alt-10A: Add Multiple Attachments** (At step 9-14)
-- User clicks "Attach File" again
-- User selects additional file
-- System uploads and saves additional attachment
-- User repeats for all files to attach
-- Continue to step 15
+**A1: Select All Items**
+- 5a. User clicks "Select All" checkbox in header
+- 5b. System selects all line items
+- 5c. Selected count updates: "All X items selected"
 
-**Alt-10B: View Attachment** (At step 3)
-- User clicks attachment link
-- System downloads file or displays in browser (for images/PDFs)
-- User reviews attachment
-- Resume at step 3 or end use case
+**A2: Deselect All**
+- 5a. User clicks "Select All" checkbox again (toggle)
+- 5b. System deselects all items
+- 5c. Bulk action toolbar hides
 
-**Alt-10C: Comment Only** (At step 3-7)
-- User adds comment without attachment
-- User does not proceed to file attachment steps
-- Use case ends after step 7
+**A3: Cancel Bulk Action**
+- 11a. User clicks "Cancel" in confirmation
+- 11b. System closes dialog without changes
+- 11c. Items remain selected for different action
 
-**Exception Flows**:
-
-**Exc-10A: File Too Large** (At step 11)
-- System detects file size exceeds 10MB limit
-- System displays error "File size must be less than 10MB"
-- User compresses file or selects different file
-- Resume at step 10 or end use case
-
-**Exc-10B: Unsupported File Type** (At step 11)
-- System detects unsupported file format
-- System displays error "Supported formats: PDF, JPG, PNG, XLSX"
-- User converts file or selects different file
-- Resume at step 10 or end use case
-
-**Business Rules**:
-- None specific (general data validation rules apply)
-
-**Related Requirements**:
-- FR-GRN-014: Comments and Attachments
-- FR-GRN-013: Activity Log (comment addition logged)
-
-**Notes**:
-- Common attachments: delivery notes, packing slips, vendor invoices, photos of discrepancies
-- Comments support collaboration between receiving, purchasing, and finance teams
-- Attachments stored securely with access controlled by user permissions
-- Comment history preserved even if GRN is voided
-- No edit or delete capability for comments to maintain audit trail
-
----
-
-## System Use Cases
-
-### UC-GRN-101: Generate Stock Movements
-
-**Description**: System automatically generates stock movement records when a GRN is committed, updating inventory levels in assigned storage locations.
-
-**Trigger**: GRN status changed to COMMITTED (via UC-GRN-012)
-
-**Actor(s)**:
-- **Primary**: Inventory Management Module
-- **Secondary**: GRN Module
-
-**Priority**: Critical
-
-**Frequency**: Real-time (triggered by each GRN commitment, 10-30 times per day)
-
-**Preconditions**:
-- GRN status changed to COMMITTED
-- All GRN items have storage locations assigned
-- Inventory Management Module is available
-- Storage locations exist and are active
-
-**Postconditions**:
-- **Success**: Stock movement records created, inventory levels updated in storage locations
-- **Failure**: Transaction rolled back, GRN status reverted, error logged
-
-**Main Flow**:
-1. System receives GRN commitment event with GRN ID
-2. System retrieves GRN data with all item details
-3. For each item in GRN, system creates stock movement record:
-   - Movement type: RECEIPT
-   - From location: Receiving area (or delivery location)
-   - To location: Assigned storage location
-   - Item ID and details
-   - Quantity: received quantity (delivered - rejected - damaged)
-   - Unit of measure
-   - Cost: unit price + allocated extra cost
-   - Total cost: quantity × cost
-   - Lot/batch number (if applicable)
-   - Movement date: GRN commitment timestamp
-4. System retrieves current stock level (before stock) for to location
-5. System calculates new stock level (after stock = before stock + quantity)
-6. System updates inventory on-hand quantity in to location
-7. System saves stock movement record
-8. System repeats for all items
-9. System validates all stock movements created successfully
-10. System returns success status to GRN module
-11. Use case ends
-
-**Alternative Flows**:
-
-**Alt-101A: Multiple Locations** (At step 3)
-- Single GRN has items going to different storage locations
-- System creates separate stock movement for each item-location combination
-- System updates inventory in each respective location
-- Continue to step 8
-
-**Alt-101B: Batch/Lot Tracking** (At step 3)
-- Item requires batch/lot tracking
-- System creates stock movement with lot number
-- System updates inventory with lot-specific quantities
-- Continue to step 4
+**A4: Partial Success**
+- 12a. Action succeeds for some items, fails for others
+- 12b. Example: Delete fails if item has stock movement
+- 12c. System displays summary:
+   - "Action applied to X items"
+   - "Failed for Y items: [reasons]"
+- 12d. Failed items remain selected for retry
 
 **Exception Flows**:
 
-**Exc-101A: Location Not Found** (At step 4)
-- System cannot find storage location in inventory system
-- System throws error "Storage location [CODE] not found"
-- System rolls back all stock movements for this GRN
-- System reverts GRN status to RECEIVED
-- System logs error and notifies support
-- Use case ends
+**E1: No Items Selected**
+- 6a. User clicks bulk action without selecting items
+- 6b. Bulk action dropdown disabled
+- 6c. System displays hint: "Select items to perform bulk actions"
 
-**Exc-101B: Negative Stock** (At step 5-6)
-- Calculated stock level would be negative (should not occur for receipts)
-- System throws error and halts processing
-- System rolls back transaction
-- Use case ends
+**E2: Incompatible Selection**
+- 12a. Selected items have conflicting properties
+- Example: Different UOMs for "Set Location"
+- 12b. System displays error: "Cannot apply action to items with different [property]"
+- 12c. User must refine selection
 
-**Exc-101C: Duplicate Stock Movement** (At step 7)
-- System detects stock movement already exists for this GRN and item
-- System prevents duplicate creation
-- System validates existing movement matches current data
-- Continue to step 8 or end use case
+**E3: Validation Errors**
+- 12a. Bulk action violates business rules
+- Example: Setting location to inactive location
+- 12b. System displays errors for each item
+- 12c. Action not applied to any items
+- 12d. User corrects issues and retries
 
-**Business Rules**:
-- **BR-GRN-014**: Stock movements only generated when GRN status changes to COMMITTED
-- **BR-GRN-009**: Stock levels updated atomically to prevent inventory discrepancies
-
-**Related Requirements**:
-- FR-GRN-010: Stock Movement Generation
-- NFR-GRN-004: Stock movement generation completes within 5 seconds
-- NFR-GRN-020: Transaction rollback on failure
-
-**Notes**:
-- Stock movements are atomic - all succeed or all fail
-- Inventory updates visible immediately in Inventory Management module
-- Stock movement records serve as audit trail for inventory changes
-- Integration point with Inventory Management Module via internal API
-- Movement cost includes proportional extra cost allocation
-
----
-
-### UC-GRN-102: Generate Journal Voucher
-
-**Description**: System automatically generates accounting journal voucher entries when a GRN is committed, recording the financial impact in the general ledger.
-
-**Trigger**: GRN status changed to COMMITTED (via UC-GRN-012)
-
-**Actor(s)**:
-- **Primary**: Finance Module
-- **Secondary**: GRN Module
-
-**Priority**: Critical
-
-**Frequency**: Real-time (triggered by each GRN commitment, 10-30 times per day)
-
-**Preconditions**:
-- GRN status changed to COMMITTED
-- All financial calculations completed (subtotal, tax, discounts, extra costs)
-- GL account mapping configured for inventory and payables
-- Finance Module is available
-
-**Postconditions**:
-- **Success**: Journal voucher created with balanced debit/credit entries
-- **Failure**: Transaction rolled back, GRN status reverted, error logged
-
-**Main Flow**:
-1. System receives GRN commitment event with GRN ID
-2. System retrieves GRN financial summary data
-3. System calculates total amounts in base currency:
-   - Subtotal (sum of all item amounts)
-   - Discount amount
-   - Net amount (subtotal - discount)
-   - Tax amount (net × tax rate)
-   - Extra costs total
-   - Grand total (net + tax + extra costs)
-4. System creates journal voucher record with unique JV number
-5. System adds debit entry:
-   - Department: Inventory/Purchasing
-   - Account: Inventory (asset account)
-   - Amount: GRN net amount
-6. System adds credit entry:
-   - Department: Finance
-   - Account: Accounts Payable (liability account)
-   - Amount: GRN net amount
-7. System adds tax debit/credit entries:
-   - Debit: VAT Recoverable
-   - Credit: VAT Payable
-   - Amount: Tax amount
-8. System adds extra cost entries:
-   - Debit: Freight In / Handling (expense accounts)
-   - Credit: Accounts Payable
-   - Amount: Extra cost amounts
-9. System validates journal voucher is balanced (total debits = total credits)
-10. System saves journal voucher
-11. System posts journal voucher to Finance Module
-12. System links journal voucher to GRN record
-13. System returns success status to GRN module
-14. Use case ends
-
-**Alternative Flows**:
-
-**Alt-102A: Multi-Currency JV** (At step 3)
-- GRN transaction currency differs from base currency
-- System includes both transaction currency and base currency amounts
-- System uses exchange rate from GRN for conversion
-- System records exchange gain/loss if applicable
-- Continue to step 4
-
-**Alt-102B: Cash Transaction** (At step 6-8)
-- GRN marked as cash transaction
-- System uses Cash/Bank account instead of Accounts Payable
-- System references cash book from GRN
-- Continue to step 9
-
-**Exception Flows**:
-
-**Exc-102A: Unbalanced Journal Voucher** (At step 9)
-- System detects total debits ≠ total credits
-- System logs detailed calculation breakdown
-- System throws error "Journal voucher unbalanced"
-- System rolls back transaction
-- System reverts GRN status
-- System notifies support
-- Use case ends
-
-**Exc-102B: GL Account Not Found** (At step 5-8)
-- System cannot find configured GL account for entry
-- System throws error "GL account mapping not configured for [account type]"
-- System halts journal voucher creation
-- System rolls back transaction
-- Use case ends
+**E4: GRN Status Changed**
+- 12a. GRN committed while user editing
+- 12b. System detects status change
+- 12c. System displays error: "GRN has been committed. Bulk actions not allowed."
+- 12d. System reloads page
 
 **Business Rules**:
-- **BR-GRN-017**: GRN subtotal = sum of all item total amounts
-- **BR-GRN-018**: GRN net amount = subtotal - discount amount
-- **BR-GRN-019**: GRN total amount = net amount + tax amount + sum of extra costs
-- **BR-GRN-016**: Item total amount includes allocated extra cost
+- Cannot perform bulk actions on COMMITTED or VOID GRN
+- Delete action requires confirmation
+- Bulk discount applies to all selected, overwriting individual discounts
+- "Mark as Accepted" sets received = ordered quantity
+- Selection persists during session (until action or cancel)
 
-**Related Requirements**:
-- FR-GRN-012: Financial Summary and Tax Calculation
-- NFR-GRN-004: Journal voucher generation completes within 5 seconds
-- NFR-GRN-020: Transaction rollback on failure
+**UI Requirements**:
+- Checkboxes appear only in edit mode
+- Bulk action toolbar sticky at top when scrolling
+- Selected item count badge prominently displayed
+- Actions disabled until items selected
+- Confirmation dialog lists affected items (if ≤10 items)
 
-**Notes**:
-- Journal voucher entries follow double-entry bookkeeping principles
-- All amounts converted to base currency (USD) for posting
-- Department allocation based on GRN location or item configuration
-- Journal voucher reference stored in GRN for audit trail
-- Finance team uses journal voucher for vendor payment processing
-- Integration point with Finance Module via internal API
+**Integration Points**:
+- Same as individual item operations (UC-GRN-007, UC-GRN-008, UC-GRN-009)
 
 ---
 
-### UC-GRN-103: Update PO Fulfillment Status
+## 4. Use Case Relationships
 
-**Description**: System automatically updates the source purchase order's fulfillment status when a GRN is created or committed from a PO.
+### Use Case Diagram (Text Representation)
 
-**Trigger**:
-- GRN created from PO (via UC-GRN-002)
-- GRN committed (via UC-GRN-012)
+```
+                         GRN Module Use Cases
 
-**Actor(s)**:
-- **Primary**: Purchase Orders Module
-- **Secondary**: GRN Module
+Actors                          Primary Use Cases
+------                          -----------------
 
-**Priority**: High
+Receiving Clerk ───────────── UC-GRN-001: View GRN List
+      │                        UC-GRN-002: Filter and Search
+      │                        UC-GRN-003: Create from Single PO
+      │                        UC-GRN-004: Create from Multiple POs
+      │                        UC-GRN-005: Create Manual GRN
+      │                        UC-GRN-006: Edit Header
+      │                        UC-GRN-007: Add Line Items
+      │                        UC-GRN-008: Edit Line Items
+      │                        UC-GRN-009: Delete Line Items
+      │                        UC-GRN-018: Bulk Actions
+      │                        UC-GRN-021: Print GRN
+      │
+Storekeeper ──────────────── UC-GRN-011: Commit GRN
+      │                        UC-GRN-014: View Stock Movements
+      │
+AP Clerk ─────────────────── UC-GRN-010: Add Extra Costs
+      │                        UC-GRN-013: View Financial Summary
+      │                        UC-GRN-022: Consignment Receipt
+      │                        UC-GRN-023: Cash Purchase
+      │
+Purchasing Manager ──────── UC-GRN-012: Void GRN
+      │
+Financial Controller ────── UC-GRN-017: View Activity Log
+      │
+All Users ────────────────── UC-GRN-015: Add Comments
+                              UC-GRN-016: Upload Attachments
+                              UC-GRN-019: Export to PDF
+                              UC-GRN-020: Export to Excel
 
-**Frequency**: Real-time (triggered by PO-based GRN operations, 10-20 times per day)
+System ─────────────────── (Auto-generate GRN numbers)
+                              (Create stock movements)
+                              (Post journal vouchers)
+                              (Update PO statuses)
+                              (Send notifications)
+```
 
-**Preconditions**:
-- GRN created from or linked to a purchase order
-- Purchase order exists and is in active status
-- Purchase Orders Module is available
+### Include Relationships
 
-**Postconditions**:
-- **Success**: PO line fulfillment quantities updated, PO status updated if fully received
-- **Failure**: Error logged, does not block GRN processing (non-critical integration)
+- UC-GRN-003, UC-GRN-004, UC-GRN-005 **include** UC-GRN-006 (Edit Header)
+- UC-GRN-003, UC-GRN-004, UC-GRN-005 **include** UC-GRN-007 (Add Line Items)
+- UC-GRN-011 (Commit GRN) **includes** UC-GRN-014 (View Stock Movements)
 
-**Main Flow**:
-1. System receives GRN event (creation or commitment) with PO reference
-2. System retrieves GRN item data with PO line item references
-3. For each GRN item linked to PO line:
-   - System retrieves corresponding PO line item
-   - System updates PO line received quantity += GRN item received quantity
-   - System calculates PO line outstanding quantity (ordered - received)
-   - If outstanding quantity = 0, system marks PO line as "Fully Received"
-   - If outstanding quantity > 0, system marks PO line as "Partially Received"
-   - System saves PO line updates
-4. System evaluates overall PO status:
-   - If all PO lines fully received, system marks PO status as "Fully Received"
-   - If some lines fully received and some partial, status remains "Partially Received"
-   - If any lines have no receipts, status remains "Open" or "Approved"
-5. System saves PO status update
-6. System creates PO activity log entry noting GRN receipt
-7. System returns success status
-8. Use case ends
+### Extend Relationships
 
-**Alternative Flows**:
-
-**Alt-103A: Partial Receipt** (At step 3)
-- GRN received quantity < PO ordered quantity
-- System updates PO line to "Partially Received"
-- System calculates and displays outstanding quantity
-- Purchasing staff can create additional GRN for remaining quantity
-- Continue to step 4
-
-**Alt-103B: Over Receipt** (At step 3)
-- GRN received quantity > PO ordered quantity
-- System allows over receipt and updates PO line
-- System flags over receipt for procurement review
-- System marks PO line as "Fully Received" (all ordered quantity + extra received)
-- Continue to step 4
-
-**Alt-103C: Multiple GRNs per PO** (At step 3)
-- Multiple GRNs created from same PO
-- System accumulates received quantities across all GRNs
-- System tracks fulfillment per PO line across multiple receipts
-- Continue to step 4
-
-**Exception Flows**:
-
-**Exc-103A: PO Not Found** (At step 2)
-- System cannot find referenced purchase order
-- System logs warning but allows GRN processing to continue
-- System does not update PO fulfillment
-- Use case ends
-
-**Exc-103B: PO Already Closed** (At step 4)
-- Purchase order status is "Closed" or "Cancelled"
-- System logs warning about receiving against closed PO
-- System still allows GRN processing (management decision)
-- System notifies procurement team
-- Continue to step 6 or end use case
-
-**Business Rules**:
-- **BR-GRN-001**: GRN-PO link maintained for traceability
-- **BR-GRN-015**: PO fulfillment updates are non-blocking (GRN processing continues even if PO update fails)
-
-**Related Requirements**:
-- FR-GRN-015: Purchase Order Reference Tracking
-- FR-GRN-002: PO-Based GRN Creation
-
-**Notes**:
-- Integration point with Purchase Orders Module via internal API
-- PO fulfillment status drives procurement workflow (close POs, trigger new POs)
-- Partial receipt common for large orders or phased deliveries
-- Over receipt handled based on configuration
-- This integration supports procurement analytics and vendor performance tracking
+- UC-GRN-007 (Add Line Items) **extends to** UC-GRN-018 (Bulk Actions)
+- UC-GRN-011 (Commit GRN) **extends to** UC-GRN-012 (Void GRN)
 
 ---
 
-## Appendix
+## 5. Cross-References
 
-### Glossary
-- **Actor**: Person, role, or system that interacts with the GRN module
-- **Discrepancy**: Variance between expected (ordered) and actual (received) goods
-- **Commitment**: Finalization of GRN triggering inventory and financial updates
-- **Stock Movement**: Inventory transaction recording goods transfer between locations
-- **Journal Voucher**: Accounting entry recording financial impact of GRN
-- **Extra Cost**: Additional cost beyond item prices (freight, handling, insurance)
-- **Base Currency**: Primary currency for financial reporting (USD)
-- **Transaction Currency**: Currency used in specific GRN transaction
+### FR to UC Mapping
 
-### References
-- [Business Requirements](./BR-goods-received-note.md)
-- [Technical Specification](./TS-goods-received-note.md)
-- [Data Definition](./DD-goods-received-note.md)
-- [Flow Diagrams](./FD-goods-received-note.md)
-- [Validations](./VAL-goods-received-note.md)
-
-### Change Requests
-| CR ID | Date | Description | Status |
-|-------|------|-------------|--------|
-| - | - | - | - |
+| Functional Requirement | Related Use Cases |
+|------------------------|-------------------|
+| FR-GRN-001: GRN List Management | UC-GRN-001, UC-GRN-002 |
+| FR-GRN-002: Create from PO | UC-GRN-003, UC-GRN-004 |
+| FR-GRN-003: Manual Creation | UC-GRN-005 |
+| FR-GRN-004: Header Information | UC-GRN-006 |
+| FR-GRN-005: Line Items | UC-GRN-007, UC-GRN-008, UC-GRN-009 |
+| FR-GRN-006: Multi-PO Support | UC-GRN-004 |
+| FR-GRN-007: Extra Costs | UC-GRN-010 |
+| FR-GRN-008: Stock Movement | UC-GRN-011, UC-GRN-014 |
+| FR-GRN-009: Financial Summary | UC-GRN-013 |
+| FR-GRN-010: Status Workflow | UC-GRN-011, UC-GRN-012 |
+| FR-GRN-011: Multi-Currency | UC-GRN-006, UC-GRN-010 |
+| FR-GRN-012: Comments & Attachments | UC-GRN-015, UC-GRN-016 |
+| FR-GRN-013: Activity Log | UC-GRN-017 |
+| FR-GRN-014: Bulk Actions | UC-GRN-018 |
+| FR-GRN-015: Export & Print | UC-GRN-019, UC-GRN-020, UC-GRN-021 |
+| FR-GRN-017: Consignment & Cash | UC-GRN-022, UC-GRN-023 |
 
 ---
 
-**Document End**
+**Document Control**
 
-> 📝 **Note to Reviewers**:
-> - This document was generated from actual source code analysis of the GRN module workflows
-> - All use cases documented exist in the current codebase implementation
-> - No fictional use cases have been added
-> - Review for accuracy against current system behavior
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | 2025-12-02 | System Analyst | Initial UC document based on BR analysis |
+
+**Approval**
+
+| Role | Name | Signature | Date |
+|------|------|-----------|------|
+| Business Analyst | | | |
+| Project Manager | | | |
+| Development Lead | | | |

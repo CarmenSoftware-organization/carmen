@@ -254,8 +254,8 @@ The system must support efficient bulk operations on multiple templates simultan
 ### Data Validation Rules
 - **BR-TPL-008**: Item code is required, must be unique within template, minimum 3 characters, alphanumeric with hyphens allowed
 - **BR-TPL-009**: Item description is required, minimum 5 characters, maximum 500 characters
-- **BR-TPL-010**: UOM (Unit of Measure) is required and must be from approved list: KG, EA, BTL, CTN, LTR, BOX, PKG, DOZ, MTR
-- **BR-TPL-011**: Quantity must be positive number greater than 0, maximum 999,999 units
+- **BR-TPL-010**: UOM (Unit of Measure) is required and must be a valid value from the centralized Product Order Unit lookup table
+- **BR-TPL-011**: Quantity must be non-negative number (>= 0), maximum 999,999 units
 - **BR-TPL-012**: Unit price must be non-negative number, maximum 99,999,999.99 per currency
 - **BR-TPL-013**: Budget code is required, must be active and valid for selected department
 - **BR-TPL-014**: Account code is required, must be active and valid for transaction type
@@ -608,7 +608,7 @@ interface Department {
 ### Glossary
 - **Template**: Reusable blueprint for creating purchase requests with predefined items and specifications
 - **Template Number**: Unique identifier for templates following TPL-YYYY-NNN pattern
-- **UOM (Unit of Measure)**: Standard unit for measuring item quantities (KG, EA, BTL, CTN, etc.)
+- **UOM (Unit of Measure)**: Standard unit for measuring item quantities, sourced from centralized Product Order Unit lookup
 - **Budget Code**: Financial coding for budget allocation and tracking
 - **Account Code**: General ledger account code for financial categorization
 - **Tax Code**: Code indicating tax treatment (VAT7, VAT0, EXEMPT, etc.)

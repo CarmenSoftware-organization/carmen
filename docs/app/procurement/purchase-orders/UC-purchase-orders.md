@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Orders
 - **Document Type**: Use Cases (UC)
-- **Version**: 2.1.0
-- **Last Updated**: 2025-10-31
+- **Version**: 2.4.0
+- **Last Updated**: 2025-12-02
 - **Status**: Approved
 
 ## Related Documents
@@ -19,6 +19,9 @@
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.4.0 | 2025-12-02 | System Analyst | Added UC-PO-020: Download QR Code for Mobile Receiving, updated UC-PO-006 to include QR Code section display |
+| 2.3.0 | 2025-12-01 | System | Added PO Item Details Dialog to UC-PO-006 with inventory status indicators (On Hand, On Order, Received), related PR links, and financial summary; Added sub-dialogs for On Hand Breakdown, Pending POs, and GRN History |
+| 2.2.0 | 2025-12-01 | System | Added Comments & Attachments sidebar feature; Updated UC-PO-006 to include collapsible right sidebar with Comments, Attachments, and Activity Log sections |
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
@@ -764,23 +767,51 @@ This table provides a quick reference of all 14 use cases in the Purchase Orders
    - Financial summary (subtotal, tax, total)
    - Budget allocation
    - Approval history with timestamps
-   - Related documents and attachments
-   - Activity timeline
+   - Related documents
    - Communication log with vendor
    - Linked purchase requests
    - Linked GRNs (if any items received)
-8. User can view detailed status information:
-   - Current status and timestamp
-   - Days in current status
-   - Expected next action and by whom
-   - Status history with all transitions
-9. User can see delivery tracking:
-   - Expected delivery date
-   - Days until/since expected delivery
-   - Quantity ordered vs. received per line item
-   - Tracking numbers (if available)
-   - Related GRN links
-10. User can access related documents:
+   - **Collapsible Sidebar** (right side, full-page height):
+     * Toggle button in header to show/hide sidebar
+     * Sidebar hidden by default
+     * **Comments & Attachments Section**:
+       - Comments list with user avatar, name, timestamp
+       - Blue left-border cards for each comment
+       - Add new comment with textarea (Ctrl+Enter to send)
+       - Attachments list with file type badges
+       - View and Download actions for attachments
+       - Attach File button for uploads
+     * **Activity Log Section**:
+       - Chronological activity entries
+       - User avatar, action badge, description, timestamp
+       - Actions: Created, Updated, Approved, Sent, Comment
+8. User can click on a line item row to view detailed item information:
+   - System opens Item Details Dialog showing:
+     * Item header with name and description
+     * **Inventory Status Indicators** (clickable):
+       - **On Hand**: Total quantity on hand (in inventory units) - click to see location breakdown
+       - **On Order**: Total quantity on order (in inventory units) - click to see pending POs
+       - **Received**: Total quantity received (in inventory units) - click to see GRN history
+     * Key Metrics: Order Quantity, Unit Price, Discount
+     * Related Purchase Request: Source PR ID and Item ID (links to source PR)
+     * Order Summary: Subtotal, Discount Amount, Tax Amount, Line Total
+     * Form fields: Name, Description, Status
+   - User can click inventory status indicators to open sub-dialogs:
+     * On Hand Breakdown: Location, Category, Status, Quantity, Units per location
+     * Pending POs: PO#, Vendor, Delivery Date, Remaining Qty, Units, Locations
+     * GRN History: GRN#, Received Date, Qty Received, Qty Rejected, Inspected By, Location with comments
+10. User can view detailed status information:
+    - Current status and timestamp
+    - Days in current status
+    - Expected next action and by whom
+    - Status history with all transitions
+11. User can see delivery tracking:
+    - Expected delivery date
+    - Days until/since expected delivery
+    - Quantity ordered vs. received per line item
+    - Tracking numbers (if available)
+    - Related GRN links
+12. User can access related documents:
     - Original PO PDF
     - Revised PO PDFs (if any revisions)
     - Source purchase request
@@ -872,6 +903,91 @@ This table provides a quick reference of all 14 use cases in the Purchase Orders
 - Status color coding: Draft (gray), Pending (yellow), Approved (blue), Sent (purple), Received (green), Cancelled (red)
 - Timeline shows all activities in chronological order
 - Communication log is comprehensive and searchable
+
+---
+
+### UC-PO-020: Download QR Code for Mobile Receiving
+
+**Actor**: Purchasing Staff, Receiving Staff
+
+**Trigger**: User views PO detail page and wants to download QR code for mobile receiving
+
+**Preconditions**:
+- User has permission to view purchase orders
+- Purchase order exists and has a PO number
+- QR code has been auto-generated for the PO
+- User is on PO detail page
+
+**Main Flow**:
+1. User navigates to PO detail page
+2. System displays QRCodeSection component with QR code image
+3. System displays QR code containing value: `PO:{orderNumber}` (e.g., "PO:PO-2025-0001")
+4. System displays action buttons: Download QR Code, Copy PO Number
+5. System displays mobile scanning instructions (5-step guide)
+6. **Download QR Code Flow**:
+   - User clicks "Download QR Code" button
+   - System generates high-resolution QR code (400×400px, 4-module margin)
+   - System creates PNG file named `{orderNumber}-QR.png`
+   - System triggers browser download
+   - User receives confirmation that download started
+7. **Copy PO Number Flow**:
+   - User clicks "Copy PO Number" button
+   - System copies PO number to clipboard
+   - System displays "Copied!" confirmation for 2 seconds
+   - User can paste PO number elsewhere
+
+**Alternative Flow 1: QR Code Generation Fails**
+- At step 2: If QR code generation fails
+- System logs error
+- System displays error message: "Unable to generate QR code"
+- System hides action buttons
+- System suggests refreshing the page
+
+**Alternative Flow 2: Copy Not Supported**
+- At step 7: If clipboard API not supported by browser
+- System displays error: "Clipboard not supported. Please copy manually: {orderNumber}"
+- User manually copies PO number
+
+**Alternative Flow 3: Mobile App Not Installed**
+- User clicks "Get it here" link in mobile app section
+- System navigates to mobile app download page
+- User can download and install Carmen mobile app
+
+**Postconditions**:
+- QR code PNG file downloaded to user's device (if download action)
+- PO number copied to clipboard (if copy action)
+- QR code is scannable with mobile app for quick GRN creation
+- High-resolution QR code suitable for printing
+
+**Business Rules**:
+- QR codes auto-generate when PO created/updated
+- QR code format must be exactly: `PO:{orderNumber}`
+- Download QR code has higher resolution (400×400px) than display (200×200px)
+- QR code error correction level: Medium (M) for 15% data restoration
+- Mobile app link points to `/mobile-app` page
+- QR code generation timeout: 5 seconds maximum
+- Clipboard copy timeout: 2 seconds for confirmation display
+
+**Technical Notes**:
+- Component path: `app/(main)/procurement/purchase-orders/components/QRCodeSection.tsx`
+- Utility functions: `lib/utils/qr-code.ts`
+- QR library: `qrcode` v1.5.3 (npm package)
+- QR generation functions:
+  * `generatePOQRCode()`: Creates base64 data URL for display
+  * `downloadPOQRCode()`: Downloads high-res PNG file
+- Mobile integration: cmobile app scans QR → extracts PO number → auto-creates GRN
+- See GRN BR document (FR-GRN-016) for complete mobile receiving workflow
+
+**Success Metrics**:
+- QR code generation success rate: >99.5%
+- Download success rate: >99%
+- Copy to clipboard success rate: >95%
+- Mobile scan success rate: >98%
+- Time from download to mobile GRN creation: <30 seconds
+
+**Related Use Cases**:
+- UC-PO-006: View and Track Purchase Order Status (displays QR code)
+- UC-GRN-001: Create Goods Receipt Note from Mobile Scan (consumes QR code)
 
 ---
 

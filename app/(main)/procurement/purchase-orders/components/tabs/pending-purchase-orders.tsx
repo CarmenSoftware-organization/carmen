@@ -2,7 +2,6 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useEffect } from "react"
 
 // Mock data for demonstration
 const poData = [
@@ -32,29 +31,22 @@ const poData = [
   },
 ]
 
-// Sample item data
-const itemData = {
-  name: "Organic Quinoa xcx",
-  description: "Premium organic white quinoa grains",
-  status: "Accepted",
-  requestedQuantity: 500,
-  approvedQuantity: 450,
-  unit: "Kg"
+interface PendingPurchaseOrdersProps {
+  itemData?: {
+    name: string;
+    description: string;
+  };
 }
 
-export function PendingPurchaseOrdersComponent() {
+export function PendingPurchaseOrdersComponent({ itemData }: PendingPurchaseOrdersProps) {
   const totalOnOrder = poData.reduce((total, po) => total + po.qtyToReceive, 0)
-
-  useEffect(() => {
-    console.log("poData", poData)
-  }, [poData])
 
   return (
     <>
       <div className="w-full mx-auto p-4">
         <div className="bg-muted p-4 mb-4">
-          <h2 className="text-xl font-bold">{itemData.name}</h2>
-          <p className="text-sm text-muted-foreground">{itemData.description}</p>
+          <h2 className="text-xl font-bold">{itemData?.name || "Item"}</h2>
+          <p className="text-sm text-muted-foreground">{itemData?.description || "Item description"}</p>
         </div>
         <ScrollArea className="max-h-[50vh] w-full">
           <Table>
