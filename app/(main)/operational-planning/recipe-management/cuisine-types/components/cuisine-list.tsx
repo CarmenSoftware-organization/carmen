@@ -721,9 +721,9 @@ export function CuisineList() {
                             {cuisine.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right">{cuisine.recipeCount}</TableCell>
-                        <TableCell className="text-right">{cuisine.activeRecipeCount}</TableCell>
-                        <TableCell>{cuisine.lastUpdated}</TableCell>
+                        <TableCell className="text-right">{cuisine.recipeCount ?? 0}</TableCell>
+                        <TableCell className="text-right">{cuisine.activeRecipeCount ?? 0}</TableCell>
+                        <TableCell>{cuisine.lastUpdated ?? 'N/A'}</TableCell>
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -828,8 +828,8 @@ export function CuisineList() {
                         <span className="text-sm text-muted-foreground">{cuisine.region}</span>
                       </div>
                       <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
-                        <span>{cuisine.recipeCount} recipes</span>
-                        <span>{cuisine.activeRecipeCount} active</span>
+                        <span>{cuisine.recipeCount ?? 0} recipes</span>
+                        <span>{cuisine.activeRecipeCount ?? 0} active</span>
                       </div>
                     </div>
                   </div>

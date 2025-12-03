@@ -100,9 +100,7 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value,
-      updatedAt: new Date().toISOString(),
-      updatedBy: 'Current User'
+      [field]: value
     }))
   }
 
@@ -175,15 +173,18 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
     const newStep = {
       id: '',
       order: formData.preparationSteps.length + 1,
+      stepNumber: (formData.preparationSteps.length + 1).toString(),
       description: '',
       duration: 0,
       temperature: undefined,
       equipments: [],
-      image: ''
+      tools: [],
+      image: '',
+      isPortionable: false
     }
     setFormData(prev => ({
       ...prev,
-      steps: [...prev.preparationSteps, newStep]
+      preparationSteps: [...prev.preparationSteps, newStep]
     }))
   }
 
@@ -196,7 +197,7 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
       }
       return {
         ...prev,
-        steps: newSteps
+        preparationSteps: newSteps
       }
     })
   }
@@ -206,10 +207,11 @@ export function RecipeForm({ initialData, onSubmit }: RecipeFormProps) {
       const newSteps = prev.preparationSteps.filter((_, i) => i !== index)
       newSteps.forEach((step, i) => {
         step.order = i + 1
+        step.stepNumber = (i + 1).toString()
       })
       return {
         ...prev,
-        steps: newSteps
+        preparationSteps: newSteps
       }
     })
   }
