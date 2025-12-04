@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Requests
 - **Database**: Carmen ERP PostgreSQL
-- **Schema Version**: 2.2.0
-- **Last Updated**: 2025-11-28
+- **Schema Version**: 2.3.0
+- **Last Updated**: 2025-12-03
 - **Owner**: Procurement Team
 - **Status**: Active
 
@@ -16,6 +16,7 @@
 | 2.0.0 | 2025-01-01 | Development Team | Converted to text-based DD format + added new fields for 9/7/2025 requirements |
 | 2.1.0 | 2025-11-26 | Documentation Team | Synchronized with BR document - updated status values, removed fictional features, added implementation status markers |
 | 2.2.0 | 2025-11-28 | Development Team | Added Returned status, return_reason and rejection_reason fields for workflow actions |
+| 2.3.0 | 2025-12-03 | Development Team | Added parent_pr_id and split_reason fields for Approver Split capability; added role-based field visibility documentation |
 
 ## Implementation Status
 
@@ -119,6 +120,21 @@ erDiagram
 - Approvers see PRs pending their approval
 - Procurement staff see all PRs for their managed departments
 - Finance sees all PRs above approval thresholds
+
+**Field-Level Visibility by Role**:
+Legend: ✅ = Editable | 👁️ = Read-only (visible) | ❌ = Hidden
+
+| Field Category | Requestor | Approver | Purchasing Staff |
+|----------------|-----------|----------|------------------|
+| Request Header (Type, Date, Department) | ✅ | 👁️ | ✅ |
+| Item Details (Description, Quantity) | ✅ | 👁️ | ✅ |
+| Vendor Selection | ❌ | 👁️ | ✅ |
+| Unit Price / Pricing | ❌ | 👁️ | ✅ |
+| Approved Quantity | ❌ | ✅ | ✅ |
+| Discount | ❌ | 👁️ | ✅ |
+| FOC (Free of Charge) | ❌ | 👁️ | ✅ |
+| Internal Notes | ✅ | 👁️ | ✅ |
+| Budget Code | ❌ | 👁️ | ✅ |
 
 #### Fields Overview
 
@@ -324,6 +340,20 @@ erDiagram
   - Implementation: Post-MVP enhancement
   - Example: uuid for "Monthly Kitchen Supplies Template"
 
+- **Parent PR ID**: Reference to original PR if this PR was created via split
+  - Required: No (NULL if not a split PR)
+  - References: purchase_requests table (self-reference)
+  - Purpose: Links split PRs to original PR for traceability
+  - Business rule: Set when Approver or Purchasing Staff splits a PR
+  - Example: uuid for "PR-2025-0042" (original PR that was split)
+
+- **Split Reason**: Reason for splitting the PR
+  - Required: No (required when parent_pr_id is set)
+  - Data type: VARCHAR(50)
+  - Allowed values: approval_status, vendor, delivery_date, manual
+  - Purpose: Documents why PR was split
+  - Example: "approval_status" (split to separate approved items from returned items)
+
 **Flexible Data**:
 - **Metadata**: Additional flexible data stored as JSON
   - Required: No
@@ -374,6 +404,8 @@ erDiagram
 | notes | TEXT | No | NULL | Public notes | "Equipment needed..." | Full-text searchable |
 | internal_notes | TEXT | No | NULL | Internal notes | "Budget code confirmed..." | Restricted visibility |
 | template_id | UUID | No | NULL | Template reference (⏳ Future) | 550e8400-... | Must exist in pr_templates |
+| parent_pr_id | UUID | No | NULL | Reference to original PR if split | 550e8400-... | Must exist in purchase_requests |
+| split_reason | VARCHAR(50) | No | NULL | Reason for split | approval_status, vendor | Required when parent_pr_id set |
 | metadata | JSONB | No | {} | Flexible data | {"urgency_reason": "..."} | Valid JSON |
 | created_at | TIMESTAMPTZ | Yes | NOW() | Creation timestamp | 2025-01-15T10:30:00Z | Immutable |
 | created_by | UUID | Yes | - | Creator user reference | 550e8400-... | Must exist in users |
@@ -427,6 +459,12 @@ erDiagram
   - On Update: CASCADE
   - Business rule: Tracks current approval workflow position
 
+- **Parent PR** (`parent_pr_id` → `purchase_requests.id`)
+  - On Delete: SET NULL (split PR persists even if original deleted)
+  - On Update: CASCADE
+  - Business rule: Links split PRs to their original PR for traceability
+  - Constraint: Cannot reference itself (prevents circular references)
+
 **Check Constraints**:
 - **Type values**: Must be one of: General, Market List, Asset
 - **Status values**: Must be one of: Draft, In-progress, Returned, Approved, Void, Completed, Cancelled
@@ -437,6 +475,8 @@ erDiagram
 - **Currency consistency**: If currency_code = base_currency_code, then exchange_rate must = 1.0
 - **Return reason validation**: If status = 'Returned', return_reason must be provided with min 10 characters
 - **Rejection reason validation**: If status = 'Void', rejection_reason must be provided with min 10 characters
+- **Split reason values**: If parent_pr_id is set, split_reason must be one of: approval_status, vendor, delivery_date, manual
+- **Split reason required**: If parent_pr_id is set, split_reason must be provided
 
 **Calculation Rules**:
 - `total_amount` = `subtotal` + `tax_amount` - `discount_amount`

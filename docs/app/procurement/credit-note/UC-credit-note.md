@@ -4,14 +4,18 @@
 - **Module**: Procurement
 - **Sub-Module**: Credit Note
 - **Route**: `/procurement/credit-note`
-- **Version**: 1.0.0
-- **Last Updated**: 2025-01-11
+- **Version**: 1.0.4
+- **Last Updated**: 2025-12-03
 - **Owner**: Procurement Team
 - **Status**: Approved
 
 ## Document History
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.0.4 | 2025-12-03 | Documentation Team | Updated to support configurable costing method (FIFO or Periodic Average) per system settings |
+| 1.0.3 | 2025-12-03 | Documentation Team | Added Shared Method references to backend use cases (UC-CN-207, UC-CN-208, UC-CN-210) |
+| 1.0.2 | 2025-12-03 | Documentation Team | Added backend system use cases for server actions (UC-CN-201 to UC-CN-214) |
+| 1.0.1 | 2025-12-03 | Documentation Team | Document history update for consistency across documentation set |
 | 1.0.0 | 2025-01-11 | Documentation Team | Initial version from source code analysis |
 
 ---
@@ -20,7 +24,7 @@
 
 This document describes the use cases for the Credit Note module, covering all user interactions, system processes, and integration points discovered in the actual codebase. The Credit Note module supports vendor credit management through two primary workflows: quantity-based credit notes (for physical returns with stock movements) and amount-based credit notes (for pricing adjustments without physical returns).
 
-Key workflows include credit note list management, item-level credit processing with FIFO costing, lot tracking, multi-currency handling, automatic journal entry generation, tax adjustments, and stock movement integration.
+Key workflows include credit note list management, item-level credit processing with inventory costing (FIFO or Periodic Average, configurable at system level), lot tracking, multi-currency handling, automatic journal entry generation, tax adjustments, and stock movement integration.
 
 **Related Documents**:
 - [Business Requirements](./BR-credit-note.md)
@@ -131,7 +135,7 @@ Key workflows include credit note list management, item-level credit processing 
 | UC-CN-004 | View Credit Note Details | Purchasing Staff, Finance Team, Warehouse Staff | High | Simple | User |
 | UC-CN-005 | Edit Credit Note (Draft Status) | Purchasing Staff, Receiving Clerk | High | Medium | User |
 | UC-CN-006 | Manage Credit Note Items with Lot Selection | Receiving Clerk, Warehouse Staff | Critical | Complex | User |
-| UC-CN-007 | Review FIFO Cost Analysis | Purchasing Staff, Finance Team | High | Medium | User |
+| UC-CN-007 | Review Cost Analysis | Purchasing Staff, Finance Team | High | Medium | User |
 | UC-CN-008 | Assign Credit Reason and Description | Purchasing Staff | Medium | Simple | User |
 | UC-CN-009 | Add Comments and Attachments | Purchasing Staff | Medium | Simple | User |
 | UC-CN-010 | Commit Credit Note | Finance Team, Procurement Manager | Critical | Complex | User |
@@ -143,6 +147,21 @@ Key workflows include credit note list management, item-level credit processing 
 | UC-CN-104 | Process Credit Note for Consumed Items | Finance Module, Inventory Module | Critical | Complex | System |
 | UC-CN-105 | Process Credit Note with Partial Availability | Finance Module, Inventory Module | Critical | Complex | System |
 | UC-CN-106 | Process Retrospective Vendor Discount | Finance Module, Procurement Module | High | Complex | System |
+| **Backend System Use Cases** | | | | | |
+| UC-CN-201 | Execute Credit Note CRUD Server Actions | Server Action Layer | Critical | Complex | Backend |
+| UC-CN-202 | Fetch Vendor and GRN Data | Server Action Layer | Critical | Medium | Backend |
+| UC-CN-203 | Execute Commitment Transaction | Server Action Layer | Critical | Complex | Backend |
+| UC-CN-204 | Execute Void Transaction | Server Action Layer | Critical | Complex | Backend |
+| UC-CN-205 | Calculate Inventory Costs | Server Action Layer | Critical | Complex | Backend |
+| UC-CN-206 | Calculate Tax Amounts | Server Action Layer | Critical | Medium | Backend |
+| UC-CN-207 | Generate Journal Entries | Server Action Layer | Critical | Complex | Backend |
+| UC-CN-208 | Generate Stock Movements | Server Action Layer | Critical | Complex | Backend |
+| UC-CN-209 | Manage Attachments | Server Action Layer | High | Medium | Backend |
+| UC-CN-210 | Log Audit Events | Server Action Layer | Critical | Medium | Backend |
+| UC-CN-211 | Generate CN Number Sequence | Server Action Layer | Critical | Medium | Backend |
+| UC-CN-212 | Update Vendor Balance | Server Action Layer | Critical | Medium | Backend |
+| UC-CN-213 | Validate Credit Note Data | Server Action Layer | Critical | Medium | Backend |
+| UC-CN-214 | Sync Real-time Data | Server Action Layer | High | Medium | Backend |
 
 ---
 
@@ -219,7 +238,7 @@ Key workflows include credit note list management, item-level credit processing 
 
 ### UC-CN-002: Create Quantity-Based Credit Note from GRN
 
-**Description**: User creates a new quantity-based credit note by selecting a vendor, choosing a GRN, selecting items with specific lot numbers, and recording return quantities with FIFO cost calculations.
+**Description**: User creates a new quantity-based credit note by selecting a vendor, choosing a GRN, selecting items with specific lot numbers, and recording return quantities with inventory cost calculations.
 
 **Actor(s)**: Purchasing Staff, Receiving Clerk
 
@@ -234,7 +253,7 @@ Key workflows include credit note list management, item-level credit processing 
 - Inventory lots exist for the items being returned
 
 **Postconditions**:
-- **Success**: New credit note created with status DRAFT, linked to source GRN and inventory lots, FIFO cost calculated
+- **Success**: New credit note created with status DRAFT, linked to source GRN and inventory lots, inventory cost calculated
 - **Failure**: No credit note created, user informed of validation errors
 
 **Main Flow**:
@@ -249,7 +268,7 @@ Key workflows include credit note list management, item-level credit processing 
 9. For each item to return, user:
    - Selects specific inventory lot(s) from available lots
    - Enters return quantity per lot
-   - System auto-calculates FIFO cost based on lot selection
+   - System auto-calculates inventory cost based on lot selection
    - System displays cost variance and realized gain/loss
 10. User enters credit note header information:
     - Document date
@@ -271,7 +290,7 @@ Key workflows include credit note list management, item-level credit processing 
 **Alt-2A: Select Multiple Lots for Same Item** (At step 9)
 - 9a. User checks multiple lot checkboxes for same product
 - 9b. System aggregates quantities across selected lots
-- 9c. System calculates weighted average cost using FIFO
+- 9c. System calculates weighted average cost using system-configured method (FIFO or Periodic Average)
 - 9d. System displays lot application details in expandable section
 - Continue to step 10
 
@@ -307,8 +326,8 @@ Key workflows include credit note list management, item-level credit processing 
 - User corrects quantity or selects additional lots
 - Resume at step 9
 
-**Exc-2D: FIFO Calculation Failure** (At step 9)
-- System cannot calculate FIFO cost due to missing lot cost data
+**Exc-2D: Inventory Cost Calculation Failure** (At step 9)
+- System cannot calculate inventory cost due to missing lot cost data
 - System displays warning message
 - User contacts administrator to correct lot cost data
 - Use case ends (resume later after correction)
@@ -317,18 +336,18 @@ Key workflows include credit note list management, item-level credit processing 
 - **BR-CN-001**: Each credit note assigned unique sequential number CN-YYYY-NNN
 - **BR-CN-010**: Credit note quantity must be greater than 0
 - **BR-CN-011**: Credit note quantity cannot exceed available lot quantity
-- **BR-CN-030**: FIFO costing method must be used for quantity-based credits
-- **BR-CN-031**: Cost variance calculated as (current cost - FIFO weighted average cost)
+- **BR-CN-030**: inventory costing method must be used for quantity-based credits
+- **BR-CN-031**: Cost variance calculated as (current cost - calculated unit cost)
 - **BR-CN-040**: Credit note must reference specific inventory lot(s)
 - **BR-CN-041**: Stock movement generated only after credit note posted
 
 **Includes**:
 - [UC-CN-006: Manage Credit Note Items with Lot Selection](#uc-cn-006-manage-credit-note-items-with-lot-selection)
-- [UC-CN-007: Review FIFO Cost Analysis](#uc-cn-007-review-fifo-cost-analysis)
+- [UC-CN-007: Review Inventory Cost Analysis](#uc-cn-007-review-fifo-cost-analysis)
 
 **Related Requirements**:
 - FR-CN-002: Quantity-Based Credit Note Creation
-- FR-CN-005: FIFO Costing and Lot Tracking
+- FR-CN-005: Inventory Costing and Lot Tracking
 - FR-CN-006: Multi-Currency Support
 - NFR-CN-003: Credit note creation completes within 3 seconds
 
@@ -336,7 +355,7 @@ Key workflows include credit note list management, item-level credit processing 
 
 **Notes**:
 - System generates temporary ID (new-UUID) during creation, replaced with actual CN number on save
-- FIFO analysis displayed in expandable section showing lot application details
+- cost analysis displayed in expandable section showing lot application details
 - Credit note type cannot be changed after save
 - System tracks applied lots for audit trail
 - Exchange rate captured at document date for multi-currency transactions
@@ -436,7 +455,7 @@ Key workflows include credit note list management, item-level credit processing 
 
 **Notes**:
 - No stock movements generated for amount-based credit notes
-- FIFO costing not applicable (no quantity return)
+- inventory costing not applicable (no quantity return)
 - Credit applied directly to vendor payable account
 - Tax adjustment calculated based on discount amount
 
@@ -479,7 +498,7 @@ Key workflows include credit note list management, item-level credit processing 
    - Tax calculations
    - Line totals
 5. User can switch between tabs to view:
-   - **Inventory Tab**: Lot application details with FIFO analysis
+   - **Inventory Tab**: Lot application details with cost analysis
    - **Journal Entries Tab**: GL account postings
    - **Tax Entries Tab**: VAT calculations and adjustments
    - **Stock Movement Tab**: Inventory movements (quantity returns only)
@@ -497,7 +516,7 @@ Key workflows include credit note list management, item-level credit processing 
 - 5b. System displays lot application table showing:
    - Applied lot numbers with receive dates
    - Original GRN and invoice references
-   - FIFO cost calculations
+   - inventory cost calculations
    - Cost variance analysis
 - Continue to step 6
 
@@ -554,7 +573,7 @@ Key workflows include credit note list management, item-level credit processing 
 **Notes**:
 - Tabs only show relevant data (e.g., no Stock Movement tab for amount-based credits)
 - Status badges color-coded for quick recognition
-- FIFO analysis expandable for detailed lot costing information
+- cost analysis expandable for detailed lot costing information
 - Print button available for PDF generation
 
 ---
@@ -591,7 +610,7 @@ Key workflows include credit note list management, item-level credit processing 
    - Item quantities or discount amounts
    - Lot selections (for quantity returns)
 6. System recalculates totals and tax amounts on field changes
-7. System displays updated FIFO calculations (for quantity changes)
+7. System displays updated inventory cost calculations (for quantity changes)
 8. User clicks "Save" button
 9. System validates all changes
 10. System recalculates journal entries and stock movements
@@ -618,7 +637,7 @@ Key workflows include credit note list management, item-level credit processing 
 - 5a. User clicks lot selection button for item
 - 5b. System displays lot selection dialog
 - 5c. User selects different lots or changes quantities
-- 5d. System recalculates FIFO costs
+- 5d. System recalculates inventory costs
 - Continue to step 6
 
 **Exception Flows**:
@@ -653,7 +672,7 @@ Key workflows include credit note list management, item-level credit processing 
 **Notes**:
 - System auto-saves to temporary storage every 2 minutes
 - All calculations update in real-time as user makes changes
-- Lot selection changes trigger FIFO recalculation
+- Lot selection changes trigger cost recalculation
 - User can discard draft and start over if needed
 
 ---
@@ -674,7 +693,7 @@ Key workflows include credit note list management, item-level credit processing 
 - User has permission to edit credit notes
 
 **Postconditions**:
-- **Success**: Credit note items updated with lot selections and quantities, FIFO costs calculated
+- **Success**: Credit note items updated with lot selections and quantities, inventory costs calculated
 - **Failure**: No changes saved, user informed of validation errors
 
 **Main Flow**:
@@ -686,13 +705,13 @@ Key workflows include credit note list management, item-level credit processing 
 4. User checks lot selection checkboxes for lots to include in return
 5. For each selected lot, user enters return quantity
 6. System validates return quantity doesn't exceed lot available quantity
-7. System calculates FIFO summary:
+7. System calculates cost summary:
    - Total received quantity across selected lots
-   - Weighted average cost using FIFO method
+   - Weighted average cost using system-configured costing method
    - Current unit cost
-   - Cost variance (current cost - FIFO average)
+   - Cost variance (current cost - calculated cost)
    - Return amount (quantity × current cost)
-   - Cost of goods sold (quantity × FIFO average)
+   - Cost of goods sold (quantity × calculated cost)
    - Realized gain/loss
 8. User optionally enters discount amount for item
 9. System displays lot application details in expandable section
@@ -718,7 +737,7 @@ Key workflows include credit note list management, item-level credit processing 
 
 **Alt-6C: Apply Proportional Quantities** (At step 5)
 - 5a. User enters total return quantity at item level
-- 5b. System distributes quantity proportionally across selected lots using FIFO
+- 5b. System distributes quantity proportionally across selected lots using oldest-first ordering
 - 5c. System displays calculated quantities per lot
 - Continue to step 6
 
@@ -737,8 +756,8 @@ Key workflows include credit note list management, item-level credit processing 
 - User corrects quantity
 - Resume at step 5
 
-**Exc-6C: FIFO Calculation Error** (At step 7)
-- System cannot calculate FIFO due to missing lot cost data
+**Exc-6C: Inventory Cost Calculation Error** (At step 7)
+- System cannot calculate inventory cost due to missing lot/period cost data
 - System displays error message
 - User contacts administrator to correct lot costs
 - Use case ends (resume later)
@@ -746,26 +765,26 @@ Key workflows include credit note list management, item-level credit processing 
 **Business Rules**:
 - **BR-CN-040**: Credit note must reference specific inventory lot(s)
 - **BR-CN-041**: Return quantity cannot exceed lot available quantity
-- **BR-CN-030**: FIFO costing method mandatory for quantity-based credits
-- **BR-CN-031**: Cost variance calculated as (current cost - FIFO weighted average cost)
+- **BR-CN-030**: inventory costing method mandatory for quantity-based credits
+- **BR-CN-031**: Cost variance calculated as (current cost - calculated unit cost)
 
 **Related Requirements**:
 - FR-CN-005: Lot Selection and Tracking
-- FR-CN-006: FIFO Cost Calculation
+- FR-CN-006: Inventory Cost Calculation
 - FR-CN-015: Real-time Calculation Updates
 
 **Notes**:
 - Lot selection dialog shows real-time availability from inventory
-- FIFO summary updates immediately as user changes selections
+- cost summary updates immediately as user changes selections
 - Expandable sections provide detailed cost analysis
 - System stores lot application for audit trail
 - Multiple lots can be selected for same item
 
 ---
 
-### UC-CN-007: Review FIFO Cost Analysis
+### UC-CN-007: Review Inventory Cost Analysis
 
-**Description**: User reviews detailed FIFO costing calculations showing weighted average costs, cost variances, and realized gains/losses for quantity-based credit notes.
+**Description**: User reviews detailed inventory costing calculations showing weighted average costs, cost variances, and realized gains/losses for quantity-based credit notes.
 
 **Actor(s)**: Purchasing Staff, Finance Team
 
@@ -775,25 +794,25 @@ Key workflows include credit note list management, item-level credit processing 
 
 **Preconditions**:
 - Credit note exists with quantity-based items
-- Inventory lots selected and FIFO calculations completed
+- Inventory lots selected and inventory cost calculations completed
 - User has permission to view cost data
 
 **Postconditions**:
-- **Success**: User views detailed FIFO analysis and understands cost implications
-- **Failure**: User sees error message if FIFO data unavailable
+- **Success**: User views detailed cost analysis and understands cost implications
+- **Failure**: User sees error message if cost data unavailable
 
 **Main Flow**:
 1. User opens credit note detail page
 2. System displays credit note with items
-3. User clicks "Inventory" tab or expands FIFO analysis section
-4. System displays FIFO summary for each item:
+3. User clicks "Inventory" tab or expands cost analysis section
+4. System displays cost summary for each item:
    - Total received quantity (sum across selected lots)
-   - Weighted average cost (FIFO calculation)
+   - Weighted average cost (inventory cost calculation)
    - Current unit cost
-   - Cost variance (current - FIFO average)
+   - Cost variance (current - calculated cost)
    - Return quantity
    - Return amount (quantity × current cost)
-   - Cost of goods sold (quantity × FIFO weighted average)
+   - Cost of goods sold (quantity × calculated cost)
    - Realized gain/loss (return amount - COGS)
 5. System displays applied lots table showing:
    - Lot number
@@ -802,15 +821,15 @@ Key workflows include credit note list management, item-level credit processing 
    - Invoice number
    - Original quantity and cost
    - Return quantity from this lot
-6. User can expand/collapse FIFO details for each item
+6. User can expand/collapse cost details for each item
 7. System highlights cost variances (positive in green, negative in red)
-8. User can export FIFO analysis to Excel
+8. User can export cost analysis to Excel
 9. Use case ends
 
 **Alternative Flows**:
 
-**Alt-7A: View Aggregate FIFO Summary** (At step 4)
-- 4a. User views document-level FIFO summary
+**Alt-7A: View Aggregate Cost Summary** (At step 4)
+- 4a. User views document-level cost summary
 - 4b. System displays totals across all items:
    - Total return amount
    - Total COGS
@@ -826,24 +845,24 @@ Key workflows include credit note list management, item-level credit processing 
 
 **Exception Flows**:
 
-**Exc-7A: FIFO Data Incomplete** (At step 4)
-- System cannot display complete FIFO analysis due to missing lot cost data
+**Exc-7A: Cost Data Incomplete** (At step 4)
+- System cannot display complete cost analysis due to missing lot cost data
 - System displays warning message
 - System shows partial data with incomplete indicators
 - User contacts administrator to correct data
 - Use case ends
 
 **Business Rules**:
-- **BR-CN-030**: FIFO costing method mandatory for quantity-based credits
-- **BR-CN-031**: Cost variance = current cost - FIFO weighted average cost
-- **BR-CN-033**: Realized gain/loss = (quantity × current cost) - (quantity × FIFO average)
+- **BR-CN-030**: inventory costing method mandatory for quantity-based credits
+- **BR-CN-031**: Cost variance = current cost - calculated unit cost
+- **BR-CN-033**: Realized gain/loss = (quantity × current cost) - (quantity × calculated cost)
 
 **Related Requirements**:
-- FR-CN-006: FIFO Cost Analysis Display
+- FR-CN-006: Inventory Cost Analysis Display
 - FR-CN-005: Lot Tracking and Application
 
 **Notes**:
-- FIFO analysis only applicable to quantity-based credit notes
+- cost analysis only applicable to quantity-based credit notes
 - Cost variances may indicate pricing changes or inventory aging
 - Realized gain/loss impacts gross margin reporting
 - Excel export includes detailed lot-by-lot breakdown
@@ -1314,13 +1333,13 @@ Key workflows include credit note list management, item-level credit processing 
 3. For each credit note item with lot selection:
    - System retrieves lot number, quantity, and location
    - System calculates negative quantity (return reduces inventory)
-   - System retrieves unit cost and extra costs from FIFO calculation
+   - System retrieves unit cost and extra costs from inventory cost calculation
 4. System creates stock movement record for each item:
    - **Transaction type**: Credit Note Return
    - **Location type**: INV (Inventory) or CON (Consignment)
    - **Lot number**: From selected lots
    - **Quantity**: Negative value (e.g., -10 for 10 units returned)
-   - **Unit cost**: From FIFO calculation
+   - **Unit cost**: From inventory cost calculation
    - **Extra cost**: Proportional allocation
    - **Movement date**: Credit note posting date
    - **Reference**: Credit note number
@@ -1361,7 +1380,7 @@ Key workflows include credit note list management, item-level credit processing 
 - **BR-CN-040**: Stock movements reference specific inventory lots
 - **BR-CN-041**: Stock movements only generated for quantity-based credits
 - **BR-CN-042**: Movement quantities are negative (reduce inventory)
-- **BR-CN-043**: Unit cost from FIFO calculation, not current cost
+- **BR-CN-043**: Unit cost from inventory cost calculation, not current cost
 - **BR-CN-044**: Stock movements cannot be manually edited
 - **BR-CN-045**: Stock movements voided when credit note voided
 
@@ -1372,7 +1391,7 @@ Key workflows include credit note list management, item-level credit processing 
 
 **Notes**:
 - Stock movements create full audit trail for inventory adjustments
-- FIFO costing ensures accurate inventory valuation
+- inventory costing ensures accurate inventory valuation
 - Negative quantities clearly indicate returns vs receipts
 - Location type determines which inventory pool is adjusted
 - System maintains lot traceability for regulatory compliance
@@ -1416,7 +1435,7 @@ Key workflows include credit note list management, item-level credit processing 
    - **Entry 2**: Credit Inventory (for quantity returns only)
      - Account: 1140
      - Department: Warehouse (WHS)
-     - Amount: Net inventory value (quantity × FIFO cost)
+     - Amount: Net inventory value (quantity × inventory cost)
      - Description: "Inventory Value Adjustment"
      - Reference: GRN number
    - **Entry 3**: Credit Input VAT
@@ -1430,8 +1449,8 @@ Key workflows include credit note list management, item-level credit processing 
    - **Entry 4**: Debit/Credit Cost Variance
      - Account: Cost variance account
      - Department: Warehouse (WHS)
-     - Amount: Cost variance (current cost - FIFO cost) × quantity
-     - Description: "FIFO Cost Variance"
+     - Amount: Cost variance (current cost - inventory cost) × quantity
+     - Description: "Inventory Cost Variance"
      - Reference: Credit note number
 5. System validates total debits equal total credits
 6. System posts journal entries to Finance module
@@ -1473,7 +1492,7 @@ Key workflows include credit note list management, item-level credit processing 
 
 **Related Requirements**:
 - FR-CN-007: Journal Entry Generation
-- FR-CN-006: FIFO Costing Integration
+- FR-CN-006: Inventory Costing Integration
 - FR-CN-008: Tax Calculation
 - NFR-CN-012: Journal entry posting within 3 seconds
 
@@ -1724,7 +1743,7 @@ Key workflows include credit note list management, item-level credit processing 
    - System creates negative stock movements for available quantity
    - System reduces inventory balance
    - System generates inventory GL entries:
-     - CR: 1140 - Inventory (available quantity × FIFO cost)
+     - CR: 1140 - Inventory (available quantity × inventory cost)
 5. **Process Consumed Quantity** (using UC-CN-104 logic):
    - System calculates COGS adjustment for consumed quantity
    - System generates COGS GL entries:
@@ -1736,7 +1755,7 @@ Key workflows include credit note list management, item-level credit processing 
      - Description: "CN Vendor Adjustment - Partial Availability"
    - **Entry 2**: Credit Inventory
      - Account: 1140
-     - Amount: Available quantity × FIFO cost
+     - Amount: Available quantity × inventory cost
      - Description: "Inventory Value Adjustment - Available Stock"
    - **Entry 3**: Credit COGS
      - Account: 5000
@@ -1814,7 +1833,7 @@ Key workflows include credit note list management, item-level credit processing 
 - Requires accurate real-time inventory tracking
 - Split methodology critical for accurate financial reporting
 - System provides detailed breakdown in credit note detail view
-- Users can see available vs consumed quantities in FIFO analysis tab
+- Users can see available vs consumed quantities in cost analysis tab
 - Important for gross margin accuracy and inventory valuation
 
 ---
@@ -1976,13 +1995,866 @@ Key workflows include credit note list management, item-level credit processing 
 
 ---
 
+## Backend System Use Cases
+
+The following use cases describe the server-side operations implemented as Next.js Server Actions. These backend use cases correspond to the Backend Requirements (BR-BE-001 through BR-BE-014) defined in the Business Requirements document.
+
+### UC-CN-201: Execute Credit Note CRUD Server Actions
+
+**Description**: Server action layer executes Create, Read, Update, and Delete operations for credit notes with atomic database transactions and proper validation.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: Critical
+
+**Frequency**: Continuous (every credit note operation)
+
+**Related Backend Requirements**: BR-BE-001 (CRUD Operations)
+
+**Preconditions**:
+- Next.js server action context established
+- Database connection available
+- User authenticated and authorized
+
+**Postconditions**:
+- **Success**: Credit note created/read/updated/deleted successfully, response returned
+- **Failure**: Transaction rolled back, error response returned
+
+**Main Flow**:
+1. Server action receives request with credit note data
+2. System validates request payload structure
+3. System begins database transaction with Serializable isolation level
+4. System acquires pessimistic lock on affected records (for update/delete)
+5. System performs operation:
+   - **Create**: Generates CN number, inserts credit note and items
+   - **Read**: Retrieves credit note with related data
+   - **Update**: Updates credit note fields, recalculates totals
+   - **Delete**: Soft deletes credit note (DRAFT only)
+6. System commits transaction
+7. System logs operation in audit trail
+8. System returns response with credit note data
+9. Use case ends
+
+**Exception Flows**:
+
+**Exc-201A: Validation Failure** (At step 2)
+- Request payload fails schema validation
+- System returns validation error response
+- Use case ends with failure
+
+**Exc-201B: Concurrent Modification** (At step 4)
+- Another transaction holds lock on record
+- System waits for lock timeout (5 seconds)
+- If timeout: returns concurrent modification error
+- If lock released: continues operation
+
+**Exc-201C: Transaction Failure** (At step 5)
+- Database operation fails
+- System rolls back transaction
+- System logs error details
+- System returns error response
+
+**Business Rules**:
+- **BR-BE-001**: All CRUD operations use atomic database transactions
+- **BR-BE-001**: Serializable isolation level for data consistency
+- **BR-BE-001**: Pessimistic locking prevents concurrent modification
+
+---
+
+### UC-CN-202: Fetch Vendor and GRN Data
+
+**Description**: Server action fetches vendor list for credit note creation and retrieves GRN data for a selected vendor with available inventory lots.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: Critical
+
+**Frequency**: Every credit note creation (15-25 times per day)
+
+**Related Backend Requirements**: BR-BE-002 (Vendor and GRN Fetch)
+
+**Preconditions**:
+- User authenticated with purchasing permissions
+- Vendor and GRN data exists in database
+
+**Postconditions**:
+- **Success**: Vendor list or GRN data returned with inventory lots
+- **Failure**: Error response with message
+
+**Main Flow**:
+1. Server action receives fetch request (vendor list or GRN data)
+2. For vendor list:
+   - System queries active vendors with credit note permissions
+   - System returns paginated vendor list
+3. For GRN data:
+   - System validates vendor ID
+   - System queries posted GRNs for vendor
+   - System joins with inventory lots table
+   - System calculates available quantities per lot
+   - System returns GRN items with lot details
+4. System caches results for performance (5-minute TTL)
+5. Use case ends
+
+**Alternative Flows**:
+
+**Alt-202A: Filter GRNs by Date Range** (At step 3)
+- Request includes date range filter
+- System applies date filter to GRN query
+- System returns filtered results
+
+**Exception Flows**:
+
+**Exc-202A: Vendor Not Found** (At step 3)
+- Specified vendor ID doesn't exist
+- System returns "Vendor not found" error
+- Use case ends with failure
+
+**Business Rules**:
+- **BR-BE-002**: Only active vendors returned in list
+- **BR-BE-002**: Only posted GRNs available for credit note creation
+- **BR-BE-002**: Available quantities calculated in real-time
+
+---
+
+### UC-CN-203: Execute Commitment Transaction
+
+**Description**: Server action executes the credit note commitment as a single atomic transaction, generating journal entries, stock movements, and updating vendor balance.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: Critical
+
+**Frequency**: Every credit note commitment (10-20 times per day)
+
+**Related Backend Requirements**: BR-BE-003 (Commitment Transaction)
+
+**Preconditions**:
+- Credit note exists with DRAFT status
+- Accounting period open for document date
+- GL accounts configured
+- User has commit permission
+
+**Postconditions**:
+- **Success**: Credit note committed, all related records created
+- **Failure**: Transaction rolled back, credit note remains DRAFT
+
+**Main Flow**:
+1. Server action receives commitment request with credit note ID
+2. System begins transaction with Serializable isolation level
+3. System acquires exclusive lock on credit note record
+4. System validates pre-commitment conditions:
+   - Credit note status is DRAFT
+   - Accounting period is open
+   - All GL accounts configured
+   - Vendor account active
+5. System calls inventory cost calculation service (UC-CN-205)
+6. System calls journal entry generator (UC-CN-207)
+7. For QUANTITY_RETURN type:
+   - System calls stock movement generator (UC-CN-208)
+   - System updates inventory balances
+8. System calls vendor balance update (UC-CN-212)
+9. System updates credit note status to COMMITTED
+10. System assigns commitment date and reference
+11. System calls audit logging service (UC-CN-210)
+12. System commits transaction
+13. System triggers post-commit notifications
+14. System returns success response with commitment reference
+15. Use case ends
+
+**Exception Flows**:
+
+**Exc-203A: Pre-commitment Validation Failure** (At step 4)
+- One or more validation checks fail
+- System rolls back transaction
+- System returns specific validation error
+- Use case ends with failure
+
+**Exc-203B: Journal Entry Generation Failure** (At step 6)
+- GL account not found or calculation error
+- System rolls back entire transaction
+- System returns error with details
+- Use case ends with failure
+
+**Exc-203C: Stock Movement Failure** (At step 7)
+- Inventory lot not found or insufficient quantity
+- System rolls back entire transaction
+- System returns error with lot details
+- Use case ends with failure
+
+**Business Rules**:
+- **BR-BE-003**: Commitment is atomic (all-or-nothing)
+- **BR-BE-003**: Uses Serializable isolation level
+- **BR-BE-003**: Exclusive lock prevents concurrent commits
+- **BR-BE-003**: All sub-operations must succeed for commit
+
+---
+
+### UC-CN-204: Execute Void Transaction
+
+**Description**: Server action executes the credit note void operation, generating reversing journal entries and restoring inventory balances.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: Critical
+
+**Frequency**: Monthly (1-3 times per month)
+
+**Related Backend Requirements**: BR-BE-004 (Void Transaction)
+
+**Preconditions**:
+- Credit note exists with COMMITTED status
+- Accounting period open for void date
+- User has void permission (manager role)
+- No dependent transactions exist
+
+**Postconditions**:
+- **Success**: Credit note voided, reversing entries created
+- **Failure**: Transaction rolled back, credit note remains COMMITTED
+
+**Main Flow**:
+1. Server action receives void request with credit note ID and reason
+2. System begins transaction with Serializable isolation level
+3. System acquires exclusive lock on credit note record
+4. System validates pre-void conditions:
+   - Credit note status is COMMITTED
+   - Void reason provided
+   - Accounting period open
+   - No dependent transactions
+5. System retrieves original journal entries
+6. System generates reversing journal entries:
+   - Same amounts with reversed debit/credit
+   - Void reference in description
+7. For QUANTITY_RETURN type:
+   - System generates reversing stock movements
+   - System restores inventory balances
+8. System restores vendor payable balance
+9. System updates credit note status to VOID
+10. System assigns void date and void reference
+11. System calls audit logging with void reason
+12. System commits transaction
+13. System triggers void notifications
+14. System returns success response
+15. Use case ends
+
+**Exception Flows**:
+
+**Exc-204A: Dependent Transactions Exist** (At step 4)
+- Credit note referenced in payment or settlement
+- System returns error with dependent transaction list
+- Use case ends with failure
+
+**Exc-204B: Inventory Reversal Failure** (At step 7)
+- Cannot reverse stock movement (lot modified)
+- System rolls back entire transaction
+- System returns error with details
+- Use case ends with failure
+
+**Business Rules**:
+- **BR-BE-004**: Void is atomic (all-or-nothing)
+- **BR-BE-004**: Reversing entries exactly mirror original
+- **BR-BE-004**: Void reason required and logged
+- **BR-BE-004**: Manager permission required
+
+---
+
+### UC-CN-205: Calculate Inventory Costs
+
+**Description**: Server action calculates inventory costs using system-configured costing method (FIFO or Periodic Average) for credit note items based on selected inventory lots or period data.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: Critical
+
+**Frequency**: Every quantity-based credit note (15-25 times per day)
+
+**Related Backend Requirements**: BR-BE-005 (Inventory Cost Calculation)
+
+**Preconditions**:
+- Credit note items with lot selections
+- Inventory lot cost data available
+- Return quantities specified
+
+**Postconditions**:
+- **Success**: inventory costs calculated, cost variance determined
+- **Failure**: Error returned with missing data details
+
+**Main Flow**:
+1. Server action receives calculation request with lot selections
+2. For each credit note item:
+   - System retrieves selected lots with receive dates
+   - System sorts lots by receive date (oldest first)
+   - System retrieves original costs per lot
+3. System calculates weighted average cost:
+   - Sum of (lot quantity × lot cost) / total quantity
+4. System calculates cost variance:
+   - Current cost - calculated cost
+5. System calculates financial impact:
+   - Return amount = quantity × current cost
+   - COGS = quantity × calculated cost
+   - Realized gain/loss = return amount - COGS
+6. System returns inventory cost calculation result:
+   - Weighted average cost
+   - Current unit cost
+   - Cost variance
+   - Total realized gain/loss
+   - Applied lot details
+7. Use case ends
+
+**Alternative Flows**:
+
+**Alt-205A: Partial Lot Availability** (At step 2)
+- Some items have consumed inventory
+- System splits calculation between available and consumed
+- System returns split calculation results
+
+**Exception Flows**:
+
+**Exc-205A: Lot Cost Data Missing** (At step 2)
+- Original cost data not found for lot
+- System logs error with lot reference
+- System returns error with missing data details
+- Use case ends with failure
+
+**Business Rules**:
+- **BR-BE-005**: system-configured costing method mandatory for quantity returns
+- **BR-BE-005**: Oldest lots used first for cost calculation
+- **BR-BE-005**: Cost variance impacts gross margin
+
+---
+
+### UC-CN-206: Calculate Tax Amounts
+
+**Description**: Server action calculates input VAT adjustments for credit note amounts based on applicable tax rates.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: Critical
+
+**Frequency**: Every credit note save (15-25 times per day)
+
+**Related Backend Requirements**: BR-BE-006 (Tax Calculation)
+
+**Preconditions**:
+- Credit note with items and amounts
+- Tax rates configured for document date
+- Vendor tax registration available
+
+**Postconditions**:
+- **Success**: Tax amounts calculated, VAT adjustments determined
+- **Failure**: Error returned with missing configuration
+
+**Main Flow**:
+1. Server action receives tax calculation request
+2. System retrieves vendor tax registration status
+3. System retrieves applicable tax rate for document date
+4. For each credit note item:
+   - System calculates base amount (quantity × price - discount)
+   - System applies tax rate
+   - System calculates tax amount
+5. System aggregates tax calculations:
+   - Total base amount
+   - Total tax amount
+   - Tax-inclusive total
+6. System determines VAT period for reporting
+7. System returns tax calculation result:
+   - Tax rate applied
+   - Base amount
+   - Tax amount
+   - Total amount
+   - VAT period
+   - Reporting codes
+8. Use case ends
+
+**Exception Flows**:
+
+**Exc-206A: Tax Rate Not Configured** (At step 3)
+- No tax rate for document date
+- System uses default rate or returns warning
+- Continue with default or end with failure
+
+**Business Rules**:
+- **BR-BE-006**: Tax rate from document date
+- **BR-BE-006**: Input VAT adjusts tax liability
+- **BR-BE-006**: Tax amounts rounded to 2 decimals
+
+---
+
+### UC-CN-207: Generate Journal Entries
+
+**Description**: Server action generates GL journal entries for credit note commitment, including primary entries and inventory variance entries.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: Critical
+
+**Frequency**: Every credit note commitment (10-20 times per day)
+
+**Related Backend Requirements**: BR-BE-007 (Journal Entry Generator)
+
+**Shared Method Reference**: Uses Transaction Recording Service patterns from [SM-inventory-operations.md#3.2](../../shared-methods/inventory-operations/SM-inventory-operations.md) for consistent transaction recording.
+
+**Preconditions**:
+- Credit note data with calculated amounts
+- GL account mapping configured
+- inventory cost calculations completed
+
+**Postconditions**:
+- **Success**: Journal entries generated with balanced debits/credits
+- **Failure**: Error returned with configuration issues
+
+**Main Flow**:
+1. Server action receives journal entry request
+2. System retrieves GL account configuration:
+   - Accounts Payable (2100)
+   - Inventory - Raw Materials (1140)
+   - Input VAT (1240)
+   - Cost Variance (5200)
+3. System generates Primary Entry Group:
+   - Entry 1: DR Accounts Payable (total amount)
+   - Entry 2: CR Inventory (for quantity returns)
+   - Entry 3: CR Input VAT (tax amount)
+4. System generates Inventory Entry Group:
+   - Entry 4: DR/CR Cost Variance (if variance exists)
+5. System validates debit/credit balance
+6. System assigns journal voucher number
+7. System returns journal entries:
+   - Entry ID and sequence
+   - Account codes and descriptions
+   - Debit/credit amounts
+   - Department codes
+   - References
+8. Use case ends
+
+**Exception Flows**:
+
+**Exc-207A: GL Account Not Configured** (At step 2)
+- Required account not found
+- System returns error with missing account type
+- Use case ends with failure
+
+**Exc-207B: Debit/Credit Imbalance** (At step 5)
+- Totals don't balance
+- System returns error with amounts
+- Use case ends with failure
+
+**Business Rules**:
+- **BR-BE-007**: Debits must equal credits
+- **BR-BE-007**: Department codes required
+- **BR-BE-007**: Journal voucher number unique
+
+---
+
+### UC-CN-208: Generate Stock Movements
+
+**Description**: Server action generates negative stock movements for quantity-based credit notes, reducing inventory balances by lot.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: Critical
+
+**Frequency**: Every quantity return commitment (10-20 times per day)
+
+**Related Backend Requirements**: BR-BE-008 (Stock Movement Generator)
+
+**Shared Method Reference**: Uses Transaction Recording Service from [SM-inventory-operations.md#3.2](../../shared-methods/inventory-operations/SM-inventory-operations.md) for stock movement recording, and Inventory Valuation Service from [SM-inventory-valuation.md](../../shared-methods/inventory-valuation/SM-inventory-valuation.md) for inventory cost calculation.
+
+**Preconditions**:
+- Credit note type is QUANTITY_RETURN
+- Inventory lots selected with quantities
+- Locations configured
+
+**Postconditions**:
+- **Success**: Stock movements generated, inventory updated
+- **Failure**: Error returned with lot/location issues
+
+**Main Flow**:
+1. Server action receives stock movement request
+2. For each credit note item with lot selection:
+   - System retrieves lot number and location
+   - System calculates negative quantity (return)
+   - System retrieves unit cost from inventory costing calculation
+3. System creates stock movement records:
+   - Transaction type: Credit Note Return
+   - Location type: INV or CON
+   - Lot number from selection
+   - Quantity (negative value)
+   - Unit cost from inventory costing
+   - Movement date from credit note
+   - Reference: credit note number
+4. System validates inventory balance (allows negative per policy)
+5. System updates inventory balances per lot
+6. System returns stock movements:
+   - Movement ID
+   - Lot and location
+   - Quantity and cost
+   - Reference
+7. Use case ends
+
+**Exception Flows**:
+
+**Exc-208A: Lot Not Found** (At step 2)
+- Specified lot doesn't exist
+- System returns error with lot reference
+- Use case ends with failure
+
+**Exc-208B: Location Not Found** (At step 3)
+- Specified location doesn't exist
+- System returns error with location code
+- Use case ends with failure
+
+**Business Rules**:
+- **BR-BE-008**: Negative quantities for returns
+- **BR-BE-008**: inventory costs from calculation
+- **BR-BE-008**: Lot traceability maintained
+
+---
+
+### UC-CN-209: Manage Attachments
+
+**Description**: Server action manages file attachments for credit notes, including upload, download, and deletion with secure storage.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: High
+
+**Frequency**: As needed (5-10 times per week)
+
+**Related Backend Requirements**: BR-BE-009 (Attachment Management)
+
+**Preconditions**:
+- Credit note exists
+- User has attachment permissions
+- Storage service available
+
+**Postconditions**:
+- **Success**: Attachment uploaded/deleted, reference stored
+- **Failure**: Error returned with storage issues
+
+**Main Flow**:
+1. Server action receives attachment operation request
+2. For upload:
+   - System validates file type (PDF, JPG, PNG, XLSX, DOCX)
+   - System validates file size (max 10MB)
+   - System generates unique storage key
+   - System uploads to secure cloud storage
+   - System creates attachment record with metadata
+3. For download:
+   - System retrieves attachment record
+   - System generates signed URL (1-hour expiry)
+   - System returns download URL
+4. For delete:
+   - System retrieves attachment record
+   - System removes from cloud storage
+   - System soft-deletes attachment record
+   - System logs deletion in audit trail
+5. System returns operation result
+6. Use case ends
+
+**Exception Flows**:
+
+**Exc-209A: File Too Large** (At step 2)
+- File exceeds 10MB limit
+- System returns size limit error
+- Use case ends with failure
+
+**Exc-209B: Invalid File Type** (At step 2)
+- File type not allowed
+- System returns file type error
+- Use case ends with failure
+
+**Business Rules**:
+- **BR-BE-009**: Max 10MB per file
+- **BR-BE-009**: Allowed types: PDF, JPG, PNG, XLSX, DOCX
+- **BR-BE-009**: Secure cloud storage
+- **BR-BE-009**: Deletion logged in audit
+
+---
+
+### UC-CN-210: Log Audit Events
+
+**Description**: Server action logs all credit note operations to immutable audit trail with user, timestamp, and change details.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: Critical
+
+**Frequency**: Every credit note operation
+
+**Related Backend Requirements**: BR-BE-010 (Audit Logging)
+
+**Shared Method Reference**: Uses Audit Trail Service from [SM-inventory-operations.md#3.7](../../shared-methods/inventory-operations/SM-inventory-operations.md) for immutable audit logging with standardized event structure.
+
+**Preconditions**:
+- Operation context available
+- User identity established
+- Audit service available
+
+**Postconditions**:
+- **Success**: Audit event logged with full context
+- **Failure**: Logged to fallback, error flagged
+
+**Main Flow**:
+1. Server action receives audit log request with:
+   - Credit note ID
+   - Operation type (CREATE, UPDATE, COMMIT, VOID)
+   - User ID and session
+   - Changed fields with before/after values
+2. System creates immutable audit record:
+   - Timestamp (UTC)
+   - Credit note reference
+   - User identity
+   - Operation type
+   - Change details (JSON)
+   - IP address and user agent
+   - Session ID
+3. System appends to audit log (append-only)
+4. System indexes for search
+5. System returns audit entry ID
+6. Use case ends
+
+**Exception Flows**:
+
+**Exc-210A: Audit Service Unavailable** (At step 3)
+- Primary audit service down
+- System logs to fallback storage
+- System flags for reconciliation
+- Continue operation (audit critical but non-blocking)
+
+**Business Rules**:
+- **BR-BE-010**: Audit trail is immutable
+- **BR-BE-010**: Append-only design
+- **BR-BE-010**: All operations logged
+- **BR-BE-010**: Sensitive data masked
+
+---
+
+### UC-CN-211: Generate CN Number Sequence
+
+**Description**: Server action generates unique sequential credit note numbers in the format CN-YYYY-NNN with year reset.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: Critical
+
+**Frequency**: Every credit note creation (15-25 times per day)
+
+**Related Backend Requirements**: BR-BE-011 (CN Number Generator)
+
+**Preconditions**:
+- Database sequence table exists
+- Transaction context active
+
+**Postconditions**:
+- **Success**: Unique CN number generated
+- **Failure**: Error returned (transaction blocked)
+
+**Main Flow**:
+1. Server action receives CN number generation request
+2. System acquires lock on sequence table
+3. System retrieves current sequence for year:
+   - If current year: increment sequence
+   - If new year: reset sequence to 1
+4. System formats CN number: CN-YYYY-NNN
+   - YYYY = current year
+   - NNN = zero-padded sequence (001, 002, etc.)
+5. System updates sequence table
+6. System releases lock
+7. System returns generated CN number
+8. Use case ends
+
+**Exception Flows**:
+
+**Exc-211A: Sequence Lock Timeout** (At step 2)
+- Cannot acquire lock within timeout
+- System retries with backoff
+- After max retries: returns error
+- Use case ends with failure
+
+**Business Rules**:
+- **BR-BE-011**: Format CN-YYYY-NNN
+- **BR-BE-011**: Sequence resets annually
+- **BR-BE-011**: Numbers are gap-free
+- **BR-BE-011**: Lock ensures uniqueness
+
+---
+
+### UC-CN-212: Update Vendor Balance
+
+**Description**: Server action updates vendor accounts payable balance when credit note is committed or voided.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: Critical
+
+**Frequency**: Every credit note commitment/void (10-20 times per day)
+
+**Related Backend Requirements**: BR-BE-012 (Vendor Balance Update)
+
+**Preconditions**:
+- Vendor account exists and active
+- Credit note amount calculated
+- Transaction context active
+
+**Postconditions**:
+- **Success**: Vendor balance updated
+- **Failure**: Transaction rolled back
+
+**Main Flow**:
+1. Server action receives balance update request:
+   - Vendor ID
+   - Credit amount (positive for commit, negative for void)
+   - Credit note reference
+2. System retrieves vendor account record
+3. System applies update within transaction:
+   - Reduces payable balance (for commit)
+   - Restores payable balance (for void)
+4. System creates vendor transaction record
+5. System updates vendor aging if applicable
+6. System returns updated balance
+7. Use case ends
+
+**Exception Flows**:
+
+**Exc-212A: Vendor Account Inactive** (At step 2)
+- Vendor marked inactive or on hold
+- System returns error
+- Use case ends with failure
+
+**Business Rules**:
+- **BR-BE-012**: Balance update atomic with commitment
+- **BR-BE-012**: Vendor must be active
+- **BR-BE-012**: Transaction history maintained
+
+---
+
+### UC-CN-213: Validate Credit Note Data
+
+**Description**: Server action performs comprehensive validation of credit note data including business rules, data integrity, and cross-field validations.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: Critical
+
+**Frequency**: Every credit note save/commit
+
+**Related Backend Requirements**: BR-BE-013 (Data Validation)
+
+**Preconditions**:
+- Credit note data submitted
+- Validation rules configured
+
+**Postconditions**:
+- **Success**: All validations pass, proceed with operation
+- **Failure**: Validation errors returned
+
+**Main Flow**:
+1. Server action receives validation request with credit note data
+2. System performs schema validation:
+   - Required fields present
+   - Data types correct
+   - Format constraints met
+3. System performs business rule validation:
+   - Quantity > 0 for quantity returns
+   - Amount > 0 for amount discounts
+   - Return quantity ≤ lot available quantity
+   - Document date ≤ current date
+   - GRN exists and is posted
+4. System performs cross-field validation:
+   - Tax calculations consistent
+   - Totals match line items
+   - Currency consistent
+5. System performs status-specific validation:
+   - DRAFT: basic validation
+   - COMMIT: pre-commitment validation
+6. System returns validation result:
+   - Valid: true/false
+   - Errors: array of field-level errors
+   - Warnings: array of non-blocking issues
+7. Use case ends
+
+**Exception Flows**:
+
+**Exc-213A: Critical Validation Failure** (At step 3)
+- Required field missing or invalid
+- System returns error immediately
+- Use case ends with failure
+
+**Business Rules**:
+- **BR-BE-013**: All required fields validated
+- **BR-BE-013**: Business rules enforced
+- **BR-BE-013**: Status-specific rules applied
+
+---
+
+### UC-CN-214: Sync Real-time Data
+
+**Description**: Server action handles real-time data synchronization for credit note list and detail views using optimistic updates and cache invalidation.
+
+**Actor(s)**: Server Action Layer (System)
+
+**Priority**: High
+
+**Frequency**: Continuous (list/detail refreshes)
+
+**Related Backend Requirements**: BR-BE-014 (Real-time Sync)
+
+**Preconditions**:
+- WebSocket or SSE connection available
+- Cache layer configured
+- User session active
+
+**Postconditions**:
+- **Success**: Real-time updates delivered to clients
+- **Failure**: Fallback to polling, cache invalidated
+
+**Main Flow**:
+1. System detects credit note state change
+2. System broadcasts update event:
+   - Credit note ID
+   - Change type (CREATE, UPDATE, COMMIT, VOID)
+   - Changed fields summary
+   - Timestamp
+3. System invalidates relevant caches:
+   - Credit note list cache
+   - Credit note detail cache
+   - Vendor balance cache
+   - Inventory lot cache
+4. Connected clients receive update:
+   - List view refreshes affected rows
+   - Detail view refreshes if viewing affected record
+5. System logs sync event
+6. Use case ends
+
+**Alternative Flows**:
+
+**Alt-214A: No Active Connections** (At step 2)
+- No clients connected for affected records
+- System skips broadcast
+- System still invalidates caches
+- Continue to step 5
+
+**Exception Flows**:
+
+**Exc-214A: Broadcast Failure** (At step 2)
+- WebSocket service unavailable
+- System logs failure
+- Clients use polling fallback
+- Continue to step 3
+
+**Business Rules**:
+- **BR-BE-014**: Updates within 500ms of change
+- **BR-BE-014**: Cache invalidation on every change
+- **BR-BE-014**: Graceful degradation to polling
+
+---
+
 ## Non-Functional Requirements Validation
 
 **Performance Requirements**:
 - List page load: < 2 seconds with 1000 credit notes
 - Detail page load: < 1.5 seconds
 - Credit note creation: < 3 seconds
-- FIFO calculation: < 2 seconds for 10 lots
+- inventory cost calculation: < 2 seconds for 10 lots
 - Posting operation: < 5 seconds
 - Void operation: < 5 seconds
 
@@ -1990,7 +2862,7 @@ Key workflows include credit note list management, item-level credit processing 
 - Intuitive wizard-based creation workflow
 - Clear status indicators with color coding
 - Real-time validation feedback
-- FIFO analysis accessible and understandable
+- cost analysis accessible and understandable
 - Responsive design for tablet use in warehouse
 
 **Security Requirements**:
@@ -2007,7 +2879,7 @@ Key workflows include credit note list management, item-level credit processing 
 - Data integrity validation
 
 **Compliance Requirements**:
-- FIFO costing for accurate inventory valuation
+- inventory costing for accurate inventory valuation
 - Input VAT calculation per tax regulations
 - Audit trail for financial compliance
 - Lot traceability for quality compliance
@@ -2016,9 +2888,11 @@ Key workflows include credit note list management, item-level credit processing 
 
 ## Glossary
 
-**FIFO (First-In-First-Out)**: Inventory costing method that assumes first items purchased are first items returned, used to calculate cost of returned goods.
+**FIFO (First-In-First-Out)**: Inventory costing method that calculates costs based on oldest inventory layers first. One of two configurable costing methods in the system.
 
-**Cost Variance**: Difference between current inventory cost and FIFO weighted average cost, impacts gross margin when returns occur.
+**Periodic Average**: Inventory costing method that calculates costs using weighted average for the period (Total Value in Period / Total Quantity in Period). One of two configurable costing methods in the system.
+
+**Cost Variance**: Difference between current inventory cost and calculated cost (using FIFO or Periodic Average, depending on system configuration), impacts gross margin when returns occur.
 
 **Realized Gain/Loss**: Financial impact of cost variance on credit note, calculated as (return amount - cost of goods sold).
 
@@ -2036,7 +2910,7 @@ Key workflows include credit note list management, item-level credit processing 
 
 **Primary Entries**: Main journal entries for accounts payable credit and inventory/tax adjustments.
 
-**Inventory Entries**: Additional journal entries for cost variances between current and FIFO costs.
+**Inventory Entries**: Additional journal entries for cost variances between current and inventory costs.
 
 ---
 
@@ -2059,12 +2933,12 @@ DRAFT ──────────► COMMITTED
 
 ### Appendix B: Credit Note Types
 
-| Type | Description | Stock Movement | FIFO Costing | Use Cases |
+| Type | Description | Stock Movement | Inventory Costing | Use Cases |
 |------|-------------|----------------|--------------|-----------|
 | QUANTITY_RETURN | Physical return of goods | Yes (negative) | Yes | Damaged goods, quality issues, over-shipment |
 | AMOUNT_DISCOUNT | Pricing adjustment only | No | No | Pricing errors, negotiated discounts, rebates |
 
-### Appendix C: FIFO Calculation Example
+### Appendix C: Inventory Cost Calculation Example
 
 **Scenario**: Return 15 units of Product X with 3 lots:
 - Lot A: 5 units @ $10.00 (received 2024-01-15)
@@ -2073,7 +2947,7 @@ DRAFT ──────────► COMMITTED
 
 **Return**: 15 units selected from Lot A (5 units) and Lot B (10 units)
 
-**FIFO Calculation**:
+**Inventory Cost Calculation**:
 - Weighted average cost = ((5 × $10.00) + (10 × $10.50)) / 15 = $10.33
 - Current cost = $11.00 (latest price)
 - Cost variance = $11.00 - $10.33 = $0.67 per unit

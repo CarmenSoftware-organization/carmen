@@ -2,8 +2,8 @@
 
 **Module**: Procurement
 **Sub-module**: Goods Received Note
-**Document Version**: 1.2
-**Last Updated**: 2025-12-02
+**Document Version**: 1.3
+**Last Updated**: 2025-12-03
 
 ---
 
@@ -739,6 +739,8 @@ The Goods Received Note (GRN) module enables receiving clerks and storekeeper st
 - Rejected and damaged quantities do not increase inventory
 - Only received quantity (accepted) increases on-hand stock
 - Stock movement cannot be reversed (must create adjustment)
+- GRN creates inventory layers with unit cost data used for inventory valuation
+- Inventory costing method (FIFO or Periodic Average) is configured at system level (System Administration → Inventory Settings) and determines how costs are calculated when inventory is consumed (e.g., credit note returns, requisitions)
 
 ---
 
@@ -755,6 +757,7 @@ The Goods Received Note (GRN) module enables receiving clerks and storekeeper st
 - Update on-hand inventory quantities
 - Update storage location balances
 - Record batch/lot numbers and expiry dates
+- Create inventory layers with unit cost for inventory valuation (supports FIFO and Periodic Average costing methods)
 
 ### 5.3 Accounts Payable
 - Trigger AP invoice matching
@@ -846,6 +849,7 @@ The Goods Received Note (GRN) module enables receiving clerks and storekeeper st
 | 1.0 | 2025-12-02 | System Analyst | Initial BR document based on code analysis |
 | 1.1 | 2025-12-02 | System Analyst | Added FR-GRN-016: QR/Barcode Scanning for Mobile Receiving with complete scan workflow documentation |
 | 1.2 | 2025-12-02 | System Analyst | Added desktop webcam-based QR scanning to Future Enhancements |
+| 1.3 | 2025-12-03 | Documentation Team | Added context for inventory costing methods (FIFO or Periodic Average) used for inventory valuation |
 
 **Approval**
 

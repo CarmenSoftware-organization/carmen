@@ -4,21 +4,29 @@
 - **Module**: Procurement
 - **Sub-Module**: Credit Note
 - **Route**: `/procurement/credit-note`
-- **Version**: 1.0.0
-- **Last Updated**: 2025-01-11
+- **Version**: 1.0.4
+- **Last Updated**: 2025-12-03
 - **Owner**: Procurement Team
 - **Status**: Approved
 
 ## Document History
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.0.4 | 2025-12-03 | Documentation Team | Updated to support configurable costing method (FIFO or Periodic Average) per system settings |
+| 1.0.3 | 2025-12-03 | Documentation Team | Added Shared Service Integration section with references to SM-inventory-valuation and SM-inventory-operations |
+| 1.0.2 | 2025-12-03 | Documentation Team | Added Server Actions Architecture section per BR-BE-001 through BR-BE-014 |
+| 1.0.1 | 2025-12-03 | Documentation Team | Document history update for consistency across documentation set |
 | 1.0.0 | 2025-01-11 | Documentation Team | Initial version from source code analysis |
 
 ---
 
 ## Overview
 
-This technical specification describes the implementation of the Credit Note module using Next.js 14 App Router, React, TypeScript, and Supabase. The module implements two distinct credit note types (quantity-based returns with FIFO costing and amount-based discounts), vendor and GRN selection workflows, inventory lot tracking, automatic journal entry generation, and tax calculations.
+This technical specification describes the implementation of the Credit Note module using Next.js 14 App Router, React, TypeScript, and Supabase. The module implements two distinct credit note types (quantity-based returns with configurable inventory costing and amount-based discounts), vendor and GRN selection workflows, inventory lot tracking, automatic journal entry generation, and tax calculations.
+
+**Costing Method**: The system supports two inventory costing methods configured at the system level:
+- **FIFO (First-In-First-Out)**: Costs calculated using oldest inventory layers first
+- **Periodic Average**: Costs calculated using weighted average for the period
 
 **⚠️ IMPORTANT: This is a Technical Specification Document - TEXT FORMAT ONLY**
 - **DO NOT include actual code** - describe implementation patterns in text
@@ -204,7 +212,7 @@ The Credit Note module follows Next.js 14 App Router conventions with server-sid
 - **Backend Layer**
   - Server Actions: Handle credit note CRUD operations and business logic (future implementation)
   - Data Access Layer: Interface with mock data (future: database queries)
-  - Business Logic: FIFO costing calculations, tax calculations, status transitions
+  - Business Logic: Inventory costing calculations (FIFO or Periodic Average), tax calculations, status transitions
   - Integration Layer: Stock movements, journal entries, GRN references, vendor payables
 
 - **Data Layer**
@@ -234,7 +242,7 @@ The Credit Note module follows Next.js 14 App Router conventions with server-sid
 - **File Storage**: Supabase Storage (for attachments)
 
 ### Business Logic
-- **FIFO Costing Engine**: Calculates weighted average costs from inventory lots
+- **Inventory Costing Engine**: Calculates costs from inventory lots using system-configured method (FIFO or Periodic Average)
 - **Tax Calculation Engine**: Applies tax rates and calculates input VAT adjustments
 - **Journal Entry Generator**: Creates GL entries for commitment to finance module
 
@@ -266,7 +274,7 @@ app/(main)/procurement/credit-note/
 │   ├── credit-note.tsx                         # Main detail component with tabs
 │   ├── vendor-selection.tsx                    # Vendor selection dialog
 │   ├── grn-selection.tsx                       # GRN selection dialog
-│   ├── item-and-lot-selection.tsx              # Item/lot selection with FIFO
+│   ├── item-and-lot-selection.tsx              # Item/lot selection with costing
 │   ├── inventory.tsx                           # Lot application display tab
 │   ├── journal-entries.tsx                     # Journal entries display tab
 │   ├── tax-entries.tsx                         # Tax calculations display tab
@@ -339,7 +347,7 @@ lib/
   - GRN reference (if applicable)
   - Credit reason and description
 - Render tabbed interface for different aspects:
-  - Inventory tab (lot applications and FIFO analysis)
+  - Inventory tab (lot applications and cost analysis)
   - Journal Entries tab (GL commitments)
   - Tax Entries tab (VAT calculations)
   - Stock Movement tab (inventory adjustments for quantity returns)
@@ -376,7 +384,7 @@ lib/
 
 #### Item and Lot Selection Component
 **File**: `components/item-and-lot-selection.tsx`
-**Purpose**: Core component for selecting items, lots, and calculating FIFO costs
+**Purpose**: Core component for selecting items, lots, and calculating inventory costs
 **Responsibilities**:
 - Display credit note type selection (Quantity Return vs Amount Discount)
 - Show GRN items in expandable table format
@@ -388,16 +396,17 @@ lib/
   - Unit cost
 - Support lot selection via checkboxes
 - Accept return quantity input per selected lot
-- Calculate real-time FIFO summary:
+- Calculate real-time cost summary based on system-configured costing method:
+  - Display costing method indicator (FIFO or Periodic Average)
   - Total received quantity across selected lots
-  - Weighted average cost using FIFO method
+  - Calculated unit cost (FIFO weighted average or period average)
   - Current unit cost
-  - Cost variance (current - FIFO average)
+  - Cost variance (current - calculated unit cost)
   - Return quantity
   - Return amount (quantity × current cost)
-  - Cost of goods sold (quantity × FIFO weighted average)
+  - Cost of goods sold (quantity × calculated unit cost)
   - Realized gain/loss (return amount - COGS)
-- Display FIFO analysis in expandable section per item
+- Display cost analysis in expandable section per item with method-specific details
 - Support discount amount entry (in addition to or instead of quantity return)
 - Validate return quantities don't exceed lot availability
 - Save item/lot selections and navigate to detail view
@@ -405,7 +414,7 @@ lib/
 
 #### Inventory Tab Component
 **File**: `components/inventory.tsx`
-**Purpose**: Display lot application details and FIFO cost analysis
+**Purpose**: Display lot application details and cost analysis
 **Responsibilities**:
 - Show applied lots table for each credit note item
 - Display lot application details:
@@ -413,9 +422,9 @@ lib/
   - Original GRN and invoice references
   - Return quantity from this lot
   - Lot unit cost
-- Show FIFO cost summary:
+- Show cost summary with costing method indicator:
   - Total received quantity
-  - Weighted average cost
+  - Calculated unit cost (per configured method)
   - Current unit cost
   - Cost variance
   - Return amount, COGS, realized gain/loss
@@ -493,7 +502,7 @@ lib/
 **Purpose**: Detailed lot application analysis and display
 **Responsibilities**:
 - Display detailed lot-by-lot breakdown
-- Show FIFO calculation methodology
+- Show cost calculation methodology (FIFO or Periodic Average based on system configuration)
 - Display cost variance analysis
 - Provide drill-down into lot details
 - Support lot-level reporting
@@ -581,10 +590,13 @@ Component stores GRN reference
 Navigation to item/lot selection
 ```
 
-### Item/Lot Selection and FIFO Calculation Flow
+### Item/Lot Selection and Cost Calculation Flow
 
 ```
 Item/Lot Selection Component loads
+    ↓
+System retrieves costing method from system configuration
+(FIFO or Periodic Average)
     ↓
 System displays GRN items (if GRN selected)
     OR product catalog (if manual)
@@ -604,16 +616,21 @@ For QUANTITY_RETURN:
     ↓
   System validates quantity ≤ lot available
     ↓
-  System calculates FIFO costing:
-    - Retrieves lot costs from inventory
-    - Calculates weighted average: Σ(qty × cost) / Σ(qty)
-    - Determines current unit cost
-    - Calculates variance: current - FIFO average
-    - Computes return amount: qty × current cost
-    - Computes COGS: qty × FIFO average
-    - Computes realized gain/loss: return amt - COGS
+  System calculates inventory cost based on configured method:
+    FOR FIFO:
+      - Retrieves lot costs from inventory layers
+      - Calculates weighted average: Σ(qty × cost) / Σ(qty) using oldest layers
+    FOR PERIODIC AVERAGE:
+      - Retrieves average cost for credit note period
+      - Uses formula: Total Value in Period / Total Qty in Period
+    COMMON:
+      - Determines current unit cost from GRN
+      - Calculates variance: current - calculated unit cost
+      - Computes return amount: qty × current cost
+      - Computes COGS: qty × calculated unit cost
+      - Computes realized gain/loss: return amt - COGS
     ↓
-  System displays FIFO summary in real-time
+  System displays cost summary with method indicator in real-time
     ↓
 For AMOUNT_DISCOUNT:
   User enters discount amount per item
@@ -651,7 +668,7 @@ System generates journal entries:
 
     Entry 2: CR Inventory (1140) [qty returns only]
       - Department: Warehouse (WHS)
-      - Amount: Net inventory value (qty × FIFO cost)
+      - Amount: Net inventory value (qty × calculated cost)
       - Description: "Inventory Value Adjustment"
       - Reference: GRN number
 
@@ -665,8 +682,8 @@ System generates journal entries:
   INVENTORY ENTRIES GROUP [if cost variance exists]:
     Entry 4: DR/CR Cost Variance account
       - Department: Warehouse (WHS)
-      - Amount: (current cost - FIFO cost) × qty
-      - Description: "FIFO Cost Variance"
+      - Amount: (current cost - calculated cost) × qty
+      - Description: "Inventory Cost Variance"
       - Reference: CN number
     ↓
 System validates journal balance:
@@ -678,7 +695,7 @@ System generates stock movements [qty returns only]:
     - Location type: INV or CON
     - Lot number: From selected lots
     - Quantity: Negative (e.g., -10 for return)
-    - Unit cost: From FIFO calculation
+    - Unit cost: From inventory costing calculation
     - Extra cost: Proportional allocation
     - Movement date: Commitment date
     - Reference: CN number
@@ -767,7 +784,7 @@ Components use React useState for:
 - **Loading states**: Loading indicators during data operations
 - **Error states**: Validation errors and error messages
 - **Selection state**: Selected lots, selected items for bulk operations
-- **Expansion state**: Expanded/collapsed FIFO analysis sections
+- **Expansion state**: Expanded/collapsed cost analysis sections
 
 ### No Global State Currently
 
@@ -786,32 +803,362 @@ All data operations currently use mock data from centralized files:
 - `lib/mock/credit-notes.ts` - Primary mock data
 - `lib/mock/static-credit-notes.ts` - Static examples for testing
 
-### Future Server Actions (Planned)
+### Server Actions Architecture
 
-**Create Credit Note**
-- Endpoint: Server action (future)
-- Input: Credit note header, items, lot selections
-- Output: Created credit note with assigned CN number
-- Business logic: Validation, FIFO calculation, number generation
+This section defines the server actions implementation as specified in BR-BE-001 through BR-BE-014.
 
-**Update Credit Note**
-- Endpoint: Server action (future)
-- Input: Credit note ID, updated fields
-- Output: Updated credit note object
-- Business logic: Status validation, recalculations, audit logging
+#### Shared Service Integration
 
+The Credit Note module integrates with the following centralized shared services to ensure consistency across the application:
 
-**Commit Credit Note**
-- Endpoint: Server action (future)
-- Input: Credit note ID, commitment date
-- Output: Posted credit note with journal entries and stock movements
-- Business logic: Journal entry generation, stock movement creation, GL commitment, inventory updates
+| Service | Location | Usage in CN |
+|---------|----------|-------------|
+| **InventoryValuationService** | [SM-inventory-valuation.md](../../shared-methods/inventory-valuation/SM-inventory-valuation.md) | Inventory cost calculation (FIFO or Periodic Average) for quantity returns (BR-BE-008) |
+| **TransactionRecordingService** | [SM-inventory-operations.md#3.2](../../shared-methods/inventory-operations/SM-inventory-operations.md) | Stock movement generation for returns (BR-BE-005) |
+| **AuditTrailService** | [SM-inventory-operations.md#3.7](../../shared-methods/inventory-operations/SM-inventory-operations.md) | Audit logging for all CN operations (BR-BE-010) |
+| **StateManagementService** | [SM-inventory-operations.md#3.3](../../shared-methods/inventory-operations/SM-inventory-operations.md) | Status transitions (Draft→Committed→Voided) (BR-CN-023) |
+| **AtomicTransactionService** | [SM-inventory-operations.md#3.6](../../shared-methods/inventory-operations/SM-inventory-operations.md) | Transaction management for commit/void operations (BR-BE-012) |
 
-**Void Credit Note**
-- Endpoint: Server action (future)
-- Input: Credit note ID, void reason
-- Output: Voided credit note with reversing entries
-- Business logic: Reversing entry generation, transaction rollback, balance restoration
+**Integration Example**: See [credit-note-integration.md](../../shared-methods/inventory-valuation/examples/credit-note-integration.md) for complete implementation patterns.
+
+#### Directory Structure
+
+```
+app/(main)/procurement/credit-note/
+├── actions/
+│   ├── index.ts                              # Barrel export for all actions
+│   ├── credit-note-crud.ts                   # Create, Read, Update, Delete actions
+│   ├── credit-note-commit.ts                 # Commitment transaction action
+│   ├── credit-note-void.ts                   # Void transaction action
+│   ├── vendor-fetch.ts                       # Vendor search and fetch
+│   ├── grn-fetch.ts                          # GRN and lot data fetching
+│   ├── inventory-costing.ts                  # Inventory costing calculations (FIFO/Periodic Average)
+│   ├── tax-calculation.ts                    # Tax calculation service
+│   ├── journal-entry-generator.ts            # Journal entry generation
+│   ├── stock-movement-generator.ts           # Stock movement generation
+│   ├── attachment-management.ts              # File upload/delete
+│   ├── cn-number-generator.ts                # CN number generation
+│   ├── validation-service.ts                 # Data validation
+│   └── audit-logger.ts                       # Audit trail logging
+```
+
+#### TS-BE-001: Credit Note CRUD Server Actions
+
+**createCreditNote**
+- **Purpose**: Create a new credit note with header, items, and lot selections
+- **Input**: CreateCreditNoteInput (see DD-BE-001)
+- **Output**: CreditNoteResponse with created credit note
+- **Implementation Steps**:
+  1. Validate input data using validation service
+  2. Generate CN number using cn-number-generator
+  3. Calculate inventory costs for quantity returns (using system-configured method)
+  4. Calculate tax amounts for all items
+  5. Create credit note record in database
+  6. Create credit note item records
+  7. Create applied lot records (for QUANTITY_RETURN)
+  8. Log creation in audit trail
+  9. Return created credit note
+- **Error Handling**: Return structured error with field-level validation details
+- **Transaction**: Single database transaction with rollback on failure
+
+**getCreditNote**
+- **Purpose**: Retrieve credit note by ID with all related data
+- **Input**: creditNoteId (UUID)
+- **Output**: CreditNote with items, applied lots, attachments
+- **Implementation Steps**:
+  1. Validate user has read permission
+  2. Fetch credit note header
+  3. Fetch related items with product details
+  4. Fetch applied lots for quantity return items
+  5. Fetch attachments
+  6. Fetch journal entries (if committed)
+  7. Fetch stock movements (if committed and quantity return)
+  8. Return assembled credit note object
+
+**updateCreditNote**
+- **Purpose**: Update draft credit note
+- **Input**: UpdateCreditNoteInput (see DD-BE-001)
+- **Output**: CreditNoteResponse with updated credit note
+- **Implementation Steps**:
+  1. Validate credit note exists and is in DRAFT status
+  2. Validate user has edit permission
+  3. Validate input data
+  4. Recalculate inventory costs if lots changed
+  5. Recalculate tax amounts if items changed
+  6. Update credit note record
+  7. Update/replace item records
+  8. Update/replace applied lot records
+  9. Log update in audit trail with old/new values
+  10. Return updated credit note
+
+**deleteCreditNote**
+- **Purpose**: Soft delete draft credit note
+- **Input**: creditNoteId (UUID)
+- **Output**: Success/failure response
+- **Implementation Steps**:
+  1. Validate credit note exists and is in DRAFT status
+  2. Validate user has delete permission
+  3. Delete attachments from storage
+  4. Soft delete credit note (set deletedAt)
+  5. Log deletion in audit trail
+
+**listCreditNotes**
+- **Purpose**: Paginated list with filtering and sorting
+- **Input**: ListCreditNotesInput (filters, pagination, sort)
+- **Output**: Paginated credit note list with totals
+- **Implementation Steps**:
+  1. Build query based on filters (status, vendor, date range, type)
+  2. Apply user location access restrictions
+  3. Apply sorting
+  4. Execute count query for pagination
+  5. Execute paginated data query
+  6. Return results with pagination metadata
+
+#### TS-BE-002: Vendor and GRN Fetch Actions
+
+**searchVendors**
+- **Purpose**: Search vendors for selection in credit note creation
+- **Input**: VendorSearchInput (see DD-BE-002)
+- **Output**: VendorSearchResponse with matching vendors
+- **Implementation Steps**:
+  1. Build search query with name/code filter
+  2. Apply active status filter
+  3. Apply user access restrictions
+  4. Execute paginated query
+  5. Return vendor summaries
+
+**searchGRNsByVendor**
+- **Purpose**: Search GRNs for selected vendor
+- **Input**: GRNSearchInput (see DD-BE-002)
+- **Output**: GRNSearchResponse with matching GRNs
+- **Implementation Steps**:
+  1. Filter by vendor ID
+  2. Apply search term to GRN number/invoice
+  3. Apply date range filter
+  4. Filter by status (only POSTED GRNs)
+  5. Execute paginated query
+  6. Return GRN summaries
+
+**getGRNItemsWithLots**
+- **Purpose**: Get GRN items with available inventory lots
+- **Input**: grnId (UUID)
+- **Output**: GRNItemsResponse with items and lot data
+- **Implementation Steps**:
+  1. Fetch GRN items
+  2. For each item, fetch inventory lots with available quantity > 0
+  3. Include lot cost data for inventory costing calculations
+  4. Return items with lot arrays
+
+**getAvailableLotsByProduct**
+- **Purpose**: Get available lots for a product (standalone credit note)
+- **Input**: productId (UUID), locationId (UUID, optional)
+- **Output**: Array of AvailableLot
+- **Implementation Steps**:
+  1. Query inventory lots for product
+  2. Filter by location if provided
+  3. Filter where available quantity > 0
+  4. Order by receive date (for FIFO ordering when applicable)
+  5. Return lot list with costs
+
+#### TS-BE-003: Commitment Transaction Action
+
+**commitCreditNote**
+- **Purpose**: Commit credit note to GL with atomic transaction
+- **Input**: CommitCreditNoteInput (see DD-BE-003)
+- **Output**: CommitCreditNoteResponse with entries and movements
+- **Implementation Steps** (all in single transaction):
+  1. Validate credit note exists and is DRAFT
+  2. Validate user has commit permission
+  3. Validate accounting period is open for commitment date
+  4. Validate all GL accounts exist and are active
+  5. Generate journal entries using journal-entry-generator:
+     - Primary entries (AP, Inventory, VAT)
+     - Inventory entries (cost variance if applicable)
+  6. Validate journal balance (debits = credits)
+  7. Generate stock movements for quantity returns using stock-movement-generator
+  8. Insert journal entries into finance module
+  9. Insert stock movements into inventory module
+  10. Update inventory lot balances
+  11. Update vendor payable balance
+  12. Update credit note status to COMMITTED
+  13. Set committedDate and commitmentReference
+  14. Log commitment in audit trail
+  15. Send notifications (finance team, requester)
+  16. Return updated credit note with entries and movements
+- **Transaction**: Serializable isolation, pessimistic locking
+- **Error Handling**: Full rollback on any failure, return detailed error
+
+#### TS-BE-004: Void Transaction Action
+
+**voidCreditNote**
+- **Purpose**: Void committed credit note with reversing entries
+- **Input**: VoidCreditNoteInput (see DD-BE-004)
+- **Output**: VoidCreditNoteResponse with reversing entries
+- **Implementation Steps** (all in single transaction):
+  1. Validate credit note exists and is COMMITTED
+  2. Validate user has void permission (manager role)
+  3. Validate no dependent transactions (payments, settlements)
+  4. Validate accounting period is open for void date
+  5. Generate reversing journal entries (same accounts, opposite DR/CR)
+  6. Generate reversing stock movements (positive quantities)
+  7. Insert reversing journal entries
+  8. Insert reversing stock movements
+  9. Restore inventory lot balances
+  10. Restore vendor payable balance
+  11. Update credit note status to VOID
+  12. Set voidDate and voidReason
+  13. Log void operation in audit trail
+  14. Send void notifications
+  15. Return updated credit note with reversing entries
+- **Transaction**: Serializable isolation, pessimistic locking
+- **Error Handling**: Full rollback on any failure
+
+#### TS-BE-005: Inventory Costing Service
+
+**calculateInventoryCost**
+- **Purpose**: Calculate inventory costs using system-configured costing method
+- **Input**: CostCalculationInput (see DD-BE-005)
+- **Output**: CostCalculationResult with cost analysis
+- **Algorithm**:
+  1. Get system costing method from configuration (FIFO or PERIODIC_AVERAGE)
+  2. **FOR FIFO**:
+     a. For each selected lot, get quantity and unit cost
+     b. Calculate total received quantity: Σ(lot quantities)
+     c. Calculate weighted average from layers: Σ(qty × cost) / Σ(qty)
+  3. **FOR PERIODIC AVERAGE**:
+     a. Get credit note period (month/year of document date)
+     b. Query total inventory value for period
+     c. Query total inventory quantity for period
+     d. Calculate period average: Total Value / Total Quantity
+  4. Get current unit cost from product master or GRN
+  5. Calculate cost variance: current - calculated unit cost
+  6. Calculate return amount: return qty × current cost
+  7. Calculate COGS: return qty × calculated unit cost
+  8. Calculate realized gain/loss: return amount - COGS
+  9. Return complete cost analysis with method indicator
+- **Caching**: Cache results per lot combination (FIFO) or per period (Periodic Average)
+- **Configuration**: Costing method from System Administration → Inventory Settings
+
+#### TS-BE-006: Tax Calculation Service
+
+**calculateTax**
+- **Purpose**: Calculate tax amounts for credit note items
+- **Input**: TaxCalculationInput (see DD-BE-006)
+- **Output**: TaxCalculationResult with tax details
+- **Algorithm**:
+  1. Look up tax rate for document date
+  2. For each item, calculate tax: base × rate
+  3. Round to 2 decimal places
+  4. Aggregate totals
+  5. Determine VAT period from document date
+  6. Return tax calculations
+- **Configuration**: Tax rates from system configuration
+
+#### TS-BE-007: Journal Entry Generator
+
+**generateJournalEntries**
+- **Purpose**: Generate GL journal entries for commitment
+- **Input**: Credit note with inventory costing and tax calculations
+- **Output**: Array of JournalEntry records
+- **Generation Rules**:
+  - Entry 1 (AP): DR Accounts Payable (2100), credit total
+  - Entry 2 (Inventory): CR Inventory (1140), net value (qty returns only)
+  - Entry 3 (VAT): CR Input VAT (1240), tax amount
+  - Entry 4 (Variance): DR/CR Cost Variance account, variance amount
+- **Validation**: Total debits must equal total credits
+
+#### TS-BE-008: Stock Movement Generator
+
+**generateStockMovements**
+- **Purpose**: Generate inventory stock movements for quantity returns
+- **Input**: Credit note items with applied lots
+- **Output**: Array of StockMovement records
+- **Generation Rules**:
+  - Movement type: Credit Note Return
+  - Quantity: Negative (e.g., -10 for 10 units returned)
+  - Unit cost: From inventory costing calculation
+  - Reference: CN number
+- **Only For**: QUANTITY_RETURN credit types
+
+#### TS-BE-009: Attachment Management
+
+**uploadAttachment**
+- **Purpose**: Upload file attachment to credit note
+- **Input**: AttachmentUploadInput (see DD-BE-007)
+- **Output**: AttachmentUploadResponse
+- **Implementation Steps**:
+  1. Validate file type (allowed MIME types)
+  2. Validate file size (max 10 MB)
+  3. Validate attachment count (max 10 per credit note)
+  4. Sanitize file name
+  5. Upload to Supabase Storage
+  6. Create attachment record with URL
+  7. Return created attachment
+
+**deleteAttachment**
+- **Purpose**: Delete attachment from credit note
+- **Input**: AttachmentDeleteInput
+- **Output**: Success/failure response
+- **Implementation Steps**:
+  1. Validate attachment exists
+  2. Validate user has permission
+  3. Delete file from storage
+  4. Delete attachment record
+
+#### TS-BE-010: Audit Logging Service
+
+**logAuditEntry**
+- **Purpose**: Create immutable audit trail entry
+- **Input**: Entity type, ID, action, old/new values, user context
+- **Output**: Created audit log entry
+- **Logged Actions**: CREATE, UPDATE, COMMIT, VOID, DELETE
+- **Captured Data**: User ID, timestamp, IP address, field changes
+- **Storage**: Separate audit table, immutable (no updates/deletes)
+
+**getAuditLog**
+- **Purpose**: Query audit trail for credit note
+- **Input**: AuditLogQuery (see DD-BE-008)
+- **Output**: Paginated audit log entries
+- **Access Control**: Audit log access requires auditor role
+
+#### TS-BE-011: CN Number Generator
+
+**generateCNNumber**
+- **Purpose**: Generate unique credit note number
+- **Input**: CNNumberRequest (see DD-BE-009)
+- **Output**: CNNumberResponse with generated number
+- **Format**: CN-{YYYY}-{NNN}
+- **Sequence**: Reset annually, increment per credit note
+- **Concurrency**: Database sequence for thread safety
+
+#### TS-BE-012: Vendor Balance Update
+
+**updateVendorPayable**
+- **Purpose**: Update vendor payable balance on commit/void
+- **Input**: Vendor ID, amount, operation (subtract/add)
+- **Output**: Updated vendor balance
+- **Integration**: Called by commit and void actions
+- **Atomicity**: Part of parent transaction
+
+#### TS-BE-013: Data Validation Service
+
+**validateCreditNote**
+- **Purpose**: Comprehensive validation of credit note data
+- **Input**: Credit note input data
+- **Output**: ValidationResult with errors and warnings
+- **Validation Categories**:
+  - Field-level validations (required, format, range)
+  - Cross-field validations (totals, lot sums)
+  - Business rule validations (status, permissions)
+  - Integration validations (vendor active, GL accounts exist)
+
+#### TS-BE-014: Real-time Data Sync
+
+**Implementation Pattern**: Server actions with revalidation
+- Use revalidatePath after mutations
+- Use revalidateTag for cache invalidation
+- WebSocket/SSE for real-time updates (future enhancement)
+- Optimistic updates in UI with server confirmation
 
 ### Integration with Other Modules
 
@@ -822,7 +1169,7 @@ All data operations currently use mock data from centralized files:
 
 **Inventory Module Integration**
 - Read lot data: Retrieve available lots for return items
-- Read lot costs: Get unit costs for FIFO calculations
+- Read lot costs: Get unit costs for inventory costing calculations
 - Commit stock movements: Send negative stock movements on credit note commitment
 - Update balances: Reduce inventory quantities per lot
 
@@ -841,32 +1188,49 @@ All data operations currently use mock data from centralized files:
 
 ## Business Logic Implementation
 
-### FIFO Costing Engine
+### Inventory Costing Engine
 
-**Purpose**: Calculate weighted average cost of returned goods using First-In-First-Out method
+**Purpose**: Calculate cost of returned goods using system-configured costing method (FIFO or Periodic Average)
+
+**System Configuration**: Costing method is configured in System Administration → Inventory Settings
 
 **Algorithm Description**:
+
+**FOR FIFO (First-In-First-Out)**:
 1. Retrieve all selected inventory lots for returned item
 2. For each lot, get lot quantity and lot unit cost
 3. Calculate total received quantity: sum of all lot quantities
 4. Calculate weighted average cost: sum of (lot qty × lot cost) / total qty
 5. Get current unit cost from product master or GRN item
-6. Calculate cost variance: current cost - weighted average cost
+6. Calculate cost variance: current cost - FIFO weighted average cost
 7. Calculate return amount: return quantity × current cost
-8. Calculate cost of goods sold: return quantity × weighted average cost
+8. Calculate cost of goods sold: return quantity × FIFO weighted average cost
+9. Calculate realized gain/loss: return amount - COGS
+10. Store all calculations with credit note item for audit and reporting
+
+**FOR PERIODIC AVERAGE**:
+1. Get credit note period (month/year of document date)
+2. Query total inventory value received during the period
+3. Query total inventory quantity received during the period
+4. Calculate period average cost: Total Value in Period / Total Quantity in Period
+5. Get current unit cost from product master or GRN item
+6. Calculate cost variance: current cost - period average cost
+7. Calculate return amount: return quantity × current cost
+8. Calculate cost of goods sold: return quantity × period average cost
 9. Calculate realized gain/loss: return amount - COGS
 10. Store all calculations with credit note item for audit and reporting
 
 **Data Requirements**:
-- Inventory lot data with quantities and costs
-- Product current cost or GRN item cost
-- Return quantity per lot
+- **FIFO**: Inventory lot data with quantities and costs, Product current cost or GRN item cost, Return quantity per lot
+- **Periodic Average**: Period inventory transactions, Total period value and quantity, Product current cost or GRN item cost
 
 **Output**:
-- Weighted average cost per item
+- Costing method used (FIFO or PERIODIC_AVERAGE)
+- Calculated unit cost per item
 - Cost variance per item
 - Realized gain/loss per item
-- Total FIFO impact across all items
+- Total cost impact across all items
+- Method-specific details (lot breakdown for FIFO, period data for Periodic Average)
 
 ### Tax Calculation Engine
 
@@ -920,7 +1284,7 @@ All data operations currently use mock data from centralized files:
    **Entry 2 - Inventory Adjustment** (quantity returns only):
    - Account: 1140
    - Department: Warehouse (WHS)
-   - Credit amount: Net inventory value (sum of qty × FIFO cost per item)
+   - Credit amount: Net inventory value (sum of qty × calculated cost per item)
    - Description: "Inventory Value Adjustment"
    - Reference: GRN number
    - Order: 2
@@ -940,7 +1304,7 @@ All data operations currently use mock data from centralized files:
    - Account: Cost variance account
    - Department: Warehouse (WHS)
    - Debit (if loss) or Credit (if gain): abs(cost variance × quantity)
-   - Description: "FIFO Cost Variance"
+   - Description: "Inventory Cost Variance"
    - Reference: Credit note number
    - Order: 4
 
@@ -954,7 +1318,7 @@ All data operations currently use mock data from centralized files:
 - GL account mapping configuration
 - Department codes
 - Credit note header and item data
-- FIFO costing results
+- Inventory costing results
 - Tax calculation results
 
 **Output**:
@@ -975,7 +1339,7 @@ All data operations currently use mock data from centralized files:
    a. Retrieve lot selection details:
       - Lot number
       - Return quantity
-      - Unit cost from FIFO calculation
+      - Unit cost from inventory costing calculation
       - Extra costs (if any)
 
    b. Create stock movement record:
@@ -983,7 +1347,7 @@ All data operations currently use mock data from centralized files:
       - Location type: INV (Inventory) or CON (Consignment)
       - Lot number: From lot selection
       - Quantity: Negative value (e.g., -10 for 10 units returned)
-      - Unit cost: From FIFO calculation
+      - Unit cost: From inventory costing calculation
       - Extra cost: Proportional allocation if applicable
       - Movement date: Credit note commitment date
       - Reference type: "Credit Note"
@@ -1005,7 +1369,7 @@ All data operations currently use mock data from centralized files:
 **Data Requirements**:
 - Credit note type
 - Credit note items with lot selections
-- FIFO costing results
+- Inventory costing results
 - Location information
 - Posting date
 
@@ -1042,10 +1406,11 @@ All data operations currently use mock data from centralized files:
 - Discount amount: Required, must be > 0
 - Discount cannot exceed original invoice amount (warning)
 
-**FIFO Validation**:
-- Lot data available: All selected lots must have cost data
+**Inventory Costing Validation**:
+- **FIFO**: Lot data available - All selected lots must have cost data
+- **Periodic Average**: Period data available - Valid inventory data exists for the period
 - Quantity validation: Return quantities match lot selections
-- Calculation validation: Weighted average cost calculation successful
+- Calculation validation: Cost calculation successful for configured method
 
 ### Server-Side Validation (Future Implementation)
 
@@ -1118,16 +1483,16 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 **Data Loading**:
 - Paginated list loading (20 records per page default)
 - Lazy loading of tab content (load tab data only when tab activated)
-- Memoization of FIFO calculations (cache results per lot combination)
+- Memoization of inventory costing calculations (cache results per lot combination for FIFO, per period for Periodic Average)
 - Debounced search inputs (300ms delay)
 
 **Calculation Performance**:
-- FIFO calculations optimized for up to 50 lots per item
+- Inventory costing calculations optimized (FIFO: up to 50 lots per item; Periodic Average: single period query)
 - Tax calculations cached per tax rate and base amount combination
 - Journal entry generation pre-calculated on save, not on each view
 
 **Component Rendering**:
-- React memo for expensive components (FIFO summary, journal entries)
+- React memo for expensive components (cost analysis summary, journal entries)
 - Virtual scrolling for large item lists (future enhancement)
 - Conditional rendering of tabs (don't render hidden tabs)
 
@@ -1140,7 +1505,7 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 
 - **List page load**: < 2 seconds with 1,000 credit notes
 - **Detail page load**: < 1.5 seconds including all tabs
-- **FIFO calculation**: < 2 seconds for 10 lots per item
+- **Inventory costing calculation**: < 2 seconds (FIFO: for 10 lots per item; Periodic Average: single period)
 - **Tax calculation**: < 1 second for 20 items
 - **Save operation**: < 3 seconds including validation
 - **Commit operation**: < 5 seconds including journal and stock movements
@@ -1197,7 +1562,7 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 ### Unit Testing (Planned)
 
 **Components to Test**:
-- FIFO calculation logic with various lot combinations
+- Inventory costing logic (FIFO and Periodic Average) with various scenarios
 - Tax calculation with different rates and amounts
 - Journal entry generation with different credit types
 - Stock movement generation for quantity returns
@@ -1213,7 +1578,7 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 - End-to-end credit note creation flow (vendor → GRN → lots → save → commit)
 - Void workflow with journal and stock movement reversal
 - Multi-currency credit note with exchange rate conversion
-- FIFO costing with complex lot selections
+- Inventory costing with complex lot selections (FIFO) and period calculations (Periodic Average)
 - Integration with GRN, Inventory, and Finance modules
 
 **Test Framework**: Playwright
@@ -1278,7 +1643,7 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 **Metrics to Track**:
 - Credit note creation success/failure rate
 - Average time to create credit note
-- FIFO calculation performance
+- Inventory costing calculation performance
 - Posting operation success rate
 - Approval workflow completion time
 - API response times
@@ -1320,14 +1685,14 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 
 2. **Advanced Reporting**:
    - Credit note aging report
-   - FIFO variance analysis report
+   - Cost variance analysis report (FIFO and Periodic Average)
    - Vendor credit summary
    - Tax credit reconciliation report
 
-3. **Enhanced FIFO Analysis**:
+3. **Enhanced Cost Analysis**:
    - Visual charts for cost variance trends
-   - Lot profitability analysis
-   - Historical FIFO comparison
+   - Lot profitability analysis (FIFO) / Period profitability analysis (Periodic Average)
+   - Historical cost method comparison
 
 4. **Integration Enhancements**:
    - Real-time vendor account updates
@@ -1348,9 +1713,11 @@ Audit log is immutable (no deletion or editing allowed) and retained per complia
 
 ## Glossary
 
-**FIFO (First-In-First-Out)**: Inventory costing method that assumes first items purchased are first items returned.
+**FIFO (First-In-First-Out)**: Inventory costing method that calculates costs based on oldest inventory layers first. One of two configurable costing methods.
 
-**Cost Variance**: Difference between current inventory cost and FIFO weighted average cost.
+**Periodic Average**: Inventory costing method that calculates costs using weighted average for the period (Total Value in Period / Total Quantity in Period). One of two configurable costing methods.
+
+**Cost Variance**: Difference between current inventory cost and calculated cost (using FIFO weighted average or Periodic Average, depending on system configuration).
 
 **Realized Gain/Loss**: Financial impact of cost variance on credit note.
 

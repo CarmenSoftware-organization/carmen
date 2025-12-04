@@ -3,8 +3,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Requests
 - **Route**: `/procurement/purchase-requests`
-- **Version**: 1.6.0
-- **Last Updated**: 2025-11-28
+- **Version**: 1.7.0
+- **Last Updated**: 2025-12-03
 
 ## **Document History**
 
@@ -17,6 +17,7 @@
 | 1.4.0 | 2025-11-28 | Development Team | Updated FR-PR-011 with Returned status as editable, added Editable Status Matrix by Role, added Requestor Editable Fields by Status matrix |
 | 1.5.0 | 2025-11-28 | Development Team | Added FR-PR-026: Bulk Item Actions for line-item level bulk operations (Approve Selected, Reject Selected, Return Selected, Split, Set Date Required) |
 | 1.6.0 | 2025-11-28 | Development Team | Added FR-PR-027: Budget Tab CRUD Operations for budget allocation management within Purchase Requests |
+| 1.7.0 | 2025-12-03 | Development Team | Updated FR-PR-011A: Approvers can view vendor/pricing in read-only; Updated FR-PR-026: Approvers can Split PR to enable parallel processing of approved vs returned items |
 
 ---
 
@@ -566,20 +567,24 @@ When **Return** action is selected:
 
 **Field Availability by Role**:
 
+Legend: ✅ = Editable | 👁️ = Read-only (visible) | ❌ = Hidden
+
 | Field | Requestor | Approver | Purchasing Staff |
 |-------|-----------|----------|------------------|
-| Vendor Selection | ❌ | ❌ | ✅ |
-| Currency | ❌ | ❌ | ✅ |
-| Exchange Rate | ❌ | ❌ | ✅ |
-| Unit Price | ❌ | ❌ | ✅ |
-| Discount Rate | ❌ | ❌ | ✅ |
-| Discount Override | ❌ | ❌ | ✅ |
-| Tax Profile | ❌ | ❌ | ✅ |
-| Tax Rate | ❌ | ❌ | 👁️ (Read-only) |
-| Tax Override | ❌ | ❌ | ✅ |
-| FOC Quantity | ❌ | ❌ | ✅ |
+| Vendor Selection | ❌ | 👁️ | ✅ |
+| Currency | ❌ | 👁️ | ✅ |
+| Exchange Rate | ❌ | 👁️ | ✅ |
+| Unit Price | ❌ | 👁️ | ✅ |
+| Discount Rate | ❌ | 👁️ | ✅ |
+| Discount Override | ❌ | 👁️ | ✅ |
+| Tax Profile | ❌ | 👁️ | ✅ |
+| Tax Rate | ❌ | 👁️ | 👁️ |
+| Tax Override | ❌ | 👁️ | ✅ |
+| FOC Quantity | ❌ | 👁️ | ✅ |
 | Approved Quantity | ❌ | ✅ | ✅ |
 | Delivery Point | ✅ | ✅ | ✅ |
+
+**Note**: Approvers always see vendor and pricing information in read-only mode to make informed approval decisions, regardless of the requestor's hide_price setting.
 
 **Requestor Editable Fields by Status**:
 
@@ -1371,16 +1376,23 @@ Integrating real-time inventory and pricing data into the PR creation process en
   * Records return timestamp, user, and comment for each item
 
 - **Split**:
-  * Available to: Purchasing Staff
+  * Available to: Approver, Purchasing Staff
   * Minimum 2 items must be selected
   * Opens split configuration dialog
   * Split options:
+    - By Approval Status: Separate approved items from items needing review (enables parallel processing)
     - By Vendor: Group selected items by assigned vendor
     - By Delivery Date: Group selected items by required delivery date
     - Manual Split: User defines item groupings
   * Creates new PR(s) with split items
   * Original PR updated to reflect remaining items
   * Maintains audit trail linking original and split PRs
+  * **Approver Split Workflow**:
+    - When some items are approved and others need requestor review
+    - Approved items proceed in original PR (status: Approved)
+    - Items needing review are split to new PR (status: Returned)
+    - Requestor notified of split with reason for each returned item
+    - Both PRs linked via parent_pr_id for traceability
 
 - **Set Date Required**:
   * Available to: Requestor (Draft/Void/Returned), Approvers, Purchasing Staff
@@ -1398,7 +1410,7 @@ Integrating real-time inventory and pricing data into the PR creation process en
 | Approve Selected | ❌ | ✅ | ✅ | For pending/in-progress items |
 | Reject Selected | ❌ | ✅ | ✅ | Requires comment |
 | Return Selected | ❌ | ✅ | ✅ | Requires comment |
-| Split | ❌ | ❌ | ✅ | Minimum 2 items |
+| Split | ❌ | ✅ | ✅ | Minimum 2 items; enables parallel processing |
 | Set Date Required | ✅ (Draft/Void/Returned) | ✅ | ✅ | Date >= today |
 
 **UI Specifications**:

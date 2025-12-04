@@ -3,8 +3,8 @@
 **Module**: Procurement
 **Sub-Module**: Purchase Requests
 **Document Type**: Validations (VAL)
-**Version**: 1.6.0
-**Last Updated**: 2025-11-28
+**Version**: 1.7.0
+**Last Updated**: 2025-12-03
 **Status**: Active
 
 ## Document History
@@ -18,6 +18,7 @@
 | 1.4.0 | 2025-11-28 | Development Team | Added VAL-PR-304A: Status-Based Edit Permission with Editable Status Matrix |
 | 1.5.0 | 2025-11-28 | Development Team | Added VAL-PR-400 series: Bulk Item Action validations for selection, permissions, and action-specific rules |
 | 1.6.0 | 2025-11-28 | Development Team | Added VAL-PR-500 series: Budget Tab CRUD validations for budget allocation management |
+| 1.7.0 | 2025-12-03 | Development Team | Extended Split capability to Approvers; added VAL-PR-405C (Split Reason), VAL-PR-410 (Approver Split by Approval Status); added role-based field visibility validations |
 
 ---
 
@@ -2300,30 +2301,37 @@ This section defines validation rules for bulk item actions within a purchase re
 
 ### VAL-PR-405: Split Items Validation
 
-**Validation Rule**: User must have Purchasing Staff role. At least 2 items must be selected.
+**Validation Rule**: User must have Approver or Purchasing Staff role. At least 2 items must be selected.
 
 **When Validated**: Before showing Split button, before processing split action
 
 **Implementation Requirements**:
-- **Client-Side**: Hide Split button for non-Purchasing Staff roles. Disable Split button when < 2 items selected.
-- **Server-Side**: Verify user role and selected item count >= 2.
+- **Client-Side**: Hide Split button for non-Approver/non-Purchasing Staff roles. Disable Split button when < 2 items selected.
+- **Server-Side**: Verify user role (Approver OR Purchasing Staff) and selected item count >= 2.
 - **Database**: Transaction ensures atomicity of split operation.
 
 **Valid Item Statuses for Split**: Pending, In-progress, Approved, Returned
 
-**Error Code**: VAL-PR-405A (Permission), VAL-PR-405B (Minimum Items)
+**Allowed Roles**: Approver, Department Manager, Finance Manager, General Manager, Purchasing Staff, Purchaser, Procurement Manager
+
+**Error Code**: VAL-PR-405A (Permission), VAL-PR-405B (Minimum Items), VAL-PR-405C (Split Reason)
 **Error Messages**:
-- VAL-PR-405A: "Only Purchasing Staff can split items"
+- VAL-PR-405A: "You do not have permission to split items"
 - VAL-PR-405B: "At least 2 items must be selected to split"
+- VAL-PR-405C: "Split reason is required when creating split PR"
 **User Action**:
-- VAL-PR-405A: Contact purchasing staff
+- VAL-PR-405A: Contact approver or purchasing staff
 - VAL-PR-405B: Select at least 2 items before splitting
+- VAL-PR-405C: Select a split reason (approval_status, vendor, delivery_date, manual)
 
 **Test Cases**:
 - ✅ Valid: Purchasing Staff splits 5 items by vendor → New PRs created
 - ✅ Valid: Purchasing Staff splits 2 items by date → 2 new PRs created
-- ❌ Invalid: Approver attempts split → 403 Permission denied
+- ✅ Valid: Approver splits 3 items by approval status → Approved items in original, returned items in new PR
+- ✅ Valid: Department Manager splits PR during approval → Two PRs created with parent_pr_id link
+- ❌ Invalid: Requestor attempts split → 403 Permission denied
 - ❌ Invalid: Only 1 item selected → "At least 2 items must be selected to split"
+- ❌ Invalid: No split reason provided → "Split reason is required"
 
 ---
 
@@ -2429,6 +2437,74 @@ This section defines validation rules for bulk item actions within a purchase re
 
 ---
 
+### VAL-PR-410: Approver Split by Approval Status
+
+**Validation Rule**: When Approver splits by approval status, items must be distributed between at least two groups (approved vs returned). Return reason is required for returned items.
+
+**When Validated**: Before confirming split action
+
+**Implementation Requirements**:
+- **Client-Side**: Validate at least one item in each group. Validate return reason length >= 10.
+- **Server-Side**: Verify item distribution. Create parent_pr_id link. Set split_reason = 'approval_status'.
+- **Database**: Transaction ensures both PRs created atomically. parent_pr_id constraint.
+
+**Allowed Split Reasons**: approval_status, vendor, delivery_date, manual
+
+**Error Code**: VAL-PR-410A (Distribution), VAL-PR-410B (Return Reason), VAL-PR-410C (Invalid Split Reason)
+**Error Messages**:
+- VAL-PR-410A: "Items must be distributed between at least two groups"
+- VAL-PR-410B: "Return reason must be at least 10 characters for returned items"
+- VAL-PR-410C: "Invalid split reason. Must be one of: approval_status, vendor, delivery_date, manual"
+**User Action**:
+- VAL-PR-410A: Assign items to both 'Approved' and 'Return' groups
+- VAL-PR-410B: Provide a more detailed return reason
+- VAL-PR-410C: Select a valid split reason
+
+**Test Cases**:
+- ✅ Valid: Approver puts 2 items in Approved, 1 in Return with valid reason → Split successful
+- ✅ Valid: Department Manager splits with return reason of 15 chars → Split successful
+- ❌ Invalid: All items assigned to Approved group → "Items must be distributed between at least two groups"
+- ❌ Invalid: Return reason is 5 chars → "Return reason must be at least 10 characters"
+- ❌ Invalid: Missing split_reason → "Invalid split reason"
+
+---
+
+### VAL-PR-411: Role-Based Field Visibility
+
+**Validation Rule**: Approvers can view vendor/pricing fields in read-only mode but cannot edit them. Only Approved Quantity is editable by Approvers.
+
+**When Validated**: On page load and field interaction
+
+**Implementation Requirements**:
+- **Client-Side**: Render fields as read-only for Approvers except Approved Quantity.
+- **Server-Side**: Reject any update attempts to restricted fields from Approver role.
+- **Database**: Check constraint on role permissions.
+
+**Field Visibility Matrix**:
+
+| Field | Requestor | Approver | Purchasing Staff |
+|-------|-----------|----------|------------------|
+| Vendor | ❌ Hidden | 👁️ Read-only | ✅ Editable |
+| Unit Price | ❌ Hidden | 👁️ Read-only | ✅ Editable |
+| Approved Quantity | ❌ Hidden | ✅ Editable | ✅ Editable |
+| Discount | ❌ Hidden | 👁️ Read-only | ✅ Editable |
+| FOC | ❌ Hidden | 👁️ Read-only | ✅ Editable |
+| Budget Code | ❌ Hidden | 👁️ Read-only | ✅ Editable |
+
+Legend: ✅ = Editable | 👁️ = Read-only (visible) | ❌ = Hidden
+
+**Error Code**: VAL-PR-411
+**Error Message**: "You do not have permission to edit this field"
+**User Action**: Contact purchasing staff to modify vendor/pricing fields
+
+**Test Cases**:
+- ✅ Valid: Approver modifies approved quantity → Update successful
+- ✅ Valid: Approver views unit price (read-only) → Field displayed, not editable
+- ❌ Invalid: Approver attempts to edit unit price → 403 Permission denied
+- ❌ Invalid: Approver attempts to change vendor → 403 Permission denied
+
+---
+
 ### Bulk Action Validation Summary
 
 | Code | Rule Name | Fields | Type | Client | Server | DB | Priority |
@@ -2437,11 +2513,13 @@ This section defines validation rules for bulk item actions within a purchase re
 | VAL-PR-402 | Bulk Approve Permission | role, item_status | Permission | ✅ | ✅ | ✅ | Critical |
 | VAL-PR-403 | Bulk Reject Permission/Comment | role, reason | Permission | ✅ | ✅ | ✅ | Critical |
 | VAL-PR-404 | Bulk Return Permission/Comment | role, reason | Permission | ✅ | ✅ | ✅ | Critical |
-| VAL-PR-405 | Split Items | role, item_count | Permission | ✅ | ✅ | ✅ | High |
+| VAL-PR-405 | Split Items | role, item_count, split_reason | Permission | ✅ | ✅ | ✅ | High |
 | VAL-PR-406 | Set Date Required | date, pr_status | Field | ✅ | ✅ | ✅ | High |
 | VAL-PR-407 | Invalid Items Warning | item_status | Business | ✅ | ✅ | ❌ | Medium |
 | VAL-PR-408 | Concurrent Modification | updated_at | Integrity | ❌ | ✅ | ✅ | Critical |
 | VAL-PR-409 | Performance | response_time | Performance | ✅ | ✅ | ✅ | Medium |
+| VAL-PR-410 | Approver Split by Status | item_groups, return_reason | Business | ✅ | ✅ | ✅ | High |
+| VAL-PR-411 | Role-Based Field Visibility | role, field | Permission | ✅ | ✅ | ✅ | Critical |
 
 ---
 

@@ -1,8 +1,8 @@
 # Shared Method: Inventory Operations
 
 ## Document Information
-- **Version**: 1.0.0
-- **Last Updated**: 2025-01-12
+- **Version**: 1.0.1
+- **Last Updated**: 2025-12-03
 - **Status**: Active
 - **Maintained By**: Architecture Team
 
@@ -15,6 +15,7 @@
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.0.1 | 2025-12-03 | Documentation Team | Added Credit Note (CN) module to integration table |
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
@@ -37,6 +38,7 @@ The **Inventory Operations** shared method provides centralized, consistent func
 
 | Module | Use Cases | Integration Points |
 |--------|-----------|-------------------|
+| **Credit Note (CN)** | Vendor returns, pricing adjustments | Stock movement generation, FIFO costing, journal entries, audit logging |
 | **Inventory Transactions** | GRN, Issues, Transfers, Adjustments | Balance updates, transaction recording, GL posting |
 | **Fractional Inventory** | Split, Combine, Prepare, Portion operations | Stock tracking, conversion recording, quality management |
 | **Store Operations** | Requisitions, wastage tracking | Stock deductions, allocation management |

@@ -4,14 +4,16 @@
 - **Module**: Procurement
 - **Sub-Module**: Goods Received Note (GRN)
 - **Route**: `/procurement/goods-received-note`
-- **Version**: 1.0.0
-- **Last Updated**: 2025-01-11
+- **Version**: 1.0.2
+- **Last Updated**: 2025-12-03
 - **Owner**: Procurement Team
 - **Status**: Approved
 
 ## Document History
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.0.2 | 2025-12-03 | Documentation Team | Added context for inventory costing methods (FIFO or Periodic Average) used for inventory valuation |
+| 1.0.1 | 2025-12-03 | Documentation Team | Verified coverage against BR requirements (FR-GRN-001 to FR-GRN-017) |
 | 1.0.0 | 2025-01-11 | Documentation Team | Initial version from source code analysis |
 
 ---
@@ -1603,6 +1605,7 @@ Current mock implementation loads all data immediately:
 - Inventory receives: Item IDs, received quantities, storage locations, costs
 - Stock movements generated with from/to locations
 - Inventory levels updated in target locations
+- Inventory layers created with unit cost for valuation (used by system-configured costing method: FIFO or Periodic Average)
 
 **Trigger Points**:
 - GRN status changes to COMMITTED

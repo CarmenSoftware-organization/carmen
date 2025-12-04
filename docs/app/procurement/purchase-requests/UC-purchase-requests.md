@@ -3,8 +3,8 @@
 **Module**: Procurement
 **Sub-Module**: Purchase Requests
 **Document Type**: Use Cases (UC)
-**Version**: 1.6.0
-**Last Updated**: 2025-11-28
+**Version**: 1.7.0
+**Last Updated**: 2025-12-03
 **Status**: Active
 
 ## Document History
@@ -18,6 +18,7 @@
 | 1.4.0 | 2025-11-28 | Development Team | Enhanced UC-PR-002 with Returned status as editable, added detailed sub-flows for Add/Edit/Remove line items, added Requestor Editable Fields matrix |
 | 1.5.0 | 2025-11-28 | Development Team | Added UC-PR-021: Bulk Item Actions for line-item level bulk operations (Approve Selected, Reject Selected, Return Selected, Split, Set Date Required) |
 | 1.6.0 | 2025-11-28 | Development Team | Added UC-PR-022: Budget Tab CRUD Operations for managing budget allocations within Purchase Requests |
+| 1.7.0 | 2025-12-03 | Development Team | Extended Split capability to Approvers; added UC-PR-023: Approver Split by Approval Status; added role-based field visibility for Approvers |
 
 ## Implementation Status
 
@@ -3628,7 +3629,7 @@ Allows authorized users to select multiple line items within a purchase request 
 | Approve Selected | ❌ | ✅ | ✅ | Items: Pending/In-progress |
 | Reject Selected | ❌ | ✅ | ✅ | Items: Pending/In-progress |
 | Return Selected | ❌ | ✅ | ✅ | Items: Pending/In-progress/Approved |
-| Split | ❌ | ❌ | ✅ | Min 2 items, PR: In-progress/Approved |
+| Split | ❌ | ✅ | ✅ | Min 2 items, PR: In-progress/Approved |
 | Set Date Required | ✅ (Draft/Void/Returned) | ✅ | ✅ | Date >= today |
 
 #### UI Specifications
@@ -3924,6 +3925,171 @@ Allows authorized users (Finance Manager, Purchasing Staff) to manage budget all
 - FR-PR-027: Budget Tab CRUD Operations
 - FR-PR-004: Budget Control
 - BR-PR-066 to BR-PR-076: Budget Tab CRUD Rules
+
+---
+
+### UC-PR-023: Approver Split by Approval Status
+
+**Priority**: High | **Status**: 🚧 Pending
+**Actor**: Approver (Department Manager, Finance Manager, General Manager)
+**Goal**: Split a Purchase Request to separate approved items from items that need revision, enabling parallel processing
+
+#### Use Case Diagram
+
+```mermaid
+graph TB
+    subgraph Actors
+        Approver([👤 Approver])
+    end
+
+    subgraph "Purchase Request System"
+        UC023((UC-PR-023<br/>Approver Split<br/>by Status))
+        UC005((UC-PR-005<br/>Approve PR))
+        UC018((UC-PR-018<br/>Return PR))
+    end
+
+    Approver --> UC023
+    UC023 -.->|extends| UC005
+    UC023 -.->|extends| UC018
+```
+
+#### Preconditions
+1. Approver is logged in with valid session
+2. PR status is "In-progress"
+3. PR has at least 2 items
+4. At least one item should be approved and at least one should be returned
+5. Approver has approval authority for the PR
+
+#### Postconditions
+1. Original PR contains only approved items with status "Approved" or "In-progress" (to next approver)
+2. New PR created with returned items and status "Returned"
+3. New PR linked to original via `parent_pr_id`
+4. Both PRs have activity logged
+5. Requestor notified about the returned PR
+
+#### Main Flow
+
+| Step | Actor | Action | System Response |
+|------|-------|--------|-----------------|
+| 1 | Approver | Opens PR detail page | System displays PR with all items |
+| 2 | Approver | Reviews items and identifies which to approve vs return | System displays item list with status indicators |
+| 3 | Approver | Selects items to split (min 2 required) | System enables Split button |
+| 4 | Approver | Clicks "Split" button | System displays Split Dialog |
+| 5 | Approver | Selects "By Approval Status" split option | System shows item categorization interface |
+| 6 | Approver | Assigns items to "Approved" or "Return for Revision" groups | System updates preview of resulting PRs |
+| 7 | Approver | Enters return reason for returned items (min 10 chars) | System validates input |
+| 8 | Approver | Reviews split preview showing both resulting PRs | System displays summary |
+| 9 | Approver | Clicks "Confirm Split" | System processes split |
+| 10 | System | Creates new PR for returned items | New PR created with parent_pr_id set |
+| 11 | System | Updates original PR with only approved items | Original PR updated |
+| 12 | System | Sets original PR items to "Approved" status | Items updated |
+| 13 | System | Sets new PR status to "Returned" | Status updated |
+| 14 | System | Logs activity on both PRs | Audit trail created |
+| 15 | System | Sends notification to Requestor about returned items | Notification sent |
+| 16 | System | Displays success message with links to both PRs | Approver sees confirmation |
+
+#### Alternative Flows
+
+**A1: Split by Vendor** (Step 5)
+5a. Approver selects "By Vendor" split option
+5b. System groups items by vendor
+5c. Continue from step 8
+
+**A2: Split by Delivery Date** (Step 5)
+5a. Approver selects "By Delivery Date" split option
+5b. System groups items by delivery date
+5c. Continue from step 8
+
+**A3: Cancel Split** (Any step before 9)
+Xa. Approver clicks Cancel
+Xb. System closes dialog without changes
+Xc. Use case ends
+
+#### Exception Flows
+
+**E1: Minimum Items Not Met** (Step 3)
+3a. Only 1 item selected
+3b. System keeps Split button disabled
+3c. Tooltip shows "Minimum 2 items required for split"
+
+**E2: Single Group After Split** (Step 6)
+6a. All items assigned to same group
+6b. System shows validation error
+6c. Message: "Items must be distributed between at least two groups"
+
+**E3: Return Reason Too Short** (Step 7)
+7a. Return reason less than 10 characters
+7b. System shows validation error
+7c. Message: "Return reason must be at least 10 characters"
+
+**E4: Network Error During Split** (Step 9)
+9a. API call fails
+9b. System shows error message
+9c. No changes made (transaction rollback)
+9d. Approver can retry
+
+#### Role-Based Field Visibility During Review
+
+When Approvers view PR items before splitting:
+
+| Field | Visibility | Editable |
+|-------|------------|----------|
+| Item Description | 👁️ Read-only | No |
+| Requested Quantity | 👁️ Read-only | No |
+| Approved Quantity | ✅ Editable | Yes |
+| Vendor | 👁️ Read-only | No |
+| Unit Price | 👁️ Read-only | No |
+| Discount | 👁️ Read-only | No |
+| FOC (Free of Charge) | 👁️ Read-only | No |
+| Budget Code | 👁️ Read-only | No |
+
+Legend: ✅ = Editable | 👁️ = Read-only (visible) | ❌ = Hidden
+
+#### UI Specifications
+
+**Split Dialog**:
+```
+┌────────────────────────────────────────────────────────────────┐
+│ Split Purchase Request                                    [X]  │
+├────────────────────────────────────────────────────────────────┤
+│ Split Option: ○ By Approval Status                             │
+│               ○ By Vendor                                      │
+│               ○ By Delivery Date                               │
+├────────────────────────────────────────────────────────────────┤
+│ Item Assignment:                                               │
+│ ┌────────────────────────────────────────────────────────────┐ │
+│ │ □ Item 1 - Office Supplies    [Approve ▼] [Return ▼]       │ │
+│ │ □ Item 2 - Kitchen Equipment  [Approve ▼] [Return ▼]       │ │
+│ │ □ Item 3 - Cleaning Products  [Approve ▼] [Return ▼]       │ │
+│ └────────────────────────────────────────────────────────────┘ │
+├────────────────────────────────────────────────────────────────┤
+│ Return Reason (required for returned items):                   │
+│ ┌────────────────────────────────────────────────────────────┐ │
+│ │ Please provide more detailed specifications...             │ │
+│ └────────────────────────────────────────────────────────────┘ │
+├────────────────────────────────────────────────────────────────┤
+│ Preview:                                                       │
+│ PR-2025-0042 (Original): 2 items → Approved                    │
+│ PR-2025-0043 (New): 1 item → Returned to Requestor             │
+├────────────────────────────────────────────────────────────────┤
+│                              [Cancel]  [Confirm Split]         │
+└────────────────────────────────────────────────────────────────┘
+```
+
+#### Business Rules
+- BR-PR-SPLIT-001: Approvers can split PRs during approval workflow
+- BR-PR-SPLIT-002: Split by Approval Status creates parent-child PR relationship
+- BR-PR-SPLIT-003: Original PR proceeds with approved items only
+- BR-PR-SPLIT-004: New PR inherits header details but has "Returned" status
+- BR-PR-SPLIT-005: Requestor can edit and resubmit the returned PR
+- BR-PR-SPLIT-006: Both PRs maintain link via parent_pr_id for traceability
+- BR-PR-SPLIT-007: Activity log tracks split action with user and timestamp
+
+#### Related Requirements
+- FR-PR-016.2: Approver Split Capability
+- FR-PR-005A: Workflow Actions by Role
+- BR-PR-BULK-005: Split maintains audit trail
+- DD: parent_pr_id, split_reason fields
 
 ---
 

@@ -4,6 +4,7 @@
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.0.1 | 2025-12-03 | Documentation Team | Added Module Integration section with Credit Note references |
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 
 ## Overview
@@ -24,6 +25,16 @@ Shared methods serve as:
 |--------|---------|------------------|---------------|
 | [Inventory Valuation](./inventory-valuation/SM-inventory-valuation.md) | Calculate inventory costs using FIFO or Periodic Average | `/lib/services/db/inventory-valuation-service.ts` | [View](./inventory-valuation/) |
 | [Inventory Operations](./inventory-operations/SM-inventory-operations.md) | Standardized inventory operations: balance tracking, transaction recording, state management | `/lib/services/db/inventory-*-service.ts` | [View](./inventory-operations/) |
+
+## Module Integration
+
+The following modules integrate with shared methods:
+
+| Module | Location | Services Used | Integration Example |
+|--------|----------|---------------|---------------------|
+| [Credit Note (CN)](../procurement/credit-note/) | `/app/(main)/procurement/credit-note` | Inventory Valuation (FIFO costing), Transaction Recording, Audit Trail, State Management, Atomic Transaction | [credit-note-integration.md](./inventory-valuation/examples/credit-note-integration.md) |
+| GRN (Goods Receive Note) | `/app/(main)/procurement/grn` | Inventory Valuation, Transaction Recording, Location Management | See SM-inventory-operations.md |
+| Inventory Adjustment | `/app/(main)/inventory-management` | Balance Service, Transaction Recording, Audit Trail | See SM-inventory-operations.md |
 
 ## When to Use Shared Methods
 
@@ -98,5 +109,5 @@ For questions or clarifications:
 
 ---
 
-**Last Updated**: 2025-11-02
+**Last Updated**: 2025-12-03
 **Maintained By**: Architecture Team

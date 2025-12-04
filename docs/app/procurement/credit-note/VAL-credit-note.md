@@ -3,15 +3,20 @@
 **Module**: Procurement
 **Sub-Module**: Credit Note
 **Document Type**: Validations (VAL)
-**Version**: 1.0.0
-**Last Updated**: 2025-11-01
+**Version**: 1.0.4
+**Last Updated**: 2025-12-03
 **Status**: Active
 
 ## Document History
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.0.4 | 2025-12-03 | Documentation Team | Updated to support configurable costing method (FIFO or Periodic Average) per system settings |
+| 1.0.3 | 2025-12-03 | Documentation Team | Added Shared Method references to VAL-CN-700 and VAL-CN-715 |
+| 1.0.2 | 2025-12-03 | Documentation Team | Added backend system validations (VAL-CN-700 to VAL-CN-799) |
+| 1.0.1 | 2025-12-03 | Documentation Team | Document history update for consistency across documentation set |
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
+
 ---
 
 ## 1. Overview
@@ -20,7 +25,7 @@
 This document defines comprehensive validation rules for the Credit Note module to ensure data integrity, enforce business rules, maintain financial accuracy, and provide a consistent user experience. Credit Note validation is critical because:
 
 - **Financial Impact**: Credit notes affect vendor payables, inventory valuation, and general ledger accounts
-- **Cost Accuracy**: FIFO costing calculations require precise lot tracking and quantity validation
+- **Cost Accuracy**: Inventory costing calculations (FIFO or Periodic Average) require precise lot tracking and quantity validation
 - **Tax Compliance**: Input VAT adjustments must be calculated correctly for tax reporting
 - **Audit Requirements**: Credit notes are legal documents requiring accurate data for financial audits
 - **Inventory Control**: Quantity returns trigger stock movements that must be validated
@@ -52,7 +57,7 @@ Data Stored
 4. Prevent security vulnerabilities (SQL injection, XSS)
 5. Enforce business rules consistently
 6. Validate data integrity across related entities
-7. Enforce FIFO costing rules for quantity returns
+7. Enforce inventory costing rules for quantity returns (FIFO or Periodic Average per system configuration)
 
 ---
 
@@ -440,8 +445,8 @@ Data Stored
 **Rationale**: Represents financial impact calculated as (return amount - cost of goods sold). Can be gain (positive) or loss (negative).
 
 **Implementation Requirements**:
-- **Client-Side**: Auto-calculate for quantity returns from FIFO cost analysis. Display as read-only. Allow null for amount discounts.
-- **Server-Side**: Optional field. If provided, verify calculation is correct based on FIFO costing.
+- **Client-Side**: Auto-calculate for quantity returns from inventory cost analysis. Display as read-only. Allow null for amount discounts.
+- **Server-Side**: Optional field. If provided, verify calculation is correct based on system-configured costing method.
 - **Database**: Column allows NULL. No constraints on positive/negative values.
 
 **Error Code**: VAL-CN-015
@@ -592,16 +597,16 @@ Data Stored
 **Database Column**: `credit_note_items.cost_variance`
 **Data Type**: DECIMAL(15,2) / number
 
-**Validation Rule**: For quantity returns, cost variance should be calculated as (current cost - FIFO weighted cost).
+**Validation Rule**: For quantity returns, cost variance should be calculated as (current cost - calculated cost) using system-configured costing method.
 
 **Implementation Requirements**:
-- **Client-Side**: Auto-calculate from FIFO cost analysis for quantity returns. Display as read-only. Allow null for amount discounts.
-- **Server-Side**: For quantity returns, verify calculation is correct based on FIFO costing. Allow null for amount discounts.
+- **Client-Side**: Auto-calculate from inventory cost analysis for quantity returns. Display as read-only. Allow null for amount discounts.
+- **Server-Side**: For quantity returns, verify calculation is correct based on system-configured costing method. Allow null for amount discounts.
 - **Database**: Column allows NULL. No constraints on positive/negative values.
 
 **Error Code**: VAL-CN-021
 **Error Message**: "Invalid cost variance calculation"
-**User Action**: System automatically calculates based on FIFO analysis. User reviews for accuracy.
+**User Action**: System automatically calculates based on inventory cost analysis. User reviews for accuracy.
 
 **Test Cases**:
 - ✅ Valid: 50.00 (positive variance - cost increased)
@@ -720,7 +725,7 @@ Data Stored
 **Database Column**: `credit_note_applied_lots.lot_number`
 **Data Type**: VARCHAR(50) / string
 
-**Validation Rule**: For quantity return items, lot number is mandatory for FIFO tracking.
+**Validation Rule**: For quantity return items, lot number is mandatory for inventory costing and tracking.
 
 **Implementation Requirements**:
 - **Client-Side**: Display red asterisk (*) for quantity returns. Auto-populate from lot selection. Show error if empty.
@@ -766,7 +771,7 @@ Data Stored
 
 ---
 
-### VAL-CN-028: Applied Lot - Unit Cost Required for FIFO
+### VAL-CN-028: Applied Lot - Unit Cost Required for Costing
 
 **Field**: `unitCost` (in AppliedLot)
 **Database Column**: `credit_note_applied_lots.unit_cost`
@@ -899,7 +904,7 @@ Data Stored
 
 **Rule**: For QUANTITY_RETURN type, each line item with cnQty > 0 must have corresponding applied lots.
 
-**Rationale**: FIFO costing requires lot-level tracking for all quantity returns.
+**Rationale**: Inventory costing (FIFO or Periodic Average) requires lot-level tracking for all quantity returns.
 
 **Implementation Requirements**:
 - **Client-Side**: Show lot selection dialog for quantity returns. Validate total lot quantities = cnQty before save.
@@ -907,7 +912,7 @@ Data Stored
 - **Database**: No direct constraint. Enforced at application level.
 
 **Error Code**: VAL-CN-102
-**Error Message**: "Quantity returns must have lot selection for FIFO costing"
+**Error Message**: "Quantity returns must have lot selection for inventory costing"
 **User Action**: User must select inventory lots for each item being returned.
 
 **Test Cases**:
@@ -922,7 +927,7 @@ Data Stored
 
 **Rule**: For AMOUNT_DISCOUNT type, lot selection is not required and should be empty.
 
-**Rationale**: Amount discounts are pricing adjustments without physical returns, so FIFO lot tracking not needed.
+**Rationale**: Amount discounts are pricing adjustments without physical returns, so inventory lot tracking not needed.
 
 **Implementation Requirements**:
 - **Client-Side**: Hide lot selection for amount discounts. Do not allow lot assignment.
@@ -1030,20 +1035,22 @@ Data Stored
 
 ---
 
-### VAL-CN-108: FIFO Weighted Average Cost Calculation
+### VAL-CN-108: Inventory Cost Calculation
 
-**Rule**: For quantity returns, FIFO weighted average cost must be calculated correctly from selected lots.
+**Rule**: For quantity returns, inventory cost must be calculated correctly using the configured costing method (FIFO or Periodic Average).
 
-**Rationale**: Ensures accurate cost variance and realized gain/loss calculations for financial reporting.
+**Rationale**: Ensures accurate cost variance and realized gain/loss calculations for financial reporting using the system-configured costing method.
 
 **Implementation Requirements**:
-- **Client-Side**: Display FIFO calculation breakdown showing: lot quantities, unit costs, weighted average, variance.
-- **Server-Side**: Verify calculation: weighted_avg_cost = SUM(lot.quantity * lot.unitCost) / SUM(lot.quantity). Verify cost_variance = current_cost - weighted_avg_cost.
+- **Client-Side**: Display cost calculation breakdown showing: costing method used, unit costs, calculated cost, variance.
+- **Server-Side**:
+  - For FIFO: Verify calculation: weighted_avg_cost = SUM(lot.quantity * lot.unitCost) / SUM(lot.quantity). Verify cost_variance = current_cost - weighted_avg_cost.
+  - For Periodic Average: Verify calculation: avg_cost = Total Inventory Value in Period / Total Quantity in Period. Verify cost_variance = current_cost - avg_cost.
 - **Database**: No direct constraint. Calculated values stored for audit trail.
 
 **Error Code**: VAL-CN-108
-**Error Message**: "FIFO weighted average cost calculation is incorrect"
-**User Action**: System automatically calculates FIFO cost. User reviews calculation for accuracy.
+**Error Message**: "Inventory cost calculation is incorrect"
+**User Action**: System automatically calculates cost using configured method. User reviews calculation for accuracy.
 
 **Test Cases**:
 - ✅ Valid: Lot1(qty=30, cost=$10) + Lot2(qty=20, cost=$12) = weighted avg $10.80
@@ -1575,6 +1582,500 @@ Data Stored
 
 ---
 
+## 8. Backend System Validations (VAL-CN-700 to 799)
+
+The following validations are implemented at the server action layer to enforce backend requirements (BR-BE-001 through BR-BE-014) for atomic database transactions, data integrity, and system integration.
+
+### VAL-CN-700: Atomic Transaction Requirement
+
+**Rule**: All credit note CRUD operations must execute within atomic database transactions with Serializable isolation level.
+
+**Related Backend Requirement**: BR-BE-001 (CRUD Operations)
+
+**Shared Method Reference**: Follows Atomic Transaction Service patterns from [SM-inventory-operations.md#3.6](../../shared-methods/inventory-operations/SM-inventory-operations.md) for consistent transaction management across modules.
+
+**Rationale**: Prevents partial updates and ensures data consistency across concurrent operations.
+
+**Implementation Requirements**:
+- **Server-Side**: Wrap all database operations in transaction with Serializable isolation
+- **Server-Side**: Acquire pessimistic locks on affected records before modification
+- **Server-Side**: Rollback entire transaction if any operation fails
+- **Database**: Support transaction isolation levels and row-level locking
+
+**Error Code**: VAL-CN-700
+**Error Message**: "Transaction failed. Changes have been rolled back."
+**User Action**: Retry operation. If error persists, contact support.
+
+**Test Cases**:
+- ✅ Valid: All operations complete within single transaction
+- ❌ Invalid: Partial update committed before transaction failure
+- ❌ Invalid: Transaction commits with missing related records
+
+---
+
+### VAL-CN-701: Pessimistic Lock Acquisition
+
+**Rule**: Server actions must acquire exclusive locks before updating or deleting credit note records.
+
+**Related Backend Requirement**: BR-BE-001 (CRUD Operations)
+
+**Rationale**: Prevents concurrent modification conflicts and ensures data consistency.
+
+**Implementation Requirements**:
+- **Server-Side**: Acquire SELECT FOR UPDATE lock on credit note record
+- **Server-Side**: Implement lock timeout (5 seconds default)
+- **Server-Side**: Handle lock contention with retry strategy
+- **Server-Side**: Release locks on transaction completion (commit or rollback)
+
+**Error Code**: VAL-CN-701
+**Error Message**: "Record is being modified by another user. Please try again."
+**User Action**: Wait a moment and retry the operation.
+
+**Test Cases**:
+- ✅ Valid: Lock acquired and released successfully
+- ❌ Invalid: Lock timeout exceeded (concurrent modification)
+- ❌ Invalid: Deadlock detected between transactions
+
+---
+
+### VAL-CN-702: Vendor Fetch Validation
+
+**Rule**: Vendor fetch operations must return only active vendors with credit note permissions.
+
+**Related Backend Requirement**: BR-BE-002 (Vendor and GRN Fetch)
+
+**Implementation Requirements**:
+- **Server-Side**: Filter vendors by is_active = true
+- **Server-Side**: Verify vendor has credit_note_enabled permission
+- **Server-Side**: Return paginated results for large datasets
+- **Server-Side**: Cache results with 5-minute TTL for performance
+
+**Error Code**: VAL-CN-702
+**Error Message**: "Vendor not found or not eligible for credit notes"
+**User Action**: Select a different vendor or contact administrator.
+
+**Test Cases**:
+- ✅ Valid: Active vendor with credit note permission returned
+- ❌ Invalid: Inactive vendor excluded from results
+- ❌ Invalid: Vendor without credit note permission excluded
+
+---
+
+### VAL-CN-703: GRN Data Fetch Validation
+
+**Rule**: GRN fetch operations must return only posted GRNs for the selected vendor with available inventory lots.
+
+**Related Backend Requirement**: BR-BE-002 (Vendor and GRN Fetch)
+
+**Implementation Requirements**:
+- **Server-Side**: Filter GRNs by status = 'POSTED' or 'COMMITTED'
+- **Server-Side**: Filter by vendor_id match
+- **Server-Side**: Join with inventory_lots table for quantity availability
+- **Server-Side**: Calculate available_quantity = received_qty - credited_qty
+
+**Error Code**: VAL-CN-703
+**Error Message**: "No eligible GRNs found for this vendor"
+**User Action**: Verify vendor has posted GRNs with available items.
+
+**Test Cases**:
+- ✅ Valid: Posted GRNs with available lots returned
+- ❌ Invalid: Draft GRN excluded
+- ❌ Invalid: Voided GRN excluded
+- ❌ Invalid: Fully credited GRN items excluded
+
+---
+
+### VAL-CN-704: Commitment Transaction Atomicity
+
+**Rule**: Credit note commitment must execute as a single atomic transaction including status update, journal entries, stock movements, and vendor balance update.
+
+**Related Backend Requirement**: BR-BE-003 (Commitment Transaction)
+
+**Implementation Requirements**:
+- **Server-Side**: Begin transaction with Serializable isolation
+- **Server-Side**: Acquire exclusive lock on credit note
+- **Server-Side**: Execute in sequence: Inventory cost calculation → Journal entries → Stock movements → Vendor balance → Status update → Audit log
+- **Server-Side**: Rollback entire transaction if any step fails
+- **Server-Side**: Commit only when all steps succeed
+
+**Error Code**: VAL-CN-704
+**Error Message**: "Commitment failed. All changes have been rolled back."
+**User Action**: Review validation errors and retry.
+
+**Test Cases**:
+- ✅ Valid: All commitment steps complete successfully
+- ❌ Invalid: Journal entry fails, entire transaction rolled back
+- ❌ Invalid: Stock movement fails, no changes committed
+- ❌ Invalid: Vendor balance update fails, credit note remains DRAFT
+
+---
+
+### VAL-CN-705: Pre-Commitment Validation
+
+**Rule**: Before commitment, system must validate status is DRAFT, accounting period is open, GL accounts are configured, and vendor is active.
+
+**Related Backend Requirement**: BR-BE-003 (Commitment Transaction)
+
+**Implementation Requirements**:
+- **Server-Side**: Verify credit_note.status = 'DRAFT'
+- **Server-Side**: Verify accounting period for document date is not closed
+- **Server-Side**: Verify all required GL accounts exist (AP, Inventory, VAT, Cost Variance)
+- **Server-Side**: Verify vendor.is_active = true and not on_hold
+
+**Error Code**: VAL-CN-705
+**Error Message**: "Pre-commitment validation failed: [specific reason]"
+**User Action**: Fix validation errors before attempting commitment.
+
+**Test Cases**:
+- ✅ Valid: All pre-commitment checks pass
+- ❌ Invalid: Status is COMMITTED (already committed)
+- ❌ Invalid: Accounting period is closed
+- ❌ Invalid: GL account not configured
+- ❌ Invalid: Vendor is inactive or on hold
+
+---
+
+### VAL-CN-706: Void Transaction Atomicity
+
+**Rule**: Credit note void must execute as a single atomic transaction including reversing entries, inventory restoration, and vendor balance restoration.
+
+**Related Backend Requirement**: BR-BE-004 (Void Transaction)
+
+**Implementation Requirements**:
+- **Server-Side**: Begin transaction with Serializable isolation
+- **Server-Side**: Acquire exclusive lock on credit note
+- **Server-Side**: Verify no dependent transactions exist
+- **Server-Side**: Generate reversing journal entries
+- **Server-Side**: Generate reversing stock movements (for quantity returns)
+- **Server-Side**: Restore vendor payable balance
+- **Server-Side**: Update status to VOID with reason and timestamp
+- **Server-Side**: Commit only when all steps succeed
+
+**Error Code**: VAL-CN-706
+**Error Message**: "Void transaction failed. All changes have been rolled back."
+**User Action**: Review errors and retry. Contact support if issue persists.
+
+**Test Cases**:
+- ✅ Valid: All void steps complete successfully
+- ❌ Invalid: Dependent transactions exist, void rejected
+- ❌ Invalid: Reversing entry fails, no changes committed
+- ❌ Invalid: Inventory restoration fails, void rolled back
+
+---
+
+### VAL-CN-707: Void Reason Required
+
+**Rule**: Void operation must include a mandatory void reason for audit trail.
+
+**Related Backend Requirement**: BR-BE-004 (Void Transaction)
+
+**Implementation Requirements**:
+- **Server-Side**: Verify void_reason is provided and not empty
+- **Server-Side**: Validate void_reason minimum length (10 characters)
+- **Server-Side**: Store void_reason, voided_by, and voided_at in audit log
+
+**Error Code**: VAL-CN-707
+**Error Message**: "Void reason is required and must be at least 10 characters"
+**User Action**: Provide a detailed reason for voiding the credit note.
+
+**Test Cases**:
+- ✅ Valid: "Item was duplicated in another credit note" (specific reason)
+- ❌ Invalid: "" (empty reason)
+- ❌ Invalid: "Error" (too short, less than 10 characters)
+
+---
+
+### VAL-CN-708: Inventory Cost Calculation Data Validation
+
+**Rule**: Inventory cost calculation requires valid data based on the configured costing method (FIFO or Periodic Average).
+
+**Related Backend Requirement**: BR-BE-005 (Inventory Costing)
+
+**Implementation Requirements**:
+- **Server-Side (FIFO method)**: Verify all selected lots exist in inventory. Verify lot.unit_cost > 0 for each lot. Verify lot.receive_date is present. Calculate weighted average: SUM(qty × cost) / SUM(qty).
+- **Server-Side (Periodic Average method)**: Verify inventory transaction history exists for the period. Verify total quantity > 0 for the period. Calculate period average: Total Value / Total Quantity.
+- **Server-Side (Both methods)**: Calculate cost variance: current_cost - calculated_unit_cost.
+
+**Error Code**: VAL-CN-708
+**Error Message**: "Inventory cost calculation failed: [specific data issue]"
+**User Action**: For FIFO: Verify lot selections have valid cost data. For Periodic Average: Verify inventory transaction history exists. Contact support if data is missing.
+
+**Test Cases**:
+- ✅ Valid: All lots have valid costs and dates
+- ❌ Invalid: Lot cost data missing
+- ❌ Invalid: Lot not found in inventory
+- ❌ Invalid: Lot receive date missing
+
+---
+
+### VAL-CN-709: Tax Calculation Accuracy
+
+**Rule**: Tax calculations must use correct tax rate for document date and match line item calculations.
+
+**Related Backend Requirement**: BR-BE-006 (Tax Calculation)
+
+**Implementation Requirements**:
+- **Server-Side**: Retrieve tax rate effective for document date
+- **Server-Side**: Calculate: tax_amount = base_amount × tax_rate / 100
+- **Server-Side**: Round to 2 decimal places
+- **Server-Side**: Verify: header.tax_amount = SUM(line_item.tax_amount) within $0.01
+
+**Error Code**: VAL-CN-709
+**Error Message**: "Tax calculation mismatch. Please verify tax rate configuration."
+**User Action**: Verify tax rate is configured for the document date.
+
+**Test Cases**:
+- ✅ Valid: Tax calculations match within tolerance
+- ❌ Invalid: Header tax doesn't match line item sum
+- ❌ Invalid: Tax rate not configured for date
+- ❌ Invalid: Rounding error exceeds tolerance
+
+---
+
+### VAL-CN-710: Journal Entry Balance Validation
+
+**Rule**: Generated journal entries must have balanced debits and credits.
+
+**Related Backend Requirement**: BR-BE-007 (Journal Entry Generator)
+
+**Implementation Requirements**:
+- **Server-Side**: Calculate total debits from all entries
+- **Server-Side**: Calculate total credits from all entries
+- **Server-Side**: Verify: ABS(total_debits - total_credits) <= 0.01
+- **Server-Side**: Reject if entries are unbalanced
+
+**Error Code**: VAL-CN-710
+**Error Message**: "Journal entries are unbalanced. Debit/Credit difference: [amount]"
+**User Action**: System error. Contact support with credit note details.
+
+**Test Cases**:
+- ✅ Valid: DR $1000 = CR $1000 (balanced)
+- ✅ Valid: DR $1000.01 = CR $1000.00 (within tolerance)
+- ❌ Invalid: DR $1000 ≠ CR $900 (unbalanced)
+- ❌ Invalid: No journal entries generated
+
+---
+
+### VAL-CN-711: GL Account Configuration Validation
+
+**Rule**: All required GL accounts must be configured before journal entry generation.
+
+**Related Backend Requirement**: BR-BE-007 (Journal Entry Generator)
+
+**Implementation Requirements**:
+- **Server-Side**: Verify Accounts Payable account (2100) exists
+- **Server-Side**: Verify Inventory - Raw Materials account (1140) exists
+- **Server-Side**: Verify Input VAT account (1240) exists
+- **Server-Side**: Verify Cost Variance account (5200) exists
+
+**Error Code**: VAL-CN-711
+**Error Message**: "Missing GL account configuration: [account type]"
+**User Action**: Contact finance administrator to configure missing GL accounts.
+
+**Test Cases**:
+- ✅ Valid: All required GL accounts configured
+- ❌ Invalid: Accounts Payable account missing
+- ❌ Invalid: Inventory account missing
+- ❌ Invalid: VAT account missing
+
+---
+
+### VAL-CN-712: Stock Movement Validation
+
+**Rule**: Stock movements must have valid lot references, negative quantities, and correct location codes.
+
+**Related Backend Requirement**: BR-BE-008 (Stock Movement Generator)
+
+**Implementation Requirements**:
+- **Server-Side**: Verify lot exists in inventory for each movement
+- **Server-Side**: Generate negative quantity (return reduces inventory)
+- **Server-Side**: Verify location code is valid (INV or CON)
+- **Server-Side**: Apply calculated unit cost from inventory costing (FIFO or Periodic Average)
+
+**Error Code**: VAL-CN-712
+**Error Message**: "Stock movement validation failed: [specific issue]"
+**User Action**: Verify lot and location selections are valid.
+
+**Test Cases**:
+- ✅ Valid: Valid lot, negative quantity, correct location
+- ❌ Invalid: Lot not found
+- ❌ Invalid: Location code invalid
+- ❌ Invalid: Positive quantity (should be negative)
+
+---
+
+### VAL-CN-713: Inventory Balance Check
+
+**Rule**: Stock movements may result in negative inventory balances per policy configuration.
+
+**Related Backend Requirement**: BR-BE-008 (Stock Movement Generator)
+
+**Implementation Requirements**:
+- **Server-Side**: Check policy: allow_negative_inventory
+- **Server-Side**: If policy = false: reject if movement would cause negative balance
+- **Server-Side**: If policy = true: allow and log warning
+- **Server-Side**: Track lot-level balances, not just product-level
+
+**Error Code**: VAL-CN-713
+**Error Message**: "Insufficient inventory in lot [lot_number]. Available: [qty]"
+**User Action**: Reduce return quantity or select different lots.
+
+**Test Cases**:
+- ✅ Valid: Available quantity >= return quantity
+- ✅ Valid: Negative balance allowed by policy
+- ❌ Invalid: Negative balance not allowed by policy
+
+---
+
+### VAL-CN-714: Attachment File Validation
+
+**Rule**: Attachments must meet file type and size restrictions for secure storage.
+
+**Related Backend Requirement**: BR-BE-009 (Attachment Management)
+
+**Implementation Requirements**:
+- **Server-Side**: Validate MIME type against allowed list (PDF, JPG, PNG, XLSX, DOCX)
+- **Server-Side**: Validate file size <= 10MB
+- **Server-Side**: Scan for malware/viruses before storage
+- **Server-Side**: Generate unique storage key for each file
+
+**Error Code**: VAL-CN-714A / VAL-CN-714B
+**Error Message**:
+- A: "File type not allowed. Allowed: PDF, JPG, PNG, XLSX, DOCX"
+- B: "File size exceeds 10MB limit"
+**User Action**: Select a valid file type under 10MB.
+
+**Test Cases**:
+- ✅ Valid: PDF file, 5MB
+- ✅ Valid: PNG image, 2MB
+- ❌ Invalid: EXE file (blocked type)
+- ❌ Invalid: 15MB file (exceeds limit)
+
+---
+
+### VAL-CN-715: Audit Log Immutability
+
+**Rule**: Audit log entries must be append-only and immutable once created.
+
+**Related Backend Requirement**: BR-BE-010 (Audit Logging)
+
+**Shared Method Reference**: Follows Audit Trail Service patterns from [SM-inventory-operations.md#3.7](../../shared-methods/inventory-operations/SM-inventory-operations.md) for immutable audit logging with standardized event structure.
+
+**Implementation Requirements**:
+- **Server-Side**: Create audit record with timestamp, user, operation, changes
+- **Server-Side**: No UPDATE or DELETE operations allowed on audit table
+- **Server-Side**: Store sensitive data in masked format
+- **Server-Side**: Include IP address and session ID for traceability
+
+**Error Code**: VAL-CN-715
+**Error Message**: "Audit log modification attempted and blocked"
+**User Action**: Contact security administrator. Attempted modification logged.
+
+**Test Cases**:
+- ✅ Valid: Audit record created successfully (append)
+- ❌ Invalid: Attempt to update audit record (blocked)
+- ❌ Invalid: Attempt to delete audit record (blocked)
+
+---
+
+### VAL-CN-716: CN Number Sequence Validation
+
+**Rule**: CN numbers must follow format CN-YYYY-NNN, be unique, and gap-free within each year.
+
+**Related Backend Requirement**: BR-BE-011 (CN Number Generator)
+
+**Implementation Requirements**:
+- **Server-Side**: Acquire lock on sequence table before generation
+- **Server-Side**: If year changed: reset sequence to 1
+- **Server-Side**: If same year: increment sequence
+- **Server-Side**: Format: CN-{4-digit-year}-{3-digit-padded-sequence}
+- **Server-Side**: Verify uniqueness before returning
+
+**Error Code**: VAL-CN-716
+**Error Message**: "Failed to generate CN number. Please retry."
+**User Action**: Retry operation. If persists, contact support.
+
+**Test Cases**:
+- ✅ Valid: "CN-2025-001" (first of year)
+- ✅ Valid: "CN-2025-002" (sequential)
+- ✅ Valid: "CN-2026-001" (new year reset)
+- ❌ Invalid: Duplicate number generated
+- ❌ Invalid: Gap in sequence
+
+---
+
+### VAL-CN-717: Vendor Balance Update Validation
+
+**Rule**: Vendor balance updates must be atomic with commitment/void transaction.
+
+**Related Backend Requirement**: BR-BE-012 (Vendor Balance Update)
+
+**Implementation Requirements**:
+- **Server-Side**: Verify vendor account is active and not on_hold
+- **Server-Side**: For commit: reduce payable balance by total_amount
+- **Server-Side**: For void: restore payable balance by total_amount
+- **Server-Side**: Create vendor transaction record for audit
+
+**Error Code**: VAL-CN-717
+**Error Message**: "Failed to update vendor balance: [specific reason]"
+**User Action**: Verify vendor account status. Contact accounts payable.
+
+**Test Cases**:
+- ✅ Valid: Balance updated successfully on commit
+- ✅ Valid: Balance restored successfully on void
+- ❌ Invalid: Vendor account inactive
+- ❌ Invalid: Vendor account on hold
+
+---
+
+### VAL-CN-718: Comprehensive Data Validation
+
+**Rule**: All credit note data must pass schema, business rule, and cross-field validations before server action execution.
+
+**Related Backend Requirement**: BR-BE-013 (Data Validation)
+
+**Implementation Requirements**:
+- **Server-Side**: Schema validation: required fields, data types, formats
+- **Server-Side**: Business rule validation: quantities, amounts, status rules
+- **Server-Side**: Cross-field validation: totals match, currency consistent
+- **Server-Side**: Return all validation errors in single response
+
+**Error Code**: VAL-CN-718
+**Error Message**: "Validation failed: [list of specific errors]"
+**User Action**: Fix all listed validation errors and retry.
+
+**Test Cases**:
+- ✅ Valid: All validations pass
+- ❌ Invalid: Required field missing
+- ❌ Invalid: Total calculation mismatch
+- ❌ Invalid: Invalid currency code
+
+---
+
+### VAL-CN-719: Real-time Sync Cache Invalidation
+
+**Rule**: Cache must be invalidated within 500ms of any credit note state change.
+
+**Related Backend Requirement**: BR-BE-014 (Real-time Sync)
+
+**Implementation Requirements**:
+- **Server-Side**: On state change, immediately invalidate affected caches
+- **Server-Side**: Caches to invalidate: credit_note_list, credit_note_detail, vendor_balance, inventory_lots
+- **Server-Side**: Broadcast update event via WebSocket/SSE
+- **Server-Side**: Target latency: < 500ms from change to client update
+
+**Error Code**: VAL-CN-719
+**Error Message**: "Real-time sync delayed. Data may be stale."
+**User Action**: Refresh page to see latest data.
+
+**Test Cases**:
+- ✅ Valid: Cache invalidated within 500ms
+- ✅ Valid: Clients receive update notification
+- ⚠️ Warning: Sync delayed beyond 500ms (degraded performance)
+- ⚠️ Warning: WebSocket unavailable (polling fallback)
+
+---
+
 ## 9. Error Message Catalog
 
 ### Error Code Format
@@ -1587,6 +2088,7 @@ Data Stored
   - 400-449: Cross-field validations
   - 500-549: Security validations
   - 600-649: Data integrity validations
+  - 700-799: Backend system validations (Server Actions)
 
 ### Error Severity Levels
 - **Critical**: Prevents save/submission, must be fixed (field required, calculation errors)
@@ -1686,9 +2188,11 @@ Action Required: Reduce credit quantity to not exceed 100.000
 | Any | VOID | User void permission validation |
 | COMMITTED | VOID | Reversal entry generation validation |
 
-### Appendix D: FIFO Calculation Validation Example
+### Appendix D: Inventory Cost Calculation Validation Examples
 
-**Scenario**: Returning 100 units from two lots
+#### Example 1: FIFO Costing Method
+
+**Scenario**: Returning 100 units from two lots (System configured for FIFO)
 
 **Applied Lots**:
 - Lot 1: 60 units @ $10.00/unit = $600.00
@@ -1705,10 +2209,29 @@ Action Required: Reduce credit quantity to not exceed 100.000
 - ✅ Current inventory cost = $11.00
 - ✅ Cost variance = $11.00 - $10.80 = **$0.20/unit** or **$20.00 total**
 
+#### Example 2: Periodic Average Costing Method
+
+**Scenario**: Returning 100 units (System configured for Periodic Average)
+
+**Period Inventory Data** (Monthly):
+- Beginning Inventory: 500 units @ $9.50/unit = $4,750.00
+- Purchases during period: 300 units @ $11.00/unit = $3,300.00
+- Total Value: $4,750.00 + $3,300.00 = $8,050.00
+- Total Quantity: 500 + 300 = 800 units
+
+**Calculation**:
+- **Period Average Cost**: $8,050.00 / 800 = **$10.0625/unit**
+
+**Validation**:
+- ✅ Period inventory data exists
+- ✅ Period average = $10.0625
+- ✅ Current inventory cost = $11.00
+- ✅ Cost variance = $11.00 - $10.0625 = **$0.9375/unit** or **$93.75 total**
+
 ---
 
 **Document Control**:
-- **Version**: 1.0.0
+- **Version**: 1.0.4
 - **Status**: Active
 - **Review Frequency**: Quarterly
 - **Next Review**: 2025-05-01
@@ -1717,3 +2240,6 @@ Action Required: Reduce credit quantity to not exceed 100.000
 
 **Change Log**:
 - 2025-11-01: Initial version 1.0.0 created
+- 2025-12-03: Version 1.0.1 - Document history update
+- 2025-12-03: Version 1.0.2 - Added backend system validations (VAL-CN-700 to VAL-CN-799)
+- 2025-12-03: Version 1.0.4 - Updated to support configurable inventory costing methods (FIFO or Periodic Average)

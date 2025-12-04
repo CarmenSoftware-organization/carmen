@@ -2,8 +2,15 @@
 
 **Module**: Procurement
 **Sub-module**: Goods Received Note
-**Document Version**: 1.0
-**Last Updated**: 2025-12-02
+**Document Version**: 1.2
+**Last Updated**: 2025-12-03
+
+## Document History
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.2 | 2025-12-03 | Documentation Team | Updated inventory section with configurable costing method context (FIFO or Periodic Average) |
+| 1.1 | 2025-12-03 | Documentation Team | Verified coverage against BR requirements (FR-GRN-001 to FR-GRN-017) |
+| 1.0 | 2025-12-02 | Documentation Team | Initial version |
 
 ---
 
@@ -1254,7 +1261,8 @@ This document covers:
    - Reference: GRN number and line number
 9. System updates inventory:
    - Increases on-hand quantity per location
-   - Updates inventory value (FIFO/WAVG method)
+   - Creates inventory layer with unit cost for valuation
+   - Cost calculation method (FIFO or Periodic Average) configured at System Administration → Inventory Settings
    - Records batch/lot details if applicable
 10. System updates PO status (if applicable):
     - Updates each linked PO item:

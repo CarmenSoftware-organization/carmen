@@ -3,14 +3,16 @@
 **Module**: Procurement
 **Sub-Module**: Goods Received Note
 **Document Type**: Validations (VAL)
-**Version**: 1.0.0
-**Last Updated**: 2025-11-01
+**Version**: 1.0.2
+**Last Updated**: 2025-12-03
 **Status**: Active
 
 ## Document History
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.0.2 | 2025-12-03 | Documentation Team | Added costing method context (FIFO or Periodic Average configurable at system level) |
+| 1.0.1 | 2025-12-03 | Documentation Team | Verified coverage against BR requirements (FR-GRN-001 to FR-GRN-017) |
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
 ---
 
@@ -19,7 +21,7 @@
 ### 1.1 Purpose
 This document defines comprehensive validation rules for the Goods Received Note (GRN) module to ensure data integrity, enforce business rules, maintain security, and provide a consistent user experience. GRN validation is critical because:
 
-- **Financial Impact**: GRNs trigger inventory valuation and accounts payable transactions
+- **Financial Impact**: GRNs trigger inventory valuation and accounts payable transactions. Inventory layers created by GRN are used by the system-configured costing method (FIFO or Periodic Average, set in System Administration → Inventory Settings) when inventory is consumed
 - **Inventory Accuracy**: Incorrect GRN data leads to stock discrepancies and operational issues
 - **Audit Compliance**: GRNs are legal documents requiring accurate data for audits
 - **Multi-Currency**: Currency conversions and exchange rates require precise validation

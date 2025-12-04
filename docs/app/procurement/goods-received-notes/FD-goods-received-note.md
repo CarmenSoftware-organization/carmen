@@ -3,14 +3,19 @@
 ## Module Information
 - **Module**: Procurement
 - **Sub-Module**: Goods Received Note (GRN)
-- **Version**: 1.0.0
-- **Last Updated**: 2025-01-11
+- **Version**: 1.0.5
+- **Last Updated**: 2025-12-03
 - **Owner**: Procurement Team
 - **Status**: Approved
 
 ## Document History
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.0.5 | 2025-12-03 | Documentation Team | Added costing method context (FIFO or Periodic Average configurable at system level) |
+| 1.0.4 | 2025-12-03 | Documentation Team | Mermaid 8.8.2 compatibility: Removed colons, equals signs, and parentheses from flowchart node labels in Diagrams 1, 2, 4, 5 |
+| 1.0.3 | 2025-12-03 | Documentation Team | Mermaid 8.8.2 compatibility: Removed parentheses from sequenceDiagram messages, replaced special characters in flowcharts |
+| 1.0.2 | 2025-12-03 | Documentation Team | Mermaid 8.8.2 compatibility: Removed unsupported note syntax from state diagram, converted to table format |
+| 1.0.1 | 2025-12-03 | Documentation Team | Verified coverage against BR requirements (FR-GRN-001 to FR-GRN-017) |
 | 1.0.0 | 2025-01-11 | Documentation Team | Initial version from workflow analysis |
 
 ---
@@ -62,7 +67,7 @@ flowchart TD
     DisplayPOs --> SelectPO[User selects<br/>PO lines to receive<br/>from one or more POs]
     SelectPO --> CreateGRN[System creates GRN<br/>with line-level PO references]
 
-    CreateGRN --> PrePopulate[Pre-populate:<br/>- Vendor info<br/>- Items<br/>- Ordered qty<br/>- Prices]
+    CreateGRN --> PrePopulate[Pre-populate<br/>Vendor info, Items,<br/>Ordered qty, Prices]
 
     PrePopulate --> EnterQty[User enters<br/>received quantities]
     EnterQty --> AutoDisc[System auto-detects<br/>discrepancies]
@@ -70,7 +75,7 @@ flowchart TD
     AutoDisc --> CheckDisc{Has<br/>discrepancies?}
     CheckDisc -->|Yes| FlagItems[Flag items<br/>with discrepancy indicator]
     CheckDisc -->|No| EnterDelivery
-    FlagItems --> EnterDelivery[User enters delivery info:<br/>- Invoice number/date<br/>- Delivery note<br/>- Vehicle/driver]
+    FlagItems --> EnterDelivery[User enters delivery info<br/>Invoice, Delivery note,<br/>Vehicle and driver]
 
     EnterDelivery --> Validate{Validation<br/>passed?}
     Validate -->|No| ShowErrors[Display<br/>validation errors]
@@ -138,7 +143,7 @@ flowchart TD
     InitStore --> NavConfirm[Navigate to detail page<br/>in confirm mode]
 
     NavConfirm --> SelectVendor[User selects vendor<br/>from dropdown]
-    SelectVendor --> EnterDelivery[User enters delivery info:<br/>- Invoice number/date<br/>- Delivery note<br/>- Vehicle/driver]
+    SelectVendor --> EnterDelivery[User enters delivery info<br/>Invoice, Delivery note,<br/>Vehicle and driver]
 
     EnterDelivery --> SearchItem[User searches for items<br/>in product catalog]
     SearchItem --> AddItem{Add<br/>item?}
@@ -146,14 +151,14 @@ flowchart TD
     AddItem -->|Yes| SelectProduct[User selects product<br/>from search results]
     SelectProduct --> ItemForm[Item detail form opens]
 
-    ItemForm --> EnterItem[User enters:<br/>- Received quantity<br/>- Unit price<br/>- Storage location<br/>- Batch/lot numbers<br/>- Expiry date]
+    ItemForm --> EnterItem[User enters<br/>Qty, Price, Location,<br/>Batch, Expiry]
 
     EnterItem --> CalcLine[System calculates<br/>line total]
     CalcLine --> AddToList[Add item to GRN]
     AddToList --> UpdateTotal[System recalculates<br/>GRN subtotal]
     UpdateTotal --> SearchItem
 
-    AddItem -->|No, done adding| Receipt[User enters:<br/>- Receipt date<br/>- Receiver name]
+    AddItem -->|No, done adding| Receipt[User enters<br/>Receipt date and<br/>Receiver name]
     Receipt --> Validate{Validation<br/>passed?}
 
     Validate -->|No| ShowErrors[Display<br/>validation errors]
@@ -224,44 +229,24 @@ stateDiagram-v2
     DRAFT --> COMMITTED: User saves & commits directly
     DRAFT --> VOID: User/Manager voids GRN
 
-    RECEIVED --> COMMITTED: User commits GRN<br/>(all validations pass)
+    RECEIVED --> COMMITTED: User commits GRN<br/>all validations pass
     RECEIVED --> VOID: User/Manager voids GRN
-    RECEIVED --> DRAFT: User changes status back<br/>(edits needed)
+    RECEIVED --> DRAFT: User changes status back<br/>edits needed
 
-    COMMITTED --> VOID: Manager voids GRN<br/>(reverses stock movements)
+    COMMITTED --> VOID: Manager voids GRN<br/>reverses stock movements
 
     VOID --> [*]
     COMMITTED --> [*]
-
-    note right of DRAFT
-        Editable: Yes
-        Deletable: Yes
-        Inventory Impact: None
-        Stock Movements: None
-    end note
-
-    note right of RECEIVED
-        Editable: Yes
-        Deletable: No (can void)
-        Inventory Impact: None
-        Stock Movements: None
-    end note
-
-    note right of COMMITTED
-        Editable: No (Immutable)
-        Deletable: No (can void)
-        Inventory Impact: Yes
-        Stock Movements: Generated
-        Journal Voucher: Posted
-    end note
-
-    note right of VOID
-        Editable: No (Read-only)
-        Deletable: No (Preserved)
-        Inventory Impact: None
-        Reversing Entries: Created if was committed
-    end note
 ```
+
+**Status Properties**:
+
+| Status | Editable | Deletable | Inventory Impact | Stock Movements | Journal Voucher |
+|--------|----------|-----------|------------------|-----------------|-----------------|
+| DRAFT | Yes | Yes | None | None | - |
+| RECEIVED | Yes | No (can void) | None | None | - |
+| COMMITTED | No (Immutable) | No (can void) | Yes | Generated | Posted |
+| VOID | No (Read-only) | No (Preserved) | None | Reversing entries if was committed | - |
 
 **Status Descriptions**:
 
@@ -313,30 +298,30 @@ stateDiagram-v2
 
 ```mermaid
 flowchart TD
-    Start([User clicks<br/>Commit GRN]) --> CheckStatus{GRN status = <br/>RECEIVED?}
-    CheckStatus -->|No| ErrorStatus[Error: Can only commit<br/>RECEIVED status GRNs]
-    ErrorStatus --> End1([End: Failed])
+    Start([User clicks<br/>Commit GRN]) --> CheckStatus{GRN status<br/>RECEIVED?}
+    CheckStatus -->|No| ErrorStatus[Error - Can only commit<br/>RECEIVED status GRNs]
+    ErrorStatus --> End1([End - Failed])
 
     CheckStatus -->|Yes| CheckLoc{All items have<br/>locations?}
-    CheckLoc -->|No| ErrorLoc[Error: Assign storage<br/>locations to all items]
+    CheckLoc -->|No| ErrorLoc[Error - Assign storage<br/>locations to all items]
     ErrorLoc --> End1
 
     CheckLoc -->|Yes| Confirm[Display commitment<br/>confirmation dialog]
 
     Confirm --> UserConfirm{User<br/>confirms?}
-    UserConfirm -->|No| End2([End: Cancelled])
+    UserConfirm -->|No| End2([End - Cancelled])
 
     UserConfirm -->|Yes| ChangeStatus[Change status to<br/>COMMITTED]
     ChangeStatus --> GenStock[Generate stock movements<br/>for each item]
 
     GenStock --> UpdateInv[Update inventory levels<br/>in storage locations]
-    UpdateInv --> CalcFinance[Calculate financial totals:<br/>- Subtotal<br/>- Tax<br/>- Extra costs<br/>- Grand total]
+    UpdateInv --> CalcFinance[Calculate financial totals<br/>Subtotal, Tax,<br/>Extra costs, Grand total]
 
-    CalcFinance --> GenJV[Generate journal voucher:<br/>- Debit: Inventory<br/>- Credit: AP<br/>- Tax entries<br/>- Extra cost entries]
+    CalcFinance --> GenJV[Generate journal voucher<br/>Debit Inventory,<br/>Credit AP, Tax entries]
 
     GenJV --> ValidateJV{Journal voucher<br/>balanced?}
     ValidateJV -->|No| RollbackJV[Rollback transaction]
-    RollbackJV --> ErrorJV[Error: JV unbalanced]
+    RollbackJV --> ErrorJV[Error - JV unbalanced]
     ErrorJV --> End1
 
     ValidateJV -->|Yes| PostJV[Post JV to<br/>Finance Module]
@@ -345,12 +330,12 @@ flowchart TD
     UpdatePO -->|Yes| UpdateFulfill[Update PO<br/>fulfillment status]
     UpdateFulfill --> Log
 
-    UpdatePO -->|No| Log[Create activity log entry:<br/>- Action: COMMITTED<br/>- User<br/>- Timestamp]
+    UpdatePO -->|No| Log[Create activity log entry<br/>Action COMMITTED,<br/>User, Timestamp]
 
-    Log --> Notify[Send notifications:<br/>- Finance team<br/>- Warehouse<br/>- Purchasing]
+    Log --> Notify[Send notifications<br/>Finance, Warehouse,<br/>Purchasing]
 
-    Notify --> LockGRN[Lock GRN<br/>(set to immutable)]
-    LockGRN --> Success([End: Committed<br/>Successfully])
+    Notify --> LockGRN[Lock GRN<br/>set to immutable]
+    LockGRN --> Success([End - Committed<br/>Successfully])
 
     style Start fill:#cce5ff,stroke:#0066cc,stroke-width:2px,color:#000
     style Success fill:#ccffcc,stroke:#00cc00,stroke-width:2px,color:#000
@@ -377,7 +362,7 @@ flowchart TD
     - To: Assigned storage location
     - Quantity: Received quantity
     - Cost: Unit price + allocated extra cost
-8. **Update Inventory**: Increment on-hand quantities in storage locations
+8. **Update Inventory**: Increment on-hand quantities in storage locations; create inventory layers with unit cost for valuation (used by system-configured costing method: FIFO or Periodic Average, set in System Administration → Inventory Settings)
 9. **Calculate Finance**: Compute all financial totals with tax and extra costs
 10. **Generate JV**: Create journal voucher with balanced entries
 11. **Validate JV**: Ensure total debits = total credits
@@ -409,24 +394,24 @@ flowchart TD
     Start([User opens<br/>Extra Costs tab]) --> Display[Display existing<br/>extra costs list]
     Display --> Action{User<br/>action?}
 
-    Action -->|Add Cost| EnterCost[User enters:<br/>- Cost type<br/>- Amount<br/>- Currency]
+    Action -->|Add Cost| EnterCost[User enters<br/>Cost type, Amount,<br/>Currency]
     EnterCost --> SaveCost[Save cost to list]
     SaveCost --> SelectMethod
 
     Action -->|Change Method| SelectMethod[User selects<br/>distribution method]
     SelectMethod --> Method{Which<br/>method?}
 
-    Method -->|Net Amount| CalcNet[For each item:<br/>allocation = <br/>item_net ÷ total_net<br/>× total_extra_costs]
+    Method -->|Net Amount| CalcNet[For each item:<br/>allocation = <br/>item_net / total_net<br/>* total_extra_costs]
 
-    Method -->|Quantity| CalcQty[For each item:<br/>allocation = <br/>item_qty ÷ total_qty<br/>× total_extra_costs]
+    Method -->|Quantity| CalcQty[For each item:<br/>allocation = <br/>item_qty / total_qty<br/>* total_extra_costs]
 
-    Method -->|Equal| CalcEqual[For each item:<br/>allocation = <br/>total_extra_costs<br/>÷ item_count]
+    Method -->|Equal| CalcEqual[For each item:<br/>allocation = <br/>total_extra_costs<br/>/ item_count]
 
-    CalcNet --> UpdateItems[Update each item's<br/>allocated extra cost]
+    CalcNet --> UpdateItems[Update each item<br/>allocated extra cost]
     CalcQty --> UpdateItems
     CalcEqual --> UpdateItems
 
-    UpdateItems --> RecalcItem[For each item:<br/>total = <br/>qty × price<br/>+ extra_cost]
+    UpdateItems --> RecalcItem[For each item:<br/>total = <br/>qty * price<br/>+ extra_cost]
 
     RecalcItem --> RecalcGRN[Recalculate GRN totals:<br/>- Subtotal<br/>- Net amount<br/>- Grand total]
 
@@ -475,8 +460,8 @@ sequenceDiagram
     participant Fin as Finance Module
     participant PO as Purchase Orders Module
 
-    User->>GRN: Click "Commit GRN"
-    GRN->>GRN: Validate GRN ready<br/>(locations assigned)
+    User->>GRN: Click Commit GRN
+    GRN->>GRN: Validate GRN ready
 
     alt Validation Failed
         GRN->>User: Display validation errors
@@ -485,38 +470,38 @@ sequenceDiagram
         User->>GRN: Confirm commitment
 
         GRN->>GRN: Change status to COMMITTED
-        GRN->>GRN: Record commit timestamp & user
+        GRN->>GRN: Record commit timestamp and user
 
         Note over GRN,Inv: Stock Movement Generation
-        GRN->>Inv: Create stock movements<br/>for each item
+        GRN->>Inv: Create stock movements for each item
         loop For each GRN item
             Inv->>Inv: Create stock movement record
-            Inv->>Inv: Update inventory on-hand<br/>in storage location
+            Inv->>Inv: Update inventory on-hand
         end
-        Inv->>GRN: Return success + movement IDs
+        Inv->>GRN: Return success with movement IDs
 
         Note over GRN,Fin: Financial Posting
         GRN->>Fin: Generate journal voucher
-        GRN->>Fin: Post JV entries:<br/>- Debit Inventory<br/>- Credit AP<br/>- Tax entries<br/>- Extra cost entries
+        GRN->>Fin: Post JV entries
         Fin->>Fin: Validate JV balanced
         Fin->>Fin: Post to general ledger
-        Fin->>GRN: Return success + JV number
+        Fin->>GRN: Return success with JV number
 
         Note over GRN,PO: PO Fulfillment Update
         alt GRN linked to PO
             GRN->>PO: Update PO fulfillment
             loop For each GRN item
-                PO->>PO: Update PO line:<br/>received_qty += item_qty
+                PO->>PO: Update received qty on PO line
                 PO->>PO: Calculate outstanding qty
-                PO->>PO: Update line status<br/>(Partially/Fully Received)
+                PO->>PO: Update line status
             end
             PO->>PO: Evaluate overall PO status
             PO->>GRN: Return success
         end
 
         GRN->>GRN: Create activity log entry
-        GRN->>GRN: Lock GRN (set immutable)
-        GRN->>User: Display success message<br/>with stock movement & JV refs
+        GRN->>GRN: Lock GRN as immutable
+        GRN->>User: Display success message
     end
 ```
 

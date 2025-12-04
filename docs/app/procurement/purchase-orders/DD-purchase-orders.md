@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Orders
 - **Document Type**: Data Definition (DD)
-- **Version**: 3.3.0
-- **Last Updated**: 2025-12-02
+- **Version**: 3.4.0
+- **Last Updated**: 2025-12-03
 - **Status**: In Progress
 
 ## Document History
@@ -16,8 +16,9 @@
 | 2.0.0 | 2025-10-31 | System | Removed purchase_order_approvals table, updated ERD, removed v_pending_po_approvals view, updated status constraints, clarified approved_by/approved_at fields are NOT multi-stage approval workflow |
 | 3.0.0 | 2025-11-21 | System | Major restructure: Converted from SQL-focused implementation document to proper Data Definition document with field definitions, business rules, and diagrams; moved all SQL code (DDL, triggers, functions, views) to Technical Specification document |
 | 3.1.0 | 2025-12-01 | System | Added Comments & Attachments sidebar feature documentation; Updated page layout to describe collapsible right sidebar with Comments, Attachments, and Activity Log sections |
-| 3.3.0 | 2025-12-02 | System Analyst | Added QR Code fields (qr_code, qr_code_image, qr_code_generated_at) to Purchase Orders table for mobile receiving integration |
 | 3.2.0 | 2025-12-01 | System | Added PO Item enhanced fields: sourceRequestId, sourceRequestItemId, lineTotal, pendingQuantity, discount, discountAmount, taxRate, taxAmount, deliveryDate for PR traceability and financial calculations |
+| 3.3.0 | 2025-12-02 | System Analyst | Added QR Code fields (qr_code, qr_code_image, qr_code_generated_at) to Purchase Orders table for mobile receiving integration |
+| 3.4.0 | 2025-12-03 | Documentation Team | Converted SQL DDL to text-based DD format for entities 2-6; moved Database Functions and Views to TS reference |
 
 ## Related Documents
 
@@ -157,562 +158,261 @@ erDiagram
 
 ---
 
-### 2. purchase_order_line_items Table
+### 2. Purchase Order Line Items
 
-**Purpose**: Individual line items on purchase orders.
+**Purpose**: Individual line items on purchase orders representing products or services being ordered.
 
-\`\`\`sql
-CREATE TABLE purchase_order_line_items (
-  -- Primary Key
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+**Primary Key**: Unique identifier (UUID)
 
-  -- Parent Reference
-  purchase_order_id UUID NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
+**Composite Key**: purchase_order_id + line_number (unique within each PO)
 
-  -- Line Number
-  line_number INT NOT NULL,
+#### Field Definitions
 
-  -- Source Reference (PR Traceability)
-  purchase_request_line_item_id UUID REFERENCES purchase_request_line_items(id),
-  source_request_id VARCHAR(50),           -- PR number for display (e.g., "PR-2024-0045")
-  source_request_item_id VARCHAR(50),      -- PR item ID for traceability
+| Field Name | Data Type | Required | Description | Business Rules |
+|------------|-----------|----------|-------------|----------------|
+| **Identification** |
+| id | UUID | Yes | System-generated unique identifier | Auto-generated |
+| purchase_order_id | UUID | Yes | Reference to parent purchase order | Foreign key to purchase_orders |
+| line_number | Integer | Yes | Sequential line number within PO | Unique within PO, auto-incremented |
+| **Source Reference (PR Traceability)** |
+| purchase_request_line_item_id | UUID | No | Reference to source PR line item | Foreign key to purchase_request_line_items |
+| source_request_id | String(50) | No | PR number for display | Format: PR-YYYY-NNNNNN (e.g., "PR-2024-0045") |
+| source_request_item_id | String(50) | No | PR item ID for traceability | Links to original request item |
+| **Product Information** |
+| product_id | UUID | No | Reference to product catalog | Foreign key to products |
+| item_code | String(50) | No | Item code from product catalog | For display and lookup |
+| item_name | String(255) | Yes | Display name for the item | Required for all line items |
+| description | Text | Yes | Detailed item description | Required for all line items |
+| **Quantity and Pricing** |
+| quantity | Decimal(15,3) | Yes | Ordered quantity | Must be > 0 |
+| unit_of_measure | String(20) | Yes | Unit of measure | E.g., "Box", "Each", "Kg" |
+| unit_price | Decimal(15,2) | Yes | Price per unit | Must be >= 0 |
+| **Discount (Line-Level)** |
+| discount | Decimal(5,2) | No | Discount percentage | Default: 0, Range: 0-100% |
+| discount_amount | Decimal(15,2) | No | Calculated discount amount | Default: 0, calculated from percentage |
+| **Line Totals** |
+| line_total | Decimal(15,2) | Yes | Line total amount | Calculated: (quantity × unit_price) - discount_amount |
+| tax_rate | Decimal(5,2) | No | Tax rate percentage | Default: 0, Range: 0-100% |
+| tax_amount | Decimal(15,2) | Yes | Tax amount for line | Default: 0.00, calculated from tax_rate |
+| **Delivery** |
+| expected_delivery_date | Date | No | Line-specific delivery date | Optional, overrides PO header date |
+| **Receipt Tracking** |
+| quantity_received | Decimal(15,3) | Yes | Total quantity received | Default: 0, updated by GRN |
+| pending_quantity | Decimal(15,3) | Yes | Quantity pending delivery | Alias for quantity_remaining |
+| quantity_remaining | Decimal(15,3) | Yes | Quantity yet to be received | Calculated: quantity - quantity_received |
+| **Additional Information** |
+| specifications | Text | No | Technical specifications | Optional detailed specs |
+| notes | Text | No | Line item notes | Internal notes |
+| **Status** |
+| status | String(20) | Yes | Line item status | Values: pending, partial, received, cancelled |
+| **Audit Fields** |
+| created_at | Timestamp | Yes | Creation timestamp | Auto-generated |
+| created_by | UUID | Yes | User who created | Reference to users |
+| updated_at | Timestamp | Yes | Last update timestamp | Auto-updated |
+| updated_by | UUID | Yes | User who last updated | Reference to users |
 
-  -- Product Information
-  product_id UUID REFERENCES products(id),
-  item_code VARCHAR(50),                   -- Item code for display
-  item_name VARCHAR(255) NOT NULL,         -- Item name
-  description TEXT NOT NULL,               -- Item description
+#### Business Constraints
 
-  -- Quantity and Pricing
-  quantity DECIMAL(15,3) NOT NULL,         -- Ordered quantity
-  unit_of_measure VARCHAR(20) NOT NULL,    -- Unit of measure (e.g., "Box", "Each")
-  unit_price DECIMAL(15,2) NOT NULL,       -- Price per unit
+1. **Quantity Validation**:
+   - Ordered quantity must be greater than 0
+   - Received quantity cannot exceed ordered quantity by more than 5% (tolerance for over-delivery)
+   - Remaining quantity must be >= 0
 
-  -- Discount (line-level)
-  discount DECIMAL(5,2) DEFAULT 0,         -- Discount percentage (0-100)
-  discount_amount DECIMAL(15,2) DEFAULT 0, -- Calculated discount amount
+2. **Pricing Validation**:
+   - Unit price must be >= 0
+   - Discount percentage must be between 0-100%
+   - Tax rate must be between 0-100%
 
-  -- Line Totals
-  line_total DECIMAL(15,2) NOT NULL,       -- (quantity * unit_price) - discount_amount
-  tax_rate DECIMAL(5,2) DEFAULT 0,         -- Tax rate percentage
-  tax_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+3. **Line Total Calculation**:
+   - line_total = (quantity × unit_price) - discount_amount
+   - discount_amount = (quantity × unit_price) × (discount / 100)
+   - tax_amount = line_total × (tax_rate / 100)
 
-  -- Delivery
-  expected_delivery_date DATE,             -- Line-specific delivery date (optional)
-
-  -- Receipt Tracking
-  quantity_received DECIMAL(15,3) NOT NULL DEFAULT 0,
-  pending_quantity DECIMAL(15,3) NOT NULL, -- Alias for quantity_remaining
-  quantity_remaining DECIMAL(15,3) NOT NULL,
-
-  -- Additional Information
-  specifications TEXT,
-  notes TEXT,
-
-  -- Status
-  status VARCHAR(20) NOT NULL DEFAULT 'pending', -- pending, partial, received, cancelled
-
-  -- Audit Fields
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  created_by UUID NOT NULL REFERENCES users(id),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_by UUID NOT NULL REFERENCES users(id),
-
-  -- Constraints
-  CONSTRAINT po_line_unique UNIQUE (purchase_order_id, line_number),
-  CONSTRAINT po_line_quantity_check CHECK (quantity > 0),
-  CONSTRAINT po_line_unit_price_check CHECK (unit_price >= 0),
-  CONSTRAINT po_line_received_check CHECK (quantity_received >= 0 AND quantity_received <= quantity * 1.05),
-  CONSTRAINT po_line_remaining_check CHECK (quantity_remaining >= 0),
-  CONSTRAINT po_line_discount_check CHECK (discount >= 0 AND discount <= 100),
-  CONSTRAINT po_line_tax_rate_check CHECK (tax_rate >= 0 AND tax_rate <= 100),
-  CONSTRAINT po_line_status_check CHECK (status IN ('pending', 'partial', 'received', 'cancelled'))
-);
-
--- Indexes
-CREATE INDEX idx_po_line_po_id ON purchase_order_line_items(purchase_order_id);
-CREATE INDEX idx_po_line_product_id ON purchase_order_line_items(product_id);
-CREATE INDEX idx_po_line_pr_line_id ON purchase_order_line_items(purchase_request_line_item_id);
-CREATE INDEX idx_po_line_line_number ON purchase_order_line_items(purchase_order_id, line_number);
-CREATE INDEX idx_po_line_source_request ON purchase_order_line_items(source_request_id);
-CREATE INDEX idx_po_line_item_code ON purchase_order_line_items(item_code);
-
--- Comments
-COMMENT ON TABLE purchase_order_line_items IS 'Individual items on purchase orders';
-COMMENT ON COLUMN purchase_order_line_items.line_number IS 'Sequential line number within PO';
-COMMENT ON COLUMN purchase_order_line_items.source_request_id IS 'Source PR number for traceability (e.g., PR-2024-0045)';
-COMMENT ON COLUMN purchase_order_line_items.source_request_item_id IS 'Source PR line item ID for traceability';
-COMMENT ON COLUMN purchase_order_line_items.item_code IS 'Item code from product catalog';
-COMMENT ON COLUMN purchase_order_line_items.item_name IS 'Display name for the item';
-COMMENT ON COLUMN purchase_order_line_items.discount IS 'Line-level discount percentage';
-COMMENT ON COLUMN purchase_order_line_items.discount_amount IS 'Calculated discount amount';
-COMMENT ON COLUMN purchase_order_line_items.line_total IS 'Calculated line total: (quantity * unit_price) - discount_amount';
-COMMENT ON COLUMN purchase_order_line_items.tax_rate IS 'Tax rate percentage for the line item';
-COMMENT ON COLUMN purchase_order_line_items.pending_quantity IS 'Quantity pending delivery (alias for quantity_remaining)';
-COMMENT ON COLUMN purchase_order_line_items.quantity_received IS 'Total quantity received across all GRNs';
-COMMENT ON COLUMN purchase_order_line_items.quantity_remaining IS 'Quantity yet to be received';
-COMMENT ON COLUMN purchase_order_line_items.status IS 'Line item status: pending, partial, received, cancelled';
-\`\`\`
+4. **Status Transitions**:
+   - pending → partial (when some quantity received)
+   - pending → received (when all quantity received)
+   - partial → received (when remaining quantity received)
+   - Any status → cancelled (with proper authorization)
 
 ---
 
-### 3. purchase_order_budget_allocations Table
+### 3. Purchase Order Budget Allocations
 
-**Purpose**: Budget account allocations for purchase orders.
+**Purpose**: Budget account allocations for purchase orders, enabling split funding across multiple budget accounts.
 
-\`\`\`sql
-CREATE TABLE purchase_order_budget_allocations (
-  -- Primary Key
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
-  -- Parent Reference
-  purchase_order_id UUID NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
-  
-  -- Budget Information
-  budget_account_id UUID NOT NULL REFERENCES budget_accounts(id),
-  allocation_amount DECIMAL(15,2) NOT NULL,
-  allocation_percentage DECIMAL(5,2) NOT NULL,
-  fiscal_year INT NOT NULL,
-  
-  -- Additional Information
-  notes TEXT,
-  
-  -- Audit Fields
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  created_by UUID NOT NULL REFERENCES users(id),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_by UUID NOT NULL REFERENCES users(id),
-  
-  -- Constraints
-  CONSTRAINT po_budget_allocation_check CHECK (allocation_amount > 0),
-  CONSTRAINT po_budget_percentage_check CHECK (allocation_percentage > 0 AND allocation_percentage <= 100)
-);
+**Primary Key**: Unique identifier (UUID)
 
--- Indexes
-CREATE INDEX idx_po_budget_po_id ON purchase_order_budget_allocations(purchase_order_id);
-CREATE INDEX idx_po_budget_account_id ON purchase_order_budget_allocations(budget_account_id);
-CREATE INDEX idx_po_budget_fiscal_year ON purchase_order_budget_allocations(fiscal_year);
+#### Field Definitions
 
--- Comments
-COMMENT ON TABLE purchase_order_budget_allocations IS 'Budget account allocations for purchase orders';
-COMMENT ON COLUMN purchase_order_budget_allocations.allocation_percentage IS 'Percentage of PO total allocated to this account';
-\`\`\`
+| Field Name | Data Type | Required | Description | Business Rules |
+|------------|-----------|----------|-------------|----------------|
+| **Identification** |
+| id | UUID | Yes | System-generated unique identifier | Auto-generated |
+| purchase_order_id | UUID | Yes | Reference to parent purchase order | Foreign key to purchase_orders, cascade delete |
+| **Budget Information** |
+| budget_account_id | UUID | Yes | Reference to budget account | Foreign key to budget_accounts |
+| allocation_amount | Decimal(15,2) | Yes | Amount allocated to this account | Must be > 0 |
+| allocation_percentage | Decimal(5,2) | Yes | Percentage of PO total | Must be > 0 and <= 100% |
+| fiscal_year | Integer | Yes | Fiscal year for allocation | Current or future fiscal year |
+| **Additional Information** |
+| notes | Text | No | Notes about allocation | Optional comments |
+| **Audit Fields** |
+| created_at | Timestamp | Yes | Creation timestamp | Auto-generated |
+| created_by | UUID | Yes | User who created | Reference to users |
+| updated_at | Timestamp | Yes | Last update timestamp | Auto-updated |
+| updated_by | UUID | Yes | User who last updated | Reference to users |
+
+#### Business Constraints
+
+1. **Allocation Validation**:
+   - Allocation amount must be greater than 0
+   - Allocation percentage must be between 0-100%
+   - Sum of all allocation percentages for a PO must equal 100%
+
+2. **Budget Availability**:
+   - Sufficient budget must be available in the budget account
+   - Allocation cannot exceed available budget balance
 
 ---
 
-### 4. purchase_order_documents Table
+### 4. Purchase Order Documents
 
-**Purpose**: Documents and attachments related to purchase orders.
+**Purpose**: Documents and attachments related to purchase orders (quotes, specifications, contracts, etc.).
 
-\`\`\`sql
-CREATE TABLE purchase_order_documents (
-  -- Primary Key
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
-  -- Parent Reference
-  purchase_order_id UUID NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
-  
-  -- File Information
-  file_name VARCHAR(255) NOT NULL,
-  file_size BIGINT NOT NULL,
-  file_type VARCHAR(100) NOT NULL,
-  file_path TEXT NOT NULL,
-  
-  -- Document Classification
-  document_type VARCHAR(50) NOT NULL,
-  description TEXT,
-  version INT NOT NULL DEFAULT 1,
-  
-  -- Status
-  is_active BOOLEAN NOT NULL DEFAULT TRUE,
-  
-  -- Audit Fields
-  uploaded_by UUID NOT NULL REFERENCES users(id),
-  uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  
-  -- Constraints
-  CONSTRAINT po_doc_type_check CHECK (document_type IN (
-    'Quote', 'Specification', 'Contract', 'Drawing', 'Email', 'Other'
-  )),
-  CONSTRAINT po_doc_file_size_check CHECK (file_size > 0 AND file_size <= 10485760) -- 10MB max
-);
+**Primary Key**: Unique identifier (UUID)
 
--- Indexes
-CREATE INDEX idx_po_doc_po_id ON purchase_order_documents(purchase_order_id);
-CREATE INDEX idx_po_doc_type ON purchase_order_documents(document_type);
-CREATE INDEX idx_po_doc_active ON purchase_order_documents(purchase_order_id, is_active) WHERE is_active = TRUE;
+#### Field Definitions
 
--- Comments
-COMMENT ON TABLE purchase_order_documents IS 'Documents and attachments for purchase orders';
-COMMENT ON COLUMN purchase_order_documents.version IS 'Document version number';
-\`\`\`
+| Field Name | Data Type | Required | Description | Business Rules |
+|------------|-----------|----------|-------------|----------------|
+| **Identification** |
+| id | UUID | Yes | System-generated unique identifier | Auto-generated |
+| purchase_order_id | UUID | Yes | Reference to parent purchase order | Foreign key to purchase_orders, cascade delete |
+| **File Information** |
+| file_name | String(255) | Yes | Original file name | Required |
+| file_size | BigInt | Yes | File size in bytes | Must be > 0, max 10MB (10485760 bytes) |
+| file_type | String(100) | Yes | MIME type | E.g., "application/pdf", "image/jpeg" |
+| file_path | Text | Yes | Storage path/URL | Path to file in storage system |
+| **Document Classification** |
+| document_type | String(50) | Yes | Type of document | Values: Quote, Specification, Contract, Drawing, Email, Other |
+| description | Text | No | Document description | Optional notes about the document |
+| version | Integer | Yes | Document version number | Default: 1, increments on replacement |
+| **Status** |
+| is_active | Boolean | Yes | Whether document is active | Default: true, false for soft delete |
+| **Audit Fields** |
+| uploaded_by | UUID | Yes | User who uploaded | Reference to users |
+| uploaded_at | Timestamp | Yes | Upload timestamp | Auto-generated |
 
----
+#### Business Constraints
 
-### 5. purchase_order_history Table
+1. **File Size Limit**:
+   - Maximum file size: 10MB (10,485,760 bytes)
+   - File size must be greater than 0
 
-**Purpose**: Complete audit trail of all changes to purchase orders.
+2. **Document Types**:
+   - Quote: Vendor quotation documents
+   - Specification: Product/service specifications
+   - Contract: Legal agreements
+   - Drawing: Technical drawings or diagrams
+   - Email: Email correspondence
+   - Other: Miscellaneous documents
 
-\`\`\`sql
-CREATE TABLE purchase_order_history (
-  -- Primary Key
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
-  -- Parent Reference
-  purchase_order_id UUID NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
-  
-  -- Change Information
-  change_type VARCHAR(50) NOT NULL,
-  field_name VARCHAR(100),
-  old_value TEXT,
-  new_value TEXT,
-  
-  -- Change Metadata
-  changed_by UUID NOT NULL REFERENCES users(id),
-  changed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  comments TEXT,
-  change_reason TEXT,
-  
-  -- Context
-  ip_address INET,
-  user_agent TEXT
-);
-
--- Indexes
-CREATE INDEX idx_po_history_po_id ON purchase_order_history(purchase_order_id);
-CREATE INDEX idx_po_history_changed_at ON purchase_order_history(changed_at DESC);
-CREATE INDEX idx_po_history_changed_by ON purchase_order_history(changed_by);
-CREATE INDEX idx_po_history_change_type ON purchase_order_history(change_type);
-
--- Comments
-COMMENT ON TABLE purchase_order_history IS 'Complete audit trail for purchase orders';
-COMMENT ON COLUMN purchase_order_history.change_type IS 'Type of change (Created, Modified, Approved, Sent, etc.)';
-\`\`\`
+3. **Version Control**:
+   - New version created when document is replaced
+   - Previous versions marked as inactive (is_active = false)
 
 ---
 
-### 6. po_sequence Table
+### 5. Purchase Order History
 
-**Purpose**: Manages sequential PO number generation per fiscal year.
+**Purpose**: Complete audit trail of all changes to purchase orders for compliance and traceability.
 
-\`\`\`sql
-CREATE TABLE po_sequence (
-  -- Primary Key
-  year INT PRIMARY KEY,
-  
-  -- Sequence
-  sequence INT NOT NULL DEFAULT 0,
-  
-  -- Audit
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  
-  -- Constraints
-  CONSTRAINT po_sequence_year_check CHECK (year >= 2000 AND year <= 2100),
-  CONSTRAINT po_sequence_value_check CHECK (sequence >= 0)
-);
+**Primary Key**: Unique identifier (UUID)
 
--- Comments
-COMMENT ON TABLE po_sequence IS 'Sequence counter for PO number generation per year';
-COMMENT ON COLUMN po_sequence.sequence IS 'Current sequence number for the year';
-\`\`\`
+#### Field Definitions
 
----
+| Field Name | Data Type | Required | Description | Business Rules |
+|------------|-----------|----------|-------------|----------------|
+| **Identification** |
+| id | UUID | Yes | System-generated unique identifier | Auto-generated |
+| purchase_order_id | UUID | Yes | Reference to purchase order | Foreign key to purchase_orders, cascade delete |
+| **Change Information** |
+| change_type | String(50) | Yes | Type of change | E.g., Created, Modified, Authorized, Sent, Cancelled |
+| field_name | String(100) | No | Name of changed field | Populated for field-level changes |
+| old_value | Text | No | Previous value | Stored as text for comparison |
+| new_value | Text | No | New value | Stored as text for comparison |
+| **Change Metadata** |
+| changed_by | UUID | Yes | User who made the change | Reference to users |
+| changed_at | Timestamp | Yes | Timestamp of change | Auto-generated, default NOW() |
+| comments | Text | No | Comments about the change | Optional notes |
+| change_reason | Text | No | Reason for the change | Required for cancellations |
+| **Context** |
+| ip_address | INET | No | IP address of user | For security audit |
+| user_agent | Text | No | Browser/client information | For security audit |
 
-## Database Functions
+#### Change Types
 
-### 1. Function: get_next_po_sequence
-
-**Purpose**: Atomically generates next PO sequence number for given year.
-
-\`\`\`sql
-CREATE OR REPLACE FUNCTION get_next_po_sequence(p_year INTEGER)
-RETURNS INTEGER
-LANGUAGE plpgsql
-AS $$
-DECLARE
-  v_sequence INTEGER;
-BEGIN
-  -- Insert or update sequence for the year
-  INSERT INTO po_sequence (year, sequence)
-  VALUES (p_year, 1)
-  ON CONFLICT (year)
-  DO UPDATE SET
-    sequence = po_sequence.sequence + 1,
-    updated_at = NOW()
-  RETURNING sequence INTO v_sequence;
-  
-  RETURN v_sequence;
-END;
-$$;
-
-COMMENT ON FUNCTION get_next_po_sequence IS 'Generate next PO sequence number for given year';
-\`\`\`
-
-### 2. Function: update_po_line_remaining_quantity
-
-**Purpose**: Automatically calculates remaining quantity on line items.
-
-\`\`\`sql
-CREATE OR REPLACE FUNCTION update_po_line_remaining_quantity()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-  NEW.quantity_remaining := NEW.quantity - NEW.quantity_received;
-  RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER trigger_update_po_line_remaining
-  BEFORE INSERT OR UPDATE OF quantity, quantity_received
-  ON purchase_order_line_items
-  FOR EACH ROW
-  EXECUTE FUNCTION update_po_line_remaining_quantity();
-
-COMMENT ON FUNCTION update_po_line_remaining_quantity IS 'Calculate remaining quantity on PO line items';
-\`\`\`
-
-### 3. Function: update_po_totals
-
-**Purpose**: Recalculates PO totals when line items change.
-
-\`\`\`sql
-CREATE OR REPLACE FUNCTION update_po_totals()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-DECLARE
-  v_subtotal DECIMAL(15,2);
-  v_tax_amount DECIMAL(15,2);
-  v_discount_amount DECIMAL(15,2);
-  v_shipping_amount DECIMAL(15,2);
-  v_grand_total DECIMAL(15,2);
-  v_po_id UUID;
-BEGIN
-  -- Determine which PO to update
-  IF TG_OP = 'DELETE' THEN
-    v_po_id := OLD.purchase_order_id;
-  ELSE
-    v_po_id := NEW.purchase_order_id;
-  END IF;
-  
-  -- Calculate subtotal and tax from line items
-  SELECT
-    COALESCE(SUM(line_total), 0),
-    COALESCE(SUM(tax_amount), 0)
-  INTO v_subtotal, v_tax_amount
-  FROM purchase_order_line_items
-  WHERE purchase_order_id = v_po_id;
-  
-  -- Get discount and shipping from PO header
-  SELECT discount_amount, shipping_amount
-  INTO v_discount_amount, v_shipping_amount
-  FROM purchase_orders
-  WHERE id = v_po_id;
-  
-  -- Calculate grand total
-  v_grand_total := v_subtotal - v_discount_amount + v_tax_amount + v_shipping_amount;
-  
-  -- Update PO header
-  UPDATE purchase_orders
-  SET
-    subtotal = v_subtotal,
-    tax_amount = v_tax_amount,
-    grand_total = v_grand_total,
-    updated_at = NOW()
-  WHERE id = v_po_id;
-  
-  RETURN COALESCE(NEW, OLD);
-END;
-$$;
-
-CREATE TRIGGER trigger_update_po_totals_on_line_change
-  AFTER INSERT OR UPDATE OR DELETE
-  ON purchase_order_line_items
-  FOR EACH ROW
-  EXECUTE FUNCTION update_po_totals();
-
-COMMENT ON FUNCTION update_po_totals IS 'Recalculate PO totals when line items change';
-\`\`\`
-
-### 4. Function: log_po_history
-
-**Purpose**: Automatically logs changes to purchase orders.
-
-\`\`\`sql
-CREATE OR REPLACE FUNCTION log_po_history()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-  IF TG_OP = 'INSERT' THEN
-    INSERT INTO purchase_order_history (
-      purchase_order_id, change_type, changed_by, comments
-    ) VALUES (
-      NEW.id, 'Created', NEW.created_by, 'Purchase order created'
-    );
-  ELSIF TG_OP = 'UPDATE' THEN
-    -- Log status changes
-    IF OLD.status IS DISTINCT FROM NEW.status THEN
-      INSERT INTO purchase_order_history (
-        purchase_order_id, change_type, field_name, old_value, new_value, changed_by
-      ) VALUES (
-        NEW.id, 'Status Changed', 'status', OLD.status, NEW.status, NEW.updated_by
-      );
-    END IF;
-    
-    -- Log authorization (single field, not multi-stage approval workflow)
-    IF OLD.approved_at IS NULL AND NEW.approved_at IS NOT NULL THEN
-      INSERT INTO purchase_order_history (
-        purchase_order_id, change_type, changed_by, comments
-      ) VALUES (
-        NEW.id, 'Authorized', NEW.approved_by, 'Purchase order authorized by purchasing staff'
-      );
-    END IF;
-    
-    -- Log sent to vendor
-    IF OLD.sent_at IS NULL AND NEW.sent_at IS NOT NULL THEN
-      INSERT INTO purchase_order_history (
-        purchase_order_id, change_type, changed_by, comments
-      ) VALUES (
-        NEW.id, 'Sent to Vendor', NEW.sent_by, 'Purchase order sent to vendor'
-      );
-    END IF;
-    
-    -- Log cancellation
-    IF OLD.cancelled_at IS NULL AND NEW.cancelled_at IS NOT NULL THEN
-      INSERT INTO purchase_order_history (
-        purchase_order_id, change_type, changed_by, comments, change_reason
-      ) VALUES (
-        NEW.id, 'Cancelled', NEW.updated_by, 'Purchase order cancelled', NEW.cancellation_reason
-      );
-    END IF;
-  END IF;
-  
-  RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER trigger_log_po_history
-  AFTER INSERT OR UPDATE
-  ON purchase_orders
-  FOR EACH ROW
-  EXECUTE FUNCTION log_po_history();
-
-COMMENT ON FUNCTION log_po_history IS 'Automatically log changes to purchase orders';
-\`\`\`
-
-### 5. Function: update_po_timestamp
-
-**Purpose**: Automatically updates updated_at timestamp.
-
-\`\`\`sql
-CREATE OR REPLACE FUNCTION update_po_timestamp()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-  NEW.updated_at := NOW();
-  RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER trigger_update_po_timestamp
-  BEFORE UPDATE ON purchase_orders
-  FOR EACH ROW
-  EXECUTE FUNCTION update_po_timestamp();
-
-COMMENT ON FUNCTION update_po_timestamp IS 'Update timestamp on PO changes';
-\`\`\`
+| Change Type | Description | When Logged |
+|-------------|-------------|-------------|
+| Created | PO initially created | On INSERT |
+| Modified | Field value changed | On UPDATE of any field |
+| Authorized | PO authorized by purchasing staff | When approved_at is set |
+| Sent to Vendor | PO sent to vendor | When sent_at is set |
+| Acknowledged | Vendor acknowledged receipt | When acknowledged_at is set |
+| Status Changed | Status field changed | On status transition |
+| Cancelled | PO cancelled | When cancelled_at is set |
 
 ---
 
-## Views
+### 6. PO Sequence
 
-### 1. View: v_purchase_orders_with_details
+**Purpose**: Manages sequential PO number generation per fiscal year to ensure unique, sequential PO numbers.
 
-**Purpose**: Complete purchase order information with related data.
+**Primary Key**: Year (Integer)
 
-\`\`\`sql
-CREATE OR REPLACE VIEW v_purchase_orders_with_details AS
-SELECT
-  po.id,
-  po.po_number,
-  po.status,
-  po.order_date,
-  po.expected_delivery_date,
-  
-  -- Vendor Information
-  v.id AS vendor_id,
-  v.company_name AS vendor_name,
-  v.email AS vendor_email,
-  
-  -- Location Information
-  l.id AS delivery_location_id,
-  l.name AS delivery_location_name,
-  
-  -- Financial Information
-  po.subtotal,
-  po.discount_amount,
-  po.tax_amount,
-  po.shipping_amount,
-  po.grand_total,
-  po.currency,
-  
-  -- Counts
-  (SELECT COUNT(*) FROM purchase_order_line_items WHERE purchase_order_id = po.id) AS line_item_count,
+#### Field Definitions
 
-  -- Tracking
-  po.created_by,
-  po.created_at,
-  po.approved_at,
-  po.sent_at,
-  po.completed_at
-  
-FROM purchase_orders po
-JOIN vendors v ON po.vendor_id = v.id
-JOIN locations l ON po.delivery_location_id = l.id
-WHERE po.deleted_at IS NULL;
+| Field Name | Data Type | Required | Description | Business Rules |
+|------------|-----------|----------|-------------|----------------|
+| year | Integer | Yes | Fiscal year | Primary key, range: 2000-2100 |
+| sequence | Integer | Yes | Current sequence number | Default: 0, must be >= 0 |
+| updated_at | Timestamp | Yes | Last update timestamp | Auto-updated |
 
-COMMENT ON VIEW v_purchase_orders_with_details IS 'Purchase orders with vendor and location details';
-\`\`\`
+#### Business Rules
 
-### 2. View: v_po_line_items_with_receipt_status
+1. **Sequence Generation**:
+   - Sequence increments atomically for each new PO
+   - Format: PO-YYYY-NNNNNN (e.g., PO-2025-000001)
+   - Sequence resets to 1 at start of each year
 
-**Purpose**: Line items with receipt status and quantities.
+2. **Year Validation**:
+   - Year must be between 2000 and 2100
+   - Sequence must be non-negative
 
-\`\`\`sql
-CREATE OR REPLACE VIEW v_po_line_items_with_receipt_status AS
-SELECT
-  li.id,
-  li.purchase_order_id,
-  li.line_number,
-  li.description,
-  li.quantity AS quantity_ordered,
-  li.quantity_received,
-  li.quantity_remaining,
-  li.unit_price,
-  li.line_total,
-  
-  -- Product Information
-  p.name AS product_name,
-  p.sku AS product_sku,
-  
-  -- Receipt Status
-  CASE
-    WHEN li.quantity_received = 0 THEN 'Not Received'
-    WHEN li.quantity_received < li.quantity THEN 'Partially Received'
-    WHEN li.quantity_received >= li.quantity THEN 'Fully Received'
-  END AS receipt_status,
-  
-  -- Percentage Received
-  ROUND((li.quantity_received / NULLIF(li.quantity, 0)) * 100, 2) AS percentage_received
-  
-FROM purchase_order_line_items li
-LEFT JOIN products p ON li.product_id = p.id;
+---
 
-COMMENT ON VIEW v_po_line_items_with_receipt_status IS 'PO line items with receipt status';
-\`\`\`
+## Database Implementation Reference
+
+For technical implementation details including SQL DDL, database functions, triggers, and views, refer to the [Technical Specification (TS-purchase-orders.md)](./TS-purchase-orders.md).
+
+### Database Functions Summary
+
+The following functions are implemented to support PO operations:
+
+| Function | Purpose |
+|----------|---------|
+| get_next_po_sequence | Atomically generates next PO sequence number for given year |
+| update_po_line_remaining_quantity | Automatically calculates remaining quantity on line items |
+| update_po_totals | Recalculates PO totals when line items change |
+| log_po_history | Automatically logs changes to purchase orders |
+| update_po_timestamp | Automatically updates updated_at timestamp |
+
+### Database Views Summary
+
+| View | Purpose |
+|------|---------|
+| v_purchase_orders_with_details | Complete PO information with vendor and location details |
+| v_po_line_items_with_receipt_status | Line items with receipt status and quantities |
 
 ---
 
@@ -720,12 +420,15 @@ COMMENT ON VIEW v_po_line_items_with_receipt_status IS 'PO line items with recei
 
 ### Initial Sequence Setup
 
-\`\`\`sql
--- Initialize sequence for current year
-INSERT INTO po_sequence (year, sequence)
-VALUES (EXTRACT(YEAR FROM CURRENT_DATE)::INT, 0)
-ON CONFLICT (year) DO NOTHING;
-\`\`\`
+**Purpose**: Initialize the PO sequence counter for the current year.
+
+**Migration Steps**:
+1. Insert a new sequence record for the current year with starting value 0
+2. If a record already exists for the year, skip the insertion (idempotent operation)
+
+**Expected Result**: A single row exists in `po_sequence` for each active year.
+
+> **Note**: For SQL implementation details, refer to [TS-purchase-orders.md](./TS-purchase-orders.md).
 
 ---
 

@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Orders
 - **Document Type**: Use Cases (UC)
-- **Version**: 2.4.0
-- **Last Updated**: 2025-12-02
+- **Version**: 2.5.0
+- **Last Updated**: 2025-12-03
 - **Status**: Approved
 
 ## Related Documents
@@ -19,6 +19,7 @@
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.5.0 | 2025-12-03 | System | Converted ASCII use case diagram to Mermaid format with three diagrams: Primary Actor Use Cases, System/Integration Use Cases, and Use Case Relationships |
 | 2.4.0 | 2025-12-02 | System Analyst | Added UC-PO-020: Download QR Code for Mobile Receiving, updated UC-PO-006 to include QR Code section display |
 | 2.3.0 | 2025-12-01 | System | Added PO Item Details Dialog to UC-PO-006 with inventory status indicators (On Hand, On Order, Received), related PR links, and financial summary; Added sub-dialogs for On Hand Breakdown, Pending POs, and GRN History |
 | 2.2.0 | 2025-12-01 | System | Added Comments & Attachments sidebar feature; Updated UC-PO-006 to include collapsible right sidebar with Comments, Attachments, and Activity Log sections |
@@ -64,53 +65,125 @@ This document describes the use cases for the Purchase Orders sub-module. Use ca
 
 ## Use Case Diagram
 
+### Primary Actor Use Cases
+
+```mermaid
+graph TB
+    subgraph Actors
+        PS[Purchasing Staff]
+        RS[Receiving Staff]
+        DM[Department Manager]
+        PM[Purchasing Manager]
+        V[Vendor]
+    end
+
+    subgraph User_Use_Cases[User Use Cases]
+        UC001[UC-PO-001<br/>Create PO from PR]
+        UC002[UC-PO-002<br/>Create Manual PO]
+        UC003[UC-PO-003<br/>Send PO to Vendor]
+        UC004[UC-PO-004<br/>Modify PO - Change Order]
+        UC005[UC-PO-005<br/>Cancel PO]
+        UC006[UC-PO-006<br/>View and Track PO]
+        UC020[UC-PO-020<br/>Download QR Code]
+    end
+
+    PS --> UC001
+    PS --> UC002
+    PS --> UC003
+    PS --> UC004
+    PS --> UC005
+    PS --> UC006
+    PS --> UC020
+
+    PM --> UC005
+
+    RS --> UC006
+    RS --> UC020
+
+    DM --> UC006
+
+    UC003 -.->|sends PO| V
 ```
-                            ┌─────────────────────────────────┐
-                            │   Purchase Orders System        │
-                            └────────────┬────────────────────┘
-                                         │
-          ┌──────────────────────────────┼──────────────────────────────┐
-          │                              │                              │
-          │                              │                              │
-    ┌─────▼──────┐                 ┌────▼─────┐                  ┌─────▼──────┐
-    │ Purchasing │                 │ Receiving│                  │ Department │
-    │   Staff    │                 │   Staff  │                  │  Manager   │
-    └─────┬──────┘                 └────┬─────┘                  └─────┬──────┘
-          │                              │                              │
-     [UC-001]                       [UC-006]                       [UC-006]
-     [UC-002]                                                      (view only)
-     [UC-003]                            │
-     [UC-004]                            │
-     [UC-005]                            │
-     [UC-006]                            │
-          │                              │
-          │                         ┌────▼─────┐
-          │                         │  Vendor  │
-          │                         │(External)│
-          └─────────────────────────┤          │
-                   [UC-003]         └──────────┘
-                (sends PO)
 
+### System and Integration Use Cases
 
-    ┌──────────────┐              ┌──────────────┐              ┌──────────────┐
-    │   System     │              │    Budget    │              │    Vendor    │
-    │ (Automated)  │              │  Management  │              │  Management  │
-    │              │              │    System    │              │    System    │
-    └──────┬───────┘              └──────┬───────┘              └──────┬───────┘
-           │                             │                             │
-      [UC-101]                      [UC-201]                       [UC-202]
-      [UC-102]                   (integration)                   (integration)
-      [UC-103]
-      [UC-104]
-      [UC-105]
-      [UC-301]
-    (scheduled)
+```mermaid
+graph TB
+    subgraph System_Actors
+        SYS[System - Automated]
+        BMS[Budget Management System]
+        VMS[Vendor Management System]
+        GRN[GRN System]
+    end
+
+    subgraph System_Use_Cases[System Use Cases]
+        UC101[UC-PO-101<br/>Generate PO Number]
+        UC102[UC-PO-102<br/>Calculate PO Totals]
+        UC103[UC-PO-103<br/>Validate Budget]
+        UC104[UC-PO-104<br/>Auto-Update from GRN]
+        UC105[UC-PO-105<br/>Send Delivery Reminder]
+    end
+
+    subgraph Integration_Use_Cases[Integration Use Cases]
+        UC201[UC-PO-201<br/>Budget Integration]
+        UC202[UC-PO-202<br/>Vendor Integration]
+    end
+
+    subgraph Background_Jobs[Background Jobs]
+        UC301[UC-PO-301<br/>Daily Status Cleanup]
+    end
+
+    SYS --> UC101
+    SYS --> UC102
+    SYS --> UC103
+    SYS --> UC104
+    SYS --> UC105
+    SYS --> UC301
+
+    BMS <--> UC201
+    VMS <--> UC202
+    GRN --> UC104
+```
+
+### Use Case Relationships
+
+```mermaid
+graph LR
+    subgraph PO_Lifecycle[Purchase Order Lifecycle]
+        Create[Create PO<br/>UC-001/002]
+        Send[Send to Vendor<br/>UC-003]
+        Modify[Modify/Change<br/>UC-004]
+        Track[Track Status<br/>UC-006]
+        Cancel[Cancel PO<br/>UC-005]
+        Complete[Auto-Complete<br/>UC-301]
+    end
+
+    Create --> Send
+    Send --> Track
+    Send --> Modify
+    Modify --> Send
+    Track --> Cancel
+    Track --> Complete
+
+    subgraph Supporting[Supporting Processes]
+        GenNum[Generate Number<br/>UC-101]
+        CalcTotal[Calculate Totals<br/>UC-102]
+        ValidBudget[Validate Budget<br/>UC-103]
+        UpdateGRN[Update from GRN<br/>UC-104]
+        Reminder[Delivery Reminder<br/>UC-105]
+    end
+
+    Create -.-> GenNum
+    Create -.-> CalcTotal
+    Send -.-> ValidBudget
+    Track -.-> UpdateGRN
+    Track -.-> Reminder
 ```
 
 **Legend**:
-- **Primary Actors** (top): Initiate use cases and interact directly with the system
-- **System Actor** (middle): Automated system processes
-- **External System Actors** (bottom): Integration points with other systems
+- **Solid arrows (→)**: Direct actor-use case relationships
+- **Dashed arrows (-.->)**: Include/extend relationships
+- **Double arrows (<-->)**: Bidirectional integration
 
 ---
 

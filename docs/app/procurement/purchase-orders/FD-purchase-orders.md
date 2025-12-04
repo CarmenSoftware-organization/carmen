@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Orders
 - **Document Type**: Flow Diagrams (FD)
-- **Version**: 2.3.0
-- **Last Updated**: 2025-12-02
+- **Version**: 2.4.0
+- **Last Updated**: 2025-12-03
 - **Status**: Approved
 
 **Document History**:
@@ -23,6 +23,7 @@
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.4.0 | 2025-12-03 | System | Mermaid 8.8.2 compatibility fixes: Updated stateDiagram to stateDiagram-v2, removed unsupported subgraph styling |
 | 2.3.0 | 2025-12-02 | System Analyst | Added Diagram 10: QR Code Generation for Mobile Receiving flow, updated PO creation flow (Diagram 1) to include QR code generation step |
 | 2.1.0 | 2025-12-01 | System | Added Comments & Attachments sidebar feature; Updated page layout description to include collapsible right sidebar with Comments, Attachments, and Activity Log sections |
 | 1.0.0 | 2025-11-19 | Documentation Team | Initial version |
@@ -43,7 +44,7 @@ This document provides visual representations of purchase order workflows, data 
 
 ## 1. Purchase Order Creation Process Flow
 
-\`\`\`mermaid
+```mermaid
 graph TD
     Start([User Starts PO Creation]) --> CheckSource{Source?}
     
@@ -83,20 +84,20 @@ graph TD
     GeneratePONum --> CreateLineItems[Create Line Items]
     CreateLineItems --> CreateBudgetAlloc[Create Budget Allocations]
     CreateBudgetAlloc --> UpdatePRStatus[Update PR Status<br/>if from PR]
-    UpdatePRStatus --> GenerateQRCode[Generate QR Code<br/>PO:{po_number}]
+    UpdatePRStatus --> GenerateQRCode[Generate QR Code<br/>for PO number]
     GenerateQRCode --> CreateAuditLog[Create Audit Log Entry]
     CreateAuditLog --> End([PO Created<br/>Status: Draft])
     
     CancelCreate --> EndCancel([Creation Cancelled])
-\`\`\`
+```
 
 **Description**: Complete flow for creating a purchase order from purchase requests or manually.
 
 ## 2. Send Purchase Order to Vendor
 
-\`\`\`mermaid
+```mermaid
 graph TD
-    Start([PO Status: Draft]) --> UserClickSend[User Clicks<br/>'Send to Vendor']
+    Start([PO Status Draft]) --> UserClickSend[User Clicks<br/>Send to Vendor]
     UserClickSend --> DisplayDialog[Display Send Dialog]
     
     DisplayDialog --> LoadVendorEmail[Load Vendor<br/>Email Address]
@@ -143,7 +144,7 @@ graph TD
     SetExpectedAck --> UpdateActivityLog[Update Activity Log]
     UpdateActivityLog --> NotifyStaff[Notify Purchasing<br/>Staff]
     NotifyStaff --> End([PO Sent to Vendor<br/>Status: Sent])
-\`\`\`
+```
 
 **Description**: Process for sending purchase order to vendor via email with PDF attachment.
 
@@ -151,9 +152,9 @@ graph TD
 
 ## 3. Purchase Order Change Order Process
 
-\`\`\`mermaid
+```mermaid
 graph TD
-    Start([PO Status: Sent/Acknowledged]) --> UserInitiate[User Clicks<br/>'Request Change Order']
+    Start([PO Status Sent or Acknowledged]) --> UserInitiate[User Clicks<br/>Request Change Order]
     UserInitiate --> DisplayChangeForm[Display Change Order Form]
     
     DisplayChangeForm --> ShowCurrentPO[Show Current<br/>PO Details<br/>Read-Only]
@@ -204,7 +205,7 @@ graph TD
     
     UpdateBudget --> NotifyStakeholders[Notify Stakeholders]
     NotifyStakeholders --> End([Change Order Complete])
-\`\`\`
+```
 
 **Description**: Process for modifying sent purchase orders with change order control and manager authorization for significant changes (>10%).
 
@@ -212,7 +213,7 @@ graph TD
 
 ## 4. Purchase Order Cancellation Process
 
-\`\`\`mermaid
+```mermaid
 graph TD
     Start([User Initiates Cancellation]) --> CheckPOStatus{Current<br/>PO Status}
     
@@ -273,7 +274,7 @@ graph TD
     PartialProcess --> End
     RedirectReturn --> EndRedirect([Redirected to<br/>Return Module])
     ClosePO --> EndClosed([PO Closed])
-\`\`\`
+```
 
 **Description**: Purchase order cancellation with vendor notification and budget release.
 
@@ -281,8 +282,8 @@ graph TD
 
 ## 5. Purchase Order Status State Transition Diagram
 
-\`\`\`mermaid
-stateDiagram
+```mermaid
+stateDiagram-v2
     [*] --> Draft: Create PO
 
     Draft --> Sent: Send to Vendor
@@ -336,7 +337,7 @@ stateDiagram
         Historical record
         Cannot reopen
     end note
-\`\`\`
+```
 
 **Description**: Complete state machine showing all possible PO status transitions and constraints.
 
@@ -390,7 +391,7 @@ stateDiagram
 
 ## 6. Budget Integration Data Flow
 
-\`\`\`mermaid
+```mermaid
 graph LR
     subgraph PO_System["Purchase Order System"]
         CreatePO[Create PO]
@@ -422,10 +423,7 @@ graph LR
     
     ReceiveGoods -->|Conversion Request| ConvertToExpense
     ConvertToExpense -->|Expense Record| ReceiveGoods
-    
-    style PO_System fill:#e1f5ff
-    style Budget_System fill:#fff4e1
-\`\`\`
+```
 
 **Description**: Data flow between purchase order system and budget management system.
 
@@ -433,7 +431,7 @@ graph LR
 
 ## 7. Vendor Communication Sequence Diagram
 
-\`\`\`mermaid
+```mermaid
 sequenceDiagram
     actor User
     participant PO_System
@@ -441,49 +439,49 @@ sequenceDiagram
     participant PDF_Generator
     participant Vendor
     participant Audit_Log
-    
-    User->>PO_System: Click "Send to Vendor"
-    PO_System->>PO_System: Validate PO Status = Draft
+
+    User->>PO_System: Click Send to Vendor
+    PO_System->>PO_System: Validate PO Status is Draft
     PO_System->>PO_System: Load Vendor Contact Info
     PO_System-->>User: Display Send Dialog
-    
+
     User->>PO_System: Review and Confirm Send
     PO_System->>PDF_Generator: Generate PO PDF
     PDF_Generator-->>PO_System: Return PDF File
-    
+
     alt PDF Generation Success
         PO_System->>Email_Service: Send Email with PDF
         Email_Service->>Vendor: Deliver Email
         Vendor-->>Email_Service: Email Received
         Email_Service-->>PO_System: Send Confirmation
-        
-        PO_System->>PO_System: Update PO Status to "Sent"
+
+        PO_System->>PO_System: Update PO Status to Sent
         PO_System->>PO_System: Record Sent Timestamp
         PO_System->>Audit_Log: Log Communication
         PO_System-->>User: Success Message
-        
+
     else PDF Generation Failed
         PDF_Generator-->>PO_System: Error
-        PO_System-->>User: Show Error, Offer Retry
+        PO_System-->>User: Show Error and Offer Retry
     else Email Send Failed
         Email_Service-->>PO_System: Delivery Failed
         PO_System->>Audit_Log: Log Failed Attempt
-        PO_System-->>User: Show Error, Offer Manual Send
+        PO_System-->>User: Show Error and Offer Manual Send
     end
-    
+
     opt Vendor Acknowledgment
-        Vendor->>PO_System: Acknowledge Receipt (via Portal)
-        PO_System->>PO_System: Update Status to "Acknowledged"
+        Vendor->>PO_System: Acknowledge Receipt via Portal
+        PO_System->>PO_System: Update Status to Acknowledged
         PO_System->>Audit_Log: Log Acknowledgment
         PO_System-->>User: Notify Acknowledgment
     end
-\`\`\`
+```
 
 **Description**: Sequence of interactions when sending PO to vendor with error handling.
 
 ## 8. Goods Receipt Integration Flow
 
-\`\`\`mermaid
+```mermaid
 graph TD
     Start([GRN Created]) --> GRNApproved{GRN<br/>Approved?}
     
@@ -527,7 +525,7 @@ graph TD
     AutoComplete --> FinalizeStatus[Set Status:<br/>'Completed']
     FinalizeStatus --> ArchivePO[Archive PO]
     ArchivePO --> End
-\`\`\`
+```
 
 **Description**: Automatic PO status update when goods are received via GRN.
 
@@ -535,7 +533,7 @@ graph TD
 
 ## 9. Line Item Details View Flow
 
-\`\`\`mermaid
+```mermaid
 graph TD
     Start([User Clicks Line Item Row]) --> LoadItem[Load Item Data from PO Line]
     LoadItem --> ShowDialog[Open Item Details Dialog]
@@ -585,7 +583,7 @@ graph TD
     UpdatePO --> CloseDialog
 
     CloseDialog --> End([Return to PO Detail Page])
-\`\`\`
+```
 
 **Description**: User flow for viewing and interacting with line item details, including inventory status indicators and sub-dialogs.
 
@@ -599,7 +597,7 @@ graph TD
     CheckPONum -->|No| WaitForNum[Wait for PO Number]
     WaitForNum --> CheckPONum
 
-    CheckPONum -->|Yes| BuildValue[Build QR Value<br/>Format: PO:{po_number}]
+    CheckPONum -->|Yes| BuildValue[Build QR Value<br/>Format: PO:po_number]
     BuildValue --> CallQRLib[Call qrcode Library v1.5.3]
 
     CallQRLib --> SetOptions[Set QR Options:<br/>- Error Correction: M 15%<br/>- Width: 300px<br/>- Margin: 4 modules]
@@ -620,7 +618,7 @@ graph TD
 
     ShowInstructions --> UserAction{User Action?}
     UserAction -->|Download| DownloadQR[Generate High-Res QR<br/>400x400px, 4 margin]
-    DownloadQR --> SaveFile[Save as PNG:<br/>{po_number}-QR.png]
+    DownloadQR --> SaveFile[Save as PNG:<br/>po_number-QR.png]
     SaveFile --> UserAction
 
     UserAction -->|Copy| CopyToClipboard[Copy PO Number<br/>to Clipboard]
@@ -679,3 +677,4 @@ These diagrams serve as reference for developers, testers, and stakeholders to u
 | 2.1.0 | 2025-12-01 | System | Added Comments & Attachments sidebar feature documentation |
 | 2.2.0 | 2025-12-01 | System | Added Line Item Details View Flow (Diagram 9) showing item details dialog with inventory status indicators, sub-dialogs for On Hand Breakdown, Pending POs, and GRN History |
 | 2.3.0 | 2025-12-02 | System Analyst | Added Diagram 10: QR Code Generation for Mobile Receiving flow with complete desktop and mobile integration, updated Diagram 1 to include QR code generation step |
+| 2.4.0 | 2025-12-03 | System | Mermaid 8.8.2 compatibility fixes: Updated stateDiagram to stateDiagram-v2, removed unsupported subgraph styling |

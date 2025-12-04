@@ -4,21 +4,25 @@
 - **Module**: Procurement
 - **Sub-Module**: Credit Note
 - **Database**: PostgreSQL (via Supabase)
-- **Schema Version**: 1.0.0
-- **Last Updated**: 2025-01-11
+- **Schema Version**: 1.0.4
+- **Last Updated**: 2025-12-03
 - **Owner**: Procurement Team
 - **Status**: Approved
 
 ## Document History
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.0.4 | 2025-12-03 | Documentation Team | Updated to support configurable costing method (FIFO or Periodic Average) per system settings |
+| 1.0.3 | 2025-12-03 | Documentation Team | Added Related Shared Data Structures section with references to SM-inventory-operations |
+| 1.0.2 | 2025-12-03 | Documentation Team | Added Backend Data Structures section for server actions and API contracts |
+| 1.0.1 | 2025-12-03 | Documentation Team | Document history update for consistency across documentation set |
 | 1.0.0 | 2025-01-11 | Documentation Team | Initial version from type definitions analysis |
 
 ---
 
 ## Overview
 
-The Credit Note data model manages vendor credits for returns and pricing adjustments. The model supports two distinct credit types: quantity-based returns with FIFO costing and lot tracking, and amount-based pricing adjustments. It captures complete credit documentation including vendor information, item details, lot applications, FIFO cost analysis, tax calculations, and journal entries.
+The Credit Note data model manages vendor credits for returns and pricing adjustments. The model supports two distinct credit types: quantity-based returns with inventory costing (FIFO or Periodic Average, configurable at system level) and lot tracking, and amount-based pricing adjustments. It captures complete credit documentation including vendor information, item details, lot applications, cost analysis, tax calculations, and journal entries.
 
 The data model consists of four primary entities: CreditNote (header), CreditNoteItem (line items), AppliedLot (lot tracking for returns), and CreditNoteAttachment (file attachments). Supporting enumerations define credit types, status values, and credit reasons. The model integrates with GRN for source data, Inventory for lot tracking, and Finance for GL postings.
 
@@ -35,6 +39,18 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 - [Use Cases](./UC-credit-note.md)
 - [Flow Diagrams](./FD-credit-note.md)
 - [Validations](./VAL-credit-note.md)
+
+**Related Shared Data Structures**:
+
+The Credit Note module utilizes data structures defined in the centralized Shared Methods documentation:
+
+| Data Structure | Shared Method Reference | Usage in CN |
+|----------------|------------------------|-------------|
+| **InventoryBalance** | [SM-inventory-operations.md#3.1](../../shared-methods/inventory-operations/SM-inventory-operations.md) | Current stock levels for return validation |
+| **InventoryOperation** | [SM-inventory-operations.md#3.2](../../shared-methods/inventory-operations/SM-inventory-operations.md) | Stock movement transactions for returns |
+| **InventoryState** | [SM-inventory-operations.md#3.3](../../shared-methods/inventory-operations/SM-inventory-operations.md) | Item state tracking for return processing |
+| **AuditLog** | [SM-inventory-operations.md#3.7](../../shared-methods/inventory-operations/SM-inventory-operations.md) | Audit trail entries for CN operations |
+| **InventoryValuation** | [SM-inventory-valuation.md](../../shared-methods/inventory-valuation/SM-inventory-valuation.md) | Inventory cost calculation results (FIFO or Periodic Average) |
 
 ---
 
@@ -146,8 +162,8 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
   - Data type: Enum (CreditNoteType)
   - Allowed values: QUANTITY_RETURN, AMOUNT_DISCOUNT
   - Business meaning:
-    - QUANTITY_RETURN: Physical goods returned, stock movements generated, FIFO costing applied
-    - AMOUNT_DISCOUNT: Pricing adjustment only, no stock movements, no FIFO costing
+    - QUANTITY_RETURN: Physical goods returned, stock movements generated, inventory costing applied (FIFO or Periodic Average based on system configuration)
+    - AMOUNT_DISCOUNT: Pricing adjustment only, no stock movements, no inventory costing
   - Default: QUANTITY_RETURN
   - Cannot be changed after save
 
@@ -381,7 +397,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 
 **Description**: Represents an individual product line item within a credit note, capturing quantities being credited, pricing, discounts, and tax calculations. For quantity returns, links to specific inventory lots via AppliedLot entity.
 
-**Business Purpose**: Provides detailed item-level tracking of credits, enabling inventory adjustments (for quantity returns), cost accounting with FIFO costing, and granular financial reporting at the SKU level.
+**Business Purpose**: Provides detailed item-level tracking of credits, enabling inventory adjustments (for quantity returns), cost accounting with system-configured costing method (FIFO or Periodic Average), and granular financial reporting at the SKU level.
 
 **Data Ownership**: Procurement and Finance Departments
 
@@ -441,10 +457,10 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
   - Manual entry for amount discounts
   - Example: 4000.00
 
-- **costVariance**: FIFO cost variance (current cost - weighted average cost)
+- **costVariance**: Inventory cost variance (current cost - calculated cost from FIFO or Periodic Average method)
   - Required: No (NULL for amount discounts, calculated for quantity returns)
   - Data type: Decimal (15,4)
-  - Example: 12.5000 (current cost is 12.50 higher than FIFO average)
+  - Example: 12.5000 (current cost is 12.50 higher than calculated cost)
 
 - **discountAmount**: Additional discount on top of credit amount
   - Required: No
@@ -500,7 +516,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 | totalReceivedQty | DECIMAL(15,3) | No | NULL | Total across selected lots | 60.000 | ≥ 0 if not NULL |
 | unitPrice | DECIMAL(15,4) | Yes | - | Price per unit | 400.0000 | > 0 |
 | cnAmt | DECIMAL(15,2) | Yes | - | Credit amount | 4000.00 | ≥ 0 |
-| costVariance | DECIMAL(15,4) | No | NULL | FIFO cost variance | 12.5000 | Any value |
+| costVariance | DECIMAL(15,4) | No | NULL | Inventory cost variance | 12.5000 | Any value |
 | discountAmount | DECIMAL(15,2) | No | 0.00 | Additional discount | 200.00 | ≥ 0 |
 | taxRate | DECIMAL(5,2) | Yes | 0.00 | Tax rate percentage | 18.00 | 0-100 |
 | tax | DECIMAL(15,2) | Yes | 0.00 | Tax amount | 684.00 | ≥ 0 |
@@ -554,16 +570,16 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 
 ### Entity: AppliedLot
 
-**Description**: Represents the application of a credit note item to specific inventory lot(s), enabling FIFO costing and lot traceability for quantity-based returns. Each record links a credit note item to a particular inventory lot with the quantity being returned from that lot.
+**Description**: Represents the application of a credit note item to specific inventory lot(s), enabling inventory costing (FIFO or Periodic Average) and lot traceability for quantity-based returns. Each record links a credit note item to a particular inventory lot with the quantity being returned from that lot.
 
-**Business Purpose**: Enables accurate inventory valuation using FIFO costing method, maintains lot traceability for quality control and regulatory compliance, and provides detailed cost variance analysis for financial reporting.
+**Business Purpose**: Enables accurate inventory valuation using system-configured costing method (FIFO or Periodic Average), maintains lot traceability for quality control and regulatory compliance, and provides detailed cost variance analysis for financial reporting.
 
 **Data Ownership**: Warehouse and Finance Departments
 
 **Access Pattern**:
 - Primarily accessed via parent credit note item ID
 - Filtered by lot number
-- Used in FIFO cost calculations
+- Used in inventory cost calculations (FIFO or Periodic Average)
 
 **Data Volume**: Approximately 400 records per month (average 1.3 lots per quantity return item), 4,800 records per year
 
@@ -601,7 +617,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
   - Example: 5.000 (returning 5 units from this lot)
   - Constraint: Must be > 0 and ≤ lot available quantity
 
-- **unitCost**: Unit cost from this lot (for FIFO calculation)
+- **unitCost**: Unit cost from this lot (for inventory costing calculation)
   - Required: Yes
   - Data type: Decimal (15,4)
   - Example: 387.5000
@@ -641,8 +657,9 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 - Applied lots only exist for quantity-based credit notes (type = QUANTITY_RETURN)
 - Sum of applied lot quantities must equal credit note item cnQty
 - Each lot must exist in inventory system with sufficient available quantity
-- FIFO weighted average cost calculated as: Σ(quantity × unitCost) / Σ(quantity)
-- Cost variance = current unit price - FIFO weighted average cost
+- **FIFO**: Weighted average cost calculated as: Σ(quantity × unitCost) / Σ(quantity)
+- **Periodic Average**: Period average cost calculated as: Total Period Value / Total Period Quantity
+- Cost variance = current unit price - calculated cost (from FIFO or Periodic Average)
 - Applied lots are immutable once credit note is committed
 
 ---
@@ -757,7 +774,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 **Values**:
 - **QUANTITY_RETURN**: Physical goods being returned to vendor
   - Triggers stock movements (negative quantities)
-  - Requires lot selection and FIFO costing
+  - Requires lot selection and inventory costing (FIFO or Periodic Average)
   - Updates inventory balances
   - Example use case: Damaged kitchen equipment returned to supplier
 
@@ -771,7 +788,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 - Credit note type determines whether AppliedLot records are required
 - Credit note type is immutable after save (cannot be changed)
 - Stock movements only generated for QUANTITY_RETURN type
-- FIFO costing only applied to QUANTITY_RETURN type
+- Inventory costing (FIFO or Periodic Average) only applied to QUANTITY_RETURN type
 
 ---
 
@@ -906,7 +923,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 - **Primary Key Index**: id (automatic)
 - **Parent Index**: creditNoteItemId (B-tree)
   - Purpose: Fast retrieval of applied lots for an item
-  - Usage: FIFO calculation, lot traceability
+  - Usage: Inventory costing calculation, lot traceability
 
 - **Lot Number Index**: lotNumber (B-tree)
   - Purpose: Find all credit applications for a lot
@@ -1030,13 +1047,426 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 
 ---
 
+## Backend Data Structures
+
+This section defines data structures required for server actions and API contracts as specified in BR-BE-001 through BR-BE-014.
+
+### Server Action Input/Output Structures
+
+#### DD-BE-001: Credit Note CRUD Operation Structures
+
+**CreateCreditNoteInput**:
+- **Description**: Input structure for creating a new credit note via server action
+- **Fields**:
+  - vendorId: UUID (required) - Reference to vendor
+  - creditType: CreditNoteType (required) - QUANTITY_RETURN or AMOUNT_DISCOUNT
+  - documentDate: Date (required) - Credit note issue date
+  - grnId: UUID (optional) - Reference to source GRN
+  - invoiceReference: String (optional) - Original invoice number
+  - taxInvoiceReference: String (optional) - Tax invoice number
+  - creditReason: CreditNoteReason (required) - Reason code
+  - description: String (required) - Detailed explanation
+  - currency: String (required) - ISO currency code
+  - exchangeRate: Decimal (required) - Exchange rate to base
+  - items: Array of CreateCreditNoteItemInput (required) - At least one item
+
+**CreateCreditNoteItemInput**:
+- **Description**: Input structure for credit note line items
+- **Fields**:
+  - productId: UUID (required) - Product reference
+  - location: String (conditional) - Required for QUANTITY_RETURN
+  - cnQty: Decimal (conditional) - Required for QUANTITY_RETURN, must be > 0
+  - unitPrice: Decimal (required) - Price per unit
+  - discountAmount: Decimal (optional) - Line discount
+  - taxRate: Decimal (required) - Tax rate percentage
+  - grnNumber: String (optional) - Source GRN reference
+  - appliedLots: Array of AppliedLotInput (conditional) - Required for QUANTITY_RETURN
+
+**AppliedLotInput**:
+- **Description**: Input structure for lot selections
+- **Fields**:
+  - lotNumber: String (required) - Inventory lot number
+  - quantity: Decimal (required) - Return quantity from this lot
+  - unitCost: Decimal (required) - Unit cost from lot
+
+**UpdateCreditNoteInput**:
+- **Description**: Input structure for updating draft credit note
+- **Fields**: Same as CreateCreditNoteInput plus:
+  - id: UUID (required) - Credit note ID to update
+
+**CreditNoteResponse**:
+- **Description**: Standard server action response structure
+- **Fields**:
+  - success: Boolean - Operation success indicator
+  - data: CreditNote (optional) - Returned credit note object
+  - error: ErrorDetails (optional) - Error information if failed
+  - message: String (optional) - User-friendly message
+
+**ErrorDetails**:
+- **Description**: Structured error information
+- **Fields**:
+  - code: String - Error code (e.g., "VALIDATION_ERROR", "NOT_FOUND")
+  - message: String - Technical error message
+  - field: String (optional) - Field name for validation errors
+  - details: Object (optional) - Additional error context
+
+#### DD-BE-002: Vendor and GRN Fetch Structures
+
+**VendorSearchInput**:
+- **Description**: Input for vendor search/fetch
+- **Fields**:
+  - searchTerm: String (optional) - Search by name or code
+  - isActive: Boolean (optional) - Filter by active status
+  - limit: Integer (optional) - Max records to return
+  - offset: Integer (optional) - Pagination offset
+
+**VendorSearchResponse**:
+- **Description**: Vendor search results
+- **Fields**:
+  - vendors: Array of VendorSummary - Matching vendors
+  - total: Integer - Total count for pagination
+  - hasMore: Boolean - More records available
+
+**VendorSummary**:
+- **Description**: Vendor information for selection
+- **Fields**:
+  - id: UUID - Vendor ID
+  - code: String - Vendor code
+  - name: String - Vendor name
+  - contactEmail: String (optional) - Primary contact email
+  - isActive: Boolean - Active status
+
+**GRNSearchInput**:
+- **Description**: Input for GRN search by vendor
+- **Fields**:
+  - vendorId: UUID (required) - Vendor to filter by
+  - searchTerm: String (optional) - Search by GRN number or invoice
+  - status: String (optional) - Filter by GRN status
+  - fromDate: Date (optional) - Date range start
+  - toDate: Date (optional) - Date range end
+  - limit: Integer (optional) - Max records
+  - offset: Integer (optional) - Pagination offset
+
+**GRNSearchResponse**:
+- **Description**: GRN search results
+- **Fields**:
+  - grns: Array of GRNSummary - Matching GRNs
+  - total: Integer - Total count
+  - hasMore: Boolean - More records available
+
+**GRNSummary**:
+- **Description**: GRN information for selection
+- **Fields**:
+  - id: UUID - GRN ID
+  - grnNumber: String - GRN number
+  - grnDate: Date - GRN date
+  - invoiceNumber: String (optional) - Invoice reference
+  - invoiceDate: Date (optional) - Invoice date
+  - totalAmount: Decimal - GRN total
+  - currency: String - Currency code
+
+**GRNItemsResponse**:
+- **Description**: GRN items with available lots
+- **Fields**:
+  - grnId: UUID - GRN ID
+  - items: Array of GRNItemWithLots - Items with lot data
+
+**GRNItemWithLots**:
+- **Description**: GRN item with available inventory lots
+- **Fields**:
+  - productId: UUID - Product ID
+  - productName: String - Product name
+  - productCode: String - Product code
+  - receivedQty: Decimal - Originally received quantity
+  - unitPrice: Decimal - Unit price from GRN
+  - orderUnit: String - Order unit of measure
+  - inventoryUnit: String - Inventory unit
+  - availableLots: Array of AvailableLot - Lots with available stock
+
+**AvailableLot**:
+- **Description**: Inventory lot available for return
+- **Fields**:
+  - lotNumber: String - Lot number
+  - receiveDate: Date - Date lot was received
+  - grnNumber: String - Source GRN
+  - invoiceNumber: String (optional) - Source invoice
+  - availableQty: Decimal - Available quantity for return
+  - unitCost: Decimal - Lot unit cost (for inventory costing)
+
+#### DD-BE-003: Commitment Transaction Structures
+
+**CommitCreditNoteInput**:
+- **Description**: Input for committing credit note to GL
+- **Fields**:
+  - creditNoteId: UUID (required) - Credit note to commit
+  - commitmentDate: Date (required) - GL posting date
+
+**CommitCreditNoteResponse**:
+- **Description**: Commitment operation response
+- **Fields**:
+  - success: Boolean - Operation success
+  - creditNote: CreditNote (optional) - Updated credit note
+  - journalEntries: Array of JournalEntry (optional) - Generated entries
+  - stockMovements: Array of StockMovement (optional) - Generated movements
+  - commitmentReference: String (optional) - Journal voucher number
+  - error: ErrorDetails (optional) - Error if failed
+
+**JournalEntry**:
+- **Description**: Generated journal entry line
+- **Fields**:
+  - id: UUID - Entry ID
+  - accountCode: String - GL account code
+  - accountName: String - GL account name
+  - department: String - Department code
+  - costCenter: String (optional) - Cost center
+  - description: String - Entry description
+  - reference: String - Document reference
+  - debitAmount: Decimal - Debit amount (0 if credit)
+  - creditAmount: Decimal - Credit amount (0 if debit)
+  - taxCode: String (optional) - Tax code if applicable
+  - entryOrder: Integer - Order within voucher
+  - entryGroup: String - PRIMARY or INVENTORY
+
+**StockMovement**:
+- **Description**: Generated stock movement record
+- **Fields**:
+  - id: UUID - Movement ID
+  - locationType: String - INV or CON
+  - lotNumber: String - Lot number
+  - quantity: Decimal - Movement quantity (negative for returns)
+  - unitCost: Decimal - Unit cost
+  - extraCost: Decimal - Extra costs per unit
+  - movementDate: Date - Movement date
+  - referenceType: String - "Credit Note"
+  - referenceNumber: String - CN number
+  - documentId: UUID - Credit note ID
+  - totalValue: Decimal - Total movement value
+
+#### DD-BE-004: Void Transaction Structures
+
+**VoidCreditNoteInput**:
+- **Description**: Input for voiding committed credit note
+- **Fields**:
+  - creditNoteId: UUID (required) - Credit note to void
+  - voidReason: String (required) - Reason for voiding
+  - voidDate: Date (required) - Void posting date
+
+**VoidCreditNoteResponse**:
+- **Description**: Void operation response
+- **Fields**:
+  - success: Boolean - Operation success
+  - creditNote: CreditNote (optional) - Updated credit note with VOID status
+  - reversingJournalEntries: Array of JournalEntry (optional) - Reversing entries
+  - reversingStockMovements: Array of StockMovement (optional) - Reversing movements
+  - voidReference: String (optional) - Void journal reference
+  - error: ErrorDetails (optional) - Error if failed
+
+#### DD-BE-005: Inventory Costing Structures
+
+**CostCalculationInput**:
+- **Description**: Input for inventory cost calculation (FIFO or Periodic Average)
+- **Fields**:
+  - productId: UUID (required) - Product for calculation
+  - selectedLots: Array of LotSelection (required) - Lots with quantities (for FIFO)
+  - creditNoteDate: Date (required) - Date for period calculation (for Periodic Average)
+
+**LotSelection**:
+- **Description**: Lot selection for costing
+- **Fields**:
+  - lotNumber: String (required) - Lot number
+  - quantity: Decimal (required) - Return quantity from lot
+
+**CostCalculationResult**:
+- **Description**: Inventory costing calculation output
+- **Fields**:
+  - productId: UUID - Product ID
+  - costingMethod: String - 'FIFO' or 'PERIODIC_AVERAGE'
+  - totalReceivedQty: Decimal - Sum of lot quantities (FIFO) or period quantity (Periodic Average)
+  - calculatedUnitCost: Decimal - Calculated cost (FIFO weighted average or period average)
+  - currentUnitCost: Decimal - Current cost from product/GRN
+  - costVariance: Decimal - Current minus weighted average
+  - returnQuantity: Decimal - Total return quantity
+  - returnAmount: Decimal - Return qty × current cost
+  - costOfGoodsSold: Decimal - Return qty × weighted average
+  - realizedGainLoss: Decimal - Return amount minus COGS
+  - lotDetails: Array of LotCostDetail - Per-lot breakdown
+
+**LotCostDetail**:
+- **Description**: Individual lot cost details
+- **Fields**:
+  - lotNumber: String - Lot number
+  - quantity: Decimal - Return quantity from lot
+  - unitCost: Decimal - Lot unit cost
+  - totalCost: Decimal - Quantity × unit cost
+  - receiveDate: Date - Lot receive date
+  - grnNumber: String - Source GRN
+
+#### DD-BE-006: Tax Calculation Structures
+
+**TaxCalculationInput**:
+- **Description**: Input for tax calculation
+- **Fields**:
+  - documentDate: Date (required) - Date for tax rate lookup
+  - items: Array of TaxableItem (required) - Items to calculate tax
+
+**TaxableItem**:
+- **Description**: Item for tax calculation
+- **Fields**:
+  - itemId: UUID - Item identifier
+  - baseAmount: Decimal - Amount before tax
+  - taxCode: String (optional) - Specific tax code
+
+**TaxCalculationResult**:
+- **Description**: Tax calculation output
+- **Fields**:
+  - totalBaseAmount: Decimal - Sum of base amounts
+  - totalTaxAmount: Decimal - Sum of tax amounts
+  - taxRate: Decimal - Applied tax rate
+  - vatPeriod: String - VAT period name
+  - vatReturnStatus: String - Open or Closed
+  - items: Array of ItemTaxDetail - Per-item tax
+
+**ItemTaxDetail**:
+- **Description**: Individual item tax details
+- **Fields**:
+  - itemId: UUID - Item identifier
+  - baseAmount: Decimal - Base amount
+  - taxRate: Decimal - Tax rate applied
+  - taxAmount: Decimal - Calculated tax
+  - taxCode: String - Tax code used
+
+#### DD-BE-007: Attachment Structures
+
+**AttachmentUploadInput**:
+- **Description**: Input for uploading attachment
+- **Fields**:
+  - creditNoteId: UUID (required) - Parent credit note
+  - file: File (required) - File to upload
+  - description: String (optional) - File description
+
+**AttachmentUploadResponse**:
+- **Description**: Upload response
+- **Fields**:
+  - success: Boolean - Upload success
+  - attachment: CreditNoteAttachment (optional) - Created attachment
+  - error: ErrorDetails (optional) - Error if failed
+
+**AttachmentDeleteInput**:
+- **Description**: Input for deleting attachment
+- **Fields**:
+  - attachmentId: UUID (required) - Attachment to delete
+
+#### DD-BE-008: Audit Log Structures
+
+**AuditLogEntry**:
+- **Description**: Audit trail record structure
+- **Fields**:
+  - id: UUID - Log entry ID
+  - entityType: String - "CreditNote"
+  - entityId: UUID - Credit note ID
+  - action: String - CREATE, UPDATE, COMMIT, VOID, DELETE
+  - userId: UUID - User who performed action
+  - userName: String - User display name
+  - timestamp: Timestamp - When action occurred
+  - ipAddress: String - Request source IP
+  - oldValues: JSON (optional) - Previous field values
+  - newValues: JSON (optional) - New field values
+  - metadata: JSON (optional) - Additional context
+
+**AuditLogQuery**:
+- **Description**: Query for retrieving audit logs
+- **Fields**:
+  - entityId: UUID (optional) - Filter by credit note
+  - action: String (optional) - Filter by action type
+  - userId: UUID (optional) - Filter by user
+  - fromDate: Date (optional) - Date range start
+  - toDate: Date (optional) - Date range end
+  - limit: Integer (optional) - Max records
+  - offset: Integer (optional) - Pagination offset
+
+#### DD-BE-009: CN Number Generation Structures
+
+**CNNumberRequest**:
+- **Description**: Request for new CN number
+- **Fields**:
+  - documentDate: Date (required) - For year determination
+  - locationId: UUID (optional) - For location-specific sequences
+
+**CNNumberResponse**:
+- **Description**: Generated CN number
+- **Fields**:
+  - cnNumber: String - Generated number (e.g., CN-2024-001)
+  - sequence: Integer - Sequence number used
+  - year: Integer - Year component
+
+#### DD-BE-010: Data Validation Structures
+
+**ValidationResult**:
+- **Description**: Validation operation result
+- **Fields**:
+  - isValid: Boolean - Overall validation status
+  - errors: Array of ValidationError - List of validation errors
+  - warnings: Array of ValidationWarning - Non-blocking warnings
+
+**ValidationError**:
+- **Description**: Individual validation error
+- **Fields**:
+  - field: String - Field name with error
+  - code: String - Error code
+  - message: String - Error message
+  - value: Any (optional) - Invalid value
+
+**ValidationWarning**:
+- **Description**: Non-blocking validation warning
+- **Fields**:
+  - field: String - Field name
+  - code: String - Warning code
+  - message: String - Warning message
+
+### Database Transaction Patterns
+
+#### DD-BE-011: Atomic Transaction Requirements
+
+**CommitmentTransaction**:
+- **Description**: Atomic transaction for credit note commitment
+- **Steps** (all must succeed or rollback):
+  1. Validate credit note state (DRAFT)
+  2. Validate accounting period open
+  3. Generate and insert journal entries
+  4. Generate and insert stock movements (QUANTITY_RETURN only)
+  5. Update inventory lot balances
+  6. Update vendor payable balance
+  7. Update credit note status to COMMITTED
+  8. Create audit log entry
+- **Isolation Level**: Serializable
+- **Lock Pattern**: Pessimistic locking on credit note record
+
+**VoidTransaction**:
+- **Description**: Atomic transaction for credit note void
+- **Steps** (all must succeed or rollback):
+  1. Validate credit note state (COMMITTED)
+  2. Validate no dependent transactions
+  3. Validate accounting period open
+  4. Generate and insert reversing journal entries
+  5. Generate and insert reversing stock movements
+  6. Restore inventory lot balances
+  7. Restore vendor payable balance
+  8. Update credit note status to VOID
+  9. Create audit log entry
+- **Isolation Level**: Serializable
+- **Lock Pattern**: Pessimistic locking on credit note and related records
+
+---
+
 ## Glossary
 
-**FIFO (First-In-First-Out)**: Inventory costing method that assumes first items purchased are first items returned. Used to calculate weighted average cost of returned goods.
+**FIFO (First-In-First-Out)**: Inventory costing method that calculates costs based on oldest inventory layers first. Used to calculate weighted average cost of returned goods. One of two configurable costing methods in the system.
 
-**Cost Variance**: Difference between current inventory cost and FIFO weighted average cost. Positive variance means current cost higher than FIFO average (loss on return), negative variance means lower (gain on return).
+**Periodic Average**: Inventory costing method that calculates costs using weighted average for the period (Total Value in Period / Total Quantity in Period). One of two configurable costing methods in the system.
 
-**Realized Gain/Loss**: Financial impact of cost variance on credit note, calculated as (return quantity × current cost) - (return quantity × FIFO weighted average cost).
+**Cost Variance**: Difference between current inventory cost and calculated cost (using FIFO weighted average or Periodic Average, depending on system configuration). Positive variance means current cost higher than calculated cost (loss on return), negative variance means lower (gain on return).
+
+**Realized Gain/Loss**: Financial impact of cost variance on credit note, calculated as (return quantity × current cost) - (return quantity × calculated cost).
 
 **Lot Tracking**: System capability to track specific inventory batches (lots) with unique identifiers for quality control and regulatory compliance.
 
@@ -1050,7 +1480,7 @@ The data model consists of four primary entities: CreditNote (header), CreditNot
 
 **Primary Entries**: Main journal entries for accounts payable credit and inventory/tax adjustments.
 
-**Inventory Entries**: Additional journal entries for cost variances between current cost and FIFO cost.
+**Inventory Entries**: Additional journal entries for cost variances between current cost and calculated cost (FIFO or Periodic Average).
 
 **Commitment Date**: Date when credit note was committed to general ledger, used for GL period determination.
 

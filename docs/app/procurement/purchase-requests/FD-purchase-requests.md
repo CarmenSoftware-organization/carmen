@@ -3,8 +3,8 @@
 **Module**: Procurement
 **Sub-Module**: Purchase Requests
 **Document Type**: Flow Diagrams (FD)
-**Version**: 1.6.0
-**Last Updated**: 2025-11-28
+**Version**: 1.7.0
+**Last Updated**: 2025-12-03
 **Status**: Active
 
 ## Document History
@@ -18,6 +18,7 @@
 | 1.4.0 | 2025-11-28 | Development Team | Updated 2.3: Edit Purchase Request flow to include Returned status as editable |
 | 1.5.0 | 2025-11-28 | Development Team | Added 2.9: Bulk Item Actions Flow for line-item level bulk operations |
 | 1.6.0 | 2025-11-28 | Development Team | Added 2.10: Budget Tab CRUD Flow for budget allocation management |
+| 1.7.0 | 2025-12-03 | Development Team | Updated 2.9.5: Split Items Flow - Approvers can now split PR by approval status; Added Approver Split Workflow |
 
 ## Implementation Status
 
@@ -763,7 +764,7 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    Start([User clicks Split]) --> ValidateRole{User is<br/>Purchasing Staff?}
+    Start([User clicks Split]) --> ValidateRole{User is Approver<br/>or Purchasing Staff?}
     ValidateRole -->|No| ShowError1[Display: Permission denied]
     ValidateRole -->|Yes| CheckCount{Items >= 2?}
 
@@ -771,11 +772,13 @@ flowchart TB
     CheckCount -->|Yes| ShowDialog[Display split configuration dialog]
 
     ShowDialog --> SelectMethod{Select split method}
+    SelectMethod -->|By Approval Status| GroupStatus["Group by approval status:<br/>- Approved items → Original PR<br/>- Items needing review → New PR"]
     SelectMethod -->|By Vendor| GroupVendor[Group items by vendor]
     SelectMethod -->|By Date| GroupDate[Group items by delivery date]
     SelectMethod -->|Manual| GroupManual[User defines groupings]
 
-    GroupVendor --> ShowPreview[Show split preview:<br/>- Groups formed<br/>- Items per group<br/>- New PR count]
+    GroupStatus --> ShowPreview[Show split preview:<br/>- Groups formed<br/>- Items per group<br/>- New PR count]
+    GroupVendor --> ShowPreview
     GroupDate --> ShowPreview
     GroupManual --> ShowPreview
 
@@ -783,12 +786,12 @@ flowchart TB
     UserConfirm -->|No| End1([End - No changes])
     UserConfirm -->|Yes| BeginTx[Begin transaction]
 
-    BeginTx --> CreateNewPRs[Create new PR for each group:<br/>- Copy header from original<br/>- Assign new ref number<br/>- Link to original PR]
+    BeginTx --> CreateNewPRs["Create new PR for each group:<br/>- Copy header from original<br/>- Assign new ref number<br/>- Set parent_pr_id to original<br/>- Set status based on split type"]
     CreateNewPRs --> UpdateOriginal["Update original PR:<br/>- Remove split items<br/>- Recalculate totals<br/>- Add split reference"]
     UpdateOriginal --> CommitTx[Commit transaction]
 
     CommitTx --> LogActivity[Log split activity with links]
-    LogActivity --> SendNotify["Send notifications:<br/>- Requestor: PR split<br/>- Staff: New PRs created"]
+    LogActivity --> SendNotify["Send notifications:<br/>- Requestor: PR split with reason<br/>- Staff: New PRs created"]
     SendNotify --> ShowSuccess["Display success with links to new PRs"]
     ShowSuccess --> End2([End - Success])
 
@@ -798,8 +801,44 @@ flowchart TB
     style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
     style End1 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
     style End2 fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style GroupStatus fill:#fff3cd,stroke:#ffc107,stroke-width:2px
     style CreateNewPRs fill:#cce5ff,stroke:#0066cc,stroke-width:2px
     style ShowSuccess fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+```
+
+#### 2.9.5.1 Approver Split by Approval Status Flow
+
+```mermaid
+flowchart TB
+    Start([Approver reviewing PR<br/>with mixed item decisions]) --> ReviewItems{Some items approved,<br/>some need review?}
+
+    ReviewItems -->|No| NormalFlow[Continue normal approval flow]
+    NormalFlow --> End1([End])
+
+    ReviewItems -->|Yes| SelectItems[Select items needing review]
+    SelectItems --> ClickSplit[Click Split button]
+    ClickSplit --> SelectByStatus["Select 'By Approval Status'"]
+
+    SelectByStatus --> SystemGroups["System creates groups:<br/>Group 1: Approved items<br/>Group 2: Returned items"]
+
+    SystemGroups --> AddComments[Approver adds return<br/>comments for each item]
+    AddComments --> ConfirmSplit{Confirm split?}
+
+    ConfirmSplit -->|No| End2([Cancel])
+    ConfirmSplit -->|Yes| ExecuteSplit[Execute split transaction]
+
+    ExecuteSplit --> OriginalPR["Original PR:<br/>- Contains approved items<br/>- Status: Approved<br/>- Proceeds to PO conversion"]
+    ExecuteSplit --> NewPR["New PR created:<br/>- Contains returned items<br/>- Status: Returned<br/>- parent_pr_id = Original PR<br/>- Return comments attached"]
+
+    OriginalPR --> NotifyRequestor["Notify Requestor:<br/>- PR split notification<br/>- Approved items proceeding<br/>- Returned items need revision"]
+    NewPR --> NotifyRequestor
+
+    NotifyRequestor --> End3([End - Parallel processing enabled])
+
+    style Start fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    style OriginalPR fill:#ccffcc,stroke:#00cc00,stroke-width:2px
+    style NewPR fill:#fff3cd,stroke:#ffc107,stroke-width:2px
+    style End3 fill:#ccffcc,stroke:#00cc00,stroke-width:2px
 ```
 
 #### 2.9.6 Set Date Required Flow
@@ -849,7 +888,8 @@ flowchart LR
         subgraph Requestor[Requestor - Draft/Void/Returned]
             R_Select[Select Items: ✅]
             R_SetDate[Set Date Required: ✅]
-            R_Others[Approve/Reject/Return/Split: ❌]
+            R_Others[Approve/Reject/Return: ❌]
+            R_Split[Split: ❌]
         end
 
         subgraph Approver[Approver]
@@ -858,7 +898,8 @@ flowchart LR
             A_Reject[Reject Selected: ✅]
             A_Return[Return Selected: ✅]
             A_SetDate[Set Date Required: ✅]
-            A_Split[Split: ❌]
+            A_Split[Split: ✅]
+            A_View[View Vendor/Pricing: 👁️]
         end
 
         subgraph Purchasing[Purchasing Staff]

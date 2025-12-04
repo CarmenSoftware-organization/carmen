@@ -4,8 +4,8 @@
 - **Module**: Procurement
 - **Sub-Module**: Purchase Requests
 - **Route**: `/procurement/purchase-requests`
-- **Version**: 1.6.0
-- **Last Updated**: 2025-11-28
+- **Version**: 1.7.0
+- **Last Updated**: 2025-12-03
 - **Owner**: Development Team
 - **Status**: Active
 
@@ -19,6 +19,7 @@
 | 1.4.0 | 2025-11-28 | Development Team | Updated Edit PR page to include Returned status, added Resubmit and Return action buttons |
 | 1.5.0 | 2025-11-28 | Development Team | Added 4.2: Bulk Item Actions Component with selection, toolbar, and action handlers |
 | 1.6.0 | 2025-11-28 | Development Team | Added 4.3: Budget Tab CRUD Component with add/edit/delete dialogs, validation, and calculations |
+| 1.7.0 | 2025-12-03 | Development Team | Extended Split capability to Approvers; added role-based field visibility; added Approver Split by Approval Status flow |
 
 ## Implementation Status
 
@@ -554,7 +555,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
   const canApprove = ['Approver', 'Purchasing Staff'].includes(userRole);
   const canReject = ['Approver', 'Purchasing Staff'].includes(userRole);
   const canReturn = ['Approver', 'Purchasing Staff'].includes(userRole);
-  const canSplit = userRole === 'Purchasing Staff' && selectionSummary.total >= 2;
+  const canSplit = ['Approver', 'Purchasing Staff'].includes(userRole) && selectionSummary.total >= 2;
   const canSetDate = true; // All roles can set date
 
   return (
@@ -696,7 +697,7 @@ const getVisibleActions = (userRole: UserRole, prStatus: PRStatus): ActionType[]
 
   // Approver
   if (['Approver', 'Department Manager', 'Finance Manager'].includes(userRole)) {
-    actions.push('approve', 'reject', 'return', 'setDate');
+    actions.push('approve', 'reject', 'return', 'split', 'setDate');
     return actions;
   }
 
@@ -777,6 +778,103 @@ const getValidStatusesForAction = (action: ActionType): ItemStatus[] => {
 | Split | secondary | blue | Split |
 | Set Date Required | secondary | blue | Calendar |
 | Clear Selection | ghost | gray | X |
+
+---
+
+#### 4.2.1 Approver Split by Approval Status
+
+**Status**: 🚧 Pending
+**Related BR**: FR-PR-016.2 (Approver Split Capability)
+**Role**: Approver, Department Manager, Finance Manager
+
+This feature enables Approvers to split a Purchase Request based on item approval status, separating approved items from items that need to be returned for revision.
+
+##### Use Case
+
+When reviewing a PR with multiple items, an Approver may:
+1. Approve some items that meet requirements
+2. Return other items that need revision or more information
+
+Rather than holding the entire PR, the Approver can split it:
+- **PR 1 (Original)**: Contains approved items → proceeds to next stage
+- **PR 2 (New)**: Contains returned items → sent back to Requestor for revision
+
+##### Split Options for Approvers
+
+| Split Option | Description | Use Case |
+|--------------|-------------|----------|
+| By Approval Status | Separate approved items from returned items | Partial approval workflow |
+| By Vendor | Group items by vendor (inherited from Purchasing Staff) | Multi-vendor PRs |
+| By Delivery Date | Group items by delivery date (inherited from Purchasing Staff) | Different timelines |
+
+##### Technical Implementation
+
+**Split by Approval Status Flow**:
+```typescript
+interface ApproverSplitRequest {
+  originalPrId: string;
+  splitReason: 'approval_status' | 'vendor' | 'delivery_date' | 'manual';
+  approvedItemIds: string[];
+  returnedItemIds: string[];
+  returnReason: string; // Required for returned items
+}
+
+const splitByApprovalStatus = async (request: ApproverSplitRequest) => {
+  // 1. Validate items belong to original PR
+  // 2. Validate at least 1 item in each group
+  // 3. Create new PR for returned items with parent_pr_id reference
+  // 4. Update original PR with only approved items
+  // 5. Set original PR items to Approved status
+  // 6. Set new PR status to Returned
+  // 7. Log activity for both PRs
+  return { originalPr, newPr };
+};
+```
+
+**Parent-Child PR Relationship**:
+```typescript
+interface SplitPRReference {
+  parent_pr_id: string;        // Reference to original PR
+  split_reason: string;        // 'approval_status', 'vendor', etc.
+  split_date: Date;            // When split occurred
+  split_by: string;            // User who performed split
+}
+```
+
+##### UI Components
+
+**ApproverSplitDialog Component**:
+```typescript
+interface ApproverSplitDialogProps {
+  prId: string;
+  items: PRItem[];
+  isOpen: boolean;
+  onClose: () => void;
+  onSplit: (request: ApproverSplitRequest) => Promise<void>;
+}
+
+// Component shows:
+// - List of items with checkboxes for approved/returned selection
+// - Summary: "X items approved, Y items to return"
+// - Return reason textarea (required)
+// - Preview of resulting PRs
+// - Confirm/Cancel buttons
+```
+
+##### Role-Based Field Visibility
+
+When Approvers view PR items, the following visibility rules apply:
+
+| Field | Visibility | Editable |
+|-------|------------|----------|
+| Item Description | 👁️ Read-only | No |
+| Requested Quantity | 👁️ Read-only | No |
+| Approved Quantity | ✅ Editable | Yes |
+| Vendor | 👁️ Read-only | No |
+| Unit Price | 👁️ Read-only | No |
+| Discount | 👁️ Read-only | No |
+| FOC (Free of Charge) | 👁️ Read-only | No |
+| Budget Code | 👁️ Read-only | No |
 
 ---
 

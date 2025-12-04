@@ -4,14 +4,18 @@
 - **Module**: Procurement
 - **Sub-Module**: Credit Note (CN)
 - **Route**: `/procurement/credit-note`
-- **Version**: 1.0.0
-- **Last Updated**: 2025-11-01
+- **Version**: 1.0.4
+- **Last Updated**: 2025-12-03
 - **Owner**: Procurement Team
 - **Status**: Active
 
 ## Document History
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.0.4 | 2025-12-03 | Documentation Team | Added Periodic Average Cost as configurable costing method option alongside FIFO |
+| 1.0.3 | 2025-12-03 | Documentation Team | Added cross-references to Shared Methods (Inventory Valuation, Inventory Operations) |
+| 1.0.2 | 2025-12-03 | Documentation Team | Added Backend Requirements section (BR-BE-001 to BR-BE-014) to document server actions needed to support existing UI features |
+| 1.0.1 | 2025-12-03 | Documentation Team | Document history update for consistency across documentation set |
 | 1.0.0 | 2025-11-01 | Documentation Team | Initial version from source code analysis |
 
 
@@ -30,7 +34,7 @@ This module is essential for hospitality operations, managing vendor credits for
 3. **Financial Accuracy**: Generate accurate financial records including journal vouchers and tax adjustments for all credits
 4. **Multi-Currency Support**: Handle international vendor transactions with automatic currency conversion and exchange rate tracking
 5. **Audit Trail**: Maintain comprehensive activity logs for all credit note operations to support compliance and audits
-6. **FIFO Costing**: Apply First-In-First-Out costing methodology for accurate cost of goods calculations on returns
+6. **Configurable Costing Method**: Apply system-configured costing methodology (FIFO or Periodic Average) for accurate cost of goods calculations on returns
 7. **Tax Compliance**: Properly calculate and adjust input VAT for all credit transactions
 8. **Vendor Accountability**: Track credit reasons and patterns to identify vendor performance issues
 9. **Lot Tracking**: Maintain detailed lot-level tracking for items being returned or credited
@@ -70,14 +74,14 @@ The system must provide a comprehensive list view of all Credit Notes with sorti
 ### FR-CN-002: Create Quantity-Based Credit Note (Item Return)
 **Priority**: Critical
 
-The system must support creating credit notes for physical returns of goods, linked to specific GRN items and inventory lots with FIFO costing.
+The system must support creating credit notes for physical returns of goods, linked to specific GRN items and inventory lots with system-configured costing method.
 
 **Acceptance Criteria**:
 - Provide vendor selection interface to filter applicable GRNs
 - Display GRNs for selected vendor with invoice references
 - Allow selection of GRN and its line items for credit
-- Support lot-level selection with FIFO layer tracking
-- Calculate weighted average cost from lot history
+- Support lot-level selection with cost layer tracking (FIFO or Periodic Average based on system configuration)
+- Calculate unit cost based on configured costing method
 - Calculate cost variance between current price and historical cost
 - Calculate realized gain/loss on return
 - Track return quantity per item and lot
@@ -161,33 +165,41 @@ The system must provide an intuitive workflow for selecting vendor and associate
 
 ---
 
-### FR-CN-006: Item and Lot Selection with FIFO Costing
+### FR-CN-006: Item and Lot Selection with Inventory Costing
 **Priority**: Critical
 
-The system must support detailed item and lot selection with First-In-First-Out cost tracking for accurate financial calculations.
+The system must support detailed item and lot selection with cost tracking based on the system-configured costing method (FIFO or Periodic Average) for accurate financial calculations.
 
 **Acceptance Criteria**:
 - Display all line items from selected GRN
 - Show item details: product name, description, location, order quantity, unit price, order unit, inventory unit
+- Display current costing method indicator (FIFO or Periodic Average) from system configuration
 - Allow selection of items to credit via checkboxes
 - For QUANTITY_RETURN type:
   * Display lot information for each item (lot number, receive date, quantity, unit cost)
   * Allow selection of specific lots to return from
   * Support entry of return quantity per item
-  * Calculate FIFO summary:
+  * Calculate cost summary based on configured method:
+    **For FIFO Method:**
     - Total received quantity from all lots
-    - Weighted average cost across lots
+    - Weighted average cost across selected lots (oldest layers first)
+    - Cost breakdown by FIFO layer consumed
+    **For Periodic Average Method:**
+    - Average cost for the credit note's period
+    - Period used for calculation (month/year)
+    - Total quantity and value in period
+    **Common Calculations:**
     - Current unit price from GRN
-    - Cost variance (current price - weighted average cost)
+    - Cost variance (current price - calculated unit cost)
     - Return amount (return quantity × current price)
-    - Cost of goods sold (return quantity × weighted average cost)
+    - Cost of goods sold (return quantity × calculated unit cost)
     - Realized gain/loss (return amount - cost of goods sold)
   * Validate return quantity does not exceed available lot quantities
 - For AMOUNT_DISCOUNT type:
   * Support entry of discount amount per item
   * No lot selection required
   * Calculate tax impact on discount
-- Show expandable detail section for FIFO analysis
+- Show expandable detail section for cost analysis with method-specific details
 - Display summary totals at bottom
 
 **Related Requirements**: FR-CN-002, FR-CN-009
@@ -205,8 +217,8 @@ The system must automatically generate stock movement transactions when quantity
 - Track movements by lot number
 - Include location information (warehouse, store, department)
 - Record location type (INV for Inventory, CON for Consignment)
-- Calculate costs:
-  * Unit cost from lot FIFO layer
+- Calculate costs using system-configured costing method:
+  * Unit cost from FIFO layer (if FIFO) or period average (if Periodic Average)
   * Extra cost (if applicable)
   * Total cost (unit cost + extra cost) × quantity
 - Link stock movements to credit note reference
@@ -534,10 +546,12 @@ The system must support printing credit notes and exporting data for external us
 
 ### Calculation Rules
 
-- **BR-CN-030**: FIFO costing: Use weighted average cost across all applicable lots
-- **BR-CN-031**: Cost variance = Current unit price - Weighted average cost
+- **BR-CN-030**: Inventory costing: Use system-configured costing method (FIFO or Periodic Average) to calculate unit cost
+  - **FIFO**: Use weighted average cost across selected lots (oldest layers first)
+  - **Periodic Average**: Use average cost for the credit note's period
+- **BR-CN-031**: Cost variance = Current unit price - Calculated unit cost
 - **BR-CN-032**: Return amount = Return quantity × Current unit price
-- **BR-CN-033**: Cost of goods sold = Return quantity × Weighted average cost
+- **BR-CN-033**: Cost of goods sold = Return quantity × Calculated unit cost
 - **BR-CN-034**: Realized gain/loss = Return amount - Cost of goods sold
 - **BR-CN-035**: Tax amount = Base amount × Tax rate / 100
 - **BR-CN-036**: For multi-currency: Base currency amount = Transaction currency amount ×  Exchange rate
@@ -642,7 +656,7 @@ Line items within a credit note.
 - `unitPrice` (decimal 15,2)
 - `creditAmount` (decimal 15,2, credit quantity × unit price)
 - `discountAmount` (decimal 15,2, for AMOUNT_DISCOUNT type)
-- `costVariance` (decimal 15,2, current price - FIFO cost)
+- `costVariance` (decimal 15,2, current price - calculated unit cost)
 - `totalReceivedQuantity` (decimal 15,3, sum from lots)
 - `taxRate` (decimal 5,2)
 - `taxAmount` (decimal 15,2)
@@ -663,7 +677,7 @@ Junction table linking credit note items to specific inventory lots.
 - `grnNumber` (string, GRN that created the lot)
 - `invoiceNumber` (string, from original GRN)
 - `lotQuantity` (decimal 15,3, quantity from this lot)
-- `unitCost` (decimal 15,2, FIFO cost from lot)
+- `unitCost` (decimal 15,2, cost from lot based on configured costing method)
 
 **Relationships**:
 - Many-to-One with CreditNoteItem
@@ -687,13 +701,452 @@ Supporting documents for credit notes.
 
 ---
 
+## Backend Requirements
+
+This section documents the server-side functionality required to support the existing UI features. These requirements define the server actions, API endpoints, and database operations needed for full system functionality.
+
+### BR-BE-001: Credit Note CRUD Server Actions
+**Priority**: Critical
+**Supports UI**: Credit Note List, Detail View, Create/Edit Forms
+
+The system must provide server actions for basic credit note operations.
+
+**Required Server Actions**:
+```
+actions/
+├── getCreditNotes.ts        # List with filtering, sorting, pagination
+├── getCreditNoteById.ts     # Single credit note with all relations
+├── createCreditNote.ts      # Create new credit note
+├── updateCreditNote.ts      # Update draft credit note
+├── deleteCreditNote.ts      # Delete draft credit note only
+└── index.ts                 # Barrel export
+```
+
+**Acceptance Criteria**:
+- `getCreditNotes`: Support filters (status, vendor, date range, reason, type), sorting, search, pagination
+- `getCreditNoteById`: Return credit note with items, lots, attachments, journal entries, stock movements
+- `createCreditNote`: Validate required fields, generate CN number (CN-YYYY-NNNNNN), set status to DRAFT
+- `updateCreditNote`: Only allow updates on DRAFT status, validate all business rules
+- `deleteCreditNote`: Only allow deletion of DRAFT status, cascade delete items and attachments
+- All actions must use Supabase client with proper error handling
+- All actions must validate user authentication and authorization
+
+---
+
+### BR-BE-002: Vendor and GRN Data Fetching
+**Priority**: Critical
+**Supports UI**: Vendor Selection, GRN Selection Workflow
+
+The system must provide server actions to fetch vendor and GRN data for credit note creation.
+
+**Required Server Actions**:
+```
+actions/
+├── getActiveVendors.ts      # List active vendors with search
+├── getVendorGRNs.ts         # GRNs for selected vendor (COMMITTED only)
+├── getGRNDetails.ts         # Full GRN with items and lots
+└── getGRNItemLots.ts        # Lot details for specific GRN item
+```
+
+**Acceptance Criteria**:
+- `getActiveVendors`: Return vendors where `status = 'active'`, support search on name/code
+- `getVendorGRNs`: Return GRNs where `vendorId = X` AND `status = 'COMMITTED'`
+- `getGRNDetails`: Return GRN with all line items, quantities, prices, locations
+- `getGRNItemLots`: Return all inventory lots created from GRN item with cost data (calculated per system costing method)
+- Include lot balance validation (available quantity for return)
+
+---
+
+### BR-BE-003: Credit Note Commitment Transaction
+**Priority**: Critical
+**Supports UI**: Commit Button, Status Transition
+
+The system must provide a server action to commit credit notes with atomic transaction handling.
+
+**Required Server Action**: `commitCreditNote.ts`
+
+**Acceptance Criteria**:
+- Validate credit note is in DRAFT status
+- Validate all required fields are complete
+- Validate sufficient lot quantities available (for QUANTITY_RETURN)
+- Validate journal entries balance (debits = credits)
+- Execute in database transaction:
+  1. Update credit note status to COMMITTED
+  2. Set committedBy and committedDate
+  3. Generate stock movements (for QUANTITY_RETURN type)
+  4. Update inventory lot balances (reduce quantities)
+  5. Generate journal voucher entries
+  6. Update vendor accounts payable balance
+  7. Create audit log entry
+- Rollback all changes if any step fails
+- Return success with generated reference numbers (stock movement, journal voucher)
+- Lock credit note for editing after successful commit
+
+**Database Tables Affected**:
+- `credit_notes` (status update)
+- `stock_movements` (insert negative movements)
+- `inventory_lots` (reduce balances)
+- `journal_vouchers` (insert header)
+- `journal_voucher_lines` (insert debit/credit entries)
+- `vendor_balances` (reduce AP balance)
+- `audit_logs` (insert commit event)
+
+---
+
+### BR-BE-004: Credit Note Void Transaction
+**Priority**: High
+**Supports UI**: Delete/Void Button, Void Confirmation Dialog
+
+The system must provide a server action to void committed credit notes with full reversal.
+
+**Required Server Action**: `voidCreditNote.ts`
+
+**Acceptance Criteria**:
+- Validate credit note is in COMMITTED status
+- Require void reason (string, min 10 characters)
+- Check authorization (manager approval for amounts > $10,000)
+- Validate credit note not reconciled in bank statement
+- Execute in database transaction:
+  1. Update credit note status to VOID
+  2. Set voidedBy, voidedDate, voidReason
+  3. Generate reversal stock movements (positive quantities)
+  4. Restore inventory lot balances
+  5. Generate reversal journal entries (swap debits/credits)
+  6. Update vendor accounts payable (add back amount)
+  7. Create audit log entry with void reason
+- Return success with reversal reference numbers
+- Mark credit note as read-only
+
+---
+
+### BR-BE-005: Stock Movement Generation
+**Priority**: Critical
+**Supports UI**: Stock Movement Tab Display
+
+The system must generate and store stock movement records when credit notes are committed.
+
+**Required Functions**:
+```typescript
+interface StockMovementInput {
+  creditNoteId: number
+  creditNoteNumber: string
+  items: CreditNoteItem[]
+}
+
+async function generateStockMovements(input: StockMovementInput): Promise<StockMovement[]>
+```
+
+**Acceptance Criteria**:
+- Generate movements only for QUANTITY_RETURN type
+- Create one movement record per lot per item
+- Movement fields:
+  - `movementType`: 'CREDIT_NOTE'
+  - `sourceDocument`: Credit note number
+  - `quantity`: Negative value (reducing stock)
+  - `lotNumber`: From applied lots
+  - `locationCode`: From item location
+  - `locationType`: 'INV' or 'CON'
+  - `unitCost`: Calculated cost based on system costing method
+  - `totalCost`: quantity × unitCost
+  - `status`: 'POSTED'
+- Update `inventory_lots.balance` for each affected lot
+- Validate lot balance >= movement quantity before posting
+
+---
+
+### BR-BE-006: Journal Entry Generation
+**Priority**: Critical
+**Supports UI**: Journal Entries Tab Display
+
+The system must generate and store journal voucher entries when credit notes are committed.
+
+**Required Functions**:
+```typescript
+interface JournalEntryInput {
+  creditNoteId: number
+  creditNoteNumber: string
+  creditType: 'QUANTITY_RETURN' | 'AMOUNT_DISCOUNT'
+  items: CreditNoteItem[]
+  taxAmount: number
+  totalAmount: number
+}
+
+async function generateJournalEntries(input: JournalEntryInput): Promise<JournalVoucher>
+```
+
+**Acceptance Criteria**:
+- Generate journal voucher header with unique number (JV-YYYY-NNNNNN)
+- For QUANTITY_RETURN type:
+  - Debit: Accounts Payable (2100) - total amount
+  - Credit: Inventory Raw Materials (1140) - net amount
+  - Credit: Input VAT (1240) - tax amount
+  - Debit/Credit: Inventory Cost Variance (1145) - if variance exists
+- For AMOUNT_DISCOUNT type:
+  - Debit: Accounts Payable (2100) - total amount
+  - Credit: Input VAT (1240) - tax amount
+  - Credit: Purchase Discounts (4200) - net amount
+- Each line must include: account code, department, cost center, description, reference
+- Validate total debits = total credits before posting
+- Set journal status to 'POSTED'
+
+---
+
+### BR-BE-007: Tax Calculation Service
+**Priority**: Critical
+**Supports UI**: Tax Entries Tab Display
+
+The system must calculate and store tax adjustments for credit notes.
+
+**Required Functions**:
+```typescript
+interface TaxCalculationInput {
+  baseAmount: number
+  taxRate: number
+  originalBase: number
+  originalTax: number
+}
+
+interface TaxCalculationResult {
+  taxAmount: number
+  baseImpact: number
+  taxImpact: number
+  vatPeriod: string
+  reportingCode: string
+}
+
+async function calculateTaxAdjustment(input: TaxCalculationInput): Promise<TaxCalculationResult>
+```
+
+**Acceptance Criteria**:
+- Calculate tax amount: baseAmount × taxRate / 100
+- Determine VAT period from credit note date
+- Assign reporting code (BOX4 for input VAT adjustments)
+- Store tax adjustment record with:
+  - Tax type, code, rate
+  - Base amount, tax amount
+  - GL account code
+  - VAT period and due date
+- Support multiple tax rates per credit note
+
+---
+
+### BR-BE-008: Inventory Cost Calculation Service
+**Priority**: Critical
+**Supports UI**: Lot Selection, Cost Variance Display
+
+The system must calculate inventory costs for credit note items using the system-configured costing method (FIFO or Periodic Average).
+
+**Costing Method Configuration**:
+The costing method is set at the system level in System Administration → Inventory Settings:
+- **FIFO (First-In-First-Out)**: Costs are calculated based on the oldest inventory layers first
+- **Periodic Average**: Costs are calculated using the weighted average cost for the period
+
+**Required Functions**:
+```typescript
+type CostingMethod = 'FIFO' | 'PERIODIC_AVERAGE'
+
+interface CostCalculationInput {
+  grnItemId: number
+  returnQuantity: number
+  selectedLots: string[]
+  creditNoteDate: Date
+}
+
+interface CostCalculationResult {
+  costingMethod: CostingMethod
+  unitCost: number
+  totalCost: number
+  costVariance: number
+  returnAmount: number
+  costOfGoodsSold: number
+  realizedGainLoss: number
+
+  // FIFO-specific data (when method = 'FIFO')
+  lotBreakdown?: LotCostDetail[]
+  layersConsumed?: FIFOLayerConsumption[]
+
+  // Periodic Average-specific data (when method = 'PERIODIC_AVERAGE')
+  period?: Date  // Month/year used for average calculation
+  averageCost?: number
+  totalQuantityInPeriod?: number
+  totalValueInPeriod?: number
+}
+
+async function calculateInventoryCost(input: CostCalculationInput): Promise<CostCalculationResult>
+```
+
+**Acceptance Criteria**:
+- Retrieve system costing method from configuration
+- **For FIFO Method**:
+  - Query inventory lots for selected GRN item
+  - Calculate weighted average cost across selected lots using oldest layers first
+  - Return lot-level breakdown with quantities and costs
+  - Track which FIFO layers are consumed
+- **For Periodic Average Method**:
+  - Calculate average cost for the credit note's period (month/year)
+  - Use formula: Total Value of Receipts in Period ÷ Total Quantity Received in Period
+  - If no receipts in period, use most recent period with receipts
+- **Common Calculations**:
+  - Calculate cost variance: current price - calculated unit cost
+  - Calculate return amount: return quantity × current price
+  - Calculate COGS: return quantity × calculated unit cost
+  - Calculate realized gain/loss: return amount - COGS
+- Display costing method indicator in UI
+- Handle edge cases (no receipts, zero quantities)
+
+**Shared Method Reference**: Uses Inventory Valuation Service from [SM-inventory-valuation.md](../../shared-methods/inventory-valuation/SM-inventory-valuation.md) for centralized cost calculation logic.
+
+---
+
+### BR-BE-009: Attachment Management
+**Priority**: Medium
+**Supports UI**: Attachments Panel, File Upload
+
+The system must provide server actions for attachment upload and management.
+
+**Required Server Actions**:
+```
+actions/
+├── uploadAttachment.ts      # Upload file to storage
+├── getAttachments.ts        # List attachments for credit note
+├── deleteAttachment.ts      # Remove attachment (DRAFT only)
+└── downloadAttachment.ts    # Generate download URL
+```
+
+**Acceptance Criteria**:
+- Upload files to Supabase Storage bucket `credit-note-attachments`
+- Validate file type (PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, GIF)
+- Validate file size (max 10MB)
+- Store metadata in `credit_note_attachments` table
+- Only allow deletion for DRAFT status credit notes
+- Generate signed URLs for secure downloads
+- Record uploadedBy and uploadDate
+
+---
+
+### BR-BE-010: Audit Logging
+**Priority**: High
+**Supports UI**: Audit Log Panel
+
+The system must log all credit note operations for audit trail.
+
+**Required Function**:
+```typescript
+interface AuditLogEntry {
+  entityType: 'CREDIT_NOTE'
+  entityId: number
+  action: 'CREATE' | 'UPDATE' | 'COMMIT' | 'VOID' | 'DELETE'
+  userId: string
+  userName: string
+  timestamp: Date
+  details: string
+  previousValues?: object
+  newValues?: object
+}
+
+async function createAuditLog(entry: AuditLogEntry): Promise<void>
+```
+
+**Acceptance Criteria**:
+- Log all create, update, commit, void, delete operations
+- Store user ID and name who performed action
+- Store timestamp of action
+- Store human-readable description of changes
+- For updates, store previous and new values
+- Audit logs must be immutable (no update or delete allowed)
+- Support querying audit logs by entity ID
+
+---
+
+### BR-BE-011: Credit Note Number Generation
+**Priority**: Critical
+**Supports UI**: Credit Note Creation
+
+The system must generate unique sequential credit note numbers.
+
+**Required Function**:
+```typescript
+async function generateCreditNoteNumber(): Promise<string>
+// Returns: "CN-2024-000001"
+```
+
+**Acceptance Criteria**:
+- Format: CN-YYYY-NNNNNN (year + 6-digit sequence)
+- Sequence resets annually
+- Must be atomic to prevent duplicate numbers
+- Use database sequence or transaction-safe increment
+- Number must be unique across all credit notes
+
+---
+
+### BR-BE-012: Vendor Balance Update
+**Priority**: High
+**Supports UI**: Vendor Account Reconciliation
+
+The system must update vendor accounts payable balance when credit notes are committed or voided.
+
+**Required Functions**:
+```typescript
+async function reduceVendorBalance(vendorId: number, amount: number, reference: string): Promise<void>
+async function restoreVendorBalance(vendorId: number, amount: number, reference: string): Promise<void>
+```
+
+**Acceptance Criteria**:
+- Reduce vendor AP balance on credit note commit
+- Restore vendor AP balance on credit note void
+- Store transaction reference for reconciliation
+- Update `vendor_balances` table with new balance
+- Create balance history record for audit
+
+---
+
+### BR-BE-013: Data Validation Service
+**Priority**: Critical
+**Supports UI**: Form Validation, Commit Validation
+
+The system must provide comprehensive validation for credit note data.
+
+**Required Validation Functions**:
+```typescript
+async function validateCreditNoteForCommit(creditNoteId: number): Promise<ValidationResult>
+async function validateReturnQuantities(items: CreditNoteItem[]): Promise<ValidationResult>
+async function validateJournalBalance(entries: JournalEntry[]): Promise<ValidationResult>
+```
+
+**Validation Rules to Implement**:
+- All required fields populated
+- Credit note date not in future
+- Credit note date within 90 days of GRN date
+- Return quantities do not exceed lot balances
+- Total amounts are positive with max 2 decimal places
+- Journal entries balance (debits = credits)
+- Exchange rate is valid positive number
+- Tax rate between 0 and 100
+- Credit reason is valid enum value
+
+---
+
+### BR-BE-014: Real-time Data Sync
+**Priority**: Medium
+**Supports UI**: List View Auto-refresh, Concurrent Edit Detection
+
+The system should support real-time updates for collaborative use.
+
+**Acceptance Criteria**:
+- Use Supabase Realtime subscriptions for credit note changes
+- Detect concurrent edits and notify users
+- Auto-refresh list view when new credit notes are created
+- Show optimistic updates with rollback on failure
+
+---
+
 ## Non-Functional Requirements
 
 ### Performance
 - **NFR-CN-001**: Credit note list page must load within 2 seconds for up to 10,000 records
 - **NFR-CN-002**: Search and filter operations must return results within 1 second
 - **NFR-CN-003**: Credit note commitment (posting) must complete within 5 seconds for single credit
-- **NFR-CN-004**: FIFO calculation for lot selection must complete within 3 seconds for up to 100 lots
+- **NFR-CN-004**: Cost calculation (FIFO or Periodic Average) for lot selection must complete within 3 seconds for up to 100 lots
 - **NFR-CN-005**: System must support concurrent creation of 20 credit notes without performance degradation
 - **NFR-CN-006**: Journal entry generation must complete within 2 seconds
 
@@ -705,7 +1158,7 @@ Supporting documents for credit notes.
 - **NFR-CN-014**: Validation errors must be displayed inline next to relevant fields
 - **NFR-CN-015**: Success and error notifications must be prominently displayed
 - **NFR-CN-016**: Keyboard navigation must be supported for power users
-- **NFR-CN-017**: FIFO calculations and cost variance must be clearly explained in UI
+- **NFR-CN-017**: Cost calculations (FIFO or Periodic Average) and cost variance must be clearly explained in UI with method indicator
 
 ### Reliability
 - **NFR-CN-020**: System must maintain 99.5% uptime during business hours
@@ -774,6 +1227,8 @@ Supporting documents for credit notes.
 - **Finance Module**: Posts journal entries and tax adjustments
 - **Vendor Management**: Vendor master data and accounts payable balances
 - **User Management**: Authentication, authorization, and user information
+- **System Configuration**: Inventory Settings for costing method (FIFO or Periodic Average)
+- **Shared Methods**: Inventory Valuation Service (FIFO/Periodic Average costing), Inventory Operations Service (stock movements, audit trail, state management)
 
 ### External Systems
 - **ERP System**: May integrate with external ERP for GL posting
@@ -808,18 +1263,24 @@ Supporting documents for credit notes.
 - Limited to single GRN reference per credit note
 - Maximum attachment size: 10MB per file
 - Credit note date cannot exceed 90 days after GRN
-- FIFO costing methodology is mandatory
+- Costing method (FIFO or Periodic Average) is configured at system level and applies consistently across all credit notes
 
 ---
 
 ## Related Documents
 
+### Module Documentation
 - **Use Cases**: [UC-credit-note.md](./UC-credit-note.md)
 - **Technical Specification**: [TS-credit-note.md](./TS-credit-note.md)
 - **Data Definition**: [DD-credit-note.md](./DD-credit-note.md)
 - **Flow Diagrams**: [FD-credit-note.md](./FD-credit-note.md)
 - **Validations**: [VAL-credit-note.md](./VAL-credit-note.md)
 - **GRN Business Requirements**: [../goods-received-note/BR-goods-received-note.md](../goods-received-note/BR-goods-received-note.md)
+
+### Shared Methods
+- **Inventory Valuation Service**: [SM-inventory-valuation.md](../../shared-methods/inventory-valuation/SM-inventory-valuation.md) - Centralized FIFO/Periodic Average costing calculations
+- **Credit Note Integration Example**: [credit-note-integration.md](../../shared-methods/inventory-valuation/examples/credit-note-integration.md) - Implementation guide for cost calculation integration
+- **Inventory Operations Service**: [SM-inventory-operations.md](../../shared-methods/inventory-operations/SM-inventory-operations.md) - Stock movements, audit trail, state management, atomic transactions
 
 ---
 

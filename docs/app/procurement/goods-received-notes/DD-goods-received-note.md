@@ -4,14 +4,16 @@
 - **Module**: Procurement
 - **Sub-Module**: Goods Received Note (GRN)
 - **Database**: PostgreSQL (via Supabase)
-- **Schema Version**: 1.0.0
-- **Last Updated**: 2025-01-11
+- **Schema Version**: 1.0.2
+- **Last Updated**: 2025-12-03
 - **Owner**: Procurement Team
 - **Status**: Approved
 
 ## Document History
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 1.0.2 | 2025-12-03 | Documentation Team | Added context for inventory costing methods (FIFO or Periodic Average) used for inventory valuation |
+| 1.0.1 | 2025-12-03 | Documentation Team | Verified coverage against BR requirements (FR-GRN-001 to FR-GRN-017) |
 | 1.0.0 | 2025-01-11 | Documentation Team | Initial version from type definitions analysis |
 
 ---
@@ -471,7 +473,7 @@ The data model consists of four primary entities: GoodsReceiveNote (header), Goo
 
 **Description**: Represents additional costs associated with goods receipt beyond item prices, such as freight, handling fees, insurance, and customs duties. These costs are distributed across received items using configurable methods.
 
-**Business Purpose**: Accurate cost accounting by allocating all receipt-related costs to inventory items, ensuring true landed cost is reflected in inventory valuation.
+**Business Purpose**: Accurate cost accounting by allocating all receipt-related costs to inventory items, ensuring true landed cost is reflected in inventory valuation. This landed cost becomes the basis for inventory layers used by the system-configured costing method (FIFO or Periodic Average) when inventory is consumed.
 
 **Data Ownership**: Procurement and Finance Departments
 
